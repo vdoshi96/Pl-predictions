@@ -65,7 +65,8 @@ test("production public routes are mobile-safe and healthy", async ({
     const requestUrl = new URL(request.url());
     const errorText = request.failure()?.errorText ?? "failed";
     const isCanceledRscPrefetch =
-      requestUrl.searchParams.has("_rsc") && errorText.includes("ERR_ABORTED");
+      requestUrl.searchParams.has("_rsc") &&
+      /(?:ERR_ABORTED|cancelled|canceled)/iu.test(errorText);
     if (requestUrl.origin === productionOrigin && !isCanceledRscPrefetch) {
       networkErrors.push(`${request.method()} ${request.url()} ${errorText}`);
     }

@@ -51,10 +51,17 @@
 - Published the tested feature history to [vdoshi96/Pl-predictions](https://github.com/vdoshi96/Pl-predictions), merged it into the canonical `main` release branch, synchronized local and remote `main`, and removed completed branch/worktree state.
 - Published the final production evidence and mobile screenshots to the same canonical `main` release branch; local and remote release state are synchronized.
 
-### Dranx branding iteration (release verification in progress)
+### Dranx branding iteration (production verified; GitHub closeout pending)
 
 - Selected **Dranx Prediction League** as the user-facing identity while retaining the repository, Vercel, Neon, URL, environment, and credential identifiers already used operationally.
 - Defined a Premier-League-inspired palette anchored on official purple `#37003c` with cyan `#05f0ff`, green `#00ff87`, and pink `#ff2882` accents and an original Dranx mark.
 - Confirmed that FotMob crest downloads and the official Premier League logo were not added because repository policy and the current official terms require authorization before copying or redistributing those marks.
 - Retained the 20 local monograms and updated `TeamMark` with contain sizing and a labelled initials fallback for transparent authorized crest assets in a future permitted update.
-- Completed canonical Markdown and deterministic HTML updates, ESLint, strict TypeScript, 97 default tests with 9 guarded skips, 9 isolated Neon integration tests, the Webpack production build, and 5 focused Playwright journeys with 20 routing skips. The aggregate `npm run check` passes. Deployment, production verification, final QA evidence, and GitHub closeout remain pending for this iteration.
+- Completed canonical Markdown and deterministic HTML updates, ESLint, strict TypeScript, 97 default tests with 9 guarded skips, 9 isolated Neon integration tests, the Webpack production build, and 5 focused Playwright journeys with 20 routing skips. The aggregate `npm run check` passed before the final production-evidence refresh.
+- Deployed Ready production `dpl_BPJUGKA7CJF7bhaUCTHjUx2cPEK7` at [https://pl-predictions-pizpoqt4u-vdoshi96s-projects.vercel.app](https://pl-predictions-pizpoqt4u-vdoshi96s-projects.vercel.app) with target `production`; Vercel built Next.js 16.3.0 with Turbopack and the stable public alias was repointed to it.
+- Confirmed that the stable public alias returned 200 while the retained protected preview returned 302 to Vercel SSO.
+- Passed the final read-only production smoke against the stable alias in all 5 projects across desktop Chromium, mobile Chromium at 390 pixels, exact 320/430-pixel reflow, and mobile WebKit. No browser, page, unexpected same-origin request, or HTTP errors occurred; the request hook excluded only cross-browser expected canceled `_rsc` navigational prefetches.
+- Reviewed Vercel logs for the preceding hour and found zero error entries and zero HTTP 500 responses.
+- Refreshed and visually inspected the prediction, review, leaderboard, and administrator-login production screenshots at 390 by 844 pixels.
+- Kept the branding-only production verification read-only: no production write smoke ran and no production data changed. The prior release's exact-ID write and cleanup evidence remains intentional history.
+- Draft GitHub PR #1 remains pending review and merge; no publication, local-`main` synchronization, or worktree cleanup is claimed for this iteration yet.

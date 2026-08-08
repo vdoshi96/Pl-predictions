@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="canonical-source" content="LOG.md" />
-    <meta name="canonical-source-sha256" content="ada561971affa564ab61e1e9306384dd6c9375c3a8fd1d85a9a512a49421726d" />
+    <meta name="canonical-source-sha256" content="6e3cc3e56d60db941b70a789f7a78fe7b7f47e81039b05804012a73e7d77138c" />
     <title>Session log</title>
     <style>
       :root { color-scheme: light dark; font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
@@ -89,16 +89,23 @@
 <li>Published the tested feature history to <a href="https://github.com/vdoshi96/Pl-predictions">vdoshi96/Pl-predictions</a>, merged it into the canonical <code>main</code> release branch, synchronized local and remote <code>main</code>, and removed completed branch/worktree state.</li>
 <li>Published the final production evidence and mobile screenshots to the same canonical <code>main</code> release branch; local and remote release state are synchronized.</li>
 </ul>
-<h3>Dranx branding iteration (release verification in progress)</h3>
+<h3>Dranx branding iteration (production verified; GitHub closeout pending)</h3>
 <ul>
 <li>Selected <strong>Dranx Prediction League</strong> as the user-facing identity while retaining the repository, Vercel, Neon, URL, environment, and credential identifiers already used operationally.</li>
 <li>Defined a Premier-League-inspired palette anchored on official purple <code>#37003c</code> with cyan <code>#05f0ff</code>, green <code>#00ff87</code>, and pink <code>#ff2882</code> accents and an original Dranx mark.</li>
 <li>Confirmed that FotMob crest downloads and the official Premier League logo were not added because repository policy and the current official terms require authorization before copying or redistributing those marks.</li>
 <li>Retained the 20 local monograms and updated <code>TeamMark</code> with contain sizing and a labelled initials fallback for transparent authorized crest assets in a future permitted update.</li>
-<li>Completed canonical Markdown and deterministic HTML updates, ESLint, strict TypeScript, 97 default tests with 9 guarded skips, 9 isolated Neon integration tests, the Webpack production build, and 5 focused Playwright journeys with 20 routing skips. The aggregate <code>npm run check</code> passes. Deployment, production verification, final QA evidence, and GitHub closeout remain pending for this iteration.</li>
+<li>Completed canonical Markdown and deterministic HTML updates, ESLint, strict TypeScript, 97 default tests with 9 guarded skips, 9 isolated Neon integration tests, the Webpack production build, and 5 focused Playwright journeys with 20 routing skips. The aggregate <code>npm run check</code> passed before the final production-evidence refresh.</li>
+<li>Deployed Ready production <code>dpl_BPJUGKA7CJF7bhaUCTHjUx2cPEK7</code> at <a href="https://pl-predictions-pizpoqt4u-vdoshi96s-projects.vercel.app">https://pl-predictions-pizpoqt4u-vdoshi96s-projects.vercel.app</a> with target <code>production</code>; Vercel built Next.js 16.3.0 with Turbopack and the stable public alias was repointed to it.</li>
+<li>Confirmed that the stable public alias returned 200 while the retained protected preview returned 302 to Vercel SSO.</li>
+<li>Passed the final read-only production smoke against the stable alias in all 5 projects across desktop Chromium, mobile Chromium at 390 pixels, exact 320/430-pixel reflow, and mobile WebKit. No browser, page, unexpected same-origin request, or HTTP errors occurred; the request hook excluded only cross-browser expected canceled <code>_rsc</code> navigational prefetches.</li>
+<li>Reviewed Vercel logs for the preceding hour and found zero error entries and zero HTTP 500 responses.</li>
+<li>Refreshed and visually inspected the prediction, review, leaderboard, and administrator-login production screenshots at 390 by 844 pixels.</li>
+<li>Kept the branding-only production verification read-only: no production write smoke ran and no production data changed. The prior release&#39;s exact-ID write and cleanup evidence remains intentional history.</li>
+<li>Draft GitHub PR #1 remains pending review and merge; no publication, local-<code>main</code> synchronization, or worktree cleanup is claimed for this iteration yet.</li>
 </ul>
 
-      <p class="source">Generated deterministically from <a href="LOG.md">docs/context/LOG.md</a>. Canonical SHA-256: <code>ada561971affa564ab61e1e9306384dd6c9375c3a8fd1d85a9a512a49421726d</code>.</p>
+      <p class="source">Generated deterministically from <a href="LOG.md">docs/context/LOG.md</a>. Canonical SHA-256: <code>6e3cc3e56d60db941b70a789f7a78fe7b7f47e81039b05804012a73e7d77138c</code>.</p>
     </main>
   </body>
 </html>

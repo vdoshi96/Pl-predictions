@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="canonical-source" content="LOG.md" />
-    <meta name="canonical-source-sha256" content="83efba26b5b8ac9cba41e79fbe96f90c594a68c47cc69f3928b2f5b56ed54a0d" />
+    <meta name="canonical-source-sha256" content="5d7cf75713e7e6c1b90abc26494088557613d2390d2296e750fde75fd9d49dc0" />
     <title>Session log</title>
     <style>
       :root { color-scheme: light dark; font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
@@ -124,15 +124,24 @@
 <li>Kept browser verification read-only; no production prediction or standings rows were written. Recaptured and visually inspected the newest prediction, review, leaderboard, and administrator-login mobile evidence.</li>
 <li>Regenerated and checked every HTML peer, published the evidence-only closeout through canonical <code>main</code>, synchronized local and remote <code>main</code>, removed completed branch/worktree state, and retained one primary worktree.</li>
 </ul>
-<h3>Owner-provided club badge iteration</h3>
+<h3>Owner-provided club badge iteration (complete)</h3>
 <ul>
 <li>Received a project-owner-supplied folder containing exactly one transparent 2048-by-2048 PNG badge for each of the 20 verified clubs plus eight out-of-scope Premier League logo/lion/ball/composite files.</li>
 <li>Copied only the 20 club badges into <code>public/team-marks/</code> under canonical slug filenames, changed all fixture paths from SVG to PNG, retained the original monograms as rollback-only first-release files, and excluded all league-brand extras.</li>
 <li>Kept the shared <code>TeamMark</code> contain sizing and labelled initials-on-error fallback, updated the user-facing rights wording, and added fixture coverage that requires a local PNG file for every canonical team path.</li>
 <li>Planned the production transition as deploy first, then idempotent seed, so existing Neon SVG paths remain valid until the PNG files are available.</li>
+<li>Passed the aggregate local <code>CI=1 npm run check</code>: documentation parity, formatting, ESLint, strict TypeScript, 115 default tests with 10 guarded skips, all 10 isolated Neon integration cases, the Webpack production build, and 8 deterministic browser journeys with 22 intentional project-routing skips.</li>
+<li>Merged GitHub <a href="https://github.com/vdoshi96/Pl-predictions/pull/5">PR #5</a> into canonical <code>main</code> at <code>1c8a20bc0a689f39d5cb392753d3582aa616bdbc</code>, then verified Ready production deployment <code>dpl_2z72V3tGKDssEAggjqMEH4PQQsYN</code> at <a href="https://pl-predictions-6hs8vokup-vdoshi96s-projects.vercel.app">https://pl-predictions-6hs8vokup-vdoshi96s-projects.vercel.app</a> and repointed the stable alias with explicit owner approval.</li>
+<li>Confirmed the stable alias served the home page and raw PNG files with 200 responses before running the explicitly approved idempotent production seed. The active season changed from 20 SVG/0 PNG paths to 0 SVG/20 PNG paths with no fixture mismatch; the non-path team metadata digest stayed <code>dc907bd0e26186a76d62210381ee593f44225f7c0557f8cede6d43c7dfae7910</code>, while prediction, standings-snapshot, and standings-item counts each stayed zero.</li>
+<li>Strengthened the production smoke for Safari-style lazy loading: every prediction and review-dialog club mark must complete with a nonzero natural width, and only cancelled Next Image candidates for those already-required local marks are excluded from generic request-failure reporting.</li>
+<li>Passed the final read-only production smoke in all 5 projects across desktop Chromium, mobile Chromium at 390 pixels, exact 320/430-pixel Chromium reflow, and mobile WebKit. Refreshed and visually inspected the newest prediction, review, leaderboard, and administrator-login screenshots; the sorter and review dialog display the new badges without horizontal clipping.</li>
+<li>Independently inspected the stable alias in a headed browser: all 20 marks decoded from PNG sources, no initials fallback appeared, all 20 optimized image requests returned 200, the console had zero messages, and desktop plus narrow viewports had no horizontal overflow.</li>
+<li>Reviewed the exact deployment&#39;s newest 500 production log records in the preceding 30-minute window: all 500 were HTTP 200, with zero warnings, errors, 4xx, or 5xx responses.</li>
+<li>Diagnosed the first final aggregate rerun&#39;s WebKit timeout as a five-second UI wait expiring while the standings save still completed. Removed the exact isolated snapshot, two import runs, and two audit rows left by that attempt/retry, restored the season pointer/watermark, expanded only that server-action wait to 20 seconds, and passed both a 13.3-second targeted WebKit rerun and the clean complete aggregate chain. Final test-database verification found zero snapshots, runs, audits, or <code>Mobile QA</code> predictions.</li>
+<li>Regenerated and checked every HTML peer, published the evidence-only closeout through canonical <code>main</code>, synchronized local and remote <code>main</code>, removed completed badge branch/worktree state, and retained only the primary worktree. The final closeout merge SHA is intentionally not pinned in this durable end-state note.</li>
 </ul>
 
-      <p class="source">Generated deterministically from <a href="LOG.md">docs/context/LOG.md</a>. Canonical SHA-256: <code>83efba26b5b8ac9cba41e79fbe96f90c594a68c47cc69f3928b2f5b56ed54a0d</code>.</p>
+      <p class="source">Generated deterministically from <a href="LOG.md">docs/context/LOG.md</a>. Canonical SHA-256: <code>5d7cf75713e7e6c1b90abc26494088557613d2390d2296e750fde75fd9d49dc0</code>.</p>
     </main>
   </body>
 </html>

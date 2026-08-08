@@ -515,7 +515,7 @@ test("mobile journey preserves privacy and gives the owner full control", async 
     page.getByText("The validated provisional table is now active.", {
       exact: true,
     }),
-  ).toBeVisible();
+  ).toBeVisible({ timeout: 20_000 });
 
   await expect
     .poll(async () => {

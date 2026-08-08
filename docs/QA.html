@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="canonical-source" content="QA.md" />
-    <meta name="canonical-source-sha256" content="8b878a39c3c18ae000175e3f046ddd7a9cdb813a5d0f3f6a82705daade7ee5b1" />
+    <meta name="canonical-source-sha256" content="e53e05c10fc912d229374acb7ed684272af672062d832bb05a07ed034beeb331" />
     <title>Quality assurance</title>
     <style>
       :root { color-scheme: light dark; font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
@@ -39,7 +39,7 @@
   <body>
     <main>
       <h1>Quality assurance</h1>
-<p>Evidence date: 2026-08-08. This document records the newest completed local verification for the owner-provided club badge iteration and the latest completed production evidence from the preceding Gameweek 1 release. Badge-specific production verification runs only after GitHub <code>main</code> contains the PNG files and the idempotent seed updates the 20 production asset paths. Prior-release write and cleanup evidence is retained below as intentional history.</p>
+<p>Evidence date: 2026-08-08. This document records the newest completed local and production verification for the owner-provided club badge iteration. The feature is merged, the PNG deployment is live at the stable alias, all 20 production asset paths are migrated, and the mobile evidence has been refreshed. Prior-release write and cleanup evidence is retained below as intentional history.</p>
 <h2>Current results</h2>
 <table>
 <thead>
@@ -111,31 +111,36 @@
 </tr>
 <tr>
 <td>Vercel production build</td>
-<td>deployment <code>dpl_4UEPWvwSECSwCHMUvLpacwmNjo1t</code></td>
-<td>Ready with target <code>production</code> for GitHub merge <code>65841c8</code>; Vercel built the application with Next.js 16.3.0 and Turbopack. The stable public alias was repointed and returned 200.</td>
+<td>deployment <code>dpl_2z72V3tGKDssEAggjqMEH4PQQsYN</code></td>
+<td>Ready with target <code>production</code> for GitHub merge <code>1c8a20b</code>; the stable alias points to it, and both the home page and raw PNG asset returned 200 before the production seed.</td>
 </tr>
 <tr>
 <td>Anonymous production smoke</td>
 <td><code>npm run test:production-smoke</code></td>
-<td>5 passed against the stable alias across desktop Chromium, mobile Chromium at 390 pixels, exact 320/430-pixel reflow projects, and mobile WebKit, with no browser, page, unexpected same-origin request, or HTTP errors.</td>
+<td>5 passed against the stable alias across desktop Chromium, mobile Chromium at 390 pixels, exact 320/430-pixel reflow projects, and mobile WebKit. All prediction and review-dialog marks loaded from PNG sources.</td>
+</tr>
+<tr>
+<td>Headed production badge check</td>
+<td>stable alias, desktop and narrow Chromium</td>
+<td>20 of 20 marks decoded from PNG sources, no initials fallback appeared, all 20 optimized requests returned 200, the console had zero messages, and no horizontal overflow occurred.</td>
 </tr>
 <tr>
 <td>Bounded production write smoke</td>
 <td><code>npm run test:production-write-smoke</code></td>
-<td>Not run for this timing/leaderboard iteration. Historical prior-release evidence: 1 passed with an exact QA submit/privacy/delete journey and exact cleanup.</td>
+<td>Not run for this badge iteration. Historical prior-release evidence: 1 passed with an exact QA submit/privacy/delete journey and exact cleanup.</td>
 </tr>
 <tr>
 <td>Production data mutation</td>
-<td>reviewed forward migration only</td>
-<td>Migration <code>0002</code> is applied; kickoff is <code>2026-08-21T19:00:00.000Z</code>, the optional earlier deadline is null, and the season remains unlocked and unrevealed. No participant or standings write smoke ran.</td>
+<td>explicitly approved idempotent seed</td>
+<td>Asset paths changed from 20 SVG/0 PNG to 0 SVG/20 exact PNG fixture matches. Non-path team metadata was unchanged; prediction, standings-snapshot, and standings-item counts each stayed zero.</td>
 </tr>
 <tr>
 <td>Vercel runtime logs</td>
-<td>final deployment, preceding 15 minutes</td>
-<td>Zero error entries and zero HTTP 500 responses.</td>
+<td>exact deployment, newest 500 within 30 minutes</td>
+<td>All 500 records were HTTP 200; zero warnings, errors, 4xx, or 5xx responses.</td>
 </tr>
 </tbody></table>
-<p>The local sandbox did not permit a default Turbopack CSS helper to bind its internal port, so the local production gate used <code>next build --webpack</code>. This was an execution-environment restriction, not an application compile error; Vercel deployment <code>dpl_4UEPWvwSECSwCHMUvLpacwmNjo1t</code> subsequently passed the Next.js 16.3.0 Turbopack production build.</p>
+<p>The local sandbox did not permit a default Turbopack CSS helper to bind its internal port, so the local production gate used <code>next build --webpack</code>. This was an execution-environment restriction, not an application compile error; Vercel deployment <code>dpl_2z72V3tGKDssEAggjqMEH4PQQsYN</code> subsequently passed the production build.</p>
 <h2>Unit and component coverage</h2>
 <p>The 115-test default run covers:</p>
 <ul>
@@ -189,19 +194,20 @@
 <li>the administrator deletes the test entry and the leaderboard no longer contains it; and</li>
 <li>after each run, the test restores the original season deadline/lock/reveal/active/final pointers and removes its participant, snapshot, import, and audit rows.</li>
 </ul>
+<p>The first final aggregate rerun exposed a local WebKit timing boundary: its five-second success-message wait expired while the standings server action was still pending, then the request completed and the retry correctly returned a duplicate. Exact isolated cleanup restored the null active snapshot and accepted-through watermark, deleted snapshot <code>9ca94c9f-16c2-51b2-ae1a-de347fcd8aaf</code>, import runs <code>400c1cb5-58e8-48a3-8cb6-921ae73ce01e</code> and <code>4055de69-2589-4185-accc-5abcbef5b65d</code>, and audit rows <code>8301ddc6-388f-48c1-9eac-e4c916828a44</code> and <code>6a4ace78-e9e3-4fe3-877a-06c6d1573602</code>. The scoped UI wait is now 20 seconds. A targeted WebKit rerun passed in 13.3 seconds, the complete aggregate rerun passed all 8 routed journeys with 22 intentional skips, and the final query found zero snapshots, runs, audits, or <code>Mobile QA</code> predictions with all season flags/pointers restored.</p>
 <p>The touch helpers honor the sorter&#39;s 250-millisecond activation constraint before movement. Chromium and WebKit can resolve the moving target at adjacent insertion boundaries, so the journey verifies touch movement independently, resets, and submits a deterministic keyboard order. The isolated clock keeps these paths reproducible after the real 2026 kickoff without creating a production bypass. Automated WebKit emulation is strong regression evidence, but it is not a substitute for a final spot check on the owner&#39;s physical iPhone when one is available.</p>
 <h2>Production deployment evidence</h2>
 <p>The owner explicitly approved changing Vercel Authentication to <code>preview</code>. The retained preview at <a href="https://pl-predictions-lkmdwjsh8-vdoshi96s-projects.vercel.app">https://pl-predictions-lkmdwjsh8-vdoshi96s-projects.vercel.app</a> still returns a 302 redirect to Vercel SSO, while the stable public production alias <a href="https://pl-predictions-2026.vercel.app">https://pl-predictions-2026.vercel.app</a> returns 200. Preview protection was not disabled.</p>
-<p>The Gameweek 1 lock release deployment <code>dpl_4UEPWvwSECSwCHMUvLpacwmNjo1t</code> is Ready with target <code>production</code> at immutable URL <a href="https://pl-predictions-428nljcvk-vdoshi96s-projects.vercel.app">https://pl-predictions-428nljcvk-vdoshi96s-projects.vercel.app</a>. Its metadata identifies GitHub <code>main</code> merge <code>65841c8d458c1912c25a151c531b2d0538490fc5</code>, and Vercel built it with Next.js 16.3.0 and Turbopack. The stable public alias was repointed to the release and returned 200. The final evidence-only closeout deployment is intentionally not pinned here; it contains no runtime application change beyond this verified release. The project remains <code>vdoshi96s-projects/pl-predictions</code> with Marketplace Neon resource <code>neon-coffee-queen</code>.</p>
+<p>GitHub <a href="https://github.com/vdoshi96/Pl-predictions/pull/5">PR #5</a> merged the tested badge feature into canonical <code>main</code> at <code>1c8a20bc0a689f39d5cb392753d3582aa616bdbc</code>. Deployment <code>dpl_2z72V3tGKDssEAggjqMEH4PQQsYN</code> is Ready with target <code>production</code> at immutable URL <a href="https://pl-predictions-6hs8vokup-vdoshi96s-projects.vercel.app">https://pl-predictions-6hs8vokup-vdoshi96s-projects.vercel.app</a>. The stable public alias was explicitly approved for repointing, resolves to that exact deployment, and returned 200 for both the home page and raw Arsenal PNG before the database transition. The project remains <code>vdoshi96s-projects/pl-predictions</code> with Marketplace Neon resource <code>neon-coffee-queen</code>. The final evidence-only closeout deployment is intentionally not pinned here because it changes no runtime application behavior.</p>
 <p>Historical prior-release context: an initial production verification exposed a Vercel edge 404 even though its deployment reported Ready. The project framework preset was null; correcting it to <code>nextjs</code> and deploying again resolved the routing failure. Prior deployment <code>dpl_JCfjcxvtVVfbsU55mmTppBK2FB9G</code> then became Ready at <a href="https://pl-predictions-65aqenfnq-vdoshi96s-projects.vercel.app">https://pl-predictions-65aqenfnq-vdoshi96s-projects.vercel.app</a>. This history is retained for operational diagnosis and is not the current Dranx deployment evidence.</p>
-<p>The final read-only browser run against the stable alias passed all five production projects: desktop Chromium, touch-enabled mobile Chromium at 390 pixels, exact 320- and 430-pixel Chromium reflow, and mobile WebKit. It verified application and health responses, no document-level horizontal overflow, and real mouse, delayed-touch, and keyboard reordering. No browser console or uncaught page errors, unexpected same-origin request failures, or HTTP 4xx/5xx responses were recorded. The request hook excludes only cross-browser expected canceled Next.js <code>_rsc</code> navigational prefetches. The first release run correctly showed that production was open but exposed a smoke-test detector that had mistaken the initially disabled, name-gated Review action for a closed season; the detector now branches on the name field&#39;s actual submission-access state, and the complete rerun passed. Vercel logs for the preceding 15 minutes contained zero error entries and zero HTTP 500 responses.</p>
-<p>No production write smoke ran for this timing/leaderboard iteration. The reviewed <code>0002</code> migration persisted the season-scoped kickoff and left the automatic earlier-deadline sentinel null; a read-only state check confirmed <code>2026-08-21T19:00:00.000Z</code>, unlocked, and unrevealed. The separately gated prior-release write smoke remains intentional historical evidence: it passed one exact-ID submit/privacy/delete journey, and its post-cleanup queries returned zero <code>predictions</code>, zero <code>prediction_items</code>, and zero prediction-target audit rows with the season open, unrevealed, and unlocked and both active and final standings pointers null.</p>
+<p>The final read-only browser run against the stable alias passed all five production projects: desktop Chromium, touch-enabled mobile Chromium at 390 pixels, exact 320- and 430-pixel Chromium reflow, and mobile WebKit. It verified application and health responses, no document-level horizontal overflow, real mouse/delayed-touch/keyboard reordering, exactly 20 PNG sources, and nonzero natural widths for all prediction and review-dialog club marks. Safari-style browser cancellation of a Next Image candidate is excluded only when it is a local <code>/team-marks/</code> optimizer candidate; the rendered mark must still complete successfully, while genuine request failures and every HTTP 4xx/5xx response remain failures. An independent headed run found 20 loaded PNG marks, no initials fallbacks, 20 optimized 200 responses, a silent console, and no overflow at desktop or narrow width. The exact deployment&#39;s newest 500 log records in the inspected 30-minute window were all HTTP 200, with zero warnings, errors, 4xx, or 5xx responses.</p>
+<p>After the PNG deployment was live, the owner explicitly approved the idempotent production seed. The active season changed from 20 SVG/0 PNG paths to 0 SVG/20 PNG paths with exact fixture matches and no other path type. The before/after non-path team metadata digest remained <code>dc907bd0e26186a76d62210381ee593f44225f7c0557f8cede6d43c7dfae7910</code>; prediction, standings-snapshot, and standings-item counts each stayed zero. No participant or standings write smoke ran for this badge iteration. The separately gated prior-release write smoke remains intentional historical evidence: it passed one exact-ID submit/privacy/delete journey, and its post-cleanup queries returned zero <code>predictions</code>, zero <code>prediction_items</code>, and zero prediction-target audit rows with the season open, unrevealed, and unlocked and both active and final standings pointers null.</p>
 <p>Historical prior-release cleanup: before that release&#39;s final smoke, four legacy <code>Reflow QA</code> predictions from earlier interrupted verification were identified and deleted by their exact UUIDs. None had an associated audit row. The follow-up and final post-smoke queries both confirmed zero prediction, item, or audit residue.</p>
 <h2>Production mobile screenshots</h2>
-<p>Only the newest completed production run is retained. All four screenshots were refreshed at 390 by 844 pixels and visually inspected for the Dranx identity, clean narrow-screen rendering, readable wrapping, and absence of horizontal clipping.</p>
-<p><strong>Prediction entry — mobile Chromium at 390 pixels:</strong> the 20-club single-column sorter, dedicated move handles, top/bottom-half boundary, and safe-area-aware review action fit the viewport.</p>
+<p>Only the newest completed production run is retained. All four screenshots were refreshed at 390 by 844 pixels and visually inspected for the Dranx identity, painted PNG badges in both prediction surfaces, clean narrow-screen rendering, readable wrapping, reachable safe-area actions, and absence of horizontal clipping.</p>
+<p><strong>Prediction entry — mobile Chromium at 390 pixels:</strong> the owner-provided club badges are legible beside long and short club names; the single-column sorter, dedicated move handles, and safe-area-aware review action fit the viewport.</p>
 <p><img src="assets/qa/prediction-mobile.png" alt="Production prediction entry on mobile Chromium"></p>
-<p><strong>Review dialog — mobile Chromium at 390 pixels:</strong> the immutable 1–20 review remains legible and keeps its confirmation actions reachable without horizontal overflow.</p>
+<p><strong>Review dialog — mobile Chromium at 390 pixels:</strong> the smoke waits for all 20 dialog badges to paint before restoring the list to the top and capturing evidence; the immutable review remains legible and keeps its confirmation actions reachable without horizontal overflow.</p>
 <p><img src="assets/qa/review-mobile.png" alt="Production prediction review dialog on mobile Chromium"></p>
 <p><strong>Pre-reveal leaderboard — mobile Chromium at 390 pixels:</strong> the zero-entry production state explains that everyone remains on 0 before kickoff and only each champion pick becomes public when an entry exists; full tables remain private.</p>
 <p><img src="assets/qa/leaderboard-mobile.png" alt="Production pre-reveal leaderboard on mobile Chromium"></p>
@@ -219,16 +225,16 @@
 <li>The original Dranx identity remains independent and no Premier League logo/lion/ball asset is used. The 20 local PNG club badges are included at the project owner&#39;s direction; club names and marks remain their respective owners&#39; property, and the original monograms are rollback-only first-release files.</li>
 </ul>
 <h2>Final closeout checklist</h2>
-<p>GitHub <a href="https://github.com/vdoshi96/Pl-predictions/pull/3">PR #3</a> merged the tested feature head <code>3191afa</code> into canonical <code>main</code> at merge SHA <code>65841c8d458c1912c25a151c531b2d0538490fc5</code>; its Vercel status was successful. Final closeout leaves local and remote <code>main</code> synchronized, no completed local temporary branch retained, and one primary worktree. The evidence-only closeout merge SHA is intentionally not pinned here so this end-state record remains accurate.</p>
+<p>GitHub <a href="https://github.com/vdoshi96/Pl-predictions/pull/5">PR #5</a> merged the tested badge feature into canonical <code>main</code> at <code>1c8a20bc0a689f39d5cb392753d3582aa616bdbc</code>; its Vercel status was successful. Final closeout leaves local and remote <code>main</code> synchronized, no completed badge branch or temporary worktree retained, and one primary worktree. The evidence-only closeout merge SHA is intentionally not pinned here so this end-state record remains accurate.</p>
 <ul>
-<li><input checked="" disabled="" type="checkbox"> Apply production migration <code>0002</code>, verify the persisted kickoff and open/unrevealed state, and merge PR #3 into canonical <code>main</code>.</li>
-<li><input checked="" disabled="" type="checkbox"> Run the read-only anonymous production smoke and retain only its newest labeled mobile prediction, review, leaderboard, and administrator screenshots under <code>docs/assets/qa/</code>.</li>
-<li><input checked="" disabled="" type="checkbox"> Keep browser verification read-only. No participant or standings write smoke ran; the only production data change was the reviewed kickoff migration.</li>
-<li><input checked="" disabled="" type="checkbox"> Confirm zero browser console/page errors, zero unexpected same-origin request failures or HTTP error responses, zero Vercel error log entries, and zero HTTP 500 responses for the final production run.</li>
-<li><input checked="" disabled="" type="checkbox"> Publish the Gameweek 1 lock and champion-leaderboard iteration plus final evidence through canonical <code>main</code>, synchronize local <code>main</code> with <code>origin/main</code>, remove completed local branch state, and retain only the single primary worktree.</li>
+<li><input checked="" disabled="" type="checkbox"> Deploy the 20 owner-provided PNG badges before changing persisted paths, verify Ready deployment <code>dpl_2z72V3tGKDssEAggjqMEH4PQQsYN</code>, and repoint the stable alias with explicit owner approval.</li>
+<li><input checked="" disabled="" type="checkbox"> Run the explicitly approved idempotent seed and prove exactly 20 SVG paths became 20 exact PNG fixture matches while non-path metadata and participant/standings record counts stayed unchanged.</li>
+<li><input checked="" disabled="" type="checkbox"> Pass the read-only anonymous production smoke in all five projects, independently confirm 20 optimized badge responses and no fallback/console/overflow issue, and inspect the exact deployment&#39;s newest 500 log records.</li>
+<li><input checked="" disabled="" type="checkbox"> Retain only the newest labeled mobile prediction, review, leaderboard, and administrator screenshots under <code>docs/assets/qa/</code>, with all displayed badges painted before capture.</li>
+<li><input checked="" disabled="" type="checkbox"> Publish the badge evidence through canonical <code>main</code>, synchronize local <code>main</code> with <code>origin/main</code>, remove completed badge branch/worktree state, and retain only the primary worktree.</li>
 </ul>
 
-      <p class="source">Generated deterministically from <a href="QA.md">docs/QA.md</a>. Canonical SHA-256: <code>8b878a39c3c18ae000175e3f046ddd7a9cdb813a5d0f3f6a82705daade7ee5b1</code>.</p>
+      <p class="source">Generated deterministically from <a href="QA.md">docs/QA.md</a>. Canonical SHA-256: <code>e53e05c10fc912d229374acb7ed684272af672062d832bb05a07ed034beeb331</code>.</p>
     </main>
   </body>
 </html>

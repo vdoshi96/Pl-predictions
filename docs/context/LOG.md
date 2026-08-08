@@ -68,7 +68,7 @@
 - Fast-forwarded local `main` to match `origin/main` at that merge before creating the final closeout branch, then removed the completed feature branch.
 - Published the final closeout documentation through canonical `main`, synchronized local and remote `main`, removed the completed local temporary closeout branch after its merge, and retained one primary worktree. The final closeout merge SHA is intentionally not pinned in this durable end-state note.
 
-### Gameweek 1 lock and champion leaderboard iteration (in progress)
+### Gameweek 1 lock and champion leaderboard iteration (complete)
 
 - Verified from the official Premier League opening-weekend announcement and complete fixture list that Arsenal v Coventry City is the first 2026/27 match at 20:00 BST on Friday 21 August 2026, exactly `2026-08-21T19:00:00.000Z`; recorded that all fixtures remain subject to change.
 - Added migration `0002_breezy_king_cobra.sql` to persist and backfill the verified kickoff per season while retaining null as the automatic-deadline sentinel. A configured owner deadline may close earlier, while null or later values cannot bypass the persisted ceiling.
@@ -77,4 +77,11 @@
 - Added post-kickoff champion status: 1st is “On track”; every other actual ordinal position is “Off track”. Scoring now requires kickoff, a meaningful table, and an accepted/re-observed timestamp at or after kickoff, so a stale preseason ordering cannot activate automatically.
 - Added a production-disabled isolated clock seam and fresh-server requirement so tests remain deterministic after the real kickoff. The post-kickoff browser phase proves stale-table suppression, 100/96-point totals, ranks, champion actual positions, and scored-card reflow at desktop/320/430 pixels.
 - Passed the final `CI=1 npm run check`: documentation parity, formatting, ESLint, strict TypeScript, 115 default tests with 10 guarded database skips, all 10 isolated Neon integration tests, the Webpack production build, and 8 Playwright journeys with 22 intentional routing skips across deterministic pre/post-kickoff phases.
-- GitHub publication, refreshed production verification, deterministic HTML regeneration, screenshot inspection, and repository cleanup remain before this iteration is complete.
+- Applied `0002_breezy_king_cobra.sql` to production and verified opening kickoff `2026-08-21T19:00:00.000Z`, a null optional earlier deadline, unlocked submissions, and unrevealed predictions.
+- Merged GitHub [PR #3](https://github.com/vdoshi96/Pl-predictions/pull/3) into canonical `main` at merge SHA `65841c8d458c1912c25a151c531b2d0538490fc5`; its tested head was `3191afa`, and its Vercel status passed.
+- Deployed Ready production `dpl_4UEPWvwSECSwCHMUvLpacwmNjo1t` at [https://pl-predictions-428nljcvk-vdoshi96s-projects.vercel.app](https://pl-predictions-428nljcvk-vdoshi96s-projects.vercel.app) with target `production` and repointed the stable alias.
+- Corrected the read-only production-smoke state detector after its first harness-only failure: Review is intentionally name-gated, so the test now distinguishes open/closed seasons through the name field and verifies Review enables after valid input.
+- Passed the clean production-smoke rerun in all 5 projects across desktop Chromium, mobile Chromium at 390 pixels, exact 320/430-pixel reflow, and mobile WebKit, with zero browser, page, unexpected same-origin request, or HTTP errors.
+- Reviewed Vercel runtime logs for the preceding 15 minutes and found zero error entries and zero HTTP 500 responses.
+- Kept browser verification read-only; no production prediction or standings rows were written. Recaptured and visually inspected the newest prediction, review, leaderboard, and administrator-login mobile evidence.
+- Regenerated and checked every HTML peer, published the evidence-only closeout through canonical `main`, synchronized local and remote `main`, removed completed branch/worktree state, and retained one primary worktree.

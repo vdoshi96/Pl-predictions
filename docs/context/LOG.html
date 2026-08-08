@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="canonical-source" content="LOG.md" />
-    <meta name="canonical-source-sha256" content="74833e29735cc66394a3fa50dad3344575e616c548f151730974477ccd083455" />
+    <meta name="canonical-source-sha256" content="84a1238503e7e778dd10b1b5730f200aacfcf531ed44e17c07b1d1e628d7b538" />
     <title>Session log</title>
     <style>
       :root { color-scheme: light dark; font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
@@ -106,7 +106,7 @@
 <li>Fast-forwarded local <code>main</code> to match <code>origin/main</code> at that merge before creating the final closeout branch, then removed the completed feature branch.</li>
 <li>Published the final closeout documentation through canonical <code>main</code>, synchronized local and remote <code>main</code>, removed the completed local temporary closeout branch after its merge, and retained one primary worktree. The final closeout merge SHA is intentionally not pinned in this durable end-state note.</li>
 </ul>
-<h3>Gameweek 1 lock and champion leaderboard iteration (in progress)</h3>
+<h3>Gameweek 1 lock and champion leaderboard iteration (complete)</h3>
 <ul>
 <li>Verified from the official Premier League opening-weekend announcement and complete fixture list that Arsenal v Coventry City is the first 2026/27 match at 20:00 BST on Friday 21 August 2026, exactly <code>2026-08-21T19:00:00.000Z</code>; recorded that all fixtures remain subject to change.</li>
 <li>Added migration <code>0002_breezy_king_cobra.sql</code> to persist and backfill the verified kickoff per season while retaining null as the automatic-deadline sentinel. A configured owner deadline may close earlier, while null or later values cannot bypass the persisted ceiling.</li>
@@ -115,10 +115,17 @@
 <li>Added post-kickoff champion status: 1st is “On track”; every other actual ordinal position is “Off track”. Scoring now requires kickoff, a meaningful table, and an accepted/re-observed timestamp at or after kickoff, so a stale preseason ordering cannot activate automatically.</li>
 <li>Added a production-disabled isolated clock seam and fresh-server requirement so tests remain deterministic after the real kickoff. The post-kickoff browser phase proves stale-table suppression, 100/96-point totals, ranks, champion actual positions, and scored-card reflow at desktop/320/430 pixels.</li>
 <li>Passed the final <code>CI=1 npm run check</code>: documentation parity, formatting, ESLint, strict TypeScript, 115 default tests with 10 guarded database skips, all 10 isolated Neon integration tests, the Webpack production build, and 8 Playwright journeys with 22 intentional routing skips across deterministic pre/post-kickoff phases.</li>
-<li>GitHub publication, refreshed production verification, deterministic HTML regeneration, screenshot inspection, and repository cleanup remain before this iteration is complete.</li>
+<li>Applied <code>0002_breezy_king_cobra.sql</code> to production and verified opening kickoff <code>2026-08-21T19:00:00.000Z</code>, a null optional earlier deadline, unlocked submissions, and unrevealed predictions.</li>
+<li>Merged GitHub <a href="https://github.com/vdoshi96/Pl-predictions/pull/3">PR #3</a> into canonical <code>main</code> at merge SHA <code>65841c8d458c1912c25a151c531b2d0538490fc5</code>; its tested head was <code>3191afa</code>, and its Vercel status passed.</li>
+<li>Deployed Ready production <code>dpl_4UEPWvwSECSwCHMUvLpacwmNjo1t</code> at <a href="https://pl-predictions-428nljcvk-vdoshi96s-projects.vercel.app">https://pl-predictions-428nljcvk-vdoshi96s-projects.vercel.app</a> with target <code>production</code> and repointed the stable alias.</li>
+<li>Corrected the read-only production-smoke state detector after its first harness-only failure: Review is intentionally name-gated, so the test now distinguishes open/closed seasons through the name field and verifies Review enables after valid input.</li>
+<li>Passed the clean production-smoke rerun in all 5 projects across desktop Chromium, mobile Chromium at 390 pixels, exact 320/430-pixel reflow, and mobile WebKit, with zero browser, page, unexpected same-origin request, or HTTP errors.</li>
+<li>Reviewed Vercel runtime logs for the preceding 15 minutes and found zero error entries and zero HTTP 500 responses.</li>
+<li>Kept browser verification read-only; no production prediction or standings rows were written. Recaptured and visually inspected the newest prediction, review, leaderboard, and administrator-login mobile evidence.</li>
+<li>Regenerated and checked every HTML peer, published the evidence-only closeout through canonical <code>main</code>, synchronized local and remote <code>main</code>, removed completed branch/worktree state, and retained one primary worktree.</li>
 </ul>
 
-      <p class="source">Generated deterministically from <a href="LOG.md">docs/context/LOG.md</a>. Canonical SHA-256: <code>74833e29735cc66394a3fa50dad3344575e616c548f151730974477ccd083455</code>.</p>
+      <p class="source">Generated deterministically from <a href="LOG.md">docs/context/LOG.md</a>. Canonical SHA-256: <code>84a1238503e7e778dd10b1b5730f200aacfcf531ed44e17c07b1d1e628d7b538</code>.</p>
     </main>
   </body>
 </html>

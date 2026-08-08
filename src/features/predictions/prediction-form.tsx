@@ -214,14 +214,14 @@ export function PredictionForm({
 
   if (success) {
     return (
-      <Card className="overflow-hidden border-emerald-200">
+      <Card className="border-accent overflow-hidden">
         <CardContent className="grid justify-items-center gap-4 px-5 py-10 text-center sm:px-10">
-          <span className="grid size-16 place-items-center rounded-2xl bg-emerald-100 text-emerald-700">
+          <span className="grid size-16 place-items-center rounded-2xl bg-[#ddffef] text-[#08734f]">
             <CheckCircle2 aria-hidden="true" className="size-9" />
           </span>
           <div>
             <Badge variant="success">Prediction submitted</Badge>
-            <h2 className="mt-3 text-2xl font-black tracking-tight [overflow-wrap:anywhere] text-slate-950">
+            <h2 className="text-brand-strong mt-3 text-2xl font-black tracking-tight [overflow-wrap:anywhere]">
               You’re in, {normalizedName}.
             </h2>
             <p
@@ -236,16 +236,16 @@ export function PredictionForm({
             {success.entryId ? (
               <Link
                 href={`/entries/${success.entryId}`}
-                className="inline-flex min-h-11 items-center justify-center rounded-xl bg-emerald-500 px-4 text-sm font-semibold text-emerald-950 outline-none hover:bg-emerald-400 focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2"
+                className="bg-accent text-brand hover:bg-accent-yellow focus-visible:ring-accent-blue inline-flex min-h-11 items-center justify-center rounded-xl px-4 text-sm font-bold outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
               >
                 View confirmation
               </Link>
             ) : null}
             <Link
               href="/leaderboard"
-              className="inline-flex min-h-11 items-center justify-center rounded-xl border border-slate-300 bg-white px-4 text-sm font-semibold text-slate-800 outline-none hover:bg-slate-50 focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2"
+              className="border-border text-brand hover:border-accent-lilac hover:bg-brand-soft focus-visible:ring-accent-blue inline-flex min-h-11 items-center justify-center rounded-xl border bg-white px-4 text-sm font-bold outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
             >
-              Friends leaderboard
+              View leaderboard
             </Link>
           </div>
         </CardContent>
@@ -264,11 +264,11 @@ export function PredictionForm({
       <Card className="overflow-visible" id="submit-prediction">
         <CardContent className="grid gap-4">
           <div className="flex items-start gap-3">
-            <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-sky-100 text-sky-800">
+            <span className="text-brand grid size-10 shrink-0 place-items-center rounded-xl bg-[#dffcff]">
               <ShieldCheck aria-hidden="true" className="size-5" />
             </span>
             <div className="min-w-0">
-              <h2 className="text-lg font-bold text-slate-950">
+              <h2 className="text-brand-strong text-lg font-black">
                 Ready to make it official?
               </h2>
               <p className="mt-1 text-sm leading-5 text-slate-600">
@@ -302,7 +302,7 @@ export function PredictionForm({
               required
               disabled={disabled || pending}
               aria-describedby="participant-name-help"
-              className="mt-2 min-h-12 w-full rounded-xl border border-slate-300 bg-white px-3.5 text-base text-slate-950 outline-none placeholder:text-slate-400 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100 disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-500"
+              className="border-border text-brand-strong focus:border-accent-lilac mt-2 min-h-12 w-full rounded-xl border bg-white px-3.5 text-base outline-none placeholder:text-slate-400 focus:ring-2 focus:ring-[#dffcff] disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-500"
               placeholder="e.g. Vishal"
             />
             <p
@@ -354,7 +354,7 @@ export function PredictionForm({
         </CardContent>
       </Card>
 
-      <div className="sticky bottom-0 z-20 -mx-2 border-t border-slate-200/80 bg-white/95 px-2 pt-3 pb-[max(1rem,env(safe-area-inset-bottom))] shadow-[0_-16px_30px_-26px_rgba(15,23,42,0.7)] backdrop-blur sm:static sm:mx-0 sm:border-0 sm:bg-transparent sm:p-0 sm:shadow-none sm:backdrop-blur-none">
+      <div className="border-border/80 sticky bottom-0 z-20 -mx-2 border-t bg-white/95 px-2 pt-3 pb-[max(1rem,env(safe-area-inset-bottom))] shadow-[0_-16px_30px_-26px_rgba(55,0,60,0.6)] backdrop-blur sm:static sm:mx-0 sm:border-0 sm:bg-transparent sm:p-0 sm:shadow-none sm:backdrop-blur-none">
         <Button
           type="submit"
           size="lg"

@@ -50,3 +50,11 @@
 
 - Published the tested feature history to [vdoshi96/Pl-predictions](https://github.com/vdoshi96/Pl-predictions), merged it into the canonical `main` release branch, synchronized local and remote `main`, and removed completed branch/worktree state.
 - Published the final production evidence and mobile screenshots to the same canonical `main` release branch; local and remote release state are synchronized.
+
+### Dranx branding iteration (release verification in progress)
+
+- Selected **Dranx Prediction League** as the user-facing identity while retaining the repository, Vercel, Neon, URL, environment, and credential identifiers already used operationally.
+- Defined a Premier-League-inspired palette anchored on official purple `#37003c` with cyan `#05f0ff`, green `#00ff87`, and pink `#ff2882` accents and an original Dranx mark.
+- Confirmed that FotMob crest downloads and the official Premier League logo were not added because repository policy and the current official terms require authorization before copying or redistributing those marks.
+- Retained the 20 local monograms and updated `TeamMark` with contain sizing and a labelled initials fallback for transparent authorized crest assets in a future permitted update.
+- Completed canonical Markdown and deterministic HTML updates, ESLint, strict TypeScript, 97 default tests with 9 guarded skips, 9 isolated Neon integration tests, the Webpack production build, and 5 focused Playwright journeys with 20 routing skips. The aggregate `npm run check` passes. Deployment, production verification, final QA evidence, and GitHub closeout remain pending for this iteration.

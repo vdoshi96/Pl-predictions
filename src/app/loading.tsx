@@ -10,7 +10,7 @@ export default function Loading() {
             <div className="bg-surface-subtle h-16 rounded-2xl" key={index} />
           ))}
         </div>
-        <span className="sr-only">Loading PL Predictions</span>
+        <span className="sr-only">Loading Dranx Prediction League</span>
       </div>
     </main>
   );

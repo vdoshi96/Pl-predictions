@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="canonical-source" content="QA.md" />
-    <meta name="canonical-source-sha256" content="fa02bdf34edd84f8566aeb53f897d4f12b0456bfe246234332e95004e7b24c94" />
+    <meta name="canonical-source-sha256" content="e7d7da06c437a0311d57f3d690c177fdf94120b00e5491be8e2f82d7c8d7d0aa" />
     <title>Quality assurance</title>
     <style>
       :root { color-scheme: light dark; font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
@@ -39,7 +39,7 @@
   <body>
     <main>
       <h1>Quality assurance</h1>
-<p>Evidence date: 2026-08-08. This document records the newest completed local and deployment run only. The owner-approved production-public/preview-protected boundary, anonymous production browser run, bounded write proof, exact cleanup, runtime logs, and newest mobile screenshots are all verified below.</p>
+<p>Evidence date: 2026-08-08. This document records the newest completed local run and the newest completed production baseline. Local evidence covers the Dranx Prediction League iteration; production rows and screenshots remain the immediately preceding release until the Dranx deployment is verified.</p>
 <h2>Current results</h2>
 <table>
 <thead>
@@ -67,7 +67,7 @@
 <tr>
 <td>Unit/component/default suite</td>
 <td><code>npm test</code></td>
-<td>95 passed; 9 database cases skipped by their explicit opt-in guard.</td>
+<td>97 passed; 9 database cases skipped by their explicit opt-in guard.</td>
 </tr>
 <tr>
 <td>Isolated Neon integration</td>
@@ -102,12 +102,12 @@
 <tr>
 <td>Vercel production build</td>
 <td>deployment <code>dpl_JCfjcxvtVVfbsU55mmTppBK2FB9G</code></td>
-<td>Ready after the project framework preset was corrected from null to <code>nextjs</code>; the stable alias points to this deployment and responds anonymously with 200.</td>
+<td>Previous release baseline: Ready after the project framework preset was corrected from null to <code>nextjs</code>; the stable alias points to this deployment and responds anonymously with 200.</td>
 </tr>
 <tr>
 <td>Anonymous production smoke</td>
 <td><code>npm run test:production-smoke</code></td>
-<td>5 passed across desktop Chromium, mobile Chromium at 390 pixels, exact 320/430-pixel reflow projects, and iPhone WebKit. Health, mouse/touch/keyboard reorder, no-overflow, zero console/page errors, and zero unexpected same-origin request failures or HTTP error responses passed.</td>
+<td>Previous release baseline: 5 passed across desktop Chromium, mobile Chromium at 390 pixels, exact 320/430-pixel reflow projects, and iPhone WebKit.</td>
 </tr>
 <tr>
 <td>Bounded production write smoke</td>
@@ -127,11 +127,12 @@
 </tbody></table>
 <p>The local sandbox did not permit a default Turbopack CSS helper to bind its internal port, so the local production gate used <code>next build --webpack</code>. This was an execution-environment restriction, not an application compile error; the Vercel deployment subsequently passed the default Turbopack build.</p>
 <h2>Unit and component coverage</h2>
-<p>The 95-test default run covers:</p>
+<p>The 97-test default run covers:</p>
 <ul>
 <li>every required mutually exclusive scoring example, the top/bottom-half boundary, a 100-point exact table, preseason suppression, and shared ranks;</li>
 <li>NFKC name normalization, length checks, duplicate/missing/out-of-season team validation, and unique positions;</li>
-<li>the exact verified 20-club fixture, display sorting, monogram paths, and factual external mappings;</li>
+<li>the exact verified 20-club fixture, display sorting, local mark paths, and factual external mappings;</li>
+<li>original Dranx header/footer language plus <code>TeamMark</code> contain sizing, accessible club-mark semantics, and labelled initials fallback after an image error;</li>
 <li>pointer/keyboard sorter structure, 56-pixel handle-only touch targets, live language for predicted versus actual positions, A–Z reset, review, server rejection, sticky safe-area action, mobile navigation, and narrow-card shrink behavior;</li>
 <li>database-clock deadline, manual lock, and irreversible early-reveal policy, including concurrent lock and deadline boundaries;</li>
 <li>complete snapshot validation and source-failure envelopes;</li>
@@ -211,7 +212,7 @@
 <li><input checked="" disabled="" type="checkbox"> Publish this final evidence update to GitHub <code>main</code>, synchronize local <code>main</code>, and remove completed branch/worktree state.</li>
 </ul>
 
-      <p class="source">Generated deterministically from <a href="QA.md">docs/QA.md</a>. Canonical SHA-256: <code>fa02bdf34edd84f8566aeb53f897d4f12b0456bfe246234332e95004e7b24c94</code>.</p>
+      <p class="source">Generated deterministically from <a href="QA.md">docs/QA.md</a>. Canonical SHA-256: <code>e7d7da06c437a0311d57f3d690c177fdf94120b00e5491be8e2f82d7c8d7d0aa</code>.</p>
     </main>
   </body>
 </html>

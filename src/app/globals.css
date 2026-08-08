@@ -1,21 +1,25 @@
 @import "tailwindcss";
 
 :root {
-  --background: #f5f4ee;
+  --background: #f8f4fa;
   --surface: #ffffff;
-  --surface-subtle: #edf0e9;
-  --foreground: #14201a;
-  --muted: #617067;
-  --border: #d7ddd6;
-  --brand: #075d42;
-  --brand-strong: #034c35;
-  --brand-soft: #dff4e9;
-  --accent: #d9ff57;
+  --surface-subtle: #f2eaf4;
+  --foreground: #2a0730;
+  --muted: #6f5f73;
+  --border: #dfd2e3;
+  --brand: #37003c;
+  --brand-strong: #26002d;
+  --brand-soft: #f1e5f3;
+  --accent: #00ff87;
+  --accent-blue: #05f0ff;
+  --accent-pink: #ff2882;
+  --accent-lilac: #953bff;
+  --accent-yellow: #ebff00;
   --danger: #a32b32;
   --danger-soft: #fde8e8;
   --warning: #8a5a00;
   --warning-soft: #fff2cc;
-  --shadow: 0 20px 70px rgb(20 32 26 / 10%);
+  --shadow: 0 22px 70px rgb(55 0 60 / 12%);
 }
 
 @theme inline {
@@ -29,6 +33,10 @@
   --color-brand-strong: var(--brand-strong);
   --color-brand-soft: var(--brand-soft);
   --color-accent: var(--accent);
+  --color-accent-blue: var(--accent-blue);
+  --color-accent-pink: var(--accent-pink);
+  --color-accent-lilac: var(--accent-lilac);
+  --color-accent-yellow: var(--accent-yellow);
   --color-danger: var(--danger);
   --color-danger-soft: var(--danger-soft);
   --color-warning: var(--warning);
@@ -49,7 +57,10 @@ html {
 body {
   min-width: 320px;
   margin: 0;
-  background: var(--background);
+  background:
+    radial-gradient(circle at 8% 0%, rgb(149 59 255 / 8%), transparent 28rem),
+    radial-gradient(circle at 96% 18%, rgb(5 240 255 / 7%), transparent 24rem),
+    var(--background);
   color: var(--foreground);
   font-family: var(--font-sans);
   text-rendering: optimizeLegibility;
@@ -73,7 +84,7 @@ a {
 }
 
 :focus-visible {
-  outline: 3px solid #0c8f65;
+  outline: 3px solid var(--accent-blue);
   outline-offset: 3px;
 }
 
@@ -84,6 +95,30 @@ a {
 
 .panel-shadow {
   box-shadow: var(--shadow);
+}
+
+.brand-hero {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 92% 10%, rgb(5 240 255 / 25%), transparent 32%),
+    radial-gradient(circle at 72% 110%, rgb(255 40 130 / 26%), transparent 38%),
+    linear-gradient(135deg, #37003c 0%, #4d0055 54%, #26002d 100%);
+  box-shadow: 0 26px 70px -42px rgb(55 0 60 / 90%);
+}
+
+.brand-hero::after {
+  position: absolute;
+  z-index: -1;
+  right: -4rem;
+  bottom: -7rem;
+  width: 16rem;
+  height: 16rem;
+  border: 2rem solid rgb(255 255 255 / 5%);
+  border-radius: 999px;
+  content: "";
+  transform: rotate(-18deg);
 }
 
 .text-balance {

@@ -6,6 +6,7 @@ Checked on 2026-08-08.
 
 - Original owner brief: `/Users/vishal/.codex/attachments/52a70e1f-75be-4dba-a2ab-739d8a99b417/pasted-text.txt` (local conversation attachment; intentionally not copied into the repository).
 - Latest owner overrides: mobile-first for the majority-mobile audience; recurring updates will be owner-run Codex automation; no runtime live-data API and no Vercel Cron.
+- Current identity direction: user-facing name **Dranx Prediction League**; Premier-League-inspired palette using official purple `#37003c` with cyan `#05f0ff`, green `#00ff87`, and pink `#ff2882` accents; original Dranx mark; operational `pl-predictions` identifiers unchanged.
 
 ## Season and rights
 
@@ -13,9 +14,10 @@ Checked on 2026-08-08.
 - [Premier League 2026/27 AGM announcement](https://www.premierleague.com/en/news/4673099/the-202627-premier-league-season-officially-starts/): membership-change corroboration.
 - [FotMob Premier League page](https://www.fotmob.com/leagues/47/overview) and canonical team pages: one-time factual league/team identifier mapping only.
 - [FotMob Terms of Use](https://www.fotmob.com/term-of-service), checked 2026-08-08: restriction on automatic crawlers and systematic or regular extraction. A consumer subscription is not treated as permission for automation or redistribution.
+- [Premier League logo portal](https://logo.premierleague.com/), checked 2026-08-08: logo access and use are limited to directed commercial partners and genuine editorial news-media users; this private prediction tool is neither.
 - [Premier League trademark and data FAQ](https://www.premierleague.com/en/about/faq/other): club names and badges remain member-club marks.
 
-The production app never requests FotMob or another football-data source. Official crests are not redistributed; local text monograms are the documented rights-safe fallback. A future automation must use manual input, a permitted export, or a source whose written licence covers the intended collection and use.
+FotMob's official terms, the Premier League logo portal, and the Premier League trademark FAQ were checked on 2026-08-08. FotMob crest downloads and the official Premier League logo were not added because repository policy and those current official terms require appropriate authorization before copying or redistributing the marks. The production app never requests FotMob or another football-data source, and the 20 local text monograms remain. `TeamMark` supports transparent local crest assets that may replace them after authorization. A future standings automation must use manual input, a permitted export, or a source whose written licence covers the intended collection and use.
 
 ## Technical authority
 

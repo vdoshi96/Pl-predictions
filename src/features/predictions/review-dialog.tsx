@@ -35,7 +35,7 @@ export function ReviewDialog({
   return (
     <Dialog.Root open={open} onOpenChange={handleOpenChange}>
       <Dialog.Portal>
-        <Dialog.Overlay className="fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-[2px] data-[state=closed]:animate-none motion-reduce:animate-none" />
+        <Dialog.Overlay className="bg-brand-strong/75 fixed inset-0 z-50 backdrop-blur-[2px] data-[state=closed]:animate-none motion-reduce:animate-none" />
         <Dialog.Content
           aria-describedby="prediction-review-description"
           onEscapeKeyDown={(event) => {
@@ -44,15 +44,15 @@ export function ReviewDialog({
           onInteractOutside={(event) => {
             if (pending) event.preventDefault();
           }}
-          className="fixed inset-x-2 top-[max(0.5rem,env(safe-area-inset-top))] bottom-2 z-50 flex flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white text-slate-950 shadow-2xl outline-none sm:inset-x-auto sm:top-1/2 sm:bottom-auto sm:left-1/2 sm:max-h-[min(860px,calc(100dvh-2rem))] sm:w-[min(36rem,calc(100vw-2rem))] sm:-translate-x-1/2 sm:-translate-y-1/2"
+          className="border-border text-foreground fixed inset-x-2 top-[max(0.5rem,env(safe-area-inset-top))] bottom-2 z-50 flex flex-col overflow-hidden rounded-2xl border bg-white shadow-2xl outline-none sm:inset-x-auto sm:top-1/2 sm:bottom-auto sm:left-1/2 sm:max-h-[min(860px,calc(100dvh-2rem))] sm:w-[min(36rem,calc(100vw-2rem))] sm:-translate-x-1/2 sm:-translate-y-1/2"
         >
-          <div className="flex shrink-0 items-start justify-between gap-3 border-b border-slate-200 px-4 py-4 sm:px-6">
+          <div className="border-border flex shrink-0 items-start justify-between gap-3 border-b px-4 py-4 sm:px-6">
             <div className="min-w-0">
               <div className="mb-2 flex flex-wrap items-center gap-2">
                 <Badge variant="accent">Final review</Badge>
                 <Badge>{teams.length} clubs</Badge>
               </div>
-              <Dialog.Title className="text-xl font-black tracking-tight text-slate-950 sm:text-2xl">
+              <Dialog.Title className="text-brand-strong text-xl font-black tracking-tight sm:text-2xl">
                 Check your 1–20
               </Dialog.Title>
               <Dialog.Description
@@ -60,7 +60,7 @@ export function ReviewDialog({
                 className="mt-1 text-sm leading-5 [overflow-wrap:anywhere] text-slate-600"
               >
                 Submitting as{" "}
-                <span className="font-bold text-slate-900">
+                <span className="text-brand-strong font-bold">
                   {participantName}
                 </span>
                 . Predictions cannot be edited after submission.
@@ -91,9 +91,9 @@ export function ReviewDialog({
                   <li
                     key={team.id}
                     value={position}
-                    className="flex min-h-12 min-w-0 items-center gap-3 rounded-xl border border-slate-100 bg-slate-50 px-2.5 py-1.5"
+                    className="border-border flex min-h-12 min-w-0 items-center gap-3 rounded-xl border bg-[#fcf9fd] px-2.5 py-1.5"
                   >
-                    <span className="grid size-8 shrink-0 place-items-center rounded-lg bg-slate-900 font-mono text-xs font-black text-white tabular-nums">
+                    <span className="bg-brand grid size-8 shrink-0 place-items-center rounded-lg font-mono text-xs font-black text-white tabular-nums">
                       {position}
                     </span>
                     <TeamMark
@@ -102,12 +102,12 @@ export function ReviewDialog({
                       src={team.assetPath}
                       size="sm"
                     />
-                    <span className="min-w-0 grow text-sm leading-4 font-semibold break-words text-slate-900">
+                    <span className="text-brand-strong min-w-0 grow text-sm leading-4 font-bold break-words">
                       {team.displayName}
                     </span>
                     <Check
                       aria-hidden="true"
-                      className="size-4 shrink-0 text-emerald-600"
+                      className="size-4 shrink-0 text-[#08734f]"
                     />
                   </li>
                 );
@@ -115,7 +115,7 @@ export function ReviewDialog({
             </ol>
           </div>
 
-          <div className="shrink-0 border-t border-slate-200 bg-white px-4 pt-3 pb-[max(1rem,env(safe-area-inset-bottom))] sm:px-6">
+          <div className="border-border shrink-0 border-t bg-white px-4 pt-3 pb-[max(1rem,env(safe-area-inset-bottom))] sm:px-6">
             {error ? (
               <p
                 role="alert"

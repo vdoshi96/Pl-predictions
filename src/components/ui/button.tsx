@@ -12,11 +12,10 @@ export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 
 const variantClasses: Record<ButtonVariant, string> = {
   primary:
-    "bg-emerald-500 text-emerald-950 shadow-sm hover:bg-emerald-400 active:bg-emerald-600",
+    "bg-accent text-brand-strong shadow-sm hover:bg-accent-yellow active:bg-[#00dc75]",
   secondary:
-    "border border-slate-300 bg-white text-slate-800 shadow-sm hover:border-slate-400 hover:bg-slate-50 active:bg-slate-100",
-  ghost:
-    "text-slate-600 hover:bg-slate-100 hover:text-slate-950 active:bg-slate-200",
+    "border border-border bg-white text-brand shadow-sm hover:border-accent-lilac hover:bg-brand-soft active:bg-[#e8d9eb]",
+  ghost: "text-muted hover:bg-brand-soft hover:text-brand active:bg-[#e8d9eb]",
   danger: "bg-red-600 text-white shadow-sm hover:bg-red-500 active:bg-red-700",
 };
 
@@ -38,7 +37,7 @@ export function Button({
     <button
       type={type}
       className={cn(
-        "inline-flex items-center justify-center gap-2 rounded-xl font-semibold transition-colors duration-150 outline-none select-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-55 motion-reduce:transition-none",
+        "focus-visible:ring-accent-blue inline-flex items-center justify-center gap-2 rounded-xl font-semibold transition-colors duration-150 outline-none select-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-55 motion-reduce:transition-none",
         variantClasses[variant],
         sizeClasses[size],
         className,

@@ -1,5 +1,11 @@
 # Decisions
 
+## 2026-08-08: Dranx identity and authorized-asset boundary
+
+Adopt **Dranx Prediction League** as the user-facing name while preserving existing `pl-predictions` repository, Vercel, database, URL, and environment identifiers. Use a Premier-League-inspired visual system anchored on the league's official purple, `#37003c`, with cyan `#05f0ff`, green `#00ff87`, and pink `#ff2882` accents and an original Dranx mark.
+
+This decision supersedes the launch identity but does not erase the historical monogram decision below. FotMob crest downloads and the official Premier League logo were not added because repository policy and the current official terms require appropriate authorization before copying or redistributing those marks. Keep the 20 local monograms and prepare the shared `TeamMark` presentation for transparent local crest assets that can be introduced later without a schema or flow change.
+
 ## 2026-08-08: Static operational data boundary
 
 The deployed application has no live football API, scheduled scraper, or Vercel Cron. A source-neutral canonical importer plus manual admin editor write validated snapshots. This implements the owner's Codex-run automation preference while isolating source acquisition and preserving the last good snapshot. FotMob must not be scraped automatically without a written licence covering the intended extraction and use.

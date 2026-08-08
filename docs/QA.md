@@ -126,8 +126,10 @@ Only the newest completed production run is retained. All four screenshots were 
 
 ## Final closeout checklist
 
+GitHub [PR #1](https://github.com/vdoshi96/Pl-predictions/pull/1) merged successfully into canonical `main` at merge SHA `a0586831332db66158975928e98246eaf72118f1`; its head was `2a0008e`, and its Vercel status was successful. Local `main` was fast-forwarded to match `origin/main` at that merge before the final closeout branch was created, and the completed local feature branch was removed. Final closeout leaves local and remote `main` synchronized, no completed local temporary branch retained, and one primary worktree. The final closeout merge SHA is intentionally not pinned here so this end-state record remains accurate.
+
 - [x] Apply the explicitly owner-approved Vercel Authentication `preview` boundary; keep preview protection enabled.
 - [x] Run the read-only anonymous production smoke and retain only its newest labeled mobile prediction, review, leaderboard, and administrator screenshots under `docs/assets/qa/`.
 - [x] Keep this branding-only production verification read-only. No production write smoke ran and no production data changed; the prior-release write/cleanup proof remains historical evidence only.
 - [x] Confirm zero browser console/page errors, zero unexpected same-origin request failures or HTTP error responses, zero Vercel error log entries, and zero HTTP 500 responses for the final production run.
-- [ ] Move draft GitHub PR #1 through review and merge, synchronize local `main`, and remove completed branch/worktree state.
+- [x] Publish the Dranx iteration and final evidence through canonical `main`, synchronize local `main` with `origin/main`, remove completed local branch state, and retain only the single primary worktree.

@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="canonical-source" content="QA.md" />
-    <meta name="canonical-source-sha256" content="b8d83674fe53e0a50b406506e317bcc47fb9e4b4257cfc9d20315a483e4c28a1" />
+    <meta name="canonical-source-sha256" content="68fb7c6df6faf74bb380f1b420bdccc954d824a817929e9c4ff82c15c26c4a04" />
     <title>Quality assurance</title>
     <style>
       :root { color-scheme: light dark; font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
@@ -205,15 +205,16 @@
 <li>Official crests are not redistributed. Local text monograms are the documented launch fallback.</li>
 </ul>
 <h2>Final closeout checklist</h2>
+<p>GitHub <a href="https://github.com/vdoshi96/Pl-predictions/pull/1">PR #1</a> merged successfully into canonical <code>main</code> at merge SHA <code>a0586831332db66158975928e98246eaf72118f1</code>; its head was <code>2a0008e</code>, and its Vercel status was successful. Local <code>main</code> was fast-forwarded to match <code>origin/main</code> at that merge before the final closeout branch was created, and the completed local feature branch was removed. Final closeout leaves local and remote <code>main</code> synchronized, no completed local temporary branch retained, and one primary worktree. The final closeout merge SHA is intentionally not pinned here so this end-state record remains accurate.</p>
 <ul>
 <li><input checked="" disabled="" type="checkbox"> Apply the explicitly owner-approved Vercel Authentication <code>preview</code> boundary; keep preview protection enabled.</li>
 <li><input checked="" disabled="" type="checkbox"> Run the read-only anonymous production smoke and retain only its newest labeled mobile prediction, review, leaderboard, and administrator screenshots under <code>docs/assets/qa/</code>.</li>
 <li><input checked="" disabled="" type="checkbox"> Keep this branding-only production verification read-only. No production write smoke ran and no production data changed; the prior-release write/cleanup proof remains historical evidence only.</li>
 <li><input checked="" disabled="" type="checkbox"> Confirm zero browser console/page errors, zero unexpected same-origin request failures or HTTP error responses, zero Vercel error log entries, and zero HTTP 500 responses for the final production run.</li>
-<li><input disabled="" type="checkbox"> Move draft GitHub PR #1 through review and merge, synchronize local <code>main</code>, and remove completed branch/worktree state.</li>
+<li><input checked="" disabled="" type="checkbox"> Publish the Dranx iteration and final evidence through canonical <code>main</code>, synchronize local <code>main</code> with <code>origin/main</code>, remove completed local branch state, and retain only the single primary worktree.</li>
 </ul>
 
-      <p class="source">Generated deterministically from <a href="QA.md">docs/QA.md</a>. Canonical SHA-256: <code>b8d83674fe53e0a50b406506e317bcc47fb9e4b4257cfc9d20315a483e4c28a1</code>.</p>
+      <p class="source">Generated deterministically from <a href="QA.md">docs/QA.md</a>. Canonical SHA-256: <code>68fb7c6df6faf74bb380f1b420bdccc954d824a817929e9c4ff82c15c26c4a04</code>.</p>
     </main>
   </body>
 </html>

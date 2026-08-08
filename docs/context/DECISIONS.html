@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="canonical-source" content="DECISIONS.md" />
+    <meta name="canonical-source-sha256" content="88d1e27e4e087ce5d6e4114ee8522599ccd96f4b7127d487dd134e58a9696088" />
+    <title>Decisions</title>
+    <style>
+      :root { color-scheme: light dark; font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+      body { margin: 0; background: #f5f5f0; color: #18201c; }
+      main { box-sizing: border-box; width: min(100% - 2rem, 880px); margin: 2rem auto; padding: clamp(1.25rem, 4vw, 3rem); background: #fff; border: 1px solid #d9ddd8; border-radius: 1rem; box-shadow: 0 18px 60px rgb(22 31 26 / 8%); }
+      h1, h2, h3 { line-height: 1.15; color: #102d22; }
+      h1 { font-size: clamp(2rem, 5vw, 3.25rem); letter-spacing: -.04em; }
+      h2 { margin-top: 2.5rem; padding-top: 1rem; border-top: 1px solid #e2e6e2; }
+      p, li { line-height: 1.7; }
+      a { color: #087854; text-underline-offset: .2em; }
+      code { padding: .12rem .35rem; border-radius: .3rem; background: #edf1ed; font-size: .92em; }
+      pre { overflow-x: auto; padding: 1rem; border-radius: .65rem; background: #111a16; color: #edf8f2; }
+      pre code { padding: 0; background: transparent; }
+      table { display: block; overflow-x: auto; width: 100%; border-collapse: collapse; }
+      th, td { padding: .65rem .8rem; border: 1px solid #d9ddd8; text-align: left; vertical-align: top; }
+      th { background: #edf4ef; }
+      img { max-width: 100%; height: auto; border-radius: .75rem; }
+      blockquote { margin-left: 0; padding-left: 1rem; border-left: .25rem solid #1b9a6c; color: #49564f; }
+      .source { margin-top: 3rem; padding-top: 1rem; border-top: 1px solid #d9ddd8; color: #627069; font-size: .85rem; }
+      @media (prefers-color-scheme: dark) {
+        body { background: #0e1512; color: #e5ebe7; }
+        main { background: #16201b; border-color: #34423a; }
+        h1, h2, h3 { color: #f2fff8; }
+        h2, .source { border-color: #34423a; }
+        a { color: #58ddb0; }
+        code, th { background: #24322b; }
+        th, td { border-color: #3b4b42; }
+        blockquote { color: #b5c2bb; }
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>Decisions</h1>
+<h2>2026-08-08: Static operational data boundary</h2>
+<p>The deployed application has no live football API and no scheduled scraper. A source-neutral canonical importer plus manual admin editor write validated snapshots. This implements the owner&#39;s automation preference while isolating source access and preserving the last good snapshot.</p>
+<h2>2026-08-08: Vercel-managed Neon and Drizzle</h2>
+<p>Use Vercel Marketplace Neon with pooled <code>DATABASE_URL</code>, Neon HTTP, Drizzle ORM, committed migrations, and atomic batches with pre-generated identifiers. This is current, serverless-friendly, and avoids obsolete Vercel Postgres packages.</p>
+<h2>2026-08-08: Accessible maintained dnd-kit</h2>
+<p>Use the current <code>@dnd-kit/react</code> sortable API. Pointer and keyboard behavior are first-class; touch-action is limited to the handle to preserve mobile scroll.</p>
+<h2>2026-08-08: Monograms until crest rights are cleared</h2>
+<p>FotMob image locations and a consumer subscription do not provide redistribution permission. Ship crisp club monograms with real names and documented source status; preserve a local asset field so permitted real marks can replace them later.</p>
+<h2>2026-08-08: Derived scoring and shared ranks</h2>
+<p>Do not persist editable totals. Derive score and tier counts from prediction items and the one active snapshot. Equal totals share the same rank, and names are alphabetized only for deterministic display.</p>
+
+      <p class="source">Generated deterministically from <a href="DECISIONS.md">docs/context/DECISIONS.md</a>. Canonical SHA-256: <code>88d1e27e4e087ce5d6e4114ee8522599ccd96f4b7127d487dd134e58a9696088</code>.</p>
+    </main>
+  </body>
+</html>

@@ -1,0 +1,63 @@
+{
+  "name": "pl-predictions",
+  "version": "0.1.0",
+  "private": true,
+  "engines": {
+    "node": "24.x"
+  },
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint . --max-warnings=0",
+    "typecheck": "tsc --noEmit",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "test": "vitest run",
+    "test:coverage": "vitest run --coverage",
+    "test:e2e": "playwright test",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "dotenv -e .env.local -- drizzle-kit migrate",
+    "db:seed": "dotenv -e .env.local -- tsx scripts/seed.ts",
+    "standings:import": "dotenv -e .env.local -- tsx scripts/import-standings.ts",
+    "docs:generate": "node scripts/generate-docs-html.mjs",
+    "docs:check": "node scripts/generate-docs-html.mjs --check",
+    "check": "npm run docs:check && npm run format:check && npm run lint && npm run typecheck && npm run test && npm run build && npm run test:e2e"
+  },
+  "dependencies": {
+    "@dnd-kit/helpers": "0.5.0",
+    "@dnd-kit/react": "0.5.0",
+    "@neondatabase/serverless": "1.1.0",
+    "@radix-ui/react-dialog": "1.1.23",
+    "clsx": "2.1.1",
+    "drizzle-orm": "0.45.2",
+    "lucide-react": "1.30.0",
+    "next": "16.3.0",
+    "react": "19.2.8",
+    "react-dom": "19.2.8",
+    "tailwind-merge": "3.6.0",
+    "zod": "4.4.3"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.62.1",
+    "@tailwindcss/postcss": "^4",
+    "@testing-library/jest-dom": "7.0.0",
+    "@testing-library/react": "16.3.2",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "@vitest/coverage-v8": "4.1.10",
+    "dotenv-cli": "11.0.0",
+    "drizzle-kit": "0.31.10",
+    "eslint": "^9",
+    "eslint-config-next": "16.3.0",
+    "jsdom": "30.0.1",
+    "marked": "18.0.9",
+    "prettier": "3.9.6",
+    "prettier-plugin-tailwindcss": "0.8.1",
+    "tailwindcss": "^4",
+    "tsx": "4.23.11",
+    "typescript": "^5",
+    "vitest": "4.1.10"
+  }
+}

@@ -1,0 +1,20 @@
+# Dependencies and build output
+/node_modules
+/.next
+/out
+/coverage
+/playwright-report
+/test-results
+/output/playwright
+
+# Local and platform state
+.vercel
+.env*
+!.env.example
+.DS_Store
+*.tsbuildinfo
+next-env.d.ts
+
+# Marketplace-installed global agent material is not project source.
+.agents/
+skills-lock.json

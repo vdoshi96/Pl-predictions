@@ -4,6 +4,8 @@ PL Predictions is an unofficial, mobile-first prediction game for a private grou
 
 Production: [https://pl-predictions-2026.vercel.app](https://pl-predictions-2026.vercel.app)
 
+GitHub: [https://github.com/vdoshi96/Pl-predictions](https://github.com/vdoshi96/Pl-predictions)
+
 Deployment status: the final production build is Ready, but Vercel Authentication currently protects every `vercel.app` deployment. Anonymous launch verification awaits explicit owner approval to switch the project to production-public/preview-protected access; previews will remain authenticated.
 
 ## Product behavior

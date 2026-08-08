@@ -37,6 +37,9 @@
 
 ### Open closeout
 
-- Push the feature branch to the owner-supplied public GitHub repository, merge it to `main`, synchronize local `main`, and verify no completed worktrees remain.
 - After explicit owner approval, set Vercel Authentication to preview-only, run the anonymous read-only smoke plus the separately gated exact-ID submit/privacy/delete proof, confirm zero production QA residue, and retain only the newest annotated screenshots.
 - Refresh final smoke/GitHub evidence, regenerate every HTML peer, and rerun parity/format checks.
+
+### Repository publication
+
+- Published the tested feature history to [vdoshi96/Pl-predictions](https://github.com/vdoshi96/Pl-predictions), merged it into the canonical `main` release branch, synchronized local and remote `main`, and removed completed branch/worktree state.

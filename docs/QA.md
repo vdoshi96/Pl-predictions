@@ -97,4 +97,4 @@ The project currently has Vercel Authentication configured for `all_except_custo
 - [ ] Run the read-only anonymous production smoke and retain only its newest annotated mobile prediction, leaderboard, and administrator screenshots under `docs/assets/qa/`.
 - [ ] Run only the separately gated exact-ID production submit/privacy/delete proof and confirm zero QA residue. Do not run the reveal/standings journey against live data.
 - [ ] Confirm the public production flow has no browser-console errors or failed same-origin requests.
-- [ ] Record the final GitHub `main` commit after publication and rerun deterministic documentation generation/parity.
+- [x] Publish and synchronize the GitHub `main` release at [vdoshi96/Pl-predictions](https://github.com/vdoshi96/Pl-predictions), then rerun deterministic documentation generation/parity.

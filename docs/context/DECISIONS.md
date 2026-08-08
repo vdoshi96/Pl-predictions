@@ -42,4 +42,4 @@ Integration and full browser journeys must never target the production database.
 
 ## 2026-08-08: Production public, previews protected
 
-The intended Vercel Authentication boundary is `preview`: the finished production site is public while preview deployments require owner sign-in. This is narrower than disabling deployment protection. Because changing the existing all-deployments setting persistently exposes production, apply it only after explicit owner approval and then verify both anonymous production access and continued preview protection.
+Use the Vercel Authentication boundary `preview`: the finished production site is public while preview deployments require owner sign-in. This is narrower than disabling deployment protection. The owner explicitly approved the persistent change from all-deployments protection; anonymous production access now returns 200, and the retained preview URL still redirects to Vercel SSO with 302.

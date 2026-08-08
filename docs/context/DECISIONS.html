@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="canonical-source" content="DECISIONS.md" />
-    <meta name="canonical-source-sha256" content="987d6b21dbeb7b3440934d88737c01bb4113a84d8f6f3db9e3d6f9114a5b37f4" />
+    <meta name="canonical-source-sha256" content="db443149920f178b31dc6c982cbca0dc4f31bb7a5e4a4232c125df098ad3598b" />
     <title>Decisions</title>
     <style>
       :root { color-scheme: light dark; font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
@@ -60,9 +60,9 @@
 <h2>2026-08-08: Isolated database tests and bounded production proof</h2>
 <p>Integration and full browser journeys must never target the production database. <code>scripts/run-with-test-database.mjs</code> uses an explicit <code>TEST_DATABASE_URL</code> or derives <code>TEST_DATABASE_NAME</code>, compares the resolved identity with production, and fails closed on ambiguity or equality. Production verification is split into a read-only public smoke and an explicit opt-in submit/privacy/delete proof scoped to the exact created prediction ID. The irreversible reveal/standings journey is test-only.</p>
 <h2>2026-08-08: Production public, previews protected</h2>
-<p>The intended Vercel Authentication boundary is <code>preview</code>: the finished production site is public while preview deployments require owner sign-in. This is narrower than disabling deployment protection. Because changing the existing all-deployments setting persistently exposes production, apply it only after explicit owner approval and then verify both anonymous production access and continued preview protection.</p>
+<p>Use the Vercel Authentication boundary <code>preview</code>: the finished production site is public while preview deployments require owner sign-in. This is narrower than disabling deployment protection. The owner explicitly approved the persistent change from all-deployments protection; anonymous production access now returns 200, and the retained preview URL still redirects to Vercel SSO with 302.</p>
 
-      <p class="source">Generated deterministically from <a href="DECISIONS.md">docs/context/DECISIONS.md</a>. Canonical SHA-256: <code>987d6b21dbeb7b3440934d88737c01bb4113a84d8f6f3db9e3d6f9114a5b37f4</code>.</p>
+      <p class="source">Generated deterministically from <a href="DECISIONS.md">docs/context/DECISIONS.md</a>. Canonical SHA-256: <code>db443149920f178b31dc6c982cbca0dc4f31bb7a5e4a4232c125df098ad3598b</code>.</p>
     </main>
   </body>
 </html>

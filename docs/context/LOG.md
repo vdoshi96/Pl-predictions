@@ -32,14 +32,21 @@
 - Passed 5 browser journeys with 20 intentional project-routing skips across desktop, exact 320/390/430-pixel Chromium, and iPhone 13 WebKit. The run covered no-overflow layout, real mouse/touch/keyboard reorder, 56-pixel touch handles, review/submit, raw HTML/RSC hidden-entry privacy, pre-reveal leaderboard, admin manual standings, recalculation, comparison, exact-ID deletion, and reversible isolated-database cleanup.
 - `npm audit --omit=dev --audit-level=high` found 0 vulnerabilities. The full audit found 4 moderate development-only legacy `esbuild` paths through `drizzle-kit`, no high/critical findings, and only a breaking forced downgrade; no force change was applied.
 - Applied forward migration `0001_left_iron_fist.sql` to production before deploying code that reads its new watermark, then reran the idempotent 20-team seed.
-- Deployed Ready preview `dpl_e7yEgPhrJBR17qnoQk3EAwdXjFmQ` and Ready production `dpl_CGDPYcKNhq6EJb8AUReEVC8odRDF`; [https://pl-predictions-2026.vercel.app](https://pl-predictions-2026.vercel.app) points to the final production deployment.
-- Attempted the narrow Vercel Authentication setting `preview` so only previews remain protected. Policy correctly rejected the persistent production-access change without explicit owner approval; no workaround or weaker setting was applied.
+- Received explicit owner approval and changed Vercel Authentication to `preview`. Anonymous production now returns 200 while the retained preview URL continues to return a 302 Vercel SSO redirect; preview protection was not disabled.
+- Traced a Vercel edge 404 on an otherwise Ready production deployment to a null project framework preset. Set the preset to `nextjs`, deployed Ready production `dpl_JCfjcxvtVVfbsU55mmTppBK2FB9G` at [https://pl-predictions-65aqenfnq-vdoshi96s-projects.vercel.app](https://pl-predictions-65aqenfnq-vdoshi96s-projects.vercel.app), and mapped [https://pl-predictions-2026.vercel.app](https://pl-predictions-2026.vercel.app) to it.
+- Passed the final anonymous production smoke in all 5 projects across desktop Chromium, mobile Chromium at 390 pixels, exact 320/430-pixel reflow, and iPhone WebKit. Health, no-overflow, mouse/touch/keyboard reorder, and zero console, page, unexpected same-origin request, or HTTP response error assertions passed; only expected canceled speculative `_rsc` prefetches were excluded.
+- Retained and visually inspected only the newest prediction, review, leaderboard, and administrator-login mobile screenshots under `docs/assets/qa/`.
+- Exact-deleted four legacy `Reflow QA` predictions by UUID before the final smoke; none had a prediction-target audit row, and the follow-up query found zero residue.
+- Passed the explicitly gated 1-case production write smoke: exact QA submit, receipt-only unrevealed access, hidden public roster details, and administrator deletion of the exact created prediction. Final queries found zero predictions, items, or prediction-target audits; the season remained open, unrevealed, and unlocked with null active/final pointers.
+- Reviewed Vercel logs for the preceding hour and found zero error entries and zero HTTP 500 responses.
 
-### Open closeout
+### Final closeout
 
-- After explicit owner approval, set Vercel Authentication to preview-only, run the anonymous read-only smoke plus the separately gated exact-ID submit/privacy/delete proof, confirm zero production QA residue, and retain only the newest annotated screenshots.
-- Refresh final smoke/GitHub evidence, regenerate every HTML peer, and rerun parity/format checks.
+- Refreshed final production evidence and labeled screenshot references in canonical Markdown.
+- Regenerated every HTML peer and reran parity/format checks before publication.
+- Published this final evidence update through the closeout branch, merged it into GitHub `main`, synchronized local and remote `main`, and removed completed branch/worktree state.
 
 ### Repository publication
 
 - Published the tested feature history to [vdoshi96/Pl-predictions](https://github.com/vdoshi96/Pl-predictions), merged it into the canonical `main` release branch, synchronized local and remote `main`, and removed completed branch/worktree state.
+- Published the final production evidence and mobile screenshots to the same canonical `main` release branch; local and remote release state are synchronized.

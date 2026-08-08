@@ -33,6 +33,25 @@ async function resetScrollPosition(page: import("@playwright/test").Page) {
     .toEqual([0, 0]);
 }
 
+async function expectClubMarksLoaded(
+  clubMarks: import("@playwright/test").Locator,
+) {
+  await expect(clubMarks).toHaveCount(20);
+  for (const clubMark of await clubMarks.all()) {
+    await clubMark.scrollIntoViewIfNeeded();
+    await expect
+      .poll(() =>
+        clubMark.evaluate(
+          (image) =>
+            image instanceof HTMLImageElement &&
+            image.complete &&
+            image.naturalWidth > 0,
+        ),
+      )
+      .toBe(true);
+  }
+}
+
 test("production public routes are mobile-safe and healthy", async ({
   page,
 }, testInfo) => {
@@ -67,7 +86,16 @@ test("production public routes are mobile-safe and healthy", async ({
     const isCanceledRscPrefetch =
       requestUrl.searchParams.has("_rsc") &&
       /(?:ERR_ABORTED|cancelled|canceled)/iu.test(errorText);
-    if (requestUrl.origin === productionOrigin && !isCanceledRscPrefetch) {
+    const optimizedImageSource = requestUrl.searchParams.get("url");
+    const isCanceledTeamMarkCandidate =
+      requestUrl.pathname === "/_next/image" &&
+      optimizedImageSource?.startsWith("/team-marks/") &&
+      /(?:ERR_ABORTED|cancelled|canceled)/iu.test(errorText);
+    if (
+      requestUrl.origin === productionOrigin &&
+      !isCanceledRscPrefetch &&
+      !isCanceledTeamMarkCandidate
+    ) {
       networkErrors.push(`${request.method()} ${request.url()} ${errorText}`);
     }
   });
@@ -96,16 +124,6 @@ test("production public routes are mobile-safe and healthy", async ({
   ).toHaveCount(20);
   const clubMarks = page.getByRole("img", { name: / club mark$/u });
   await expect(clubMarks).toHaveCount(20);
-  await expect
-    .poll(() =>
-      clubMarks.evaluateAll((images) =>
-        images.every(
-          (image) =>
-            image instanceof HTMLImageElement && image.naturalWidth > 0,
-        ),
-      ),
-    )
-    .toBe(true);
   expect(
     await clubMarks.evaluateAll((images) =>
       images.every((image) => {
@@ -172,9 +190,20 @@ test("production public routes are mobile-safe and healthy", async ({
     }
 
     await reviewButton.click();
-    await expect(
-      page.getByRole("dialog", { name: "Check your 1–20" }),
-    ).toBeVisible();
+    const reviewDialog = page.getByRole("dialog", {
+      name: "Check your 1–20",
+    });
+    await expect(reviewDialog).toBeVisible();
+    await expectClubMarksLoaded(
+      reviewDialog.getByRole("img", { name: / club mark$/u }),
+    );
+    const reviewScroller = reviewDialog.locator(".overflow-y-auto");
+    await reviewScroller.evaluate((element) => {
+      element.scrollTop = 0;
+    });
+    await expect
+      .poll(() => reviewScroller.evaluate((element) => element.scrollTop))
+      .toBe(0);
     if (captureMobileEvidence) {
       await page.screenshot({
         path: path.join(screenshotDirectory!, "review-mobile.png"),
@@ -197,6 +226,8 @@ test("production public routes are mobile-safe and healthy", async ({
       });
     }
   }
+
+  await expectClubMarksLoaded(clubMarks);
 
   await page.goto("/leaderboard");
   await expect(

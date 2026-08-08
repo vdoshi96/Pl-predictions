@@ -51,7 +51,7 @@
 - Published the tested feature history to [vdoshi96/Pl-predictions](https://github.com/vdoshi96/Pl-predictions), merged it into the canonical `main` release branch, synchronized local and remote `main`, and removed completed branch/worktree state.
 - Published the final production evidence and mobile screenshots to the same canonical `main` release branch; local and remote release state are synchronized.
 
-### Dranx branding iteration (production verified; GitHub closeout pending)
+### Dranx branding iteration (complete)
 
 - Selected **Dranx Prediction League** as the user-facing identity while retaining the repository, Vercel, Neon, URL, environment, and credential identifiers already used operationally.
 - Defined a Premier-League-inspired palette anchored on official purple `#37003c` with cyan `#05f0ff`, green `#00ff87`, and pink `#ff2882` accents and an original Dranx mark.
@@ -64,4 +64,6 @@
 - Reviewed Vercel logs for the preceding hour and found zero error entries and zero HTTP 500 responses.
 - Refreshed and visually inspected the prediction, review, leaderboard, and administrator-login production screenshots at 390 by 844 pixels.
 - Kept the branding-only production verification read-only: no production write smoke ran and no production data changed. The prior release's exact-ID write and cleanup evidence remains intentional history.
-- Draft GitHub PR #1 remains pending review and merge; no publication, local-`main` synchronization, or worktree cleanup is claimed for this iteration yet.
+- Merged GitHub [PR #1](https://github.com/vdoshi96/Pl-predictions/pull/1) successfully into canonical `main` at merge SHA `a0586831332db66158975928e98246eaf72118f1`. Its head was `2a0008e`, and its Vercel status was successful.
+- Fast-forwarded local `main` to match `origin/main` at that merge before creating the final closeout branch, then removed the completed feature branch.
+- Published the final closeout documentation through canonical `main`, synchronized local and remote `main`, removed the completed local temporary closeout branch after its merge, and retained one primary worktree. The final closeout merge SHA is intentionally not pinned in this durable end-state note.

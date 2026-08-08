@@ -17,7 +17,7 @@ Sources:
 
 FotMob league ID `47` and the canonical team pages expose the factual external IDs used for import matching. Those identifiers are seeded once. The application stores only minimal snapshot facts: team ID, position, played, points, matchweek, capture time, and source URL.
 
-FotMob's terms effective 2026-06-15 prohibit robots/crawlers and systematic or regular extraction. A consumer subscription is not evidence of a data redistribution or automation licence. The Premier League also says club names and badges remain member-club marks.
+FotMob's current terms, checked 2026-08-08, prohibit robots/crawlers and systematic or regular extraction. A consumer subscription is not evidence of a data redistribution or automation licence. The Premier League also says club names and badges remain member-club marks.
 
 Decision: do not implement recurring FotMob scraping in the product. A future owner-run Codex workflow may submit a permitted/licensed export through the source-neutral importer. The app also supports manual standings. It stores no source HTML, browser cookies, or subscription credentials.
 
@@ -52,7 +52,7 @@ Sources:
 
 Vercel Postgres is discontinued for new databases. Neon is provisioned through Vercel Marketplace and injects a pooled `DATABASE_URL`. The project uses `@neondatabase/serverless` `1.1.0`, Drizzle ORM `0.45.2`, and committed Drizzle Kit `0.31.10` migrations.
 
-Decision: use `drizzle-orm/neon-http` with pre-generated UUIDs and atomic Drizzle batch operations for prediction and snapshot writes. This matches short serverless requests while keeping each aggregate atomic. The database schema duplicates application invariants with unique and check constraints.
+Decision: use `drizzle-orm/neon-http`. Prediction creation is one guarded PostgreSQL common-table-expression statement, so database-time fairness checks, the parent, and all 20 items succeed together. Snapshot creation uses an atomic Drizzle batch with pre-generated UUIDs. Both patterns match short serverless requests, and the database schema duplicates application invariants with unique and check constraints.
 
 The Vercel project `vdoshi96s-projects/pl-predictions` and its Neon resource `neon-coffee-queen` were provisioned before scaffolding. No Vercel Cron is configured because the owner explicitly chose Codex-driven updates and no runtime data API.
 
@@ -64,6 +64,7 @@ Sources:
 - [Drizzle Neon guide](https://orm.drizzle.team/docs/connect-neon)
 - [Drizzle batch API](https://orm.drizzle.team/docs/batch-api)
 - [Vercel GitHub integration](https://vercel.com/docs/git/vercel-for-github)
+- [Vercel Authentication deployment protection](https://vercel.com/docs/deployment-protection/methods-to-protect-deployments/vercel-authentication)
 
 ## Rejected alternatives
 

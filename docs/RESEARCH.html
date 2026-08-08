@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="canonical-source" content="RESEARCH.md" />
-    <meta name="canonical-source-sha256" content="4f307eb564535b9cde745d13a8cebd900de4caeba73a29728a359305256a1946" />
+    <meta name="canonical-source-sha256" content="9e2bd21b1f5b31a20894a98914ab4f9cce4b1c60ff7d544c0b94afea140b8789" />
     <title>Research: PL Predictions</title>
     <style>
       :root { color-scheme: light dark; font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
@@ -50,7 +50,7 @@
 </ul>
 <h2>FotMob data and rights</h2>
 <p>FotMob league ID <code>47</code> and the canonical team pages expose the factual external IDs used for import matching. Those identifiers are seeded once. The application stores only minimal snapshot facts: team ID, position, played, points, matchweek, capture time, and source URL.</p>
-<p>FotMob&#39;s terms effective 2026-06-15 prohibit robots/crawlers and systematic or regular extraction. A consumer subscription is not evidence of a data redistribution or automation licence. The Premier League also says club names and badges remain member-club marks.</p>
+<p>FotMob&#39;s current terms, checked 2026-08-08, prohibit robots/crawlers and systematic or regular extraction. A consumer subscription is not evidence of a data redistribution or automation licence. The Premier League also says club names and badges remain member-club marks.</p>
 <p>Decision: do not implement recurring FotMob scraping in the product. A future owner-run Codex workflow may submit a permitted/licensed export through the source-neutral importer. The app also supports manual standings. It stores no source HTML, browser cookies, or subscription credentials.</p>
 <p>Crest decision: FotMob&#39;s image URLs identify the genuine marks but do not grant redistribution or hotlinking rights. Production starts with polished text monograms and documented attribution/rights status. Real local assets can replace them without schema or UI changes after the owner obtains permission. This is the documented temporary source limitation allowed by the brief.</p>
 <p>Sources:</p>
@@ -77,7 +77,7 @@
 </ul>
 <h2>Database and deployment</h2>
 <p>Vercel Postgres is discontinued for new databases. Neon is provisioned through Vercel Marketplace and injects a pooled <code>DATABASE_URL</code>. The project uses <code>@neondatabase/serverless</code> <code>1.1.0</code>, Drizzle ORM <code>0.45.2</code>, and committed Drizzle Kit <code>0.31.10</code> migrations.</p>
-<p>Decision: use <code>drizzle-orm/neon-http</code> with pre-generated UUIDs and atomic Drizzle batch operations for prediction and snapshot writes. This matches short serverless requests while keeping each aggregate atomic. The database schema duplicates application invariants with unique and check constraints.</p>
+<p>Decision: use <code>drizzle-orm/neon-http</code>. Prediction creation is one guarded PostgreSQL common-table-expression statement, so database-time fairness checks, the parent, and all 20 items succeed together. Snapshot creation uses an atomic Drizzle batch with pre-generated UUIDs. Both patterns match short serverless requests, and the database schema duplicates application invariants with unique and check constraints.</p>
 <p>The Vercel project <code>vdoshi96s-projects/pl-predictions</code> and its Neon resource <code>neon-coffee-queen</code> were provisioned before scaffolding. No Vercel Cron is configured because the owner explicitly chose Codex-driven updates and no runtime data API.</p>
 <p>Sources:</p>
 <ul>
@@ -87,6 +87,7 @@
 <li><a href="https://orm.drizzle.team/docs/connect-neon">Drizzle Neon guide</a></li>
 <li><a href="https://orm.drizzle.team/docs/batch-api">Drizzle batch API</a></li>
 <li><a href="https://vercel.com/docs/git/vercel-for-github">Vercel GitHub integration</a></li>
+<li><a href="https://vercel.com/docs/deployment-protection/methods-to-protect-deployments/vercel-authentication">Vercel Authentication deployment protection</a></li>
 </ul>
 <h2>Rejected alternatives</h2>
 <ul>
@@ -100,7 +101,7 @@
 <h2>Failure behavior</h2>
 <p>Malformed, stale, duplicate, unauthorized, or incomplete imports never replace the last active snapshot. All-zero preseason tables remain unscored. If no valid active standings exist, the leaderboard still shows submission count and a clear scoring-not-started state. Manual admin entry remains available even when the external source is inaccessible.</p>
 
-      <p class="source">Generated deterministically from <a href="RESEARCH.md">docs/RESEARCH.md</a>. Canonical SHA-256: <code>4f307eb564535b9cde745d13a8cebd900de4caeba73a29728a359305256a1946</code>.</p>
+      <p class="source">Generated deterministically from <a href="RESEARCH.md">docs/RESEARCH.md</a>. Canonical SHA-256: <code>9e2bd21b1f5b31a20894a98914ab4f9cce4b1c60ff7d544c0b94afea140b8789</code>.</p>
     </main>
   </body>
 </html>

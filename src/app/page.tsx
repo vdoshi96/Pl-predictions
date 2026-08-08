@@ -1,69 +1,125 @@
-import Image from "next/image";
+import { CalendarClock, Check, Trophy } from "lucide-react";
 
-export default function Home() {
+import { submitPrediction } from "@/app/actions/predictions";
+import { Badge } from "@/components/ui/badge";
+import { Card, CardContent } from "@/components/ui/card";
+import { PredictionForm } from "@/features/predictions/prediction-form";
+import { getActiveSeasonView } from "@/features/seasons/queries";
+import { formatUtcDateTime } from "@/shared/format";
+import { getSeasonAccess } from "@/shared/policy";
+
+export const dynamic = "force-dynamic";
+
+const scoringRules = [
+  { label: "Exact position", points: 5 },
+  { label: "Within 3 places", points: 3 },
+  { label: "Same half only", points: 1 },
+] as const;
+
+export default async function PredictionPage() {
+  const { season, teams } = await getActiveSeasonView();
+  const access = getSeasonAccess({
+    revealPredictions: season.revealPredictions,
+    submissionDeadline: season.submissionDeadline,
+    submissionsLocked: season.submissionsLocked,
+  });
+
+  const closedReason = season.submissionsLocked
+    ? "The owner has locked new predictions."
+    : access.deadlinePassed
+      ? "The submission deadline has passed."
+      : "Predictions have been revealed, so new entries are permanently closed.";
+
   return (
-    <div className="flex flex-1 flex-col items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex w-full max-w-3xl flex-1 flex-col items-center justify-between bg-white px-16 py-32 sm:items-start dark:bg-black">
-        <Image
-          className="h-5 w-[100px] dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl leading-10 font-semibold tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the{" "}
-            <code className="rounded bg-black/[.06] px-1.5 py-0.5 font-mono text-[0.9em] dark:bg-white/[.08]">
-              page.tsx
-            </code>{" "}
-            file.
+    <main className="page-shell w-full flex-1 py-6 sm:py-10">
+      <div className="mx-auto grid max-w-3xl gap-5 sm:gap-7">
+        <section className="order-1 overflow-hidden rounded-3xl bg-slate-950 px-5 py-5 text-white sm:px-8 sm:py-9">
+          <div className="flex flex-wrap items-center gap-2">
+            <Badge className="bg-emerald-300 text-slate-950 ring-emerald-300">
+              {season.name}
+            </Badge>
+            <Badge variant={access.submissionsOpen ? "success" : "warning"}>
+              {access.submissionsOpen ? "Open" : "Closed"}
+            </Badge>
+          </div>
+          <h1 className="mt-3 text-3xl leading-tight font-black tracking-[-0.04em] text-balance sm:mt-5 sm:text-5xl">
+            Your Premier League table. One final call.
           </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
+          <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-300 sm:mt-4 sm:text-base sm:leading-7">
+            Put all 20 clubs in your predicted finishing order, review every
+            place, and submit your immutable entry for the friends league.
           </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="bg-foreground text-background flex h-12 w-full items-center justify-center gap-2 rounded-full px-5 transition-colors hover:bg-[#383838] md:w-[158px] dark:hover:bg-[#ccc]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="h-[14px] w-4 dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={14}
+
+          <div className="mt-4 flex items-start gap-3 rounded-2xl border border-slate-700 bg-slate-900 p-3 sm:mt-6 sm:p-4">
+            <CalendarClock
+              aria-hidden="true"
+              className="mt-0.5 size-5 shrink-0 text-emerald-300"
             />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] md:w-[158px] dark:border-white/[.145] dark:hover:bg-[#1a1a1a]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+            <div>
+              <p className="text-sm font-bold">
+                {access.submissionsOpen
+                  ? "Submissions open"
+                  : "Submissions closed"}
+              </p>
+              <p className="mt-1 text-xs leading-5 text-slate-400">
+                {season.submissionDeadline
+                  ? `Deadline: ${formatUtcDateTime(season.submissionDeadline)}`
+                  : "The owner has not set a deadline yet. Server-side lock controls still apply."}
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <Card className="order-3 sm:order-2">
+          <CardContent className="grid gap-4 sm:grid-cols-[1fr_auto] sm:items-center">
+            <div>
+              <div className="flex items-center gap-2">
+                <Trophy aria-hidden="true" className="size-5 text-amber-600" />
+                <h2 className="font-black tracking-tight">How scoring works</h2>
+              </div>
+              <p className="mt-1 text-sm leading-6 text-slate-600">
+                Only the highest matching tier counts for each club. Scores are
+                recalculated from scratch against the latest valid table.
+              </p>
+            </div>
+            <div className="grid grid-cols-3 gap-2" aria-label="Scoring tiers">
+              {scoringRules.map((rule) => (
+                <div
+                  className="min-w-0 rounded-xl bg-slate-50 px-2 py-2.5 text-center ring-1 ring-slate-200"
+                  key={rule.label}
+                >
+                  <strong className="block text-lg font-black text-slate-950">
+                    {rule.points}
+                  </strong>
+                  <span className="mt-0.5 block text-[0.68rem] leading-4 font-medium text-slate-600">
+                    {rule.label}
+                  </span>
+                </div>
+              ))}
+            </div>
+            <p className="flex items-center gap-2 text-xs font-semibold text-slate-500 sm:col-span-2">
+              <Check aria-hidden="true" className="size-4 text-emerald-600" />
+              Exact full table: 100 points maximum.
+            </p>
+          </CardContent>
+        </Card>
+
+        <div className="order-2 min-w-0 sm:order-3">
+          <PredictionForm
+            teams={teams.map((team) => ({
+              id: team.id,
+              displayName: team.displayName,
+              shortName: team.shortName,
+              sortName: team.sortName,
+              assetPath: team.assetPath,
+            }))}
+            onSubmit={submitPrediction}
+            seasonName={season.name}
+            disabled={!access.submissionsOpen}
+            disabledReason={closedReason}
+          />
         </div>
-      </main>
-    </div>
+      </div>
+    </main>
   );
 }

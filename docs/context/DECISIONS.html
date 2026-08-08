@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="canonical-source" content="DECISIONS.md" />
-    <meta name="canonical-source-sha256" content="88d1e27e4e087ce5d6e4114ee8522599ccd96f4b7127d487dd134e58a9696088" />
+    <meta name="canonical-source-sha256" content="987d6b21dbeb7b3440934d88737c01bb4113a84d8f6f3db9e3d6f9114a5b37f4" />
     <title>Decisions</title>
     <style>
       :root { color-scheme: light dark; font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
@@ -40,17 +40,29 @@
     <main>
       <h1>Decisions</h1>
 <h2>2026-08-08: Static operational data boundary</h2>
-<p>The deployed application has no live football API and no scheduled scraper. A source-neutral canonical importer plus manual admin editor write validated snapshots. This implements the owner&#39;s automation preference while isolating source access and preserving the last good snapshot.</p>
+<p>The deployed application has no live football API, scheduled scraper, or Vercel Cron. A source-neutral canonical importer plus manual admin editor write validated snapshots. This implements the owner&#39;s Codex-run automation preference while isolating source acquisition and preserving the last good snapshot. FotMob must not be scraped automatically without a written licence covering the intended extraction and use.</p>
 <h2>2026-08-08: Vercel-managed Neon and Drizzle</h2>
 <p>Use Vercel Marketplace Neon with pooled <code>DATABASE_URL</code>, Neon HTTP, Drizzle ORM, committed migrations, and atomic batches with pre-generated identifiers. This is current, serverless-friendly, and avoids obsolete Vercel Postgres packages.</p>
 <h2>2026-08-08: Accessible maintained dnd-kit</h2>
 <p>Use the current <code>@dnd-kit/react</code> sortable API. Pointer and keyboard behavior are first-class; touch-action is limited to the handle to preserve mobile scroll.</p>
+<h2>2026-08-08: Mobile is the primary layout</h2>
+<p>Design from the narrow single-column journey outward. Use 56-pixel dedicated move handles, a wrapping full-width navigation, safe-area-aware submission action, no horizontal overflow in the prediction list, explicit focus/live announcements, and reduced-motion support. Desktop density is an enhancement of the same semantic flow rather than a separate interface.</p>
 <h2>2026-08-08: Monograms until crest rights are cleared</h2>
 <p>FotMob image locations and a consumer subscription do not provide redistribution permission. Ship crisp club monograms with real names and documented source status; preserve a local asset field so permitted real marks can replace them later.</p>
 <h2>2026-08-08: Derived scoring and shared ranks</h2>
 <p>Do not persist editable totals. Derive score and tier counts from prediction items and the one active snapshot. Equal totals share the same rank, and names are alphabetized only for deterministic display.</p>
+<h2>2026-08-08: Source finality is advisory</h2>
+<p>Imports always create provisional snapshots even when a source labels a table final. Final status requires all 20 teams to have 38 played games and an explicit authenticated administrator confirmation. This avoids trusting ambiguous provider completion semantics.</p>
+<h2>2026-08-08: Compare-and-swap standings transitions</h2>
+<p>Snapshot activation claims the active pointer value observed at import start, requires no final pointer, and advances a season-row accepted-capture watermark only for a newer observation. Newer identical observations advance that watermark, while genuinely newer historical content may be reactivated without mutating its first-seen provenance. Finalization and undo each use one PostgreSQL common-table-expression statement to claim the exact active/final snapshot and keep pointer, snapshot flag, and audit changes atomic. Whichever concurrent transition wins the shared season row prevents the other from applying a split-brain state.</p>
+<h2>2026-08-08: Single-owner credential handoff</h2>
+<p>Keep the administrator mechanism provider-free. Store the login credential in Vercel server-only environments and the owner&#39;s macOS Keychain, sign short HttpOnly sessions with a separate secret, and rotate either without source changes. Use a distinct bearer secret for the standings intake so data automation never receives administrator-session authority.</p>
+<h2>2026-08-08: Isolated database tests and bounded production proof</h2>
+<p>Integration and full browser journeys must never target the production database. <code>scripts/run-with-test-database.mjs</code> uses an explicit <code>TEST_DATABASE_URL</code> or derives <code>TEST_DATABASE_NAME</code>, compares the resolved identity with production, and fails closed on ambiguity or equality. Production verification is split into a read-only public smoke and an explicit opt-in submit/privacy/delete proof scoped to the exact created prediction ID. The irreversible reveal/standings journey is test-only.</p>
+<h2>2026-08-08: Production public, previews protected</h2>
+<p>The intended Vercel Authentication boundary is <code>preview</code>: the finished production site is public while preview deployments require owner sign-in. This is narrower than disabling deployment protection. Because changing the existing all-deployments setting persistently exposes production, apply it only after explicit owner approval and then verify both anonymous production access and continued preview protection.</p>
 
-      <p class="source">Generated deterministically from <a href="DECISIONS.md">docs/context/DECISIONS.md</a>. Canonical SHA-256: <code>88d1e27e4e087ce5d6e4114ee8522599ccd96f4b7127d487dd134e58a9696088</code>.</p>
+      <p class="source">Generated deterministically from <a href="DECISIONS.md">docs/context/DECISIONS.md</a>. Canonical SHA-256: <code>987d6b21dbeb7b3440934d88737c01bb4113a84d8f6f3db9e3d6f9114a5b37f4</code>.</p>
     </main>
   </body>
 </html>

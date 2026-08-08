@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="canonical-source" content="QA.md" />
-    <meta name="canonical-source-sha256" content="c2c1fc7d62ccfecdde391e8644675c9d34796bee20a5ffe2f770e2adb12de3b8" />
+    <meta name="canonical-source-sha256" content="fb272f9ce6d225d5ff71780322bd9aaf5e7f07f99f2918858bef223a2320da53" />
     <title>Quality assurance</title>
     <style>
       :root { color-scheme: light dark; font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
@@ -39,10 +39,146 @@
   <body>
     <main>
       <h1>Quality assurance</h1>
-<p>QA evidence will be updated after implementation and will retain only the newest completed run.</p>
-<p>Planned gates: documentation parity, formatting, ESLint, strict TypeScript, Vitest unit/integration coverage, production build, Playwright desktop/mobile/keyboard flows, dependency audit, preview inspection, production smoke testing, browser console review, database-write verification, and test-data cleanup.</p>
+<p>Evidence date: 2026-08-08. This document records the newest completed local and deployment run only. Final anonymous production smoke screenshots remain blocked until the owner explicitly approves changing Vercel Authentication from all deployments to previews only. Generated HTML peers remain current with this documented blocker.</p>
+<h2>Current results</h2>
+<table>
+<thead>
+<tr>
+<th>Gate</th>
+<th>Command or environment</th>
+<th>Result</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Formatting</td>
+<td><code>npm run format:check</code></td>
+<td>Passed; rerun after final Markdown/HTML generation.</td>
+</tr>
+<tr>
+<td>ESLint</td>
+<td><code>npm run lint</code></td>
+<td>Passed with zero warnings.</td>
+</tr>
+<tr>
+<td>TypeScript</td>
+<td><code>npm run typecheck</code></td>
+<td>Passed in strict mode after Next route-type generation.</td>
+</tr>
+<tr>
+<td>Unit/component/default suite</td>
+<td><code>npm test</code></td>
+<td>95 passed; 9 database cases skipped by their explicit opt-in guard.</td>
+</tr>
+<tr>
+<td>Isolated Neon integration</td>
+<td><code>npm run test:integration</code></td>
+<td>9 passed against <code>pl_predictions_test</code> through the fail-closed test-database wrapper.</td>
+</tr>
+<tr>
+<td>Restricted-local production build</td>
+<td><code>npm run build:verify</code></td>
+<td>Passed using Next.js Webpack mode.</td>
+</tr>
+<tr>
+<td>Browser journeys</td>
+<td><code>npm run test:e2e</code></td>
+<td>5 passed with 20 intentional project-routing skips across desktop, 320/390/430-pixel Chromium, and iPhone 13 WebKit.</td>
+</tr>
+<tr>
+<td>Production dependency audit</td>
+<td><code>npm audit --omit=dev --audit-level=high</code></td>
+<td>0 vulnerabilities.</td>
+</tr>
+<tr>
+<td>Full dependency audit</td>
+<td><code>npm audit --audit-level=high</code></td>
+<td>4 moderate, 0 high, 0 critical. All four are development-only legacy <code>esbuild</code> paths through <code>drizzle-kit</code>; the proposed force fix would downgrade/break the selected Drizzle toolchain, so no force change was applied.</td>
+</tr>
+<tr>
+<td>Vercel preview build</td>
+<td>deployment <code>dpl_e7yEgPhrJBR17qnoQk3EAwdXjFmQ</code></td>
+<td>Ready after Vercel&#39;s default Turbopack build at the sign-in-protected preview URL.</td>
+</tr>
+<tr>
+<td>Vercel production build</td>
+<td>deployment <code>dpl_CGDPYcKNhq6EJb8AUReEVC8odRDF</code></td>
+<td>Ready after Vercel&#39;s default Turbopack build; stable alias points to this deployment. Anonymous requests still receive Vercel SSO until the explicit protection-setting approval is supplied.</td>
+</tr>
+</tbody></table>
+<p>The local sandbox did not permit a default Turbopack CSS helper to bind its internal port, so the local production gate used <code>next build --webpack</code>. This was an execution-environment restriction, not an application compile error; the Vercel deployment subsequently passed the default Turbopack build.</p>
+<h2>Unit and component coverage</h2>
+<p>The 95-test default run covers:</p>
+<ul>
+<li>every required mutually exclusive scoring example, the top/bottom-half boundary, a 100-point exact table, preseason suppression, and shared ranks;</li>
+<li>NFKC name normalization, length checks, duplicate/missing/out-of-season team validation, and unique positions;</li>
+<li>the exact verified 20-club fixture, display sorting, monogram paths, and factual external mappings;</li>
+<li>pointer/keyboard sorter structure, 56-pixel handle-only touch targets, live language for predicted versus actual positions, A–Z reset, review, server rejection, sticky safe-area action, mobile navigation, and narrow-card shrink behavior;</li>
+<li>database-clock deadline, manual lock, and irreversible early-reveal policy, including concurrent lock and deadline boundaries;</li>
+<li>complete snapshot validation and source-failure envelopes;</li>
+<li>canonical hashing, future-skew rejection, duplicate watermark semantics, historical-content reactivation, initial/changed active-pointer guards, source-finality isolation, and import/finalize races;</li>
+<li>38-game final-candidate requirements plus compare-and-swap finalization and undo;</li>
+<li>constant-time administrator credential verification, signed-session nonce/expiry/tamper handling, cookie attributes, origin checks, mutation authorization, rotation invalidation, and bounded request IDs.</li>
+</ul>
+<h2>Database integration</h2>
+<p><code>npm run test:integration</code> loaded <code>.env.local</code>, routed through <code>scripts/run-with-test-database.mjs</code>, and passed nine cases against the isolated <code>pl_predictions_test</code> database:</p>
+<ol>
+<li>one prediction and exactly 20 items are created atomically;</li>
+<li>case-insensitive participant uniqueness is enforced by PostgreSQL;</li>
+<li>the database deadline boundary creates no partial rows;</li>
+<li>a concurrent administrator lock wins before a guarded prediction insert;</li>
+<li>an inconsistent revealed row still fails closed even if its lock flag is false;</li>
+<li>imported snapshots remain provisional while invalid subsequent input retains the last good active snapshot;</li>
+<li>newer duplicate observations advance the monotonic watermark, historical content can be reactivated without changing first-seen provenance, and delayed changed data is rejected;</li>
+<li>implausibly future capture timestamps are rejected without moving the active pointer; and</li>
+<li>implausibly future source-update timestamps receive the same last-good protection.</li>
+</ol>
+<p>The wrapper refuses to run if the target resolves to production. The suite uses unique identifiers and deletes its prediction/import data after the run. A post-E2E read-only check found zero <code>Mobile QA</code> predictions, zero manual-admin import runs, null active/final pointers, and the original open/unrevealed season flags.</p>
+<h2>Browser and mobile verification</h2>
+<p>Playwright routes focused cases across five projects:</p>
+<ul>
+<li>desktop Chromium for public layout, real mouse drag, and keyboard reorder;</li>
+<li>touch-enabled Chromium at 390 by 844 for the complete private-to-revealed owner journey;</li>
+<li>Chromium at exact 320-pixel and 430-pixel widths for reflow/privacy boundaries; and</li>
+<li>WebKit using the iPhone 13 device profile for the complete touch journey.</li>
+</ul>
+<p>Verified behavior:</p>
+<ul>
+<li><code>/</code> renders exactly 20 verified clubs with no document-level horizontal overflow;</li>
+<li>every move handle measures at least 56 by 56 pixels and is the only touch-action suppression point;</li>
+<li>real mouse and delayed touch gestures reorder through the production sorter; Arrow Down then produces a deterministic one-place order, updated accessible position text, and one live announcement;</li>
+<li>a normalized participant name opens a 20-row review dialog and submits successfully;</li>
+<li>the receipt browser can open its private confirmation, while a clean mobile context receives the not-found page for the same unrevealed entry;</li>
+<li>the pre-reveal leaderboard lists the participant without linking or exposing the table;</li>
+<li>owner login succeeds from the server-only credential, the manual admin table contains 20 clubs, and a provisional matchweek-one snapshot saves;</li>
+<li>early reveal recalculates the submitted table to the expected 96 points, exposes the participant link, and shows provisional comparison details;</li>
+<li>the administrator deletes the test entry and the leaderboard no longer contains it; and</li>
+<li>after each run, the test restores the original season deadline/lock/reveal/active/final pointers and removes its participant, snapshot, import, and audit rows.</li>
+</ul>
+<p>The touch helpers honor the sorter&#39;s 250-millisecond activation constraint before movement. Chromium and WebKit can resolve the moving target at adjacent insertion boundaries, so the journey verifies touch movement independently, resets, and submits a deterministic keyboard order for the 96-point scoring assertion. Automated WebKit emulation is strong regression evidence, but it is not a substitute for a final spot check on the owner&#39;s physical iPhone when one is available.</p>
+<h2>Production deployment evidence</h2>
+<p>Final preview deployment <code>dpl_e7yEgPhrJBR17qnoQk3EAwdXjFmQ</code> is Ready at <a href="https://pl-predictions-lkmdwjsh8-vdoshi96s-projects.vercel.app">https://pl-predictions-lkmdwjsh8-vdoshi96s-projects.vercel.app</a>. Final production deployment <code>dpl_CGDPYcKNhq6EJb8AUReEVC8odRDF</code> is Ready, and <a href="https://pl-predictions-2026.vercel.app">https://pl-predictions-2026.vercel.app</a> points to it. Both passed Vercel&#39;s default Turbopack build and use project <code>vdoshi96s-projects/pl-predictions</code> with Marketplace Neon resource <code>neon-coffee-queen</code>.</p>
+<p>The project currently has Vercel Authentication configured for <code>all_except_custom_domains</code>, so anonymous requests to the <code>vercel.app</code> production alias receive an SSO redirect. The safer intended setting is <code>preview</code>: production public, previews still authenticated. Applying that persistent security-boundary change was correctly blocked pending explicit owner approval. Therefore the anonymous read-only production browser smoke, bounded exact-ID submit/privacy/delete proof, console/network review, and annotated newest-run screenshots remain deliberately unclaimed. The forward migration and idempotent production seed have succeeded, and the final deployment is Ready behind SSO.</p>
+<h2>Security and source review</h2>
+<ul>
+<li>No environment value, receipt token, database URL, administrator credential, or subscription cookie is committed or exposed through a public variable.</li>
+<li>Public entry queries fail closed before reveal unless the matching receipt or administrator session exists.</li>
+<li>Administrator writes require both a valid signed session and exact same-origin request metadata.</li>
+<li>The standings intake uses a separate bearer secret, a 64 KiB body cap, strict JSON/Zod validation, and bounded public errors.</li>
+<li>CSP, anti-framing, MIME-sniffing, referrer, and browser permissions headers are configured.</li>
+<li>Production dependencies have no reported audit vulnerability; the remaining moderate findings are dev-only and do not justify a breaking forced downgrade.</li>
+<li>There is no live football API call, runtime FotMob access, scraper, or Vercel Cron. FotMob automated extraction remains prohibited absent a written licence covering the intended workflow.</li>
+<li>Official crests are not redistributed. Local text monograms are the documented launch fallback.</li>
+</ul>
+<h2>Final closeout checklist</h2>
+<ul>
+<li><input disabled="" type="checkbox"> Obtain explicit owner approval to change Vercel Authentication to preview-only; do not disable preview protection.</li>
+<li><input disabled="" type="checkbox"> Run the read-only anonymous production smoke and retain only its newest annotated mobile prediction, leaderboard, and administrator screenshots under <code>docs/assets/qa/</code>.</li>
+<li><input disabled="" type="checkbox"> Run only the separately gated exact-ID production submit/privacy/delete proof and confirm zero QA residue. Do not run the reveal/standings journey against live data.</li>
+<li><input disabled="" type="checkbox"> Confirm the public production flow has no browser-console errors or failed same-origin requests.</li>
+<li><input checked="" disabled="" type="checkbox"> Publish and synchronize the GitHub <code>main</code> release at <a href="https://github.com/vdoshi96/Pl-predictions">vdoshi96/Pl-predictions</a>, then rerun deterministic documentation generation/parity.</li>
+</ul>
 
-      <p class="source">Generated deterministically from <a href="QA.md">docs/QA.md</a>. Canonical SHA-256: <code>c2c1fc7d62ccfecdde391e8644675c9d34796bee20a5ffe2f770e2adb12de3b8</code>.</p>
+      <p class="source">Generated deterministically from <a href="QA.md">docs/QA.md</a>. Canonical SHA-256: <code>fb272f9ce6d225d5ff71780322bd9aaf5e7f07f99f2918858bef223a2320da53</code>.</p>
     </main>
   </body>
 </html>

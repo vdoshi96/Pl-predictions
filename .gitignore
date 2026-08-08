@@ -6,6 +6,7 @@
 /playwright-report
 /test-results
 /output/playwright
+/.playwright-cli
 
 # Local and platform state
 .vercel

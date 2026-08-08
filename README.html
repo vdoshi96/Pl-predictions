@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="canonical-source" content="README.md" />
-    <meta name="canonical-source-sha256" content="402f9d7938f094ad079cf2b767a0a187062b3b1aae66680c6d34a0f8344a95ec" />
+    <meta name="canonical-source-sha256" content="4eb816d1c6631f3c906443b46fc2d77a149f28d0f915c563186cdb567754c4a5" />
     <title>Dranx Prediction League</title>
     <style>
       :root { color-scheme: light dark; font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
@@ -45,7 +45,7 @@
 <p>Deployment status: production is public and Ready at the stable alias above. Vercel Authentication is set to <code>preview</code>, so retained preview deployments still require owner sign-in while production remains anonymously accessible. Final production browser and cleanup evidence is recorded in <a href="docs/QA.html">docs/QA.md</a>.</p>
 <h2>Brand and club assets</h2>
 <p>The user-facing identity is Dranx Prediction League. Its Premier-League-inspired palette anchors on the league&#39;s official purple, <code>#37003c</code>, with cyan <code>#05f0ff</code>, green <code>#00ff87</code>, and pink <code>#ff2882</code> accents and an original Dranx mark. The original mark is used instead of the official Premier League logo.</p>
-<p>FotMob crest downloads and the official Premier League logo were not added. Repository policy and the current official terms require appropriate authorization before those third-party marks can be copied or redistributed. The application therefore retains its 20 local text monograms. The shared <code>TeamMark</code> now uses contain sizing, a neutral backing, and a labelled initials fallback so authorized transparent files can replace the monograms later without changing the database model or public flows.</p>
+<p>The project owner supplied one transparent PNG badge for each of the 20 clubs and explicitly directed their use in this application. Those local files are now the canonical team marks; the shared <code>TeamMark</code> uses contain sizing, a neutral backing, and a labelled initials fallback. The original SVG monograms remain only as rollback-safe files during the first PNG release. The owner-provided handoff does not imply affiliation, transfer ownership of the club marks, or authorize the separate Premier League logo/lion/ball files, none of which are used.</p>
 <h2>Product behavior</h2>
 <ul>
 <li><code>/</code> presents an alphabetical 20-club sorter, name field, review dialog, and receipt confirmation.</li>
@@ -232,17 +232,17 @@ vercel deploy --prod
 </ol>
 <h2>Current limitations</h2>
 <ul>
-<li>Club marks remain the 20 project-owned text monograms, not official crests. Names and badges remain the clubs&#39; property; replace assets only after redistribution permission is documented. <code>TeamMark</code> already supports transparent authorized crest files without requiring a schema change.</li>
+<li>Club marks use the 20 owner-provided local PNG badges. Names and marks remain their respective owners&#39; property; the repository records the project owner&#39;s direction to use this exact set, not a broader licence for other league or club artwork. The original monograms remain rollback-only during the first PNG release.</li>
 <li>Standings are manual or accepted through the authenticated canonical importer. There is no built-in provider fetch, sync-now source client, scheduled job, or live-data guarantee.</li>
 <li>Participants have no accounts and cannot edit an entry. The administrator can delete an erroneous entry so it can be resubmitted.</li>
 <li>The opening fixture is reviewed static season data, not a live schedule feed. Because Premier League fixtures can change, the owner must update both the canonical UTC fixture metadata and the persisted season row through a reviewed forward migration before the existing cutoff if the opener moves. A constant-only deploy does not change the database-enforced instant.</li>
 <li>Season rollover currently requires a reviewed code and seed update.</li>
 </ul>
 <h2>Data and rights attribution</h2>
-<p>Season membership and preferred club names were verified with the official Premier League 2026/27 table and AGM announcement. FotMob league/team pages supplied one-time factual external-ID mapping only. No FotMob crest file or official Premier League logo is included. Source and rights research is recorded with links and access date in <a href="docs/RESEARCH.html">docs/RESEARCH.md</a>.</p>
+<p>Season membership and preferred club names were verified with the official Premier League 2026/27 table and AGM announcement. FotMob league/team pages supplied one-time factual external-ID mapping only; the application does not fetch or hotlink FotMob images. The local club badge files were supplied directly by the project owner, while the official Premier League logo is not included. Source and rights research is recorded with links and access date in <a href="docs/RESEARCH.html">docs/RESEARCH.md</a>.</p>
 <p>This is an unofficial fan project and is not affiliated with the Premier League. Club names and crests belong to their respective owners.</p>
 
-      <p class="source">Generated deterministically from <a href="README.md">README.md</a>. Canonical SHA-256: <code>402f9d7938f094ad079cf2b767a0a187062b3b1aae66680c6d34a0f8344a95ec</code>.</p>
+      <p class="source">Generated deterministically from <a href="README.md">README.md</a>. Canonical SHA-256: <code>4eb816d1c6631f3c906443b46fc2d77a149f28d0f915c563186cdb567754c4a5</code>.</p>
     </main>
   </body>
 </html>

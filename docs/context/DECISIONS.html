@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="canonical-source" content="DECISIONS.md" />
-    <meta name="canonical-source-sha256" content="58a7ee1936914cf53f080fab365bfacf5d181f952709d197d82f873a4ae836bb" />
+    <meta name="canonical-source-sha256" content="65da17b00211d74b1cb7a580ad9023039f64045abbd49d4a174cf05d189e790b" />
     <title>Decisions</title>
     <style>
       :root { color-scheme: light dark; font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
@@ -42,10 +42,12 @@
 <h2>2026-08-08: Opening-kickoff submission ceiling</h2>
 <p>Treat the first 2026/27 league kickoff, Arsenal v Coventry City at <code>2026-08-21T19:00:00.000Z</code>, as the non-extendable submission ceiling. Persist the reviewed instant on the season row so historical entries retain their own start boundary after rollover. An administrator may select an earlier deadline, manually lock, or reveal early, but neither a null nor later stored deadline can permit an entry at or after kickoff. Use the database clock for public access decisions and sample PostgreSQL&#39;s live wall clock only after the atomic write has acquired the season lock. Keep the official fixture URL and verification date with the season data because fixtures remain subject to change and this application has no live schedule feed; a reschedule requires a reviewed code and forward data migration.</p>
 <h2>2026-08-08: Public champion projection and preseason zero state</h2>
-<p>Before full-table reveal, publish only each participant&#39;s name, submission time, 0-point total, and predicted champion name/project-owned mark. Keep the prediction UUID and positions 2–20 out of public HTML and RSC. Do not score any active standings snapshot before the opening kickoff or until that table has been accepted/re-observed after kickoff; retain the meaningful-table guard as well. Once scoring is active, show the champion&#39;s actual ordinal position and define “on track” narrowly as currently 1st.</p>
+<p>Before full-table reveal, publish only each participant&#39;s name, submission time, 0-point total, and predicted champion name/local club mark. Keep the prediction UUID and positions 2–20 out of public HTML and RSC. Do not score any active standings snapshot before the opening kickoff or until that table has been accepted/re-observed after kickoff; retain the meaningful-table guard as well. Once scoring is active, show the champion&#39;s actual ordinal position and define “on track” narrowly as currently 1st.</p>
+<h2>2026-08-08: Owner-provided local club badge set</h2>
+<p>The project owner supplied one transparent PNG badge for each of the 20 verified clubs and explicitly directed use of that exact set. Make slug-named PNGs the canonical <code>teams.asset_path</code> values and update existing rows through the idempotent seed only after the files are deployed. Keep the original SVG monograms as rollback-only files for this first release so either database path remains valid during the transition. Continue using the original Dranx identity and exclude the supplied Premier League logo/lion/ball/composite extras. This decision records project-owner direction for these local files; it does not claim original ownership, affiliation, or permission for additional third-party artwork.</p>
 <h2>2026-08-08: Dranx identity and authorized-asset boundary</h2>
 <p>Adopt <strong>Dranx Prediction League</strong> as the user-facing name while preserving existing <code>pl-predictions</code> repository, Vercel, database, URL, and environment identifiers. Use a Premier-League-inspired visual system anchored on the league&#39;s official purple, <code>#37003c</code>, with cyan <code>#05f0ff</code>, green <code>#00ff87</code>, and pink <code>#ff2882</code> accents and an original Dranx mark.</p>
-<p>This decision supersedes the launch identity but does not erase the historical monogram decision below. FotMob crest downloads and the official Premier League logo were not added because repository policy and the current official terms require appropriate authorization before copying or redistributing those marks. Keep the 20 local monograms and prepare the shared <code>TeamMark</code> presentation for transparent local crest assets that can be introduced later without a schema or flow change.</p>
+<p>This decision superseded the launch identity but does not erase the historical monogram decision below. At that point, FotMob crest downloads and the official Premier League logo were not added because repository policy and the current official terms required appropriate authorization before copying or redistributing those marks. The owner-provided local club badge decision above later superseded the monogram presentation while retaining the prepared <code>TeamMark</code> seam.</p>
 <h2>2026-08-08: Static operational data boundary</h2>
 <p>The deployed application has no live football API, scheduled scraper, or Vercel Cron. A source-neutral canonical importer plus manual admin editor write validated snapshots. This implements the owner&#39;s Codex-run automation preference while isolating source acquisition and preserving the last good snapshot. FotMob must not be scraped automatically without a written licence covering the intended extraction and use.</p>
 <h2>2026-08-08: Vercel-managed Neon and Drizzle</h2>
@@ -69,7 +71,7 @@
 <h2>2026-08-08: Production public, previews protected</h2>
 <p>Use the Vercel Authentication boundary <code>preview</code>: the finished production site is public while preview deployments require owner sign-in. This is narrower than disabling deployment protection. The owner explicitly approved the persistent change from all-deployments protection; anonymous production access now returns 200, and the retained preview URL still redirects to Vercel SSO with 302.</p>
 
-      <p class="source">Generated deterministically from <a href="DECISIONS.md">docs/context/DECISIONS.md</a>. Canonical SHA-256: <code>58a7ee1936914cf53f080fab365bfacf5d181f952709d197d82f873a4ae836bb</code>.</p>
+      <p class="source">Generated deterministically from <a href="DECISIONS.md">docs/context/DECISIONS.md</a>. Canonical SHA-256: <code>65da17b00211d74b1cb7a580ad9023039f64045abbd49d4a174cf05d189e790b</code>.</p>
     </main>
   </body>
 </html>

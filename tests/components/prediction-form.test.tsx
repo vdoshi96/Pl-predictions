@@ -62,7 +62,7 @@ function SorterHarness({
 describe("TeamMark", () => {
   it("renders a provided club mark with contain sizing", () => {
     render(
-      <TeamMark initials="ARS" name="Arsenal" src="/team-marks/arsenal.svg" />,
+      <TeamMark initials="ARS" name="Arsenal" src="/team-marks/arsenal.png" />,
     );
 
     expect(screen.getByRole("img", { name: "Arsenal club mark" })).toHaveClass(
@@ -73,7 +73,7 @@ describe("TeamMark", () => {
 
   it("falls back to labelled initials when the image reports an error", () => {
     render(
-      <TeamMark initials="ARS" name="Arsenal" src="/team-marks/arsenal.svg" />,
+      <TeamMark initials="ARS" name="Arsenal" src="/team-marks/arsenal.png" />,
     );
 
     fireEvent.error(screen.getByRole("img", { name: "Arsenal club mark" }));
@@ -360,7 +360,7 @@ describe("shared site chrome", () => {
     ).toBeVisible();
     expect(
       screen.getByText(
-        /local team identifiers are used until authorized crest assets are available/i,
+        /club marks are displayed from owner-provided local assets/i,
       ),
     ).toBeVisible();
     expect(

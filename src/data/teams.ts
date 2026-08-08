@@ -1,7 +1,7 @@
 import { PREMIER_LEAGUE_TEAM_COUNT } from "./season";
 
 export type TeamSeed = {
-  assetPath: `/team-marks/${string}.svg`;
+  assetPath: `/team-marks/${string}.png`;
   displayName: string;
   externalId: number;
   shortName: string;
@@ -16,7 +16,7 @@ export type TeamSeed = {
  */
 export const PREMIER_LEAGUE_2026_27_TEAMS = [
   {
-    assetPath: "/team-marks/arsenal.svg",
+    assetPath: "/team-marks/arsenal.png",
     displayName: "Arsenal",
     externalId: 9825,
     shortName: "Arsenal",
@@ -24,7 +24,7 @@ export const PREMIER_LEAGUE_2026_27_TEAMS = [
     sortName: "Arsenal",
   },
   {
-    assetPath: "/team-marks/aston-villa.svg",
+    assetPath: "/team-marks/aston-villa.png",
     displayName: "Aston Villa",
     externalId: 10252,
     shortName: "Aston Villa",
@@ -32,7 +32,7 @@ export const PREMIER_LEAGUE_2026_27_TEAMS = [
     sortName: "Aston Villa",
   },
   {
-    assetPath: "/team-marks/afc-bournemouth.svg",
+    assetPath: "/team-marks/afc-bournemouth.png",
     displayName: "AFC Bournemouth",
     externalId: 8678,
     shortName: "Bournemouth",
@@ -40,7 +40,7 @@ export const PREMIER_LEAGUE_2026_27_TEAMS = [
     sortName: "Bournemouth",
   },
   {
-    assetPath: "/team-marks/brentford.svg",
+    assetPath: "/team-marks/brentford.png",
     displayName: "Brentford",
     externalId: 9937,
     shortName: "Brentford",
@@ -48,7 +48,7 @@ export const PREMIER_LEAGUE_2026_27_TEAMS = [
     sortName: "Brentford",
   },
   {
-    assetPath: "/team-marks/brighton-and-hove-albion.svg",
+    assetPath: "/team-marks/brighton-and-hove-albion.png",
     displayName: "Brighton & Hove Albion",
     externalId: 10204,
     shortName: "Brighton",
@@ -56,7 +56,7 @@ export const PREMIER_LEAGUE_2026_27_TEAMS = [
     sortName: "Brighton & Hove Albion",
   },
   {
-    assetPath: "/team-marks/chelsea.svg",
+    assetPath: "/team-marks/chelsea.png",
     displayName: "Chelsea",
     externalId: 8455,
     shortName: "Chelsea",
@@ -64,7 +64,7 @@ export const PREMIER_LEAGUE_2026_27_TEAMS = [
     sortName: "Chelsea",
   },
   {
-    assetPath: "/team-marks/coventry-city.svg",
+    assetPath: "/team-marks/coventry-city.png",
     displayName: "Coventry City",
     externalId: 8669,
     shortName: "Coventry",
@@ -72,7 +72,7 @@ export const PREMIER_LEAGUE_2026_27_TEAMS = [
     sortName: "Coventry City",
   },
   {
-    assetPath: "/team-marks/crystal-palace.svg",
+    assetPath: "/team-marks/crystal-palace.png",
     displayName: "Crystal Palace",
     externalId: 9826,
     shortName: "Crystal Palace",
@@ -80,7 +80,7 @@ export const PREMIER_LEAGUE_2026_27_TEAMS = [
     sortName: "Crystal Palace",
   },
   {
-    assetPath: "/team-marks/everton.svg",
+    assetPath: "/team-marks/everton.png",
     displayName: "Everton",
     externalId: 8668,
     shortName: "Everton",
@@ -88,7 +88,7 @@ export const PREMIER_LEAGUE_2026_27_TEAMS = [
     sortName: "Everton",
   },
   {
-    assetPath: "/team-marks/fulham.svg",
+    assetPath: "/team-marks/fulham.png",
     displayName: "Fulham",
     externalId: 9879,
     shortName: "Fulham",
@@ -96,7 +96,7 @@ export const PREMIER_LEAGUE_2026_27_TEAMS = [
     sortName: "Fulham",
   },
   {
-    assetPath: "/team-marks/hull-city.svg",
+    assetPath: "/team-marks/hull-city.png",
     displayName: "Hull City",
     externalId: 8667,
     shortName: "Hull",
@@ -104,7 +104,7 @@ export const PREMIER_LEAGUE_2026_27_TEAMS = [
     sortName: "Hull City",
   },
   {
-    assetPath: "/team-marks/ipswich-town.svg",
+    assetPath: "/team-marks/ipswich-town.png",
     displayName: "Ipswich Town",
     externalId: 9902,
     shortName: "Ipswich",
@@ -112,7 +112,7 @@ export const PREMIER_LEAGUE_2026_27_TEAMS = [
     sortName: "Ipswich Town",
   },
   {
-    assetPath: "/team-marks/leeds-united.svg",
+    assetPath: "/team-marks/leeds-united.png",
     displayName: "Leeds United",
     externalId: 8463,
     shortName: "Leeds",
@@ -120,7 +120,7 @@ export const PREMIER_LEAGUE_2026_27_TEAMS = [
     sortName: "Leeds United",
   },
   {
-    assetPath: "/team-marks/liverpool.svg",
+    assetPath: "/team-marks/liverpool.png",
     displayName: "Liverpool",
     externalId: 8650,
     shortName: "Liverpool",
@@ -128,7 +128,7 @@ export const PREMIER_LEAGUE_2026_27_TEAMS = [
     sortName: "Liverpool",
   },
   {
-    assetPath: "/team-marks/manchester-city.svg",
+    assetPath: "/team-marks/manchester-city.png",
     displayName: "Manchester City",
     externalId: 8456,
     shortName: "Man City",
@@ -136,7 +136,7 @@ export const PREMIER_LEAGUE_2026_27_TEAMS = [
     sortName: "Manchester City",
   },
   {
-    assetPath: "/team-marks/manchester-united.svg",
+    assetPath: "/team-marks/manchester-united.png",
     displayName: "Manchester United",
     externalId: 10260,
     shortName: "Man United",
@@ -144,7 +144,7 @@ export const PREMIER_LEAGUE_2026_27_TEAMS = [
     sortName: "Manchester United",
   },
   {
-    assetPath: "/team-marks/newcastle-united.svg",
+    assetPath: "/team-marks/newcastle-united.png",
     displayName: "Newcastle United",
     externalId: 10261,
     shortName: "Newcastle",
@@ -152,7 +152,7 @@ export const PREMIER_LEAGUE_2026_27_TEAMS = [
     sortName: "Newcastle United",
   },
   {
-    assetPath: "/team-marks/nottingham-forest.svg",
+    assetPath: "/team-marks/nottingham-forest.png",
     displayName: "Nottingham Forest",
     externalId: 10203,
     shortName: "Nott'm Forest",
@@ -160,7 +160,7 @@ export const PREMIER_LEAGUE_2026_27_TEAMS = [
     sortName: "Nottingham Forest",
   },
   {
-    assetPath: "/team-marks/sunderland.svg",
+    assetPath: "/team-marks/sunderland.png",
     displayName: "Sunderland",
     externalId: 8472,
     shortName: "Sunderland",
@@ -168,7 +168,7 @@ export const PREMIER_LEAGUE_2026_27_TEAMS = [
     sortName: "Sunderland",
   },
   {
-    assetPath: "/team-marks/tottenham-hotspur.svg",
+    assetPath: "/team-marks/tottenham-hotspur.png",
     displayName: "Tottenham Hotspur",
     externalId: 8586,
     shortName: "Tottenham",

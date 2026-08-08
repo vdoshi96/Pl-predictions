@@ -94,6 +94,26 @@ test("production public routes are mobile-safe and healthy", async ({
       .getByRole("list", { name: "Premier League predicted positions" })
       .getByRole("listitem"),
   ).toHaveCount(20);
+  const clubMarks = page.getByRole("img", { name: / club mark$/u });
+  await expect(clubMarks).toHaveCount(20);
+  await expect
+    .poll(() =>
+      clubMarks.evaluateAll((images) =>
+        images.every(
+          (image) =>
+            image instanceof HTMLImageElement && image.naturalWidth > 0,
+        ),
+      ),
+    )
+    .toBe(true);
+  expect(
+    await clubMarks.evaluateAll((images) =>
+      images.every((image) => {
+        const source = decodeURIComponent(image.getAttribute("src") ?? "");
+        return source.includes("/team-marks/") && source.includes(".png");
+      }),
+    ),
+  ).toBe(true);
 
   const participantName = page.getByRole("textbox", {
     name: "Your display name",

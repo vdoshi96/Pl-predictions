@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="canonical-source" content="QA.md" />
-    <meta name="canonical-source-sha256" content="49d66084e1df77a2ab4d0eef5963e6915bd31bfdcc0201b73e0a3df73ed7ac4f" />
+    <meta name="canonical-source-sha256" content="8b878a39c3c18ae000175e3f046ddd7a9cdb813a5d0f3f6a82705daade7ee5b1" />
     <title>Quality assurance</title>
     <style>
       :root { color-scheme: light dark; font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
@@ -39,7 +39,7 @@
   <body>
     <main>
       <h1>Quality assurance</h1>
-<p>Evidence date: 2026-08-08. This document records the newest completed local and production verification for the Gameweek 1 lock and champion-leaderboard iteration. Production migration <code>0002_breezy_king_cobra.sql</code> changed only schema and reviewed season timing metadata; no participant or standings write smoke ran. Prior-release write and cleanup evidence is retained below as intentional history.</p>
+<p>Evidence date: 2026-08-08. This document records the newest completed local verification for the owner-provided club badge iteration and the latest completed production evidence from the preceding Gameweek 1 release. Badge-specific production verification runs only after GitHub <code>main</code> contains the PNG files and the idempotent seed updates the 20 production asset paths. Prior-release write and cleanup evidence is retained below as intentional history.</p>
 <h2>Current results</h2>
 <table>
 <thead>
@@ -83,6 +83,11 @@
 <td>Browser journeys</td>
 <td><code>npm run test:e2e</code></td>
 <td>8 passed with 22 intentional project-routing skips across deterministic pre/post-kickoff phases, desktop Chromium, 320/390/430-pixel Chromium, and iPhone 13 WebKit.</td>
+</tr>
+<tr>
+<td>Local club badge rendering</td>
+<td>headed Chromium plus strengthened browser test</td>
+<td>All 20 club marks loaded from <code>.png</code> sources through Next image optimization with 200 responses; zero console warnings/errors, legible varied shapes, and no horizontal overflow at the narrow inspected viewport.</td>
 </tr>
 <tr>
 <td>Complete local chain</td>
@@ -136,7 +141,7 @@
 <ul>
 <li>every required mutually exclusive scoring example, the top/bottom-half boundary, a 100-point exact table, kickoff and zero-match preseason suppression, and shared ranks;</li>
 <li>NFKC name normalization, length checks, duplicate/missing/out-of-season team validation, and unique positions;</li>
-<li>the exact verified 20-club fixture, display sorting, local mark paths, and factual external mappings;</li>
+<li>the exact verified 20-club fixture, display sorting, canonical PNG mark paths, existence of every referenced local file, and factual external mappings;</li>
 <li>original Dranx header/footer language plus <code>TeamMark</code> contain sizing, accessible club-mark semantics, and labelled initials fallback after an image error;</li>
 <li>pointer/keyboard sorter structure, 56-pixel handle-only touch targets, live language for predicted versus actual positions, A–Z reset, review, server rejection, sticky safe-area action, mobile navigation, and narrow-card shrink behavior;</li>
 <li>the official Arsenal v Coventry opening instant, season-scoped rollover behavior, null automatic-deadline sentinel, explicit-timezone parsing, fail-closed isolated test clock, database-clock policy, manual lock, and irreversible early reveal;</li>
@@ -205,13 +210,13 @@
 <h2>Security and source review</h2>
 <ul>
 <li>No environment value, receipt token, database URL, administrator credential, or subscription cookie is committed or exposed through a public variable.</li>
-<li>Public entry queries fail closed before reveal unless the matching receipt or administrator session exists. The only intentional pre-reveal prediction projection is the champion name/project-owned mark; prediction UUIDs and positions 2–20 remain absent from public HTML and RSC.</li>
+<li>Public entry queries fail closed before reveal unless the matching receipt or administrator session exists. The only intentional pre-reveal prediction projection is the champion name/local club mark; prediction UUIDs and positions 2–20 remain absent from public HTML and RSC.</li>
 <li>Administrator writes require both a valid signed session and exact same-origin request metadata.</li>
 <li>The standings intake uses a separate bearer secret, a 64 KiB body cap, strict JSON/Zod validation, and bounded public errors.</li>
 <li>CSP, anti-framing, MIME-sniffing, referrer, and browser permissions headers are configured.</li>
 <li>Production dependencies have no reported audit vulnerability; the remaining moderate findings are dev-only and do not justify a breaking forced downgrade.</li>
 <li>There is no live football API call, runtime FotMob access, scraper, or Vercel Cron. FotMob automated extraction remains prohibited absent a written licence covering the intended workflow.</li>
-<li>Official crests are not redistributed. Local text monograms are the documented launch fallback.</li>
+<li>The original Dranx identity remains independent and no Premier League logo/lion/ball asset is used. The 20 local PNG club badges are included at the project owner&#39;s direction; club names and marks remain their respective owners&#39; property, and the original monograms are rollback-only first-release files.</li>
 </ul>
 <h2>Final closeout checklist</h2>
 <p>GitHub <a href="https://github.com/vdoshi96/Pl-predictions/pull/3">PR #3</a> merged the tested feature head <code>3191afa</code> into canonical <code>main</code> at merge SHA <code>65841c8d458c1912c25a151c531b2d0538490fc5</code>; its Vercel status was successful. Final closeout leaves local and remote <code>main</code> synchronized, no completed local temporary branch retained, and one primary worktree. The evidence-only closeout merge SHA is intentionally not pinned here so this end-state record remains accurate.</p>
@@ -223,7 +228,7 @@
 <li><input checked="" disabled="" type="checkbox"> Publish the Gameweek 1 lock and champion-leaderboard iteration plus final evidence through canonical <code>main</code>, synchronize local <code>main</code> with <code>origin/main</code>, remove completed local branch state, and retain only the single primary worktree.</li>
 </ul>
 
-      <p class="source">Generated deterministically from <a href="QA.md">docs/QA.md</a>. Canonical SHA-256: <code>49d66084e1df77a2ab4d0eef5963e6915bd31bfdcc0201b73e0a3df73ed7ac4f</code>.</p>
+      <p class="source">Generated deterministically from <a href="QA.md">docs/QA.md</a>. Canonical SHA-256: <code>8b878a39c3c18ae000175e3f046ddd7a9cdb813a5d0f3f6a82705daade7ee5b1</code>.</p>
     </main>
   </body>
 </html>

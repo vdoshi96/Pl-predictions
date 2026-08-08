@@ -9,9 +9,8 @@ export function SiteFooter() {
         </p>
         <p>
           Club names and marks remain the property of their respective owners.
-          Local team identifiers are used until authorized crest assets are
-          available; table data appears only after the owner validates and saves
-          a complete snapshot.
+          Club marks are displayed from owner-provided local assets; table data
+          appears only after the owner validates and saves a complete snapshot.
         </p>
       </div>
     </footer>

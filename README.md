@@ -12,7 +12,7 @@ Deployment status: production is public and Ready at the stable alias above. Ver
 
 The user-facing identity is Dranx Prediction League. Its Premier-League-inspired palette anchors on the league's official purple, `#37003c`, with cyan `#05f0ff`, green `#00ff87`, and pink `#ff2882` accents and an original Dranx mark. The original mark is used instead of the official Premier League logo.
 
-FotMob crest downloads and the official Premier League logo were not added. Repository policy and the current official terms require appropriate authorization before those third-party marks can be copied or redistributed. The application therefore retains its 20 local text monograms. The shared `TeamMark` now uses contain sizing, a neutral backing, and a labelled initials fallback so authorized transparent files can replace the monograms later without changing the database model or public flows.
+The project owner supplied one transparent PNG badge for each of the 20 clubs and explicitly directed their use in this application. Those local files are now the canonical team marks; the shared `TeamMark` uses contain sizing, a neutral backing, and a labelled initials fallback. The original SVG monograms remain only as rollback-safe files during the first PNG release. The owner-provided handoff does not imply affiliation, transfer ownership of the club marks, or authorize the separate Premier League logo/lion/ball files, none of which are used.
 
 ## Product behavior
 
@@ -217,7 +217,7 @@ The application intentionally has one code-selected active season.
 
 ## Current limitations
 
-- Club marks remain the 20 project-owned text monograms, not official crests. Names and badges remain the clubs' property; replace assets only after redistribution permission is documented. `TeamMark` already supports transparent authorized crest files without requiring a schema change.
+- Club marks use the 20 owner-provided local PNG badges. Names and marks remain their respective owners' property; the repository records the project owner's direction to use this exact set, not a broader licence for other league or club artwork. The original monograms remain rollback-only during the first PNG release.
 - Standings are manual or accepted through the authenticated canonical importer. There is no built-in provider fetch, sync-now source client, scheduled job, or live-data guarantee.
 - Participants have no accounts and cannot edit an entry. The administrator can delete an erroneous entry so it can be resubmitted.
 - The opening fixture is reviewed static season data, not a live schedule feed. Because Premier League fixtures can change, the owner must update both the canonical UTC fixture metadata and the persisted season row through a reviewed forward migration before the existing cutoff if the opener moves. A constant-only deploy does not change the database-enforced instant.
@@ -225,6 +225,6 @@ The application intentionally has one code-selected active season.
 
 ## Data and rights attribution
 
-Season membership and preferred club names were verified with the official Premier League 2026/27 table and AGM announcement. FotMob league/team pages supplied one-time factual external-ID mapping only. No FotMob crest file or official Premier League logo is included. Source and rights research is recorded with links and access date in [docs/RESEARCH.md](docs/RESEARCH.md).
+Season membership and preferred club names were verified with the official Premier League 2026/27 table and AGM announcement. FotMob league/team pages supplied one-time factual external-ID mapping only; the application does not fetch or hotlink FotMob images. The local club badge files were supplied directly by the project owner, while the official Premier League logo is not included. Source and rights research is recorded with links and access date in [docs/RESEARCH.md](docs/RESEARCH.md).
 
 This is an unofficial fan project and is not affiliated with the Premier League. Club names and crests belong to their respective owners.

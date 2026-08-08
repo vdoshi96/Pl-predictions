@@ -343,9 +343,12 @@ test("mobile journey preserves privacy and gives the owner full control", async 
   expect(originalSeason?.finalSnapshotId).toBeNull();
   expect(originalSeason?.revealPredictions).toBe(false);
   expect(originalSeason?.submissionsLocked).toBe(false);
+  const isolatedNow = new Date(
+    process.env.PL_PREDICTIONS_TEST_NOW_ISO ?? new Date().toISOString(),
+  );
   expect(
     !originalSeason?.submissionDeadline ||
-      originalSeason.submissionDeadline.getTime() > Date.now(),
+      originalSeason.submissionDeadline.getTime() > isolatedNow.getTime(),
   ).toBe(true);
 
   await page.goto("/");
@@ -450,7 +453,13 @@ test("mobile journey preserves privacy and gives the owner full control", async 
   await expect(
     page.getByRole("link", { name: qaName, exact: true }),
   ).toHaveCount(0);
-  await expect(page.getByText("Tables are still private")).toBeVisible();
+  await expect(page.getByText("Full tables are still private")).toBeVisible();
+  const preseasonEntry = page.getByLabel(`${qaName} leaderboard entry`);
+  await expect(
+    preseasonEntry.getByText("Aston Villa", { exact: true }),
+  ).toBeVisible();
+  await expect(preseasonEntry.getByText("0", { exact: true })).toBeVisible();
+  await expect(preseasonEntry.getByText(/track/u)).toHaveCount(0);
   await expectNoHorizontalOverflow(page);
 
   await page.goto("/admin/login");
@@ -553,17 +562,22 @@ test("mobile journey preserves privacy and gives the owner full control", async 
 
   await page.goto("/leaderboard", { waitUntil: "networkidle" });
   await expect(page.getByRole("link", { name: qaName })).toBeVisible();
-  await expect(page.getByText("96", { exact: true })).toBeVisible();
+  const revealedPreseasonEntry = page.getByLabel(`${qaName} leaderboard entry`);
+  await expect(
+    revealedPreseasonEntry.getByText("Aston Villa", { exact: true }),
+  ).toBeVisible();
+  await expect(
+    revealedPreseasonEntry.getByText("0", { exact: true }),
+  ).toBeVisible();
+  await expect(page.getByText("Everyone starts on 0 points")).toBeVisible();
   await expect(page.getByText("Matchweek 1", { exact: true })).toBeVisible();
   await expect(page.getByText("Provisional", { exact: true })).toBeVisible();
   await page.getByRole("link", { name: qaName }).click();
   await expect(
     page.getByRole("heading", { level: 1, name: `${qaName}'s table` }),
   ).toBeVisible();
-  await expect(page.getByText("96 points", { exact: true })).toBeVisible();
-  await expect(
-    page.getByText("3 · Within 3", { exact: true }).first(),
-  ).toBeVisible();
+  await expect(page.getByText("96 points", { exact: true })).toHaveCount(0);
+  await expect(page.getByText("Not scored")).toHaveCount(20);
   await expectNoHorizontalOverflow(page);
 
   await page.goto("/admin/submissions", { waitUntil: "networkidle" });

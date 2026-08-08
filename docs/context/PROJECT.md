@@ -1,8 +1,8 @@
 # Project
 
-Dranx Prediction League is an unofficial prediction game for a private invited group covering the 2026/27 English Premier League. A participant orders exactly 20 clubs, enters one display name, reviews, and submits an immutable prediction. After reveal, the leaderboard compares every entry with one active actual-table snapshot and recalculates all scores from scratch.
+Dranx Prediction League is an unofficial prediction game for a private invited group covering the 2026/27 English Premier League. A participant orders exactly 20 clubs, enters one display name, reviews, and submits an immutable prediction. Before the opener, the leaderboard exposes only each participant's predicted champion and a 0-point total. After kickoff, it compares every revealed entry with one active actual-table snapshot, recalculates all scores from scratch, and shows the champion pick's current actual position.
 
-Primary users are invited participants on mobile devices and one owner-administrator. The owner controls deadline, lock, reveal, erroneous-entry deletion, manual standings, import visibility, and final status.
+Primary users are invited participants on mobile devices and one owner-administrator. Arsenal v Coventry City's verified `2026-08-21T19:00:00.000Z` opening kickoff is the persisted, non-extendable submission ceiling for the 2026/27 season. The owner can close earlier, manually lock, reveal early, delete erroneous entries, manage standings/import visibility, and confirm or undo final status.
 
 The user-facing visual system uses the Premier League's official purple, `#37003c`, with cyan `#05f0ff`, green `#00ff87`, and pink `#ff2882` accents and an original Dranx mark. The official Premier League logo and FotMob crest downloads are not included. Third-party marks still require authorization, so the 20 local monograms remain; the shared `TeamMark` already supports transparent authorized crest files.
 

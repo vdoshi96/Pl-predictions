@@ -25,7 +25,7 @@ test.afterEach(async () => {
   qaEntryId = null;
 });
 
-test("production accepts, protects, and exactly deletes one QA entry", async ({
+test("production enforces its current submission state and cleans any QA entry", async ({
   browser,
   page,
 }) => {
@@ -42,8 +42,19 @@ test("production accepts, protects, and exactly deletes one QA entry", async ({
   ).toBeTruthy();
 
   await page.goto("/", { waitUntil: "networkidle" });
+  const reviewButton = page.getByRole("button", { name: "Review your 1–20" });
+  if (!(await reviewButton.isEnabled())) {
+    await expect(
+      page.getByText("Submissions closed", { exact: true }),
+    ).toBeVisible();
+    await expect(
+      page.getByRole("textbox", { name: "Your display name" }),
+    ).toBeDisabled();
+    return;
+  }
+
   await page.getByRole("textbox", { name: "Your display name" }).fill(qaName);
-  await page.getByRole("button", { name: "Review your 1–20" }).click();
+  await reviewButton.click();
   await page
     .getByRole("dialog", { name: "Check your 1–20" })
     .getByRole("button", { name: "Submit prediction" })

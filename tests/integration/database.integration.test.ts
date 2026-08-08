@@ -16,9 +16,13 @@ import {
   standingsSnapshots,
   teams,
 } from "@/db/schema";
-import { insertPredictionAtomically } from "@/features/predictions/atomic-insert";
+import {
+  buildAtomicPredictionInsertQuery,
+  insertPredictionAtomically,
+} from "@/features/predictions/atomic-insert";
 import { normalizedParticipantNameKey } from "@/features/predictions/normalization";
 import { createPrediction } from "@/features/predictions/service";
+import { resolveIsolatedTestNow } from "@/features/seasons/clock";
 import { PublicError } from "@/shared/errors";
 import { STANDINGS_FUTURE_TIMESTAMP_ERROR_CODE } from "@/features/standings/validation";
 import { importCanonicalStandings } from "../../scripts/import-standings";
@@ -30,6 +34,7 @@ const importSources = new Set<string>();
 const originalSeasonSubmissionSettings = new Map<
   string,
   {
+    openingKickoff: Date;
     revealPredictions: boolean;
     submissionDeadline: Date | null;
     submissionsLocked: boolean;
@@ -65,6 +70,7 @@ function rememberSeasonSubmissionSettings(
 ) {
   if (!originalSeasonSubmissionSettings.has(season.id)) {
     originalSeasonSubmissionSettings.set(season.id, {
+      openingKickoff: season.openingKickoff,
       revealPredictions: season.revealPredictions,
       submissionDeadline: season.submissionDeadline,
       submissionsLocked: season.submissionsLocked,
@@ -84,6 +90,7 @@ afterEach(async () => {
     await db
       .update(seasons)
       .set({
+        openingKickoff: settings.openingKickoff,
         revealPredictions: settings.revealPredictions,
         submissionDeadline: settings.submissionDeadline,
         submissionsLocked: settings.submissionsLocked,
@@ -92,6 +99,7 @@ afterEach(async () => {
 
     const [restored] = await db
       .select({
+        openingKickoff: seasons.openingKickoff,
         revealPredictions: seasons.revealPredictions,
         submissionDeadline: seasons.submissionDeadline,
         submissionsLocked: seasons.submissionsLocked,
@@ -100,6 +108,8 @@ afterEach(async () => {
       .where(eq(seasons.id, seasonId))
       .limit(1);
     if (
+      restored?.openingKickoff.getTime() !==
+        settings.openingKickoff.getTime() ||
       restored?.submissionDeadline?.getTime() !==
         settings.submissionDeadline?.getTime() ||
       restored?.submissionsLocked !== settings.submissionsLocked ||
@@ -224,13 +234,13 @@ describe.runIf(enabled)("Neon integration", () => {
   it("closes at the database deadline boundary without partial rows", async () => {
     const { activeTeams, db, season } = await activeFixture();
     rememberSeasonSubmissionSettings(season);
-    await db.execute(sql`
-      update "seasons"
-      set
-        "submission_deadline" = now(),
-        "submissions_locked" = false
-      where "id" = ${season.id}::uuid
-    `);
+    await db
+      .update(seasons)
+      .set({
+        submissionDeadline: resolveIsolatedTestNow() ?? new Date(),
+        submissionsLocked: false,
+      })
+      .where(eq(seasons.id, season.id));
 
     const suffix = randomUUID().slice(0, 8);
     const participantName = `Boundary ${suffix}`;
@@ -335,6 +345,78 @@ describe.runIf(enabled)("Neon integration", () => {
     } finally {
       if (transactionOpen) await admin.query("rollback");
       admin.release();
+      await pool.end();
+    }
+  }, 15_000);
+
+  it("rechecks wall-clock time after a row lock crosses the deadline", async () => {
+    const { activeTeams, db, season } = await activeFixture();
+    rememberSeasonSubmissionSettings(season);
+    await db.execute(sql`
+      update "seasons"
+      set
+        "opening_kickoff" = clock_timestamp() + interval '10 seconds',
+        "submission_deadline" = clock_timestamp() + interval '2 seconds',
+        "submissions_locked" = false,
+        "reveal_predictions" = false
+      where "id" = ${season.id}::uuid
+    `);
+
+    const databaseUrl = process.env.DATABASE_URL;
+    if (!databaseUrl) throw new Error("DATABASE_URL is required.");
+    const pool = new Pool({ connectionString: databaseUrl });
+    const blocker = await pool.connect();
+    const predictionId = randomUUID();
+    createdPredictionIds.add(predictionId);
+    let transactionOpen = false;
+
+    try {
+      await blocker.query("begin");
+      transactionOpen = true;
+      await blocker.query("select id from seasons where id = $1 for update", [
+        season.id,
+      ]);
+
+      let insertSettled = false;
+      const insertOutcome = db
+        .execute(
+          buildAtomicPredictionInsertQuery(
+            {
+              id: predictionId,
+              items: activeTeams.map((team, index) => ({
+                predictedPosition: index + 1,
+                teamId: team.id,
+              })),
+              normalizedParticipantName: `deadline race ${predictionId.slice(0, 8)}`,
+              participantName: `Deadline Race ${predictionId.slice(0, 8)}`,
+              receiptTokenHash: predictionId.replaceAll("-", "").repeat(2),
+              seasonId: season.id,
+            },
+            sql<Date>`clock_timestamp()`,
+          ),
+        )
+        .then((result) => {
+          insertSettled = true;
+          return result;
+        });
+
+      await new Promise((resolve) => setTimeout(resolve, 150));
+      expect(insertSettled).toBe(false);
+      await new Promise((resolve) => setTimeout(resolve, 2_100));
+
+      await blocker.query("commit");
+      transactionOpen = false;
+      const result = await insertOutcome;
+      expect(result.rows[0]).toMatchObject({ inserted: false, itemCount: 0 });
+
+      const [persisted] = await db
+        .select({ value: count() })
+        .from(predictions)
+        .where(eq(predictions.id, predictionId));
+      expect(persisted?.value).toBe(0);
+    } finally {
+      if (transactionOpen) await blocker.query("rollback");
+      blocker.release();
       await pool.end();
     }
   }, 15_000);

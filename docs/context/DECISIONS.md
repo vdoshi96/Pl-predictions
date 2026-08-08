@@ -1,5 +1,13 @@
 # Decisions
 
+## 2026-08-08: Opening-kickoff submission ceiling
+
+Treat the first 2026/27 league kickoff, Arsenal v Coventry City at `2026-08-21T19:00:00.000Z`, as the non-extendable submission ceiling. Persist the reviewed instant on the season row so historical entries retain their own start boundary after rollover. An administrator may select an earlier deadline, manually lock, or reveal early, but neither a null nor later stored deadline can permit an entry at or after kickoff. Use the database clock for public access decisions and sample PostgreSQL's live wall clock only after the atomic write has acquired the season lock. Keep the official fixture URL and verification date with the season data because fixtures remain subject to change and this application has no live schedule feed; a reschedule requires a reviewed code and forward data migration.
+
+## 2026-08-08: Public champion projection and preseason zero state
+
+Before full-table reveal, publish only each participant's name, submission time, 0-point total, and predicted champion name/project-owned mark. Keep the prediction UUID and positions 2–20 out of public HTML and RSC. Do not score any active standings snapshot before the opening kickoff or until that table has been accepted/re-observed after kickoff; retain the meaningful-table guard as well. Once scoring is active, show the champion's actual ordinal position and define “on track” narrowly as currently 1st.
+
 ## 2026-08-08: Dranx identity and authorized-asset boundary
 
 Adopt **Dranx Prediction League** as the user-facing name while preserving existing `pl-predictions` repository, Vercel, database, URL, and environment identifiers. Use a Premier-League-inspired visual system anchored on the league's official purple, `#37003c`, with cyan `#05f0ff`, green `#00ff87`, and pink `#ff2882` accents and an original Dranx mark.
@@ -44,7 +52,7 @@ Keep the administrator mechanism provider-free. Store the login credential in Ve
 
 ## 2026-08-08: Isolated database tests and bounded production proof
 
-Integration and full browser journeys must never target the production database. `scripts/run-with-test-database.mjs` uses an explicit `TEST_DATABASE_URL` or derives `TEST_DATABASE_NAME`, compares the resolved identity with production, and fails closed on ambiguity or equality. Production verification is split into a read-only public smoke and an explicit opt-in submit/privacy/delete proof scoped to the exact created prediction ID. The irreversible reveal/standings journey is test-only.
+Integration and full browser journeys must never target the production database. `scripts/run-with-test-database.mjs` uses an explicit `TEST_DATABASE_URL` or derives `TEST_DATABASE_NAME`, compares the resolved identity with production, and fails closed on ambiguity or equality. Only that verified non-production process can activate the fixed pre/post-kickoff test clock; production always uses PostgreSQL's live wall clock, and Playwright refuses to reuse an unattested local server. Production verification is split into a read-only public smoke and an explicit opt-in submit/privacy/delete proof scoped to the exact created prediction ID. The irreversible reveal/standings journey is test-only.
 
 ## 2026-08-08: Production public, previews protected
 

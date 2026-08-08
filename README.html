@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="canonical-source" content="README.md" />
-    <meta name="canonical-source-sha256" content="6f237f5bb7766f49b7f14f5da199e074710f0336bd49aa511aa2bcd9d87156f2" />
+    <meta name="canonical-source-sha256" content="402f9d7938f094ad079cf2b767a0a187062b3b1aae66680c6d34a0f8344a95ec" />
     <title>Dranx Prediction League</title>
     <style>
       :root { color-scheme: light dark; font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
@@ -39,7 +39,7 @@
   <body>
     <main>
       <h1>Dranx Prediction League</h1>
-<p>Dranx Prediction League is an unofficial, mobile-first prediction game for a private invited group. Each participant orders the 20 verified 2026/27 Premier League clubs, reviews an immutable 1–20 table, and submits one display name. Once entries are revealed, every score is recalculated from the latest validated standings snapshot; scores are never accumulated between matchweeks.</p>
+<p>Dranx Prediction League is an unofficial, mobile-first prediction game for a private invited group. Each participant orders the 20 verified 2026/27 Premier League clubs, reviews an immutable 1–20 table, and submits one display name. The leaderboard shows every participant on 0 points with only their predicted champion before the season starts. After kickoff, every score is recalculated from the latest validated standings snapshot; scores are never accumulated between matchweeks.</p>
 <p>Production: <a href="https://pl-predictions-2026.vercel.app">https://pl-predictions-2026.vercel.app</a></p>
 <p>GitHub: <a href="https://github.com/vdoshi96/Pl-predictions">https://github.com/vdoshi96/Pl-predictions</a></p>
 <p>Deployment status: production is public and Ready at the stable alias above. Vercel Authentication is set to <code>preview</code>, so retained preview deployments still require owner sign-in while production remains anonymously accessible. Final production browser and cleanup evidence is recorded in <a href="docs/QA.html">docs/QA.md</a>.</p>
@@ -49,12 +49,13 @@
 <h2>Product behavior</h2>
 <ul>
 <li><code>/</code> presents an alphabetical 20-club sorter, name field, review dialog, and receipt confirmation.</li>
-<li><code>/leaderboard</code> shows the participant roster before reveal and shared-rank scores afterward.</li>
+<li><code>/leaderboard</code> always shows every participant&#39;s current total and predicted champion mark. Before kickoff, totals remain 0 and no actual position is shown. Once scoring starts, the card also reports whether that champion is on track in 1st or off track in its current actual position.</li>
 <li><code>/entries/[id]</code> is private to the receipt browser or administrator before reveal, then becomes the public club-by-club comparison.</li>
 <li><code>/admin</code> provides owner-only settings, submission deletion, manual standings, import history, and final-table controls.</li>
 <li><code>/api/automation/standings</code> accepts a source-neutral, bearer-authenticated snapshot or failure record. It never fetches a football-data service itself.</li>
 </ul>
-<p>Scoring is mutually exclusive per club: 5 points exact, otherwise 3 within three places, otherwise 1 in the same half, otherwise 0. An exact table scores 100.</p>
+<p>Scoring is mutually exclusive per club: 5 points exact, otherwise 3 within three places, otherwise 1 in the same half, otherwise 0. An exact table scores 100. No snapshot is scored before the verified Gameweek 1 opener, and a table last observed before kickoff remains at 0 afterward until a post-kickoff observation is accepted.</p>
+<p>Submissions close no later than Arsenal v Coventry City&#39;s opening kickoff at <code>2026-08-21T19:00:00.000Z</code> (20:00 BST on Friday 21 August 2026). That season-scoped instant is persisted in PostgreSQL. An owner deadline may close entries earlier but cannot extend the ceiling. Public access uses the database clock, and the guarded insert acquires the season-row lock before rechecking PostgreSQL&#39;s live wall clock so a request blocked across kickoff is rejected.</p>
 <h2>Mobile-first interaction</h2>
 <p>The prediction and manual-standings lists are single-column and have no horizontal overflow at narrow widths. Each row has a dedicated 56 by 56 pixel move handle; <code>touch-action: none</code> is limited to the handle so the rest of the page still scrolls naturally. The same handle supports pointer dragging and direct Arrow Up/Arrow Down reordering with live screen-reader announcements. Position numbers update immediately, the top/bottom-half boundary is visible, focus states are explicit, reduced-motion preferences are respected, and the review action remains reachable above the mobile safe area.</p>
 <h2>Architecture</h2>
@@ -143,7 +144,7 @@ npm run dev
 <tr>
 <td><code>PREDICTION_DEADLINE_ISO</code></td>
 <td>Optional seed input</td>
-<td>Initial ISO deadline for a newly inserted season. Later changes are made in <code>/admin/settings</code>.</td>
+<td>Optional earlier initial deadline for a newly inserted season. It must include <code>Z</code> or an explicit UTC offset. Unset or exact-kickoff values retain the null automatic sentinel; later values are rejected.</td>
 </tr>
 </tbody></table>
 <p>There are no <code>NEXT_PUBLIC</code> secrets, football-provider token, or cron secret.</p>
@@ -158,7 +159,7 @@ npm run test:integration    # isolated Neon integration suite; fails closed with
 npm run test:coverage       # coverage report
 npm run build               # normal Next.js production build
 npm run build:verify        # Webpack build used in restricted local QA
-npm run test:e2e            # desktop, 320/390/430px Chromium, and iPhone WebKit
+npm run test:e2e            # deterministic pre/post-kickoff desktop, 320/390/430px Chromium, and iPhone WebKit phases
 npm run test:production-smoke       # read-only public deployment checks
 npm run test:production-write-smoke # explicit opt-in, exact-ID submit/delete proof
 npm run check               # complete local verification chain
@@ -172,7 +173,7 @@ npm run db:seed             # idempotently seed the active season and 20 clubs
 npm run db:test:migrate     # apply migrations only to the isolated test target
 npm run db:test:seed        # seed only the isolated test target
 </code></pre>
-<p>The committed schema history starts with <code>drizzle/0000_oval_slyde.sql</code>. <code>drizzle/0001_left_iron_fist.sql</code> adds and backfills the season-level accepted-through standings watermark. Do not edit an already-applied migration; create a new forward migration.</p>
+<p>The committed schema history starts with <code>drizzle/0000_oval_slyde.sql</code>. <code>drizzle/0001_left_iron_fist.sql</code> adds and backfills the season-level accepted-through standings watermark. <code>drizzle/0002_breezy_king_cobra.sql</code> persists and backfills each season&#39;s reviewed opening kickoff while preserving the null automatic-deadline sentinel. Do not edit an already-applied migration; create a new forward migration.</p>
 <h2>Standings operations</h2>
 <h3>Manual fallback</h3>
 <p>Sign in at <code>/admin/login</code>, open <code>/admin/standings</code>, order all 20 clubs, and optionally enter matchweek, games played, and league points. A save writes one complete provisional snapshot. Invalid, duplicate, stale, incomplete, or concurrent input cannot replace the last active good table.</p>
@@ -227,21 +228,21 @@ vercel deploy --prod
 <li>Keep the old season rows; a new slug makes <code>npm run db:seed</code> insert a separate season. Do not recycle IDs.</li>
 <li>Run fixture, scoring, importer, integration, and browser tests, then seed and verify exactly 20 teams.</li>
 <li>If correcting membership after a season has already been seeded, create an explicit data migration. The idempotent seed updates known teams but deliberately does not delete referenced historical rows.</li>
-<li>Set the new deadline in <code>/admin/settings</code>, verify reveal/lock defaults, and deploy.</li>
+<li>Verify the first Gameweek 1 kickoff from an official source, update the auditable opening-fixture constant, and add a reviewed forward migration/data update for that season&#39;s <code>opening_kickoff</code>. If the opener changes, handle any stored deadline equal to the old automatic cutoff explicitly; never reopen a season after an effective cutoff or reveal. Set only an optional earlier owner deadline in <code>/admin/settings</code>.</li>
 </ol>
 <h2>Current limitations</h2>
 <ul>
 <li>Club marks remain the 20 project-owned text monograms, not official crests. Names and badges remain the clubs&#39; property; replace assets only after redistribution permission is documented. <code>TeamMark</code> already supports transparent authorized crest files without requiring a schema change.</li>
 <li>Standings are manual or accepted through the authenticated canonical importer. There is no built-in provider fetch, sync-now source client, scheduled job, or live-data guarantee.</li>
 <li>Participants have no accounts and cannot edit an entry. The administrator can delete an erroneous entry so it can be resubmitted.</li>
-<li>The seed leaves a new season open when <code>PREDICTION_DEADLINE_ISO</code> is unset; the owner must set or lock it in <code>/admin/settings</code>.</li>
+<li>The opening fixture is reviewed static season data, not a live schedule feed. Because Premier League fixtures can change, the owner must update both the canonical UTC fixture metadata and the persisted season row through a reviewed forward migration before the existing cutoff if the opener moves. A constant-only deploy does not change the database-enforced instant.</li>
 <li>Season rollover currently requires a reviewed code and seed update.</li>
 </ul>
 <h2>Data and rights attribution</h2>
 <p>Season membership and preferred club names were verified with the official Premier League 2026/27 table and AGM announcement. FotMob league/team pages supplied one-time factual external-ID mapping only. No FotMob crest file or official Premier League logo is included. Source and rights research is recorded with links and access date in <a href="docs/RESEARCH.html">docs/RESEARCH.md</a>.</p>
 <p>This is an unofficial fan project and is not affiliated with the Premier League. Club names and crests belong to their respective owners.</p>
 
-      <p class="source">Generated deterministically from <a href="README.md">README.md</a>. Canonical SHA-256: <code>6f237f5bb7766f49b7f14f5da199e074710f0336bd49aa511aa2bcd9d87156f2</code>.</p>
+      <p class="source">Generated deterministically from <a href="README.md">README.md</a>. Canonical SHA-256: <code>402f9d7938f094ad079cf2b767a0a187062b3b1aae66680c6d34a0f8344a95ec</code>.</p>
     </main>
   </body>
 </html>

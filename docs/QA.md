@@ -1,6 +1,6 @@
 # Quality assurance
 
-Evidence date: 2026-08-08. This document records the newest completed local and production verification for the Dranx Prediction League iteration. The production verification was read-only because this iteration changed branding and presentation only; no production write smoke ran and no production data changed. Prior-release write and cleanup evidence is retained below as intentional history.
+Evidence date: 2026-08-08. This document records the newest completed local verification for the Gameweek 1 lock and champion-leaderboard iteration, plus the latest completed production evidence. The current feature keeps production data untouched; production verification is refreshed only after GitHub `main` contains the tested commit. Prior-release write and cleanup evidence is retained below as intentional history.
 
 ## Current results
 
@@ -9,10 +9,11 @@ Evidence date: 2026-08-08. This document records the newest completed local and 
 | Formatting                        | `npm run format:check`                        | Passed; rerun after final Markdown/HTML generation.                                                                                                                                                                      |
 | ESLint                            | `npm run lint`                                | Passed with zero warnings.                                                                                                                                                                                               |
 | TypeScript                        | `npm run typecheck`                           | Passed in strict mode after Next route-type generation.                                                                                                                                                                  |
-| Unit/component/default suite      | `npm test`                                    | 97 passed; 9 database cases skipped by their explicit opt-in guard.                                                                                                                                                      |
-| Isolated Neon integration         | `npm run test:integration`                    | 9 passed against `pl_predictions_test` through the fail-closed test-database wrapper.                                                                                                                                    |
+| Unit/component/default suite      | `npm test`                                    | 115 passed; 10 database cases skipped by their explicit opt-in guard.                                                                                                                                                    |
+| Isolated Neon integration         | `npm run test:integration`                    | 10 passed against `pl_predictions_test` through the fail-closed test-database wrapper.                                                                                                                                   |
 | Restricted-local production build | `npm run build:verify`                        | Passed using Next.js Webpack mode.                                                                                                                                                                                       |
-| Browser journeys                  | `npm run test:e2e`                            | 5 passed with 20 intentional project-routing skips across desktop, 320/390/430-pixel Chromium, and iPhone 13 WebKit.                                                                                                     |
+| Browser journeys                  | `npm run test:e2e`                            | 8 passed with 22 intentional project-routing skips across deterministic pre/post-kickoff phases, desktop Chromium, 320/390/430-pixel Chromium, and iPhone 13 WebKit.                                                     |
+| Complete local chain              | `CI=1 npm run check`                          | Passed after final documentation generation: parity, formatting, lint, strict types, 115 default tests, 10 isolated integration tests, Webpack build, and both browser phases.                                           |
 | Production dependency audit       | `npm audit --omit=dev --audit-level=high`     | 0 vulnerabilities.                                                                                                                                                                                                       |
 | Full dependency audit             | `npm audit --audit-level=high`                | 4 moderate, 0 high, 0 critical. All four are development-only legacy `esbuild` paths through `drizzle-kit`; the proposed force fix would downgrade/break the selected Drizzle toolchain, so no force change was applied. |
 | Retained preview protection       | retained preview URL                          | Anonymous request returns 302 to Vercel SSO after the owner-approved `preview` protection change.                                                                                                                        |
@@ -26,14 +27,15 @@ The local sandbox did not permit a default Turbopack CSS helper to bind its inte
 
 ## Unit and component coverage
 
-The 97-test default run covers:
+The 115-test default run covers:
 
-- every required mutually exclusive scoring example, the top/bottom-half boundary, a 100-point exact table, preseason suppression, and shared ranks;
+- every required mutually exclusive scoring example, the top/bottom-half boundary, a 100-point exact table, kickoff and zero-match preseason suppression, and shared ranks;
 - NFKC name normalization, length checks, duplicate/missing/out-of-season team validation, and unique positions;
 - the exact verified 20-club fixture, display sorting, local mark paths, and factual external mappings;
 - original Dranx header/footer language plus `TeamMark` contain sizing, accessible club-mark semantics, and labelled initials fallback after an image error;
 - pointer/keyboard sorter structure, 56-pixel handle-only touch targets, live language for predicted versus actual positions, A–Z reset, review, server rejection, sticky safe-area action, mobile navigation, and narrow-card shrink behavior;
-- database-clock deadline, manual lock, and irreversible early-reveal policy, including concurrent lock and deadline boundaries;
+- the official Arsenal v Coventry opening instant, season-scoped rollover behavior, null automatic-deadline sentinel, explicit-timezone parsing, fail-closed isolated test clock, database-clock policy, manual lock, and irreversible early reveal;
+- champion-pick cards before scoring, 1st-place on-track status, non-1st off-track ordinals, and the local mark fallback;
 - complete snapshot validation and source-failure envelopes;
 - canonical hashing, future-skew rejection, duplicate watermark semantics, historical-content reactivation, initial/changed active-pointer guards, source-finality isolation, and import/finalize races;
 - 38-game final-candidate requirements plus compare-and-swap finalization and undo;
@@ -41,19 +43,20 @@ The 97-test default run covers:
 
 ## Database integration
 
-`npm run test:integration` loaded `.env.local`, routed through `scripts/run-with-test-database.mjs`, and passed nine cases against the isolated `pl_predictions_test` database:
+`npm run test:integration` loaded `.env.local`, routed through `scripts/run-with-test-database.mjs`, and passed ten cases against the isolated `pl_predictions_test` database:
 
 1. one prediction and exactly 20 items are created atomically;
 2. case-insensitive participant uniqueness is enforced by PostgreSQL;
 3. the database deadline boundary creates no partial rows;
 4. a concurrent administrator lock wins before a guarded prediction insert;
-5. an inconsistent revealed row still fails closed even if its lock flag is false;
-6. imported snapshots remain provisional while invalid subsequent input retains the last good active snapshot;
-7. newer duplicate observations advance the monotonic watermark, historical content can be reactivated without changing first-seen provenance, and delayed changed data is rejected;
-8. implausibly future capture timestamps are rejected without moving the active pointer; and
-9. implausibly future source-update timestamps receive the same last-good protection.
+5. an insert blocked on the season row until its configured deadline passes rechecks the live wall clock and writes nothing;
+6. an inconsistent revealed row still fails closed even if its lock flag is false;
+7. imported snapshots remain provisional while invalid subsequent input retains the last good active snapshot;
+8. newer duplicate observations advance the monotonic watermark, historical content can be reactivated without changing first-seen provenance, and delayed changed data is rejected;
+9. implausibly future capture timestamps are rejected without moving the active pointer; and
+10. implausibly future source-update timestamps receive the same last-good protection.
 
-The wrapper refuses to run if the target resolves to production. The suite uses unique identifiers and deletes its prediction/import data after the run. A post-E2E read-only check found zero `Mobile QA` predictions, zero manual-admin import runs, null active/final pointers, and the original open/unrevealed season flags.
+The wrapper refuses to run if the target resolves to production. Only a wrapper-attested isolated target can use the deterministic test clock, and Playwright always starts a fresh server with that target instead of reusing an unknown process on port 3100. The suite uses unique identifiers and deletes its prediction/import data after the run.
 
 ## Browser and mobile verification
 
@@ -71,13 +74,15 @@ Verified behavior:
 - real mouse and delayed touch gestures reorder through the production sorter; Arrow Down then produces a deterministic one-place order, updated accessible position text, and one live announcement;
 - a normalized participant name opens a 20-row review dialog and submits successfully;
 - the receipt browser can open its private confirmation, while a clean mobile context receives the not-found page for the same unrevealed entry;
-- the pre-reveal leaderboard lists the participant without linking or exposing the table;
+- the pre-reveal leaderboard shows the participant at 0 points with only the Aston Villa champion pick, while withholding the prediction UUID and the other 19 positions from HTML and RSC;
 - owner login succeeds from the server-only credential, the manual admin table contains 20 clubs, and a provisional matchweek-one snapshot saves;
-- early reveal recalculates the submitted table to the expected 96 points, exposes the participant link, and shows provisional comparison details;
+- early reveal exposes the participant link but, because the verified opener has not kicked off, keeps the leaderboard at 0 and every comparison row unscored even after a provisional matchweek-one snapshot is saved;
+- the separate post-kickoff phase first proves that a pre-kickoff observation stays at 0 after the clock crosses kickoff, then advances only the accepted-through observation time and proves 100 points/rank 1/Arsenal on track in 1st plus 96 points/rank 2/Aston Villa off track in 2nd;
+- the scored leaderboard has no horizontal overflow at desktop, exact 320-pixel, or exact 430-pixel widths;
 - the administrator deletes the test entry and the leaderboard no longer contains it; and
 - after each run, the test restores the original season deadline/lock/reveal/active/final pointers and removes its participant, snapshot, import, and audit rows.
 
-The touch helpers honor the sorter's 250-millisecond activation constraint before movement. Chromium and WebKit can resolve the moving target at adjacent insertion boundaries, so the journey verifies touch movement independently, resets, and submits a deterministic keyboard order for the 96-point scoring assertion. Automated WebKit emulation is strong regression evidence, but it is not a substitute for a final spot check on the owner's physical iPhone when one is available.
+The touch helpers honor the sorter's 250-millisecond activation constraint before movement. Chromium and WebKit can resolve the moving target at adjacent insertion boundaries, so the journey verifies touch movement independently, resets, and submits a deterministic keyboard order. The isolated clock keeps these paths reproducible after the real 2026 kickoff without creating a production bypass. Automated WebKit emulation is strong regression evidence, but it is not a substitute for a final spot check on the owner's physical iPhone when one is available.
 
 ## Production deployment evidence
 
@@ -116,7 +121,7 @@ Only the newest completed production run is retained. All four screenshots were 
 ## Security and source review
 
 - No environment value, receipt token, database URL, administrator credential, or subscription cookie is committed or exposed through a public variable.
-- Public entry queries fail closed before reveal unless the matching receipt or administrator session exists.
+- Public entry queries fail closed before reveal unless the matching receipt or administrator session exists. The only intentional pre-reveal prediction projection is the champion name/project-owned mark; prediction UUIDs and positions 2–20 remain absent from public HTML and RSC.
 - Administrator writes require both a valid signed session and exact same-origin request metadata.
 - The standings intake uses a separate bearer secret, a 64 KiB body cap, strict JSON/Zod validation, and bounded public errors.
 - CSP, anti-framing, MIME-sniffing, referrer, and browser permissions headers are configured.

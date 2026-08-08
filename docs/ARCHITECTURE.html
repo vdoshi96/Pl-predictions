@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="canonical-source" content="ARCHITECTURE.md" />
-    <meta name="canonical-source-sha256" content="9c094d35a461a36989658ef75168f581269773580f6b55a45fd19cf759023bc7" />
+    <meta name="canonical-source-sha256" content="275853365f177814dd95361756da17c568c2906169bc6725507a4819cde97cb3" />
     <title>Architecture</title>
     <style>
       :root { color-scheme: light dark; font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
@@ -75,7 +75,7 @@ Next.js server components/actions                           |
 <h2>Routes</h2>
 <ul>
 <li><code>/</code> — prediction form or server-derived closed state.</li>
-<li><code>/leaderboard</code> — pre-reveal participant roster or the scored table.</li>
+<li><code>/leaderboard</code> — 0-point champion-pick cards before kickoff and shared-rank scores with champion status afterward.</li>
 <li><code>/entries/[id]</code> — receipt/admin-authorized private confirmation before reveal; public comparison afterward.</li>
 <li><code>/admin/login</code> — owner credential handoff.</li>
 <li><code>/admin</code> — season and latest-import overview.</li>
@@ -92,14 +92,15 @@ Next.js server components/actions                           |
 <ol>
 <li>The browser sends a display name, honeypot, and ordered team UUIDs.</li>
 <li>Zod requires a normalized 2–40 character name and exactly one occurrence of every active team and position. The server resolves names and assets from its own team rows; it never trusts browser-supplied club metadata.</li>
-<li>One guarded PostgreSQL common-table-expression statement locks and claims the active season only while manual lock and reveal are both false and the database clock is strictly before any deadline.</li>
-<li>The same statement inserts the prediction and all 20 dependent items or inserts nothing. This closes request-start/deadline and administrator-lock races without relying on an application clock.</li>
+<li>One guarded PostgreSQL common-table-expression statement first locks the active season row, then samples PostgreSQL <code>clock_timestamp()</code> and claims the row only while manual lock and reveal are both false and that post-lock wall clock is strictly before both the configured deadline and the season&#39;s persisted opening-kickoff ceiling.</li>
+<li>The same statement inserts the prediction and all 20 dependent items or inserts nothing. This closes request-start/deadline, lock-wait/deadline, and administrator-lock races without relying on an application clock.</li>
 <li>A unique <code>(season_id, normalized_participant_name)</code> index resolves simultaneous duplicate names safely.</li>
 <li>A random receipt token is returned once and stored only as a SHA-256 hash. Its HttpOnly cookie permits that browser to view its own table before reveal.</li>
 </ol>
 <p>Predictions are immutable. Administrator deletion cascades through all 20 items, allowing a corrected resubmission.</p>
 <h2>Reveal and privacy policy</h2>
-<p>The shared server policy reveals entries after the configured deadline, after a manual lock, or when early reveal is explicitly enabled. Before then, the leaderboard selects only participant names and timestamps. An entry lookup returns no result unless the request has the matching receipt cookie or an administrator session. There is no public route-handler payload containing hidden prediction items.</p>
+<p>The shared server policy reveals full entries after the effective deadline, after a manual lock, or when early reveal is explicitly enabled. The effective deadline is the earlier of an optional owner deadline and the owning season row&#39;s persisted Gameweek 1 opening kickoff. Pages read PostgreSQL&#39;s wall clock with the season, and the atomic insert independently checks the same persisted instant after acquiring its row lock, so app-clock skew or lock contention cannot admit a competing entry after reveal.</p>
+<p>Before full reveal, the leaderboard deliberately publishes one narrow projection: participant name, submission time, 0-point total, and the position-1 predicted champion&#39;s name and permitted local mark. Prediction UUIDs and positions 2–20 remain absent from public HTML and RSC. An entry lookup still returns no result unless the request has the matching receipt cookie or an administrator session.</p>
 <h2>Standings intake and last-good preservation</h2>
 <p>The version-1 canonical envelope is validated in <code>src/features/standings/validation.ts</code> and accepts either:</p>
 <ul>
@@ -120,10 +121,10 @@ Next.js server components/actions                           |
 <p>All four effects succeed together or the action reports that the active standings changed. This compare-and-swap is complementary to import activation, so an import/finalize race cannot finalize one snapshot while activating another. A final pointer blocks differing imports until the owner explicitly confirms undo. Undo is a second single-statement compare-and-swap requiring the same snapshot to remain both active and final before it clears the pointer, unmarks that snapshot, and records the audit together. The current table remains active when final status is undone.</p>
 <h2>Scoring and leaderboard</h2>
 <p>Scores are computed on read from prediction items plus the one active standings snapshot. They are never accumulated or stored as independently editable totals. Each club receives exactly one tier: 5 exact, otherwise 3 within three, otherwise 1 in the same half, otherwise 0. The system derives total, exact count, within-three count, and correct-half-only count.</p>
-<p>All-zero played-games tables are treated as preseason and remain unscored. When scoring is active, entries sort by total descending; equal totals receive the same competition rank and are alphabetized only for deterministic display. The maximum is 100.</p>
+<p>Scoring cannot activate before the owning season&#39;s verified opening kickoff. The active table must also have been accepted or re-observed at or after kickoff; a stale preseason ordering cannot turn into points merely because the clock crossed the boundary. All-zero played-games tables remain unscored after kickoff. Before activation, every leaderboard card shows 0 and only its predicted champion. When scoring is active, cards add the champion&#39;s actual ordinal position and label 1st as on track or every other position as off track. Entries sort by total descending; equal totals receive the same competition rank and are alphabetized only for deterministic display. The maximum is 100.</p>
 <h2>Database model and invariants</h2>
 <ul>
-<li><code>seasons</code> stores the code-selected season, fairness settings, active/final pointers, and the monotonic accepted-capture watermark.</li>
+<li><code>seasons</code> stores the code-selected season, persisted opening kickoff, optional earlier owner deadline, fairness settings, active/final pointers, and the monotonic accepted-capture watermark.</li>
 <li><code>teams</code> stores season-scoped names, sort names, factual external mapping, and permitted local asset path.</li>
 <li><code>predictions</code> and <code>prediction_items</code> store immutable participant tables and receipt hashes.</li>
 <li><code>standings_snapshots</code> and <code>standings_items</code> store complete actual tables.</li>
@@ -148,7 +149,7 @@ Next.js server components/actions                           |
 <li>Manual standings remain available when external acquisition is unavailable.</li>
 </ul>
 
-      <p class="source">Generated deterministically from <a href="ARCHITECTURE.md">docs/ARCHITECTURE.md</a>. Canonical SHA-256: <code>9c094d35a461a36989658ef75168f581269773580f6b55a45fd19cf759023bc7</code>.</p>
+      <p class="source">Generated deterministically from <a href="ARCHITECTURE.md">docs/ARCHITECTURE.md</a>. Canonical SHA-256: <code>275853365f177814dd95361756da17c568c2906169bc6725507a4819cde97cb3</code>.</p>
     </main>
   </body>
 </html>

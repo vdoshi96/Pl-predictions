@@ -25,7 +25,7 @@ export const dynamic = "force-dynamic";
 export default async function AdminPage() {
   if (!(await getAdminSession())) redirect("/admin/login");
 
-  const { season } = await getActiveSeasonView();
+  const { databaseNow, season } = await getActiveSeasonView();
   const db = getDb();
   const [[submissionCount], latestRuns, activeSnapshots] = await Promise.all([
     db
@@ -55,11 +55,15 @@ export default async function AdminPage() {
 
   const activeSnapshot = activeSnapshots[0];
   const latestRun = latestRuns[0];
-  const access = getSeasonAccess({
-    revealPredictions: season.revealPredictions,
-    submissionDeadline: season.submissionDeadline,
-    submissionsLocked: season.submissionsLocked,
-  });
+  const access = getSeasonAccess(
+    {
+      openingKickoff: season.openingKickoff,
+      revealPredictions: season.revealPredictions,
+      submissionDeadline: season.submissionDeadline,
+      submissionsLocked: season.submissionsLocked,
+    },
+    databaseNow,
+  );
 
   const stats = [
     {
@@ -68,7 +72,7 @@ export default async function AdminPage() {
       value: String(submissionCount?.value ?? 0),
       detail: access.predictionsRevealed
         ? "Predictions revealed"
-        : "Tables private",
+        : "Full tables private",
     },
     {
       icon: Settings2,

@@ -60,7 +60,7 @@ export default defineConfig({
     : {
         command: "npm run dev -- --port 3100",
         url: "http://127.0.0.1:3100/api/health",
-        reuseExistingServer: !process.env.CI,
+        reuseExistingServer: false,
         timeout: 120_000,
       },
 });

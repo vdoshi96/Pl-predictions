@@ -12,6 +12,9 @@ Checked on 2026-08-08.
 
 - [Official Premier League 2026/27 table](https://www.premierleague.com/en/tables/premier-league/2026-27): authoritative 20-club membership and display-name check.
 - [Premier League 2026/27 AGM announcement](https://www.premierleague.com/en/news/4673099/the-202627-premier-league-season-officially-starts/): membership-change corroboration.
+- [Premier League opening-weekend schedule](https://www.premierleague.com/en/news/4675508/premier-league-fixture-schedulereleased-for-season-202627), checked 2026-08-08: the season kicks off with Arsenal v Coventry City at Emirates Stadium at 20:00 BST on Friday 21 August 2026, exactly `2026-08-21T19:00:00.000Z`.
+- [Complete official 2026/27 fixture list](https://www.premierleague.com/en/news/4675097/all-380-fixtures-for-202627-premier-league-season), checked 2026-08-08: Arsenal v Coventry is the sole Friday fixture before the other Matchweek 1 matches; the league explicitly states that all fixtures are subject to change.
+- [Official fixture-change guidance](https://www.premierleague.com/en/news/4324634): scheduling can change for broadcast and competition conflicts, so the static UTC deadline must be reverified and reviewed if the opener moves.
 - [FotMob Premier League page](https://www.fotmob.com/leagues/47/overview) and canonical team pages: one-time factual league/team identifier mapping only.
 - [FotMob Terms of Use](https://www.fotmob.com/term-of-service), checked 2026-08-08: restriction on automatic crawlers and systematic or regular extraction. A consumer subscription is not treated as permission for automation or redistribution.
 - [Premier League logo portal](https://logo.premierleague.com/), checked 2026-08-08: logo access and use are limited to directed commercial partners and genuine editorial news-media users; this private prediction tool is neither.

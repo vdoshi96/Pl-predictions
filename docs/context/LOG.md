@@ -67,3 +67,14 @@
 - Merged GitHub [PR #1](https://github.com/vdoshi96/Pl-predictions/pull/1) successfully into canonical `main` at merge SHA `a0586831332db66158975928e98246eaf72118f1`. Its head was `2a0008e`, and its Vercel status was successful.
 - Fast-forwarded local `main` to match `origin/main` at that merge before creating the final closeout branch, then removed the completed feature branch.
 - Published the final closeout documentation through canonical `main`, synchronized local and remote `main`, removed the completed local temporary closeout branch after its merge, and retained one primary worktree. The final closeout merge SHA is intentionally not pinned in this durable end-state note.
+
+### Gameweek 1 lock and champion leaderboard iteration (in progress)
+
+- Verified from the official Premier League opening-weekend announcement and complete fixture list that Arsenal v Coventry City is the first 2026/27 match at 20:00 BST on Friday 21 August 2026, exactly `2026-08-21T19:00:00.000Z`; recorded that all fixtures remain subject to change.
+- Added migration `0002_breezy_king_cobra.sql` to persist and backfill the verified kickoff per season while retaining null as the automatic-deadline sentinel. A configured owner deadline may close earlier, while null or later values cannot bypass the persisted ceiling.
+- Aligned public access/reveal decisions with PostgreSQL's wall clock. The atomic statement now acquires the season-row lock before sampling `clock_timestamp()`, so a write blocked across either deadline inserts neither parent nor items.
+- Changed the preseason leaderboard to show every participant at 0 points with only the predicted champion's local mark/name. The prediction UUID and positions 2–20 remain absent from public HTML and RSC.
+- Added post-kickoff champion status: 1st is “On track”; every other actual ordinal position is “Off track”. Scoring now requires kickoff, a meaningful table, and an accepted/re-observed timestamp at or after kickoff, so a stale preseason ordering cannot activate automatically.
+- Added a production-disabled isolated clock seam and fresh-server requirement so tests remain deterministic after the real kickoff. The post-kickoff browser phase proves stale-table suppression, 100/96-point totals, ranks, champion actual positions, and scored-card reflow at desktop/320/430 pixels.
+- Passed the final `CI=1 npm run check`: documentation parity, formatting, ESLint, strict TypeScript, 115 default tests with 10 guarded database skips, all 10 isolated Neon integration tests, the Webpack production build, and 8 Playwright journeys with 22 intentional routing skips across deterministic pre/post-kickoff phases.
+- GitHub publication, refreshed production verification, deterministic HTML regeneration, screenshot inspection, and repository cleanup remain before this iteration is complete.

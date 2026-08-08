@@ -4,6 +4,7 @@ import Link from "next/link";
 
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
+import { ChampionPick } from "@/features/leaderboard/champion-pick";
 import { LeaderboardEntryLink } from "@/features/leaderboard/entry-link";
 import { getLeaderboardView } from "@/features/leaderboard/queries";
 import { getActiveSeasonView } from "@/features/seasons/queries";
@@ -79,12 +80,13 @@ export default async function LeaderboardPage() {
               </span>
               <div>
                 <h2 className="font-black text-slate-950">
-                  Tables are still private
+                  Full tables are still private
                 </h2>
                 <p className="mt-1 text-sm leading-6 text-slate-600">
-                  Names and submission times are visible now. Full predictions
-                  and scoring appear after the deadline, a manual lock, or an
-                  early reveal by the owner.
+                  Everyone is on 0 points, and only each predicted champion is
+                  public now. The other 19 positions stay private until the
+                  opening kickoff, a manual lock, or an early reveal by the
+                  owner.
                 </p>
               </div>
             </CardContent>
@@ -97,11 +99,14 @@ export default async function LeaderboardPage() {
               </span>
               <div>
                 <h2 className="font-black text-slate-950">
-                  Scoring begins once the season table is active
+                  {view.seasonStarted
+                    ? "Waiting for the first active table"
+                    : "Everyone starts on 0 points"}
                 </h2>
                 <p className="mt-1 text-sm leading-6 text-slate-600">
-                  A zero-match preseason order is never scored. The submission
-                  roster remains available below.
+                  {view.seasonStarted
+                    ? "Scores will recalculate as soon as a meaningful standings snapshot is active."
+                    : "Only predicted champions are shown until Arsenal v Coventry kicks off."}
                 </p>
               </div>
             </CardContent>
@@ -128,8 +133,12 @@ export default async function LeaderboardPage() {
         ) : scoringStarted && view.scoredEntries ? (
           <section aria-label="Scored leaderboard" className="grid gap-3">
             {view.scoredEntries.map((entry) => (
-              <Card key={entry.id}>
-                <CardContent className="grid grid-cols-[auto_1fr_auto] items-center gap-3 sm:grid-cols-[4rem_1fr_6rem_18rem]">
+              <Card
+                aria-label={`${entry.participantName} leaderboard entry`}
+                key={entry.id}
+                role="article"
+              >
+                <CardContent className="grid grid-cols-[auto_1fr_auto] items-center gap-3 sm:grid-cols-[4rem_1fr_6rem]">
                   <span
                     className="bg-brand grid size-11 place-items-center rounded-xl text-lg font-black text-white"
                     aria-label={`Rank ${entry.rank}`}
@@ -153,45 +162,49 @@ export default async function LeaderboardPage() {
                       points
                     </span>
                   </div>
-                  <dl className="col-span-3 grid grid-cols-3 gap-1.5 sm:col-span-1">
-                    <div className="rounded-lg bg-[#ddffef] p-2 text-center">
-                      <dt className="text-[0.64rem] font-bold text-[#075d42] uppercase">
-                        Exact
-                      </dt>
-                      <dd className="font-black text-[#064c37]">
-                        {entry.exactCount}
-                      </dd>
-                    </div>
-                    <div className="rounded-lg bg-[#dffcff] p-2 text-center">
-                      <dt className="text-brand text-[0.64rem] font-bold uppercase">
-                        Within 3
-                      </dt>
-                      <dd className="text-brand-strong font-black">
-                        {entry.withinThreeCount}
-                      </dd>
-                    </div>
-                    <div className="rounded-lg bg-slate-100 p-2 text-center">
-                      <dt className="text-[0.64rem] font-bold text-slate-600 uppercase">
-                        Half
-                      </dt>
-                      <dd className="font-black text-slate-800">
-                        {entry.correctHalfCount}
-                      </dd>
-                    </div>
-                  </dl>
+                  <div className="col-span-3 grid min-w-0 gap-2 sm:col-span-2 sm:col-start-2 sm:grid-cols-[minmax(0,1fr)_18rem]">
+                    <ChampionPick champion={entry.champion} />
+                    <dl className="grid grid-cols-3 gap-1.5">
+                      <div className="rounded-lg bg-[#ddffef] p-2 text-center">
+                        <dt className="text-[0.64rem] font-bold text-[#075d42] uppercase">
+                          Exact
+                        </dt>
+                        <dd className="font-black text-[#064c37]">
+                          {entry.exactCount}
+                        </dd>
+                      </div>
+                      <div className="rounded-lg bg-[#dffcff] p-2 text-center">
+                        <dt className="text-brand text-[0.64rem] font-bold uppercase">
+                          Within 3
+                        </dt>
+                        <dd className="text-brand-strong font-black">
+                          {entry.withinThreeCount}
+                        </dd>
+                      </div>
+                      <div className="rounded-lg bg-slate-100 p-2 text-center">
+                        <dt className="text-[0.64rem] font-bold text-slate-600 uppercase">
+                          Half
+                        </dt>
+                        <dd className="font-black text-slate-800">
+                          {entry.correctHalfCount}
+                        </dd>
+                      </div>
+                    </dl>
+                  </div>
                 </CardContent>
               </Card>
             ))}
           </section>
         ) : (
           <section aria-label="Submission roster" className="grid gap-2">
-            {view.entries.map((entry, index) => (
-              <Card key={entry.publicKey}>
-                <CardContent className="flex items-center gap-3 py-3">
-                  <span className="grid size-9 shrink-0 place-items-center rounded-xl bg-slate-100 font-mono text-sm font-black text-slate-600">
-                    {index + 1}
-                  </span>
-                  <div className="min-w-0 grow">
+            {view.entries.map((entry) => (
+              <Card
+                aria-label={`${entry.participantName} leaderboard entry`}
+                key={entry.publicKey}
+                role="article"
+              >
+                <CardContent className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 py-3 sm:grid-cols-[minmax(0,1fr)_minmax(15rem,auto)_5rem]">
+                  <div className="min-w-0">
                     {view.predictionsRevealed && entry.id ? (
                       <LeaderboardEntryLink
                         entryId={entry.id}
@@ -206,7 +219,18 @@ export default async function LeaderboardPage() {
                       Submitted {formatUtcDateTime(entry.createdAt)}
                     </span>
                   </div>
-                  <Badge variant="success">In</Badge>
+                  <ChampionPick
+                    champion={entry.champion}
+                    className="col-span-2 row-start-2 sm:col-span-1 sm:col-start-2 sm:row-start-1"
+                  />
+                  <div className="col-start-2 row-start-1 text-right sm:col-start-3">
+                    <strong className="block text-2xl font-black text-[#c80047] tabular-nums">
+                      {entry.totalScore}
+                    </strong>
+                    <span className="text-[0.68rem] font-bold tracking-wide text-slate-500 uppercase">
+                      points
+                    </span>
+                  </div>
                 </CardContent>
               </Card>
             ))}

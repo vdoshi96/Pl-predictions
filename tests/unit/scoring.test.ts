@@ -55,7 +55,7 @@ describe("prediction score summary", () => {
       playedGames: 0,
     }));
     expect(isStandingsScoringActive(preseason)).toBe(false);
-    expect(scorePredictionIfActive(prediction, preseason)).toEqual({
+    expect(scorePredictionIfActive(prediction, preseason, true)).toEqual({
       status: "not-started",
     });
   });
@@ -66,7 +66,15 @@ describe("prediction score summary", () => {
       teamId,
     }));
     expect(isStandingsScoringActive(manual)).toBe(true);
-    expect(scorePredictionIfActive(prediction, manual).status).toBe("scored");
+    expect(scorePredictionIfActive(prediction, manual, true).status).toBe(
+      "scored",
+    );
+  });
+
+  it("does not score any standings snapshot before the season kickoff", () => {
+    expect(scorePredictionIfActive(prediction, exactStandings, false)).toEqual({
+      status: "not-started",
+    });
   });
 });
 

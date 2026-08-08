@@ -6,6 +6,7 @@ import type { BatchItem } from "drizzle-orm/batch";
 import { ACTIVE_SEASON, PREMIER_LEAGUE_2026_27_TEAMS } from "@/data";
 import { getDb, type Database } from "@/db/client";
 import { seasons, teams } from "@/db/schema";
+import { assertDeadlineNotAfterOpeningKickoff } from "@/features/seasons/deadline";
 
 export function parseSeedDeadline(
   value = process.env.PREDICTION_DEADLINE_ISO,
@@ -13,12 +14,22 @@ export function parseSeedDeadline(
   const candidate = value?.trim();
   if (!candidate) return null;
 
+  if (!/(?:Z|[+-]\d{2}:\d{2})$/u.test(candidate)) {
+    throw new Error(
+      "PREDICTION_DEADLINE_ISO must include Z or an explicit UTC offset.",
+    );
+  }
+
   const deadline = new Date(candidate);
   if (Number.isNaN(deadline.getTime())) {
     throw new Error("PREDICTION_DEADLINE_ISO must be a valid ISO timestamp.");
   }
 
-  return deadline;
+  assertDeadlineNotAfterOpeningKickoff(deadline);
+  return deadline.getTime() ===
+    Date.parse(ACTIVE_SEASON.openingFixture.kickoffIso)
+    ? null
+    : deadline;
 }
 
 export async function seedDatabase(db: Database = getDb()): Promise<{
@@ -30,6 +41,7 @@ export async function seedDatabase(db: Database = getDb()): Promise<{
     .values({
       competitionCode: ACTIVE_SEASON.competitionCode,
       name: ACTIVE_SEASON.name,
+      openingKickoff: new Date(ACTIVE_SEASON.openingFixture.kickoffIso),
       slug: ACTIVE_SEASON.slug,
       startYear: ACTIVE_SEASON.startYear,
       submissionDeadline: parseSeedDeadline(),

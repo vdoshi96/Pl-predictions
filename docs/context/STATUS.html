@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="canonical-source" content="STATUS.md" />
-    <meta name="canonical-source-sha256" content="9d78fd9680fa7bd2e381a5d3fffa60fb71ac99fa09a9bc6aa586891e7ce64fd1" />
+    <meta name="canonical-source-sha256" content="da37f3e8538f39a9b95e9cb60a533d0469cd3f88dd0f680d65eb570be947feaa" />
     <title>Status</title>
     <style>
       :root { color-scheme: light dark; font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
@@ -40,18 +40,23 @@
     <main>
       <h1>Status</h1>
 <ul>
-<li>Current phase: foundation and implementation.</li>
-<li>Vercel: project <code>vdoshi96s-projects/pl-predictions</code> linked.</li>
-<li>Database: Vercel Marketplace Neon resource <code>neon-coffee-queen</code> provisioned and environment keys pulled locally.</li>
-<li>Research: official 2026/27 membership, current stack, data-source terms, and crest rights recorded.</li>
-<li>Git: new local repository initialized on <code>main</code>; private GitHub remote still to be created.</li>
-<li>In progress: Next.js scaffold, schema, features, tests, and documentation generator.</li>
-<li>Last verification: Vercel CLI 58.7.1 authenticated as <code>vdoshi96</code>; required Neon environment key names present.</li>
-<li>Known issue: <code>gh auth status</code> reports an invalid saved CLI token. Use authenticated Firefox or reauthorize the CLI before publishing.</li>
-<li>Rights limitation: no cleared crest redistribution licence; launch uses text monograms until permission is obtained.</li>
+<li>Current phase: implementation and production deployment complete; anonymous production smoke/screenshots await one explicit Vercel protection approval, while GitHub publication closeout is in progress.</li>
+<li>Product: mobile-first prediction, private receipt, leaderboard/comparison, owner settings/submission deletion, manual standings, authenticated source-neutral imports, and explicit final-table controls implemented.</li>
+<li>Vercel: project <code>vdoshi96s-projects/pl-predictions</code>; production alias <a href="https://pl-predictions-2026.vercel.app">https://pl-predictions-2026.vercel.app</a>.</li>
+<li>Latest deployment evidence: preview <code>dpl_e7yEgPhrJBR17qnoQk3EAwdXjFmQ</code> and production <code>dpl_CGDPYcKNhq6EJb8AUReEVC8odRDF</code> are Ready after Vercel&#39;s default Turbopack build; the stable production alias points to the latter.</li>
+<li>Access blocker: Vercel Authentication still protects all <code>vercel.app</code> deployments. Changing it to preview-only would make production public while retaining preview SSO, but that persistent security-boundary change requires explicit owner approval.</li>
+<li>Database: Vercel Marketplace Neon resource <code>neon-coffee-queen</code>; migrations <code>0000</code> and <code>0001</code> applied to production, idempotent seed rerun, and exactly 20 verified 2026/27 clubs present. Automated DB/browser suites use isolated database <code>pl_predictions_test</code> through a fail-closed wrapper.</li>
+<li>Standings: no runtime football API, scraper, or Vercel Cron. Manual admin entry and the bearer-authenticated canonical importer preserve the last good snapshot. FotMob automation remains prohibited absent written permission.</li>
+<li>Finalization: all 20 clubs must show 38 played games; finalization and undo each compare-and-swap the exact active/final snapshot. Imports use a monotonic accepted-through watermark so duplicate observations cannot permit a later standings regression.</li>
+<li>Assets: local text monograms are the launch fallback because official crest redistribution rights are not cleared.</li>
+<li>Verification: 95 default tests passed with 9 opt-in database skips; all 9 isolated Neon integration tests passed; the Webpack production build passed; 5 focused browser journeys passed with 20 intentional routing skips across desktop, 320/390/430-pixel Chromium, and iPhone WebKit; production dependencies audit at 0 vulnerabilities.</li>
+<li>Dependency note: the full audit reports 4 moderate development-only legacy <code>esbuild</code> paths through <code>drizzle-kit</code>, with no high or critical findings. The breaking force-downgrade suggestion was not applied.</li>
+<li>Git: work is on <code>agent/build-pl-predictions</code>; public owner-supplied repository <a href="https://github.com/vdoshi96/Pl-predictions">vdoshi96/Pl-predictions</a> is configured as <code>origin</code>, and push/merge/local-main synchronization are the next publication step.</li>
+<li>Documentation: canonical Markdown records current evidence and the protection blocker; deterministic same-content HTML peers are generated and checked.</li>
+<li>Remaining closeout: publish and merge GitHub, obtain the one explicit Vercel protection approval, run the anonymous read-only and bounded exact-ID write smokes, confirm cleanup/console health, retain newest annotated screenshots, then refresh documentation evidence.</li>
 </ul>
 
-      <p class="source">Generated deterministically from <a href="STATUS.md">docs/context/STATUS.md</a>. Canonical SHA-256: <code>9d78fd9680fa7bd2e381a5d3fffa60fb71ac99fa09a9bc6aa586891e7ce64fd1</code>.</p>
+      <p class="source">Generated deterministically from <a href="STATUS.md">docs/context/STATUS.md</a>. Canonical SHA-256: <code>da37f3e8538f39a9b95e9cb60a533d0469cd3f88dd0f680d65eb570be947feaa</code>.</p>
     </main>
   </body>
 </html>

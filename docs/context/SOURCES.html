@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="canonical-source" content="SOURCES.md" />
-    <meta name="canonical-source-sha256" content="271d6fa2328b77508692cfbaa726532676ecd5ffd9260da7419887afbb472ba0" />
+    <meta name="canonical-source-sha256" content="f1ee562b644e7c2b17a92af174394028382a98bb7e5a5f89fe8b4aab5d8c0074" />
     <title>Sources</title>
     <style>
       :root { color-scheme: light dark; font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
@@ -39,16 +39,26 @@
   <body>
     <main>
       <h1>Sources</h1>
+<p>Checked on 2026-08-08.</p>
+<h2>Product authority</h2>
 <ul>
-<li>Official Premier League 2026/27 table and AGM announcement: authoritative season membership and names.</li>
-<li>FotMob league and team pages: one-time factual external identifiers and source mapping only.</li>
-<li>FotMob Terms of Use and Premier League FAQ: automation, data, and badge-rights caveats.</li>
-<li>Next.js, React, Node, Tailwind, dnd-kit, Neon, Drizzle, Vercel, and GitHub official documentation: current stack and deployment decisions.</li>
-<li>Original owner brief: <code>/Users/vishal/.codex/attachments/52a70e1f-75be-4dba-a2ab-739d8a99b417/pasted-text.txt</code> (local conversation attachment; not copied into the repository).</li>
+<li>Original owner brief: <code>/Users/vishal/.codex/attachments/52a70e1f-75be-4dba-a2ab-739d8a99b417/pasted-text.txt</code> (local conversation attachment; intentionally not copied into the repository).</li>
+<li>Latest owner overrides: mobile-first for the majority-mobile audience; recurring updates will be owner-run Codex automation; no runtime live-data API and no Vercel Cron.</li>
 </ul>
-<p>Detailed links, access date, decisions, caveats, and rejected alternatives are in <code>docs/RESEARCH.md</code>.</p>
+<h2>Season and rights</h2>
+<ul>
+<li><a href="https://www.premierleague.com/en/tables/premier-league/2026-27">Official Premier League 2026/27 table</a>: authoritative 20-club membership and display-name check.</li>
+<li><a href="https://www.premierleague.com/en/news/4673099/the-202627-premier-league-season-officially-starts/">Premier League 2026/27 AGM announcement</a>: membership-change corroboration.</li>
+<li><a href="https://www.fotmob.com/leagues/47/overview">FotMob Premier League page</a> and canonical team pages: one-time factual league/team identifier mapping only.</li>
+<li><a href="https://www.fotmob.com/term-of-service">FotMob Terms of Use</a>, checked 2026-08-08: restriction on automatic crawlers and systematic or regular extraction. A consumer subscription is not treated as permission for automation or redistribution.</li>
+<li><a href="https://www.premierleague.com/en/about/faq/other">Premier League trademark and data FAQ</a>: club names and badges remain member-club marks.</li>
+</ul>
+<p>The production app never requests FotMob or another football-data source. Official crests are not redistributed; local text monograms are the documented rights-safe fallback. A future automation must use manual input, a permitted export, or a source whose written licence covers the intended collection and use.</p>
+<h2>Technical authority</h2>
+<p>Current official Next.js, React, Node.js/Vercel runtime, Tailwind CSS, dnd-kit, Neon, Drizzle, Vercel Marketplace/Git integration, Vercel Authentication, and GitHub documentation informed the pinned stack and deployment flow. Exact links, decisions, caveats, rejected alternatives, and failure behavior are recorded in <code>docs/RESEARCH.md</code>.</p>
+<p>Implementation and current checked-out behavior remain authoritative when a historical note differs.</p>
 
-      <p class="source">Generated deterministically from <a href="SOURCES.md">docs/context/SOURCES.md</a>. Canonical SHA-256: <code>271d6fa2328b77508692cfbaa726532676ecd5ffd9260da7419887afbb472ba0</code>.</p>
+      <p class="source">Generated deterministically from <a href="SOURCES.md">docs/context/SOURCES.md</a>. Canonical SHA-256: <code>f1ee562b644e7c2b17a92af174394028382a98bb7e5a5f89fe8b4aab5d8c0074</code>.</p>
     </main>
   </body>
 </html>

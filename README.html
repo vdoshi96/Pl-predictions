@@ -4,8 +4,8 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="canonical-source" content="README.md" />
-    <meta name="canonical-source-sha256" content="60b55ff7df79af72590f9524208e46642bc32bdc175cdad41349681c0e2f958f" />
-    <title>or</title>
+    <meta name="canonical-source-sha256" content="4ae1577ddd5dee0d12f8c2b1ea4f83c3ff7b5461874d730e53a0f7a89efa7337" />
+    <title>PL Predictions</title>
     <style>
       :root { color-scheme: light dark; font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
       body { margin: 0; background: #f5f5f0; color: #18201c; }
@@ -38,32 +38,206 @@
   </head>
   <body>
     <main>
-      <p>This is a <a href="https://nextjs.org">Next.js</a> project bootstrapped with <a href="https://nextjs.org/docs/app/api-reference/cli/create-next-app"><code>create-next-app</code></a>.</p>
-<h2>Getting Started</h2>
-<p>First, run the development server:</p>
-<pre><code class="language-bash">npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-</code></pre>
-<p>Open <a href="http://localhost:3000">http://localhost:3000</a> with your browser to see the result.</p>
-<p>You can start editing the page by modifying <code>app/page.tsx</code>. The page auto-updates as you edit the file.</p>
-<p>This project uses <a href="https://nextjs.org/docs/app/building-your-application/optimizing/fonts"><code>next/font</code></a> to automatically optimize and load <a href="https://vercel.com/font">Geist</a>, a new font family for Vercel.</p>
-<h2>Learn More</h2>
-<p>To learn more about Next.js, take a look at the following resources:</p>
+      <h1>PL Predictions</h1>
+<p>PL Predictions is an unofficial, mobile-first prediction game for a private group of friends. Each participant orders the 20 verified 2026/27 Premier League clubs, reviews an immutable 1–20 table, and submits one display name. Once entries are revealed, every score is recalculated from the latest validated standings snapshot; scores are never accumulated between matchweeks.</p>
+<p>Production: <a href="https://pl-predictions-2026.vercel.app">https://pl-predictions-2026.vercel.app</a></p>
+<p>Deployment status: the final production build is Ready, but Vercel Authentication currently protects every <code>vercel.app</code> deployment. Anonymous launch verification awaits explicit owner approval to switch the project to production-public/preview-protected access; previews will remain authenticated.</p>
+<h2>Product behavior</h2>
 <ul>
-<li><a href="https://nextjs.org/docs">Next.js Documentation</a> - learn about Next.js features and API.</li>
-<li><a href="https://nextjs.org/learn">Learn Next.js</a> - an interactive Next.js tutorial.</li>
+<li><code>/</code> presents an alphabetical 20-club sorter, name field, review dialog, and receipt confirmation.</li>
+<li><code>/leaderboard</code> shows the participant roster before reveal and shared-rank scores afterward.</li>
+<li><code>/entries/[id]</code> is private to the receipt browser or administrator before reveal, then becomes the public club-by-club comparison.</li>
+<li><code>/admin</code> provides owner-only settings, submission deletion, manual standings, import history, and final-table controls.</li>
+<li><code>/api/automation/standings</code> accepts a source-neutral, bearer-authenticated snapshot or failure record. It never fetches a football-data service itself.</li>
 </ul>
-<p>You can check out <a href="https://github.com/vercel/next.js">the Next.js GitHub repository</a> - your feedback and contributions are welcome!</p>
-<h2>Deploy on Vercel</h2>
-<p>The easiest way to deploy your Next.js app is to use the <a href="https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme">Vercel Platform</a> from the creators of Next.js.</p>
-<p>Check out our <a href="https://nextjs.org/docs/app/building-your-application/deploying">Next.js deployment documentation</a> for more details.</p>
+<p>Scoring is mutually exclusive per club: 5 points exact, otherwise 3 within three places, otherwise 1 in the same half, otherwise 0. An exact table scores 100.</p>
+<h2>Mobile-first interaction</h2>
+<p>The prediction and manual-standings lists are single-column and have no horizontal overflow at narrow widths. Each row has a dedicated 56 by 56 pixel move handle; <code>touch-action: none</code> is limited to the handle so the rest of the page still scrolls naturally. The same handle supports pointer dragging and direct Arrow Up/Arrow Down reordering with live screen-reader announcements. Position numbers update immediately, the top/bottom-half boundary is visible, focus states are explicit, reduced-motion preferences are respected, and the review action remains reachable above the mobile safe area.</p>
+<h2>Architecture</h2>
+<p>The application is one Next.js 16 App Router deployment on Vercel. Dynamic server components and server actions read and mutate a Vercel Marketplace Neon database through Drizzle and the Neon serverless HTTP driver. Zod validates every public, admin, and standings payload; PostgreSQL constraints repeat the important invariants.</p>
+<p>Standings are deliberately decoupled from source acquisition:</p>
+<pre><code class="language-text">permitted export or owner-entered table
+                 |
+                 v
+       canonical 20-team payload
+                 |
+                 v
+authenticated import route / local script / admin form
+                 |
+                 v
+ Zod + known-team + position + freshness validation
+                 |
+                 v
+ atomic Neon snapshot activation and derived scoring
+</code></pre>
+<p>There is no runtime football API client, production scraper, or Vercel Cron. A future owner-run Codex automation can collect data only from a permitted or licensed source and submit the canonical payload. Manual entry at <code>/admin/standings</code> remains the independent fallback.</p>
+<p>See <a href="docs/ARCHITECTURE.html">docs/ARCHITECTURE.md</a>, <a href="docs/RESEARCH.html">docs/RESEARCH.md</a>, and <a href="docs/QA.html">docs/QA.md</a> for the detailed design, source decisions, and current evidence.</p>
+<h2>Stack</h2>
+<ul>
+<li>Node.js 24.x</li>
+<li>Next.js 16.3.0 and React 19.2.8</li>
+<li>TypeScript strict mode and Tailwind CSS 4</li>
+<li><code>@dnd-kit/react</code> and <code>@dnd-kit/helpers</code></li>
+<li>Neon Serverless Postgres, Drizzle ORM, and committed migrations</li>
+<li>Zod, Vitest, Testing Library, and Playwright</li>
+<li>Vercel Hobby-compatible deployment</li>
+</ul>
+<h2>Local setup</h2>
+<p>Prerequisites are Node.js 24, npm, a linked Vercel project, and access to the project&#39;s Neon integration.</p>
+<pre><code class="language-bash">npm ci
+vercel link --project pl-predictions
+vercel env pull .env.local
+npm run db:migrate
+npm run db:seed
+npm run dev
+</code></pre>
+<p>Open <a href="http://localhost:3000">http://localhost:3000</a>. Never commit <code>.env.local</code> or paste complete environment values into logs.</p>
+<h3>Environment variables</h3>
+<table>
+<thead>
+<tr>
+<th>Variable</th>
+<th>Required</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>DATABASE_URL</code></td>
+<td>Yes</td>
+<td>Pooled production/development Neon connection used by the application, migrations, seed, and local import script. Never point the automated integration or browser journeys at this database.</td>
+</tr>
+<tr>
+<td><code>DATABASE_URL_UNPOOLED</code></td>
+<td>Provisioned</td>
+<td>Direct Neon connection supplied by the Marketplace integration; retained for provider tooling even though this app currently uses <code>DATABASE_URL</code>.</td>
+</tr>
+<tr>
+<td><code>TEST_DATABASE_URL</code></td>
+<td>Tests</td>
+<td>Preferred explicit connection to an isolated test database or branch. The safety wrapper rejects a target that resolves to <code>DATABASE_URL</code>.</td>
+</tr>
+<tr>
+<td><code>TEST_DATABASE_NAME</code></td>
+<td>Local test alternative</td>
+<td>Local-only database name used to derive an isolated target from <code>DATABASE_URL</code> when <code>TEST_DATABASE_URL</code> is not set.</td>
+</tr>
+<tr>
+<td><code>ADMIN_SECRET</code></td>
+<td>Yes</td>
+<td>Owner login credential; server-only.</td>
+</tr>
+<tr>
+<td><code>ADMIN_SESSION_SECRET</code></td>
+<td>Yes</td>
+<td>HMAC key for the signed, eight-hour HttpOnly admin session.</td>
+</tr>
+<tr>
+<td><code>STANDINGS_INGEST_SECRET</code></td>
+<td>For automated imports</td>
+<td>Bearer credential for <code>/api/automation/standings</code>; server-only.</td>
+</tr>
+<tr>
+<td><code>PREDICTION_DEADLINE_ISO</code></td>
+<td>Optional seed input</td>
+<td>Initial ISO deadline for a newly inserted season. Later changes are made in <code>/admin/settings</code>.</td>
+</tr>
+</tbody></table>
+<p>There are no <code>NEXT_PUBLIC</code> secrets, football-provider token, or cron secret.</p>
+<h2>Commands</h2>
+<pre><code class="language-bash">npm run dev                 # local development server
+npm run format              # write formatting
+npm run format:check        # verify formatting
+npm run lint                # ESLint with zero warnings
+npm run typecheck           # strict TypeScript
+npm test                    # unit and component suites
+npm run test:integration    # isolated Neon integration suite; fails closed without a safe target
+npm run test:coverage       # coverage report
+npm run build               # normal Next.js production build
+npm run build:verify        # Webpack build used in restricted local QA
+npm run test:e2e            # desktop, 320/390/430px Chromium, and iPhone WebKit
+npm run test:production-smoke       # read-only public deployment checks
+npm run test:production-write-smoke # explicit opt-in, exact-ID submit/delete proof
+npm run check               # complete local verification chain
+npm run docs:generate       # regenerate every Markdown HTML peer
+npm run docs:check          # prove generated HTML is current
+</code></pre>
+<p>Database commands:</p>
+<pre><code class="language-bash">npm run db:generate         # generate a migration after an intentional schema change
+npm run db:migrate          # apply committed migrations
+npm run db:seed             # idempotently seed the active season and 20 clubs
+npm run db:test:migrate     # apply migrations only to the isolated test target
+npm run db:test:seed        # seed only the isolated test target
+</code></pre>
+<p>The committed schema history starts with <code>drizzle/0000_oval_slyde.sql</code>. <code>drizzle/0001_left_iron_fist.sql</code> adds and backfills the season-level accepted-through standings watermark. Do not edit an already-applied migration; create a new forward migration.</p>
+<h2>Standings operations</h2>
+<h3>Manual fallback</h3>
+<p>Sign in at <code>/admin/login</code>, open <code>/admin/standings</code>, order all 20 clubs, and optionally enter matchweek, games played, and league points. A save writes one complete provisional snapshot. Invalid, duplicate, stale, incomplete, or concurrent input cannot replace the last active good table.</p>
+<p>A table becomes eligible for final confirmation only when all 20 clubs have 38 played games. Finalization is explicit. Its compare-and-swap database statement claims the exact active snapshot, marks it final, and writes the audit record together; a racing import cannot be accidentally finalized. New imports are blocked until the administrator explicitly undoes final status.</p>
+<h3>Authenticated source-neutral import</h3>
+<p>Prepare a version-1 JSON envelope matching <code>src/features/standings/validation.ts</code>. A snapshot contains the season slug, source label, capture timestamp, optional source timestamp/reference and matchweek, plus exactly 20 unique known <code>teamSlug</code> rows with positions 1–20. Games played and league points may be null. A source failure can instead be recorded with <code>kind: &quot;failure&quot;</code>; it never changes the active table.</p>
+<p>Import locally:</p>
+<pre><code class="language-bash">npm run standings:import -- /absolute/path/to/standings.json
+</code></pre>
+<p>Or post from an owner-controlled automation:</p>
+<pre><code class="language-bash">curl --request POST &quot;https://pl-predictions-2026.vercel.app/api/automation/standings&quot; \
+  --header &quot;Authorization: Bearer $STANDINGS_INGEST_SECRET&quot; \
+  --header &quot;Content-Type: application/json&quot; \
+  --data-binary @/absolute/path/to/standings.json
+</code></pre>
+<p>The endpoint has a 64 KiB body limit, validates a complete known-team permutation, rejects stale, implausibly future, or post-final snapshots, records import outcomes, and preserves the last good snapshot on every failure. A database-time-anchored five-minute skew bound protects both capture timestamps. A season-level accepted-through watermark also advances for newer duplicate observations, so delayed changed data cannot regress the active table. The payload&#39;s <code>isFinal</code> field is advisory only; only an authenticated administrator can confirm final status.</p>
+<h3>FotMob boundary</h3>
+<p>FotMob was used during one-time research to map factual team identifiers. Its current terms, checked 2026-08-08, prohibit automatic crawlers and systematic or regular extraction; a consumer subscription is not a written automation or redistribution licence. Do not configure Codex or this project to scrape FotMob automatically unless the owner first obtains explicit written permission covering the intended extraction and use. Use a permitted/licensed export or the manual admin table instead. The deployed application stores no source cookies, credentials, HTML, or live API dependency.</p>
+<h2>Admin credential retrieval and rotation</h2>
+<p>The owner&#39;s current <code>ADMIN_SECRET</code> is stored in macOS Keychain under service <code>pl-predictions-admin</code> and account <code>vishal</code>. Retrieve it only in a private terminal:</p>
+<pre><code class="language-bash">security find-generic-password -a vishal -s pl-predictions-admin -w
+</code></pre>
+<p>To rotate it, first create a strong new value in a password manager. Store it without placing the value in shell history; keeping <code>-w</code> last makes Keychain prompt securely:</p>
+<pre><code class="language-bash">security add-generic-password -U -a vishal -s pl-predictions-admin -l &quot;PL Predictions Admin Secret&quot; -w
+</code></pre>
+<p>Then stream the Keychain value directly to each Vercel environment and redeploy:</p>
+<pre><code class="language-bash">security find-generic-password -a vishal -s pl-predictions-admin -w | vercel env add ADMIN_SECRET production --sensitive --force
+security find-generic-password -a vishal -s pl-predictions-admin -w | vercel env add ADMIN_SECRET preview --sensitive --force
+security find-generic-password -a vishal -s pl-predictions-admin -w | vercel env add ADMIN_SECRET development --force
+vercel deploy --prod
+</code></pre>
+<p>Rotating <code>ADMIN_SESSION_SECRET</code> separately invalidates all existing admin sessions. Never rotate either secret by changing source code.</p>
+<h2>Deployment</h2>
+<p>The Vercel project is <code>vdoshi96s-projects/pl-predictions</code>. Neon resource <code>neon-coffee-queen</code> was provisioned through Vercel Marketplace before migrations and seed data were applied.</p>
+<p>For a new environment:</p>
+<ol>
+<li>Authenticate with <code>vercel whoami</code> and link the project.</li>
+<li>Provision or connect Neon through the current Vercel Marketplace integration.</li>
+<li>Pull environment variables without printing their values.</li>
+<li>Run <code>npm run db:migrate</code> and <code>npm run db:seed</code> against the linked database.</li>
+<li>Run <code>npm run check</code>.</li>
+<li>Create and inspect a preview with <code>vercel deploy</code> and <code>vercel inspect &lt;preview-url&gt;</code>.</li>
+<li>Deploy production with <code>vercel deploy --prod</code> and inspect the production URL/logs.</li>
+<li>Run the read-only production smoke. If a production write proof is required, run only the separately gated exact-ID submit/privacy/delete smoke and verify cleanup. Never run the full reveal/standings journey against production.</li>
+</ol>
+<p>No Vercel Cron should be added. Recurring data acquisition belongs to the owner&#39;s separate Codex automation and must respect the source boundary above.</p>
+<h2>Season rollover and club updates</h2>
+<p>The application intentionally has one code-selected active season.</p>
+<ol>
+<li>Verify the new membership and display names against official Premier League sources.</li>
+<li>Add the new season metadata in <code>src/data/season.ts</code> and a complete 20-club fixture in <code>src/data/teams.ts</code>. Give every club a stable slug, sort name, permitted asset path, and external mapping only when lawfully sourced.</li>
+<li>Keep the old season rows; a new slug makes <code>npm run db:seed</code> insert a separate season. Do not recycle IDs.</li>
+<li>Run fixture, scoring, importer, integration, and browser tests, then seed and verify exactly 20 teams.</li>
+<li>If correcting membership after a season has already been seeded, create an explicit data migration. The idempotent seed updates known teams but deliberately does not delete referenced historical rows.</li>
+<li>Set the new deadline in <code>/admin/settings</code>, verify reveal/lock defaults, and deploy.</li>
+</ol>
+<h2>Current limitations</h2>
+<ul>
+<li>Club marks are project-owned text monograms, not official crests. Names and badges remain the clubs&#39; property; replace assets only after redistribution permission is documented.</li>
+<li>Standings are manual or accepted through the authenticated canonical importer. There is no built-in provider fetch, sync-now source client, scheduled job, or live-data guarantee.</li>
+<li>Participants have no accounts and cannot edit an entry. The administrator can delete an erroneous entry so it can be resubmitted.</li>
+<li>The seed leaves a new season open when <code>PREDICTION_DEADLINE_ISO</code> is unset; the owner must set or lock it in <code>/admin/settings</code>.</li>
+<li>Season rollover currently requires a reviewed code and seed update.</li>
+</ul>
+<h2>Data and rights attribution</h2>
+<p>Season membership and preferred club names were verified with the official Premier League 2026/27 table and AGM announcement. FotMob league/team pages supplied one-time factual external-ID mapping only. Source and rights research is recorded with links and access date in <a href="docs/RESEARCH.html">docs/RESEARCH.md</a>.</p>
+<p>This is an unofficial fan project and is not affiliated with the Premier League. Club names and crests belong to their respective owners.</p>
 
-      <p class="source">Generated deterministically from <a href="README.md">README.md</a>. Canonical SHA-256: <code>60b55ff7df79af72590f9524208e46642bc32bdc175cdad41349681c0e2f958f</code>.</p>
+      <p class="source">Generated deterministically from <a href="README.md">README.md</a>. Canonical SHA-256: <code>4ae1577ddd5dee0d12f8c2b1ea4f83c3ff7b5461874d730e53a0f7a89efa7337</code>.</p>
     </main>
   </body>
 </html>

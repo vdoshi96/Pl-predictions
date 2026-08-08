@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="canonical-source" content="LOG.md" />
-    <meta name="canonical-source-sha256" content="2d4a210685936cea1f4de75429ff316b18074c6cd95f522bf1a881cb3e9fa5c5" />
+    <meta name="canonical-source-sha256" content="f81ca98294868e55c024844570a2c3fdd2e9f057d5e2784b0ca0fb7a888f5279" />
     <title>Session log</title>
     <style>
       :root { color-scheme: light dark; font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
@@ -40,16 +40,47 @@
     <main>
       <h1>Session log</h1>
 <h2>2026-08-08</h2>
+<h3>Research and provisioning</h3>
 <ul>
-<li>Read the complete greenfield product brief and latest owner override.</li>
-<li>Verified Vercel CLI authentication and created <code>vdoshi96s-projects/pl-predictions</code>.</li>
-<li>Provisioned Vercel Marketplace Neon resource <code>neon-coffee-queen</code> and confirmed environment-key names without exposing values.</li>
-<li>Verified official 2026/27 league membership and FotMob identifiers.</li>
-<li>Recorded the no-live-API/no-cron architecture and third-party crest limitation.</li>
-<li>Initialized the local Git repository and began implementation.</li>
+<li>Read the complete greenfield product brief and the owner&#39;s no-live-API/no-cron and mobile-first overrides.</li>
+<li>Verified official 2026/27 league membership and the 20 seeded club display names.</li>
+<li>Recorded FotMob&#39;s automated-extraction restriction and the fact that a consumer subscription does not grant automation or redistribution rights.</li>
+<li>Selected the source-neutral authenticated importer plus manual owner entry, with local monograms until crest redistribution rights are cleared.</li>
+<li>Verified Vercel CLI authentication, created and linked <code>vdoshi96s-projects/pl-predictions</code>, and provisioned Vercel Marketplace Neon resource <code>neon-coffee-queen</code> before database work.</li>
+<li>Generated server-only credentials, stored the owner login in macOS Keychain, configured Vercel environments without exposing values, pulled local environment names, applied the committed migration, and seeded exactly 20 teams.</li>
+<li>Initialized the local Git repository and created branch <code>agent/build-pl-predictions</code> after the bootstrap checkpoint.</li>
+</ul>
+<h3>Implementation</h3>
+<ul>
+<li>Built the mobile-first prediction sorter, review dialog, atomic submission flow, receipt-gated confirmation, fairness deadline/lock/reveal policy, pre-reveal roster, derived leaderboard, and entry comparison.</li>
+<li>Built the owner login/session, status dashboard, season settings, submission deletion, manual standings editor, import history, 38-game final-candidate check, explicit final confirmation, and undo.</li>
+<li>Added the canonical version-1 snapshot/failure schema, local import script, 64 KiB bearer-authenticated intake route, deterministic content hashes, stale/duplicate/final rejection, run history, and last-good preservation.</li>
+<li>Added compare-and-swap guards in both import activation and one-statement finalization so concurrent transitions cannot split the active and final snapshots.</li>
+<li>Added strict server validation, database constraints/indexes, receipt hashing, constant-time credential checks, signed HttpOnly sessions, same-origin admin mutations, honeypot, audit metadata, safe errors, security headers, and no-secret caching behavior.</li>
+<li>Added 20 independent local monogram assets, a responsive header/footer, unofficial rights disclaimer, safe-area mobile action, 56-pixel handle targets, keyboard announcements, focus states, and reduced-motion behavior.</li>
+<li>Added deterministic Markdown-to-HTML generation, repository context documents, focused unit/component/integration tests, a fail-closed isolated test-database wrapper, and reversible Playwright journeys across desktop, 320/390/430-pixel Chromium, and iPhone WebKit.</li>
+<li>Hardened prediction writes into one database-clock-guarded SQL statement; early reveal now closes submissions irreversibly, and hidden pre-reveal server payloads omit prediction identifiers and items.</li>
+<li>Added a five-minute database-time timestamp bound, season-level standings accepted-through watermark, historical-content reactivation, duplicate-watermark handling, and exact compare-and-swap final undo.</li>
+</ul>
+<h3>Verification and deployment</h3>
+<ul>
+<li>Passed formatting, ESLint with zero warnings, and strict TypeScript checks before documentation closeout.</li>
+<li>Passed 95 default-suite tests; the 9 database cases were skipped there by design and then all passed under <code>npm run test:integration</code> against isolated Neon database <code>pl_predictions_test</code>.</li>
+<li>Passed <code>npm run build:verify</code> with Next.js Webpack mode. The restricted local environment blocked an internal Turbopack helper port, while Vercel&#39;s default Turbopack production build later passed.</li>
+<li>Passed 5 browser journeys with 20 intentional project-routing skips across desktop, exact 320/390/430-pixel Chromium, and iPhone 13 WebKit. The run covered no-overflow layout, real mouse/touch/keyboard reorder, 56-pixel touch handles, review/submit, raw HTML/RSC hidden-entry privacy, pre-reveal leaderboard, admin manual standings, recalculation, comparison, exact-ID deletion, and reversible isolated-database cleanup.</li>
+<li><code>npm audit --omit=dev --audit-level=high</code> found 0 vulnerabilities. The full audit found 4 moderate development-only legacy <code>esbuild</code> paths through <code>drizzle-kit</code>, no high/critical findings, and only a breaking forced downgrade; no force change was applied.</li>
+<li>Applied forward migration <code>0001_left_iron_fist.sql</code> to production before deploying code that reads its new watermark, then reran the idempotent 20-team seed.</li>
+<li>Deployed Ready preview <code>dpl_e7yEgPhrJBR17qnoQk3EAwdXjFmQ</code> and Ready production <code>dpl_CGDPYcKNhq6EJb8AUReEVC8odRDF</code>; <a href="https://pl-predictions-2026.vercel.app">https://pl-predictions-2026.vercel.app</a> points to the final production deployment.</li>
+<li>Attempted the narrow Vercel Authentication setting <code>preview</code> so only previews remain protected. Policy correctly rejected the persistent production-access change without explicit owner approval; no workaround or weaker setting was applied.</li>
+</ul>
+<h3>Open closeout</h3>
+<ul>
+<li>Push the feature branch to the owner-supplied public GitHub repository, merge it to <code>main</code>, synchronize local <code>main</code>, and verify no completed worktrees remain.</li>
+<li>After explicit owner approval, set Vercel Authentication to preview-only, run the anonymous read-only smoke plus the separately gated exact-ID submit/privacy/delete proof, confirm zero production QA residue, and retain only the newest annotated screenshots.</li>
+<li>Refresh final smoke/GitHub evidence, regenerate every HTML peer, and rerun parity/format checks.</li>
 </ul>
 
-      <p class="source">Generated deterministically from <a href="LOG.md">docs/context/LOG.md</a>. Canonical SHA-256: <code>2d4a210685936cea1f4de75429ff316b18074c6cd95f522bf1a881cb3e9fa5c5</code>.</p>
+      <p class="source">Generated deterministically from <a href="LOG.md">docs/context/LOG.md</a>. Canonical SHA-256: <code>f81ca98294868e55c024844570a2c3fdd2e9f057d5e2784b0ca0fb7a888f5279</code>.</p>
     </main>
   </body>
 </html>

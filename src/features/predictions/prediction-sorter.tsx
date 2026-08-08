@@ -102,21 +102,19 @@ function SortableTeamRow({
       data-team-id={team.id}
       data-position={position}
       className={cn(
-        "group relative flex min-h-16 w-full min-w-0 items-center gap-3 rounded-2xl border bg-white py-2 pr-2 pl-3 shadow-sm transition-[border-color,box-shadow,opacity] duration-150 motion-reduce:transition-none",
+        "group relative flex min-h-16 w-full min-w-0 items-center gap-3 rounded-2xl border bg-white py-2 pr-2 pl-3 shadow-[0_10px_26px_-24px_rgba(55,0,60,0.65)] transition-[border-color,box-shadow,opacity,transform] duration-150 motion-reduce:transition-none",
         position === 11
-          ? "mt-2 border-t-4 border-t-slate-300"
-          : "border-slate-200",
-        isDropTarget && "border-emerald-400 ring-2 ring-emerald-100",
-        isDragging && "z-10 border-emerald-400 opacity-80 shadow-xl",
+          ? "border-border border-t-accent-blue mt-2 border-t-4"
+          : "border-border",
+        isDropTarget && "border-accent ring-2 ring-[#d8ffeb]",
+        isDragging && "border-accent z-10 scale-[1.01] opacity-85 shadow-xl",
       )}
     >
       <span
         aria-label={`${positionKind === "predicted" ? "Predicted" : "Actual"} position ${position}`}
         className={cn(
           "grid size-9 shrink-0 place-items-center rounded-xl font-mono text-sm font-black tabular-nums",
-          position <= 10
-            ? "bg-slate-900 text-white"
-            : "bg-slate-100 text-slate-700",
+          position <= 10 ? "bg-brand text-white" : "bg-brand-soft text-brand",
         )}
       >
         {position}
@@ -129,7 +127,7 @@ function SortableTeamRow({
         size="md"
       />
 
-      <span className="min-w-0 grow text-sm leading-4 font-semibold break-words text-slate-900 sm:truncate sm:text-base sm:leading-5">
+      <span className="text-brand-strong min-w-0 grow text-sm leading-4 font-bold break-words sm:truncate sm:text-base sm:leading-5">
         {team.displayName}
       </span>
 
@@ -147,7 +145,7 @@ function SortableTeamRow({
           event.stopPropagation();
           onKeyboardMove(team.id, direction);
         }}
-        className="inline-flex size-14 shrink-0 touch-none items-center justify-center rounded-xl border border-slate-200 bg-slate-50 text-slate-600 outline-none select-none hover:border-slate-300 hover:bg-slate-100 hover:text-slate-950 focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2 active:cursor-grabbing disabled:cursor-not-allowed disabled:opacity-45 motion-reduce:transition-none sm:cursor-grab"
+        className="border-border bg-brand-soft text-brand hover:border-accent-lilac hover:text-brand-strong focus-visible:ring-accent-blue inline-flex size-14 shrink-0 touch-none items-center justify-center rounded-xl border outline-none select-none hover:bg-white focus-visible:ring-2 focus-visible:ring-offset-2 active:cursor-grabbing disabled:cursor-not-allowed disabled:opacity-45 motion-reduce:transition-none sm:cursor-grab"
       >
         <GripVertical
           aria-hidden="true"
@@ -299,12 +297,12 @@ export function PredictionSorter({
     <section className={cn("min-w-0", className)} aria-labelledby={headingId}>
       <div className="mb-3 flex flex-wrap items-end justify-between gap-3">
         <div className="min-w-0">
-          <h2 id={headingId} className="text-lg font-bold text-slate-950">
+          <h2 id={headingId} className="text-brand-strong text-lg font-black">
             {mode === "standings"
               ? "Current league table"
               : "Your predicted table"}
           </h2>
-          <p className="mt-1 text-sm leading-5 text-slate-600">
+          <p className="text-muted mt-1 text-sm leading-5">
             Drag the large handle, or focus it and press Arrow Up or Arrow Down.
           </p>
         </div>

@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="canonical-source" content="STATUS.md" />
-    <meta name="canonical-source-sha256" content="9af8b8f7a23532b2d845ca1b45e7286271d5d7da3d2dc65ec4de359029e27793" />
+    <meta name="canonical-source-sha256" content="db7f600cb782703db1f73225f097fd712b421ac81c71741465796c27c18ddd90" />
     <title>Status</title>
     <style>
       :root { color-scheme: light dark; font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
@@ -40,24 +40,25 @@
     <main>
       <h1>Status</h1>
 <ul>
-<li>Current phase: implementation, production deployment, anonymous production verification, bounded write cleanup, documentation parity, and GitHub publication are complete.</li>
-<li>Product: mobile-first prediction, private receipt, leaderboard/comparison, owner settings/submission deletion, manual standings, authenticated source-neutral imports, and explicit final-table controls implemented.</li>
+<li>Current phase: Dranx Prediction League branding, crest-readiness implementation, local verification, read-only production verification, and deterministic documentation parity are complete. GitHub publication through draft PR #1 remains pending.</li>
+<li>Product: user-facing identity is Dranx Prediction League; mobile-first prediction, private receipt, leaderboard/comparison, owner settings/submission deletion, manual standings, authenticated source-neutral imports, and explicit final-table controls remain the product scope.</li>
 <li>Vercel: project <code>vdoshi96s-projects/pl-predictions</code>; production alias <a href="https://pl-predictions-2026.vercel.app">https://pl-predictions-2026.vercel.app</a>.</li>
-<li>Smoke-verified production runtime: deployment <code>dpl_JCfjcxvtVVfbsU55mmTppBK2FB9G</code> is Ready at immutable URL <a href="https://pl-predictions-65aqenfnq-vdoshi96s-projects.vercel.app">https://pl-predictions-65aqenfnq-vdoshi96s-projects.vercel.app</a>. The earlier edge 404 was traced to a null Vercel framework preset and resolved by setting the project preset to <code>nextjs</code> before this deployment. The stable production alias remains the public release URL even when a later documentation-only Git deployment advances its target.</li>
-<li>Access boundary: after explicit owner approval, Vercel Authentication was changed to <code>preview</code>. Anonymous production health and application requests return 200, while the retained preview URL continues to redirect to Vercel SSO with 302.</li>
+<li>Dranx production deployment: <code>dpl_BPJUGKA7CJF7bhaUCTHjUx2cPEK7</code> is Ready with target <code>production</code> at immutable URL <a href="https://pl-predictions-pizpoqt4u-vdoshi96s-projects.vercel.app">https://pl-predictions-pizpoqt4u-vdoshi96s-projects.vercel.app</a>. Vercel built it with Next.js 16.3.0 and Turbopack, and the stable public alias was repointed to it.</li>
+<li>Access boundary: the stable public alias returns 200, while the retained preview continues to redirect to Vercel SSO with 302. Preview protection remains enabled.</li>
 <li>Database: Vercel Marketplace Neon resource <code>neon-coffee-queen</code>; migrations <code>0000</code> and <code>0001</code> applied to production, idempotent seed rerun, and exactly 20 verified 2026/27 clubs present. Automated DB/browser suites use isolated database <code>pl_predictions_test</code> through a fail-closed wrapper.</li>
 <li>Standings: no runtime football API, scraper, or Vercel Cron. Manual admin entry and the bearer-authenticated canonical importer preserve the last good snapshot. FotMob automation remains prohibited absent written permission.</li>
 <li>Finalization: all 20 clubs must show 38 played games; finalization and undo each compare-and-swap the exact active/final snapshot. Imports use a monotonic accepted-through watermark so duplicate observations cannot permit a later standings regression.</li>
-<li>Assets: local text monograms are the launch fallback because official crest redistribution rights are not cleared.</li>
-<li>Verification: 95 default tests passed with 9 opt-in database skips; all 9 isolated Neon integration tests passed; the Webpack production build passed; 5 focused local browser journeys passed with 20 intentional routing skips. The final anonymous production smoke passed 5 of 5 projects across desktop Chromium, 320/390/430-pixel Chromium, and iPhone WebKit with mouse/touch/keyboard reorder, no horizontal overflow, healthy responses, and zero console, page, unexpected same-origin request, or HTTP response errors. The bounded production write smoke passed 1 of 1.</li>
+<li>Brand and assets: the Premier-League-inspired palette uses official purple <code>#37003c</code> with cyan <code>#05f0ff</code>, green <code>#00ff87</code>, and pink <code>#ff2882</code> accents and an original Dranx mark. FotMob crest downloads and the official Premier League logo were not added because repository policy and current official terms require authorization. The 20 local monograms remain, while <code>TeamMark</code> now uses contain sizing and a labelled initials fallback for authorized transparent future assets.</li>
+<li>Local verification: ESLint and strict TypeScript passed; 97 default tests passed with 9 opt-in database skips; all 9 isolated Neon integration tests passed; the Webpack production build passed; and 5 focused local browser journeys passed with 20 intentional routing skips across desktop, 320/390/430-pixel Chromium, and iPhone WebKit.</li>
+<li>Production verification: the final read-only smoke against the stable alias passed 5 of 5 projects across desktop Chromium, mobile Chromium at 390 pixels, exact 320/430-pixel reflow, and mobile WebKit. It recorded no browser, page, unexpected same-origin request, or HTTP errors; only cross-browser expected canceled <code>_rsc</code> navigational prefetches were excluded. Vercel logs for the preceding hour contained zero error entries and zero HTTP 500 responses.</li>
 <li>Dependency note: the full audit reports 4 moderate development-only legacy <code>esbuild</code> paths through <code>drizzle-kit</code>, with no high or critical findings. The breaking force-downgrade suggestion was not applied.</li>
-<li>GitHub: public owner-supplied repository <a href="https://github.com/vdoshi96/Pl-predictions">vdoshi96/Pl-predictions</a>; the final evidence release is published on canonical <code>main</code>, with local and remote <code>main</code> synchronized and no completed worktree retained.</li>
-<li>Production cleanup: the bounded smoke created one exact QA prediction, proved receipt privacy and the hidden pre-reveal roster, then deleted that exact entry through the administrator flow. Production now has zero predictions, prediction items, and prediction audits; the season remains open, unrevealed, and unlocked with null active/final standings pointers.</li>
-<li>Documentation: canonical Markdown now records the public-access boundary, final production evidence, and newest labeled mobile screenshots; deterministic same-content HTML peers are generated and checked.</li>
-<li>Remaining closeout: none.</li>
+<li>GitHub: public owner-supplied repository <a href="https://github.com/vdoshi96/Pl-predictions">vdoshi96/Pl-predictions</a>; the previous release is published on canonical <code>main</code>. Draft PR #1 contains the current branding iteration and remains pending review and merge.</li>
+<li>Production data: no production write smoke ran for this branding-only iteration, and no production data changed. The previous release&#39;s exact-ID write and cleanup proof remains intentional historical evidence.</li>
+<li>Documentation: canonical Markdown records the Dranx identity, local and production results, and authorized-asset boundary. Four 390-by-844 production screenshots were refreshed and visually inspected; all 14 deterministic HTML peers were regenerated and pass the parity check.</li>
+<li>Remaining closeout: move draft PR #1 through review and merge, synchronize local <code>main</code>, and remove completed worktree state.</li>
 </ul>
 
-      <p class="source">Generated deterministically from <a href="STATUS.md">docs/context/STATUS.md</a>. Canonical SHA-256: <code>9af8b8f7a23532b2d845ca1b45e7286271d5d7da3d2dc65ec4de359029e27793</code>.</p>
+      <p class="source">Generated deterministically from <a href="STATUS.md">docs/context/STATUS.md</a>. Canonical SHA-256: <code>db7f600cb782703db1f73225f097fd712b421ac81c71741465796c27c18ddd90</code>.</p>
     </main>
   </body>
 </html>

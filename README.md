@@ -1,12 +1,18 @@
-# PL Predictions
+# Dranx Prediction League
 
-PL Predictions is an unofficial, mobile-first prediction game for a private group of friends. Each participant orders the 20 verified 2026/27 Premier League clubs, reviews an immutable 1–20 table, and submits one display name. Once entries are revealed, every score is recalculated from the latest validated standings snapshot; scores are never accumulated between matchweeks.
+Dranx Prediction League is an unofficial, mobile-first prediction game for a private invited group. Each participant orders the 20 verified 2026/27 Premier League clubs, reviews an immutable 1–20 table, and submits one display name. Once entries are revealed, every score is recalculated from the latest validated standings snapshot; scores are never accumulated between matchweeks.
 
 Production: [https://pl-predictions-2026.vercel.app](https://pl-predictions-2026.vercel.app)
 
 GitHub: [https://github.com/vdoshi96/Pl-predictions](https://github.com/vdoshi96/Pl-predictions)
 
 Deployment status: production is public and Ready at the stable alias above. Vercel Authentication is set to `preview`, so retained preview deployments still require owner sign-in while production remains anonymously accessible. Final production browser and cleanup evidence is recorded in [docs/QA.md](docs/QA.md).
+
+## Brand and club assets
+
+The user-facing identity is Dranx Prediction League. Its Premier-League-inspired palette anchors on the league's official purple, `#37003c`, with cyan `#05f0ff`, green `#00ff87`, and pink `#ff2882` accents and an original Dranx mark. The original mark is used instead of the official Premier League logo.
+
+FotMob crest downloads and the official Premier League logo were not added. Repository policy and the current official terms require appropriate authorization before those third-party marks can be copied or redistributed. The application therefore retains its 20 local text monograms. The shared `TeamMark` now uses contain sizing, a neutral backing, and a labelled initials fallback so authorized transparent files can replace the monograms later without changing the database model or public flows.
 
 ## Product behavior
 
@@ -209,7 +215,7 @@ The application intentionally has one code-selected active season.
 
 ## Current limitations
 
-- Club marks are project-owned text monograms, not official crests. Names and badges remain the clubs' property; replace assets only after redistribution permission is documented.
+- Club marks remain the 20 project-owned text monograms, not official crests. Names and badges remain the clubs' property; replace assets only after redistribution permission is documented. `TeamMark` already supports transparent authorized crest files without requiring a schema change.
 - Standings are manual or accepted through the authenticated canonical importer. There is no built-in provider fetch, sync-now source client, scheduled job, or live-data guarantee.
 - Participants have no accounts and cannot edit an entry. The administrator can delete an erroneous entry so it can be resubmitted.
 - The seed leaves a new season open when `PREDICTION_DEADLINE_ISO` is unset; the owner must set or lock it in `/admin/settings`.
@@ -217,6 +223,6 @@ The application intentionally has one code-selected active season.
 
 ## Data and rights attribution
 
-Season membership and preferred club names were verified with the official Premier League 2026/27 table and AGM announcement. FotMob league/team pages supplied one-time factual external-ID mapping only. Source and rights research is recorded with links and access date in [docs/RESEARCH.md](docs/RESEARCH.md).
+Season membership and preferred club names were verified with the official Premier League 2026/27 table and AGM announcement. FotMob league/team pages supplied one-time factual external-ID mapping only. No FotMob crest file or official Premier League logo is included. Source and rights research is recorded with links and access date in [docs/RESEARCH.md](docs/RESEARCH.md).
 
 This is an unofficial fan project and is not affiliated with the Premier League. Club names and crests belong to their respective owners.

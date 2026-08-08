@@ -20,11 +20,11 @@ export async function generateMetadata({
 }
 
 const tierPresentation = {
-  exact: { label: "Exact", className: "bg-emerald-100 text-emerald-900" },
-  "within-three": { label: "Within 3", className: "bg-sky-100 text-sky-900" },
+  exact: { label: "Exact", className: "bg-[#ddffef] text-[#075d42]" },
+  "within-three": { label: "Within 3", className: "bg-[#dffcff] text-brand" },
   "correct-half": {
     label: "Correct half",
-    className: "bg-amber-100 text-amber-950",
+    className: "bg-[#ffe3ef] text-[#8f0033]",
   },
   miss: { label: "No points", className: "bg-slate-100 text-slate-700" },
 } as const;
@@ -38,9 +38,9 @@ export default async function EntryPage({
   return (
     <main className="page-shell w-full flex-1 py-6 sm:py-10">
       <div className="mx-auto grid max-w-4xl gap-5 sm:gap-7">
-        <section className="rounded-3xl bg-slate-950 p-5 text-white sm:p-8">
+        <section className="brand-hero rounded-3xl p-5 text-white sm:p-8">
           <div className="flex flex-wrap items-center gap-2">
-            <Badge className="bg-emerald-300 text-slate-950 ring-emerald-300">
+            <Badge className="bg-accent text-brand ring-accent">
               2026/27 prediction
             </Badge>
             {entry.predictionsRevealed ? (
@@ -57,19 +57,19 @@ export default async function EntryPage({
           <h1 className="mt-5 text-3xl font-black tracking-tight [overflow-wrap:anywhere] sm:text-5xl">
             {entry.participantName}&apos;s table
           </h1>
-          <p className="mt-3 text-sm leading-6 text-slate-300">
+          <p className="mt-3 text-sm leading-6 text-white/75">
             Submitted {formatUtcDateTime(entry.createdAt)}
           </p>
           {entry.totalScore !== null ? (
             <div className="mt-6 flex items-center gap-3">
-              <span className="grid size-12 place-items-center rounded-2xl bg-emerald-300 text-slate-950">
+              <span className="bg-accent text-brand grid size-12 place-items-center rounded-2xl">
                 <Medal aria-hidden="true" className="size-6" />
               </span>
               <div>
                 <strong className="block text-3xl font-black tabular-nums">
                   {entry.totalScore} points
                 </strong>
-                <span className="text-xs font-semibold text-slate-400">
+                <span className="text-xs font-semibold text-white/65">
                   Recalculated from the active table
                 </span>
               </div>
@@ -125,7 +125,7 @@ export default async function EntryPage({
                 <Card>
                   <CardContent className="grid grid-cols-[auto_auto_1fr] items-center gap-3 py-3 sm:grid-cols-[3rem_3rem_1fr_7rem_6rem_7rem]">
                     <span
-                      className="grid size-10 place-items-center rounded-xl bg-slate-950 font-mono text-sm font-black text-white"
+                      className="bg-brand grid size-10 place-items-center rounded-xl font-mono text-sm font-black text-white"
                       aria-label={`Predicted ${ordinal(item.predictedPosition)}`}
                     >
                       {item.predictedPosition}

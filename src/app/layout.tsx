@@ -8,12 +8,12 @@ import "./globals.css";
 export const metadata: Metadata = {
   metadataBase: new URL("https://pl-predictions-2026.vercel.app"),
   title: {
-    default: "PL Predictions 2026/27",
-    template: "%s · PL Predictions",
+    default: "Dranx Prediction League 2026/27",
+    template: "%s · Dranx Prediction League",
   },
   description:
-    "A private friends game for predicting the 2026/27 Premier League table.",
-  applicationName: "PL Predictions",
+    "A private prediction competition for the 2026/27 Premier League table.",
+  applicationName: "Dranx Prediction League",
   robots: { index: false, follow: false },
 };
 

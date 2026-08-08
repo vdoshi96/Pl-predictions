@@ -6,7 +6,7 @@ import {
 } from "@/data";
 
 describe("2026/27 team fixture", () => {
-  it("contains exactly 20 unique clubs, external IDs, and monogram paths", () => {
+  it("contains exactly 20 unique clubs, external IDs, and local mark paths", () => {
     expect(PREMIER_LEAGUE_2026_27_TEAMS).toHaveLength(
       PREMIER_LEAGUE_TEAM_COUNT,
     );

@@ -1,0 +1,32 @@
+import { cn } from "./ui/cn";
+
+export interface BrandMarkProps {
+  className?: string;
+}
+
+/**
+ * Original Dranx mark. It intentionally avoids the Premier League lion while
+ * borrowing the competition's high-energy purple and neon palette.
+ */
+export function BrandMark({ className }: BrandMarkProps) {
+  return (
+    <svg
+      aria-hidden="true"
+      className={cn("shrink-0", className)}
+      viewBox="0 0 64 64"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <rect width="64" height="64" rx="18" fill="#ffffff" />
+      <path
+        d="M11 12h22.5C46.5 12 55 19.5 55 31.6 55 44.4 46.2 52 32.6 52H11V12Z"
+        fill="#37003c"
+      />
+      <path
+        d="M22 22h10.8c6.9 0 11.2 3.6 11.2 9.8 0 6.5-4.5 10.2-11.7 10.2H22V22Zm9.8 13.2c2.9 0 4.6-1.1 4.6-3.3s-1.7-3.2-4.6-3.2h-2.4v6.5h2.4Z"
+        fill="#00ff87"
+      />
+      <path d="M8 17 20 8h21l-8 7H15v16L8 37V17Z" fill="#05f0ff" />
+      <circle cx="50" cy="13" r="5" fill="#ff2882" />
+    </svg>
+  );
+}

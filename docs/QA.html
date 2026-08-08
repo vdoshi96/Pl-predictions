@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="canonical-source" content="QA.md" />
-    <meta name="canonical-source-sha256" content="fa02bdf34edd84f8566aeb53f897d4f12b0456bfe246234332e95004e7b24c94" />
+    <meta name="canonical-source-sha256" content="b8d83674fe53e0a50b406506e317bcc47fb9e4b4257cfc9d20315a483e4c28a1" />
     <title>Quality assurance</title>
     <style>
       :root { color-scheme: light dark; font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
@@ -39,7 +39,7 @@
   <body>
     <main>
       <h1>Quality assurance</h1>
-<p>Evidence date: 2026-08-08. This document records the newest completed local and deployment run only. The owner-approved production-public/preview-protected boundary, anonymous production browser run, bounded write proof, exact cleanup, runtime logs, and newest mobile screenshots are all verified below.</p>
+<p>Evidence date: 2026-08-08. This document records the newest completed local and production verification for the Dranx Prediction League iteration. The production verification was read-only because this iteration changed branding and presentation only; no production write smoke ran and no production data changed. Prior-release write and cleanup evidence is retained below as intentional history.</p>
 <h2>Current results</h2>
 <table>
 <thead>
@@ -67,7 +67,7 @@
 <tr>
 <td>Unit/component/default suite</td>
 <td><code>npm test</code></td>
-<td>95 passed; 9 database cases skipped by their explicit opt-in guard.</td>
+<td>97 passed; 9 database cases skipped by their explicit opt-in guard.</td>
 </tr>
 <tr>
 <td>Isolated Neon integration</td>
@@ -101,23 +101,23 @@
 </tr>
 <tr>
 <td>Vercel production build</td>
-<td>deployment <code>dpl_JCfjcxvtVVfbsU55mmTppBK2FB9G</code></td>
-<td>Ready after the project framework preset was corrected from null to <code>nextjs</code>; the stable alias points to this deployment and responds anonymously with 200.</td>
+<td>deployment <code>dpl_BPJUGKA7CJF7bhaUCTHjUx2cPEK7</code></td>
+<td>Ready with target <code>production</code>; Vercel built the application with Next.js 16.3.0 and Turbopack. The stable public alias was repointed to this deployment and returned 200.</td>
 </tr>
 <tr>
 <td>Anonymous production smoke</td>
 <td><code>npm run test:production-smoke</code></td>
-<td>5 passed across desktop Chromium, mobile Chromium at 390 pixels, exact 320/430-pixel reflow projects, and iPhone WebKit. Health, mouse/touch/keyboard reorder, no-overflow, zero console/page errors, and zero unexpected same-origin request failures or HTTP error responses passed.</td>
+<td>5 passed against the stable alias across desktop Chromium, mobile Chromium at 390 pixels, exact 320/430-pixel reflow projects, and mobile WebKit, with no browser, page, unexpected same-origin request, or HTTP errors.</td>
 </tr>
 <tr>
 <td>Bounded production write smoke</td>
 <td><code>npm run test:production-write-smoke</code></td>
-<td>1 passed with the explicit production-write opt-in: exact QA submit, receipt privacy, hidden pre-reveal roster, and administrator deletion of the exact created prediction.</td>
+<td>Not run for this branding-only iteration. Historical prior-release evidence: 1 passed with an exact QA submit/privacy/delete journey and exact cleanup.</td>
 </tr>
 <tr>
-<td>Production database cleanup</td>
-<td>post-smoke read-only queries</td>
-<td>Zero <code>predictions</code>, <code>prediction_items</code>, and prediction-target audit rows; season open, unrevealed, and unlocked with null active/final pointers.</td>
+<td>Production data mutation</td>
+<td>branding-only read-only verification</td>
+<td>No production write smoke ran and no production data changed during this iteration.</td>
 </tr>
 <tr>
 <td>Vercel runtime logs</td>
@@ -125,13 +125,14 @@
 <td>Zero error entries and zero HTTP 500 responses.</td>
 </tr>
 </tbody></table>
-<p>The local sandbox did not permit a default Turbopack CSS helper to bind its internal port, so the local production gate used <code>next build --webpack</code>. This was an execution-environment restriction, not an application compile error; the Vercel deployment subsequently passed the default Turbopack build.</p>
+<p>The local sandbox did not permit a default Turbopack CSS helper to bind its internal port, so the local production gate used <code>next build --webpack</code>. This was an execution-environment restriction, not an application compile error; Vercel deployment <code>dpl_BPJUGKA7CJF7bhaUCTHjUx2cPEK7</code> subsequently passed the Next.js 16.3.0 Turbopack production build.</p>
 <h2>Unit and component coverage</h2>
-<p>The 95-test default run covers:</p>
+<p>The 97-test default run covers:</p>
 <ul>
 <li>every required mutually exclusive scoring example, the top/bottom-half boundary, a 100-point exact table, preseason suppression, and shared ranks;</li>
 <li>NFKC name normalization, length checks, duplicate/missing/out-of-season team validation, and unique positions;</li>
-<li>the exact verified 20-club fixture, display sorting, monogram paths, and factual external mappings;</li>
+<li>the exact verified 20-club fixture, display sorting, local mark paths, and factual external mappings;</li>
+<li>original Dranx header/footer language plus <code>TeamMark</code> contain sizing, accessible club-mark semantics, and labelled initials fallback after an image error;</li>
 <li>pointer/keyboard sorter structure, 56-pixel handle-only touch targets, live language for predicted versus actual positions, A–Z reset, review, server rejection, sticky safe-area action, mobile navigation, and narrow-card shrink behavior;</li>
 <li>database-clock deadline, manual lock, and irreversible early-reveal policy, including concurrent lock and deadline boundaries;</li>
 <li>complete snapshot validation and source-failure envelopes;</li>
@@ -176,13 +177,14 @@
 </ul>
 <p>The touch helpers honor the sorter&#39;s 250-millisecond activation constraint before movement. Chromium and WebKit can resolve the moving target at adjacent insertion boundaries, so the journey verifies touch movement independently, resets, and submits a deterministic keyboard order for the 96-point scoring assertion. Automated WebKit emulation is strong regression evidence, but it is not a substitute for a final spot check on the owner&#39;s physical iPhone when one is available.</p>
 <h2>Production deployment evidence</h2>
-<p>The owner explicitly approved changing Vercel Authentication to <code>preview</code>. The retained preview at <a href="https://pl-predictions-lkmdwjsh8-vdoshi96s-projects.vercel.app">https://pl-predictions-lkmdwjsh8-vdoshi96s-projects.vercel.app</a> still returns a 302 redirect to Vercel SSO, while anonymous production requests return 200. Preview protection was not disabled.</p>
-<p>An initial production verification exposed a Vercel edge 404 even though the deployment reported Ready. The project framework preset was null; correcting it to <code>nextjs</code> and deploying again resolved the routing failure. Production deployment <code>dpl_JCfjcxvtVVfbsU55mmTppBK2FB9G</code> is Ready at immutable URL <a href="https://pl-predictions-65aqenfnq-vdoshi96s-projects.vercel.app">https://pl-predictions-65aqenfnq-vdoshi96s-projects.vercel.app</a>, and stable alias <a href="https://pl-predictions-2026.vercel.app">https://pl-predictions-2026.vercel.app</a> maps to it. The project remains <code>vdoshi96s-projects/pl-predictions</code> with Marketplace Neon resource <code>neon-coffee-queen</code>.</p>
-<p>The final read-only browser run passed all five production projects: desktop Chromium, touch-enabled mobile Chromium at 390 pixels, exact 320- and 430-pixel Chromium reflow, and iPhone WebKit. It verified application and health responses, no document-level horizontal overflow, and real mouse, delayed-touch, and keyboard reordering. No browser console or uncaught page errors, unexpected same-origin request failures, or HTTP 4xx/5xx responses were recorded. The request hook ignores only Chromium&#39;s expected cancellation of speculative Next.js <code>_rsc</code> prefetches during a full navigation. Vercel logs for the preceding hour contained zero error entries and zero HTTP 500 responses.</p>
-<p>The separately gated production write smoke passed its one exact-ID journey. It created one QA prediction, verified that only the receipt browser could view the unrevealed table, verified that the public pre-reveal roster did not disclose it, then signed in and deleted that exact prediction through the administrator flow. Post-cleanup production queries returned zero <code>predictions</code>, zero <code>prediction_items</code>, and zero prediction-target audit rows; the season remained open, unrevealed, and unlocked, with both active and final standings pointers null. No reveal or standings mutation ran against production.</p>
-<p>Before the final smoke, four legacy <code>Reflow QA</code> predictions from earlier interrupted verification were identified and deleted by their exact UUIDs. None had an associated audit row. The follow-up and final post-smoke queries both confirmed zero prediction, item, or audit residue.</p>
+<p>The owner explicitly approved changing Vercel Authentication to <code>preview</code>. The retained preview at <a href="https://pl-predictions-lkmdwjsh8-vdoshi96s-projects.vercel.app">https://pl-predictions-lkmdwjsh8-vdoshi96s-projects.vercel.app</a> still returns a 302 redirect to Vercel SSO, while the stable public production alias <a href="https://pl-predictions-2026.vercel.app">https://pl-predictions-2026.vercel.app</a> returns 200. Preview protection was not disabled.</p>
+<p>The Dranx release deployment <code>dpl_BPJUGKA7CJF7bhaUCTHjUx2cPEK7</code> is Ready with target <code>production</code> at immutable URL <a href="https://pl-predictions-pizpoqt4u-vdoshi96s-projects.vercel.app">https://pl-predictions-pizpoqt4u-vdoshi96s-projects.vercel.app</a>. Vercel built it with Next.js 16.3.0 and Turbopack. The stable public alias was repointed to this deployment and returned 200. The project remains <code>vdoshi96s-projects/pl-predictions</code> with Marketplace Neon resource <code>neon-coffee-queen</code>.</p>
+<p>Historical prior-release context: an initial production verification exposed a Vercel edge 404 even though its deployment reported Ready. The project framework preset was null; correcting it to <code>nextjs</code> and deploying again resolved the routing failure. Prior deployment <code>dpl_JCfjcxvtVVfbsU55mmTppBK2FB9G</code> then became Ready at <a href="https://pl-predictions-65aqenfnq-vdoshi96s-projects.vercel.app">https://pl-predictions-65aqenfnq-vdoshi96s-projects.vercel.app</a>. This history is retained for operational diagnosis and is not the current Dranx deployment evidence.</p>
+<p>The final read-only browser run against the stable alias passed all five production projects: desktop Chromium, touch-enabled mobile Chromium at 390 pixels, exact 320- and 430-pixel Chromium reflow, and mobile WebKit. It verified application and health responses, no document-level horizontal overflow, and real mouse, delayed-touch, and keyboard reordering. No browser console or uncaught page errors, unexpected same-origin request failures, or HTTP 4xx/5xx responses were recorded. The request hook excludes only cross-browser expected canceled Next.js <code>_rsc</code> navigational prefetches. Vercel logs for the preceding hour contained zero error entries and zero HTTP 500 responses.</p>
+<p>No production write smoke ran for this branding-only iteration, and no production data changed. The separately gated prior-release write smoke remains intentional historical evidence: it passed one exact-ID submit/privacy/delete journey, and its post-cleanup queries returned zero <code>predictions</code>, zero <code>prediction_items</code>, and zero prediction-target audit rows with the season open, unrevealed, and unlocked and both active and final standings pointers null.</p>
+<p>Historical prior-release cleanup: before that release&#39;s final smoke, four legacy <code>Reflow QA</code> predictions from earlier interrupted verification were identified and deleted by their exact UUIDs. None had an associated audit row. The follow-up and final post-smoke queries both confirmed zero prediction, item, or audit residue.</p>
 <h2>Production mobile screenshots</h2>
-<p>Only the newest completed production run is retained. Each image below was visually inspected for clean narrow-screen rendering, readable wrapping, and absence of horizontal clipping.</p>
+<p>Only the newest completed production run is retained. All four screenshots were refreshed at 390 by 844 pixels and visually inspected for the Dranx identity, clean narrow-screen rendering, readable wrapping, and absence of horizontal clipping.</p>
 <p><strong>Prediction entry — mobile Chromium at 390 pixels:</strong> the 20-club single-column sorter, dedicated move handles, top/bottom-half boundary, and safe-area-aware review action fit the viewport.</p>
 <p><img src="assets/qa/prediction-mobile.png" alt="Production prediction entry on mobile Chromium"></p>
 <p><strong>Review dialog — mobile Chromium at 390 pixels:</strong> the immutable 1–20 review remains legible and keeps its confirmation actions reachable without horizontal overflow.</p>
@@ -206,12 +208,12 @@
 <ul>
 <li><input checked="" disabled="" type="checkbox"> Apply the explicitly owner-approved Vercel Authentication <code>preview</code> boundary; keep preview protection enabled.</li>
 <li><input checked="" disabled="" type="checkbox"> Run the read-only anonymous production smoke and retain only its newest labeled mobile prediction, review, leaderboard, and administrator screenshots under <code>docs/assets/qa/</code>.</li>
-<li><input checked="" disabled="" type="checkbox"> Run only the separately gated exact-ID production submit/privacy/delete proof and confirm zero QA residue. The reveal/standings journey did not run against live data.</li>
+<li><input checked="" disabled="" type="checkbox"> Keep this branding-only production verification read-only. No production write smoke ran and no production data changed; the prior-release write/cleanup proof remains historical evidence only.</li>
 <li><input checked="" disabled="" type="checkbox"> Confirm zero browser console/page errors, zero unexpected same-origin request failures or HTTP error responses, zero Vercel error log entries, and zero HTTP 500 responses for the final production run.</li>
-<li><input checked="" disabled="" type="checkbox"> Publish this final evidence update to GitHub <code>main</code>, synchronize local <code>main</code>, and remove completed branch/worktree state.</li>
+<li><input disabled="" type="checkbox"> Move draft GitHub PR #1 through review and merge, synchronize local <code>main</code>, and remove completed branch/worktree state.</li>
 </ul>
 
-      <p class="source">Generated deterministically from <a href="QA.md">docs/QA.md</a>. Canonical SHA-256: <code>fa02bdf34edd84f8566aeb53f897d4f12b0456bfe246234332e95004e7b24c94</code>.</p>
+      <p class="source">Generated deterministically from <a href="QA.md">docs/QA.md</a>. Canonical SHA-256: <code>b8d83674fe53e0a50b406506e317bcc47fb9e4b4257cfc9d20315a483e4c28a1</code>.</p>
     </main>
   </body>
 </html>

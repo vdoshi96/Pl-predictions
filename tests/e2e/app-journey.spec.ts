@@ -248,7 +248,7 @@ test("desktop public routes render the complete league without overflow", async 
   await expect(
     page.getByRole("heading", {
       level: 1,
-      name: "Your Premier League table. One final call.",
+      name: "Build your 2026/27 Premier League table.",
     }),
   ).toBeVisible();
   await expect(
@@ -295,7 +295,7 @@ test("desktop public routes render the complete league without overflow", async 
 
   await page.goto("/leaderboard");
   await expect(
-    page.getByRole("heading", { level: 1, name: "Friends leaderboard" }),
+    page.getByRole("heading", { level: 1, name: "Dranx Prediction League" }),
   ).toBeVisible();
   await expectNoHorizontalOverflow(page);
 });

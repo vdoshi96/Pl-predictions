@@ -4,8 +4,8 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="canonical-source" content="RESEARCH.md" />
-    <meta name="canonical-source-sha256" content="c8612877f9fa79b282a2694e16d0f7603c2e593fcdf30c4bb74b75fa53873765" />
-    <title>Research: PL Predictions</title>
+    <meta name="canonical-source-sha256" content="33716f2cb06dc658b983eb53b82420b320ed4db5b384264165602dc58554c60b" />
+    <title>Research: Dranx Prediction League</title>
     <style>
       :root { color-scheme: light dark; font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
       body { margin: 0; background: #f5f5f0; color: #18201c; }
@@ -38,7 +38,7 @@
   </head>
   <body>
     <main>
-      <h1>Research: PL Predictions</h1>
+      <h1>Research: Dranx Prediction League</h1>
 <p>Checked on 2026-08-08. The latest user instruction supersedes the original brief where standings acquisition conflicts: the production application has no live football-data dependency and no Vercel Cron.</p>
 <h2>Season and clubs</h2>
 <p>The official Premier League 2026/27 table and the league&#39;s 5 June AGM announcement confirm the 20-club field. Coventry City, Ipswich Town, and Hull City joined the league; Burnley, West Ham United, and Wolverhampton Wanderers are not members for 2026/27.</p>
@@ -48,11 +48,14 @@
 <li><a href="https://www.premierleague.com/en/tables/premier-league/2026-27">Official 2026/27 Premier League table</a></li>
 <li><a href="https://www.premierleague.com/en/news/4673099/the-202627-premier-league-season-officially-starts/">Premier League AGM membership announcement</a></li>
 </ul>
+<h2>Brand identity and third-party marks</h2>
+<p>The user-facing name is <strong>Dranx Prediction League</strong>. The visual direction is Premier-League-inspired rather than an imitation: it uses the league&#39;s official purple, <code>#37003c</code>, with cyan <code>#05f0ff</code>, green <code>#00ff87</code>, and pink <code>#ff2882</code> accents and an original Dranx mark. Existing repository, deployment, database, URL, and environment identifiers retain their operational <code>pl-predictions</code> names.</p>
+<p>The official Premier League logo was not added. The Premier League trademark FAQ states that club names and badges remain member-club marks, and repository policy requires authorization before third-party marks are copied or redistributed. An original Dranx mark keeps the product identity distinct while retaining the requested color reference.</p>
 <h2>FotMob data and rights</h2>
 <p>FotMob league ID <code>47</code> and the canonical team pages expose the factual external IDs used for import matching. Those identifiers are seeded once. The application stores only minimal snapshot facts: team ID, position, played, points, matchweek, capture time, and source URL.</p>
 <p>FotMob&#39;s current terms, checked 2026-08-08, prohibit robots/crawlers and systematic or regular extraction. A consumer subscription is not evidence of a data redistribution or automation licence. The Premier League also says club names and badges remain member-club marks.</p>
 <p>Decision: do not implement recurring FotMob scraping in the product. A future owner-run Codex workflow may submit a permitted/licensed export through the source-neutral importer. The app also supports manual standings. It stores no source HTML, browser cookies, or subscription credentials.</p>
-<p>Crest decision: FotMob&#39;s image URLs identify the genuine marks but do not grant redistribution or hotlinking rights. Production starts with polished text monograms and documented attribution/rights status. Real local assets can replace them without schema or UI changes after the owner obtains permission. This is the documented temporary source limitation allowed by the brief.</p>
+<p>Crest decision: FotMob&#39;s image URLs identify the genuine marks but do not grant redistribution or hotlinking rights. FotMob crest downloads were therefore not added. The 20 local text monograms remain, while the shared <code>TeamMark</code> now uses contain sizing and a safe initials fallback so authorized transparent crests can replace them later without schema or workflow changes.</p>
 <p>Sources:</p>
 <ul>
 <li><a href="https://www.fotmob.com/leagues/47/overview">FotMob Premier League page</a></li>
@@ -95,6 +98,7 @@
 <ul>
 <li><code>football-data.org</code> and its token: superseded by the no-live-API instruction.</li>
 <li>Runtime FotMob scraping: conflicts with current published terms and makes the site brittle.</li>
+<li>FotMob crest downloads and the official Premier League logo without documented authorization: conflict with repository policy and the current official terms.</li>
 <li>Vercel Cron: unnecessary for the selected owner-run automation model.</li>
 <li><code>@vercel/postgres</code>: obsolete for new Vercel databases.</li>
 <li>Legacy dnd-kit packages and recipes: superseded by the maintained React package.</li>
@@ -103,7 +107,7 @@
 <h2>Failure behavior</h2>
 <p>Malformed, stale, duplicate, unauthorized, or incomplete imports never replace the last active snapshot. All-zero preseason tables remain unscored. If no valid active standings exist, the leaderboard still shows submission count and a clear scoring-not-started state. Manual admin entry remains available even when the external source is inaccessible.</p>
 
-      <p class="source">Generated deterministically from <a href="RESEARCH.md">docs/RESEARCH.md</a>. Canonical SHA-256: <code>c8612877f9fa79b282a2694e16d0f7603c2e593fcdf30c4bb74b75fa53873765</code>.</p>
+      <p class="source">Generated deterministically from <a href="RESEARCH.md">docs/RESEARCH.md</a>. Canonical SHA-256: <code>33716f2cb06dc658b983eb53b82420b320ed4db5b384264165602dc58554c60b</code>.</p>
     </main>
   </body>
 </html>

@@ -11,6 +11,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
+import { TeamMark } from "@/components/team-mark";
 import { Card, CardContent } from "@/components/ui/card";
 import { PREMIER_LEAGUE_2026_27_TEAMS } from "@/data/teams";
 import {
@@ -57,6 +58,34 @@ function SorterHarness({
 
   return <PredictionSorter teams={orderedTeams} onChange={setOrderedTeams} />;
 }
+
+describe("TeamMark", () => {
+  it("renders a provided club mark with contain sizing", () => {
+    render(
+      <TeamMark initials="ARS" name="Arsenal" src="/team-marks/arsenal.svg" />,
+    );
+
+    expect(screen.getByRole("img", { name: "Arsenal club mark" })).toHaveClass(
+      "object-contain",
+      "p-0.5",
+    );
+  });
+
+  it("falls back to labelled initials when the image reports an error", () => {
+    render(
+      <TeamMark initials="ARS" name="Arsenal" src="/team-marks/arsenal.svg" />,
+    );
+
+    fireEvent.error(screen.getByRole("img", { name: "Arsenal club mark" }));
+
+    expect(
+      screen.queryByRole("img", { name: "Arsenal club mark" }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.getByRole("img", { name: "Arsenal initials" }),
+    ).toHaveTextContent("ARS");
+  });
+});
 
 describe("PredictionSorter", () => {
   it("renders all 20 positions with one direct-arrow announcement model", async () => {
@@ -242,6 +271,9 @@ describe("PredictionForm", () => {
     expect(
       screen.getByRole("link", { name: /view confirmation/i }),
     ).toHaveAttribute("href", "/entries/entry-123");
+    expect(
+      screen.getByRole("link", { name: "View leaderboard" }),
+    ).toHaveAttribute("href", "/leaderboard");
   });
 
   it("keeps a server rejection actionable in the review dialog", async () => {
@@ -316,13 +348,25 @@ describe("shared site chrome", () => {
       "href",
       "/leaderboard",
     );
+    expect(screen.getByText("2026/27 Premier League")).toBeVisible();
+    expect(screen.getByText("Dranx Prediction League")).toBeVisible();
 
     rerender(<SiteFooter />);
 
-    expect(screen.getByText(/unofficial fan project/i)).toBeVisible();
-    expect(screen.getByText(/independent text monograms/i)).toBeVisible();
     expect(
-      screen.getByText(/unofficial fan project/i).parentElement?.className,
+      screen.getByText(
+        /Dranx Prediction League is an independent, private prediction competition/i,
+      ),
+    ).toBeVisible();
+    expect(
+      screen.getByText(
+        /local team identifiers are used until authorized crest assets are available/i,
+      ),
+    ).toBeVisible();
+    expect(
+      screen.getByText(
+        /Dranx Prediction League is an independent, private prediction competition/i,
+      ).parentElement?.className,
     ).toContain("safe-area-inset-bottom");
   });
 

@@ -2,7 +2,7 @@
 
 ## System boundary
 
-PL Predictions is one Next.js 16 App Router application deployed to Vercel and backed by Vercel Marketplace Neon. Public pages, administrator pages, server actions, and the standings intake route share one codebase. There is no separate backend, client-side source of truth, runtime football API client, production scraper, or Vercel Cron.
+Dranx Prediction League is one Next.js 16 App Router application deployed to Vercel and backed by Vercel Marketplace Neon. Public pages, administrator pages, server actions, and the standings intake route share one codebase. There is no separate backend, client-side source of truth, runtime football API client, production scraper, or Vercel Cron. Existing repository, Vercel, database, URL, and environment identifiers retain their operational `pl-predictions` names.
 
 ```text
 participant browser                         owner operations
@@ -123,7 +123,9 @@ Security headers set a self-restricted content security policy, deny framing, di
 
 ## Assets and rights
 
-The 20 launch assets are independent text monograms with accessible club-name alternatives. Official crests are intentionally absent because neither image locations nor a consumer subscription grant redistribution rights. `teams.asset_path` lets approved local assets replace monograms later without changing the schema or UI. The site does not use the Premier League logo and carries an unofficial-project disclaimer.
+The user-facing visual system is Dranx Prediction League: a Premier-League-inspired palette anchored on official purple `#37003c`, with cyan `#05f0ff`, green `#00ff87`, and pink `#ff2882` accents and an original Dranx mark. The official Premier League logo is not included.
+
+The 20 club assets remain independent text monograms with accessible club-name alternatives. FotMob crest downloads were not added because repository policy and current official terms require authorization before copying or redistributing those marks. `teams.asset_path` continues to provide the stable local-asset seam. The shared `TeamMark` uses contain sizing, a neutral backing, and a labelled initials fallback, so authorized transparent files can replace monograms later without changing the schema or public workflows.
 
 ## Failure behavior
 

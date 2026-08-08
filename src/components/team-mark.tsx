@@ -55,7 +55,7 @@ function MonogramFallback({
     <span
       role="img"
       aria-label={accessibleName}
-      className="flex size-full items-center justify-center bg-slate-900 font-black tracking-tight text-white"
+      className="bg-brand flex size-full items-center justify-center overflow-hidden rounded-[0.7rem] font-black tracking-tight text-white"
     >
       {initials}
     </span>
@@ -76,12 +76,12 @@ export function TeamMark({
       ? initialsCandidate.toUpperCase()
       : deriveInitials(initialsCandidate || name);
   const showImage = Boolean(src && failedSource !== src);
-  const accessibleName = `${name} monogram mark`;
+  const accessibleName = `${name} club mark`;
 
   return (
     <span
       className={cn(
-        "relative inline-flex shrink-0 overflow-hidden rounded-xl ring-1 ring-slate-200 ring-offset-1 ring-offset-white",
+        "ring-border relative inline-flex shrink-0 items-center justify-center rounded-xl bg-white ring-1 ring-offset-1 ring-offset-white",
         sizeClasses[size],
         className,
       )}
@@ -92,12 +92,12 @@ export function TeamMark({
           alt={accessibleName}
           width={pixelSizes[size]}
           height={pixelSizes[size]}
-          className="size-full object-cover"
+          className="size-full object-contain p-0.5"
           onError={() => setFailedSource(src)}
         />
       ) : (
         <MonogramFallback
-          accessibleName={accessibleName}
+          accessibleName={`${name} initials`}
           initials={resolvedInitials}
         />
       )}

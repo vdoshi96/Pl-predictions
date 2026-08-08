@@ -101,9 +101,10 @@ test("production public routes are mobile-safe and healthy", async ({
   const reviewButton = page.getByRole("button", { name: "Review your 1–20" });
   await expectNoHorizontalOverflow(page);
 
-  if (await reviewButton.isEnabled()) {
+  if (await participantName.isEnabled()) {
     await participantName.fill("Production review preview");
     await expect(participantName).toHaveValue("Production review preview");
+    await expect(reviewButton).toBeEnabled();
 
     let firstHandle = page.getByRole("button", { name: /^Move Arsenal,/ });
     const secondHandle = page.getByRole("button", {

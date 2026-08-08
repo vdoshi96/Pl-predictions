@@ -41,7 +41,7 @@ The public application never contacts FotMob or another football-data source. A 
 ## Routes
 
 - `/` — prediction form or server-derived closed state.
-- `/leaderboard` — pre-reveal participant roster or the scored table.
+- `/leaderboard` — 0-point champion-pick cards before kickoff and shared-rank scores with champion status afterward.
 - `/entries/[id]` — receipt/admin-authorized private confirmation before reveal; public comparison afterward.
 - `/admin/login` — owner credential handoff.
 - `/admin` — season and latest-import overview.
@@ -61,8 +61,8 @@ Leaderboard and comparison data use mobile cards before expanding into denser de
 
 1. The browser sends a display name, honeypot, and ordered team UUIDs.
 2. Zod requires a normalized 2–40 character name and exactly one occurrence of every active team and position. The server resolves names and assets from its own team rows; it never trusts browser-supplied club metadata.
-3. One guarded PostgreSQL common-table-expression statement locks and claims the active season only while manual lock and reveal are both false and the database clock is strictly before any deadline.
-4. The same statement inserts the prediction and all 20 dependent items or inserts nothing. This closes request-start/deadline and administrator-lock races without relying on an application clock.
+3. One guarded PostgreSQL common-table-expression statement first locks the active season row, then samples PostgreSQL `clock_timestamp()` and claims the row only while manual lock and reveal are both false and that post-lock wall clock is strictly before both the configured deadline and the season's persisted opening-kickoff ceiling.
+4. The same statement inserts the prediction and all 20 dependent items or inserts nothing. This closes request-start/deadline, lock-wait/deadline, and administrator-lock races without relying on an application clock.
 5. A unique `(season_id, normalized_participant_name)` index resolves simultaneous duplicate names safely.
 6. A random receipt token is returned once and stored only as a SHA-256 hash. Its HttpOnly cookie permits that browser to view its own table before reveal.
 
@@ -70,7 +70,9 @@ Predictions are immutable. Administrator deletion cascades through all 20 items,
 
 ## Reveal and privacy policy
 
-The shared server policy reveals entries after the configured deadline, after a manual lock, or when early reveal is explicitly enabled. Before then, the leaderboard selects only participant names and timestamps. An entry lookup returns no result unless the request has the matching receipt cookie or an administrator session. There is no public route-handler payload containing hidden prediction items.
+The shared server policy reveals full entries after the effective deadline, after a manual lock, or when early reveal is explicitly enabled. The effective deadline is the earlier of an optional owner deadline and the owning season row's persisted Gameweek 1 opening kickoff. Pages read PostgreSQL's wall clock with the season, and the atomic insert independently checks the same persisted instant after acquiring its row lock, so app-clock skew or lock contention cannot admit a competing entry after reveal.
+
+Before full reveal, the leaderboard deliberately publishes one narrow projection: participant name, submission time, 0-point total, and the position-1 predicted champion's name and permitted local mark. Prediction UUIDs and positions 2–20 remain absent from public HTML and RSC. An entry lookup still returns no result unless the request has the matching receipt cookie or an administrator session.
 
 ## Standings intake and last-good preservation
 
@@ -100,11 +102,11 @@ All four effects succeed together or the action reports that the active standing
 
 Scores are computed on read from prediction items plus the one active standings snapshot. They are never accumulated or stored as independently editable totals. Each club receives exactly one tier: 5 exact, otherwise 3 within three, otherwise 1 in the same half, otherwise 0. The system derives total, exact count, within-three count, and correct-half-only count.
 
-All-zero played-games tables are treated as preseason and remain unscored. When scoring is active, entries sort by total descending; equal totals receive the same competition rank and are alphabetized only for deterministic display. The maximum is 100.
+Scoring cannot activate before the owning season's verified opening kickoff. The active table must also have been accepted or re-observed at or after kickoff; a stale preseason ordering cannot turn into points merely because the clock crossed the boundary. All-zero played-games tables remain unscored after kickoff. Before activation, every leaderboard card shows 0 and only its predicted champion. When scoring is active, cards add the champion's actual ordinal position and label 1st as on track or every other position as off track. Entries sort by total descending; equal totals receive the same competition rank and are alphabetized only for deterministic display. The maximum is 100.
 
 ## Database model and invariants
 
-- `seasons` stores the code-selected season, fairness settings, active/final pointers, and the monotonic accepted-capture watermark.
+- `seasons` stores the code-selected season, persisted opening kickoff, optional earlier owner deadline, fairness settings, active/final pointers, and the monotonic accepted-capture watermark.
 - `teams` stores season-scoped names, sort names, factual external mapping, and permitted local asset path.
 - `predictions` and `prediction_items` store immutable participant tables and receipt hashes.
 - `standings_snapshots` and `standings_items` store complete actual tables.

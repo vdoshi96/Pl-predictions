@@ -143,8 +143,9 @@ export function isStandingsScoringActive(
 export function scorePredictionIfActive(
   prediction: readonly ScoringPredictionItem[],
   standings: readonly ScoringStandingsItem[],
+  scoringWindowOpen: boolean,
 ): ScoringState {
-  if (!isStandingsScoringActive(standings)) {
+  if (!scoringWindowOpen || !isStandingsScoringActive(standings)) {
     return { status: "not-started" };
   }
 

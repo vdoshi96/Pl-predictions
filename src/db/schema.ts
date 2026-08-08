@@ -24,6 +24,10 @@ export const seasons = pgTable(
     name: varchar("name", { length: 80 }).notNull(),
     competitionCode: varchar("competition_code", { length: 16 }).notNull(),
     startYear: integer("start_year").notNull(),
+    openingKickoff: timestamp("opening_kickoff", {
+      mode: "date",
+      withTimezone: true,
+    }).notNull(),
     submissionDeadline: timestamp("submission_deadline", {
       mode: "date",
       withTimezone: true,

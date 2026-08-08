@@ -1,4 +1,10 @@
+import {
+  getEffectiveSubmissionDeadline,
+  hasSeasonStarted,
+} from "@/features/seasons/deadline";
+
 export type SeasonAccessSettings = {
+  openingKickoff: Date;
   revealPredictions: boolean;
   submissionDeadline: Date | null;
   submissionsLocked: boolean;
@@ -7,16 +13,20 @@ export type SeasonAccessSettings = {
 export type SeasonAccess = {
   deadlinePassed: boolean;
   predictionsRevealed: boolean;
+  seasonStarted: boolean;
+  submissionDeadline: Date;
   submissionsOpen: boolean;
 };
 
 export function getSeasonAccess(
   settings: SeasonAccessSettings,
-  now = new Date(),
+  now: Date,
 ): SeasonAccess {
-  const deadlinePassed =
-    settings.submissionDeadline !== null &&
-    now.getTime() >= settings.submissionDeadline.getTime();
+  const submissionDeadline = getEffectiveSubmissionDeadline(
+    settings.submissionDeadline,
+    settings.openingKickoff,
+  );
+  const deadlinePassed = now.getTime() >= submissionDeadline.getTime();
 
   return {
     deadlinePassed,
@@ -28,5 +38,7 @@ export function getSeasonAccess(
       settings.revealPredictions ||
       settings.submissionsLocked ||
       deadlinePassed,
+    seasonStarted: hasSeasonStarted(now, settings.openingKickoff),
+    submissionDeadline,
   };
 }

@@ -14,6 +14,8 @@ import {
 } from "@/db/schema";
 import { getAdminSession } from "@/features/admin";
 import { hasPredictionReceipt } from "@/features/predictions/receipt";
+import { authoritativeDatabaseTimeSql } from "@/features/seasons/clock";
+import { hasSeasonStarted } from "@/features/seasons/deadline";
 import {
   scorePredictionIfActive,
   type ScorePoints,
@@ -58,6 +60,7 @@ export async function getEntryComparison(
   const [entry] = await db
     .select({
       createdAt: predictions.createdAt,
+      databaseNow: authoritativeDatabaseTimeSql().mapWith(seasons.updatedAt),
       id: predictions.id,
       participantName: predictions.participantName,
       receiptTokenHash: predictions.receiptTokenHash,
@@ -70,11 +73,15 @@ export async function getEntryComparison(
 
   if (!entry) return null;
 
-  const access = getSeasonAccess({
-    revealPredictions: entry.season.revealPredictions,
-    submissionDeadline: entry.season.submissionDeadline,
-    submissionsLocked: entry.season.submissionsLocked,
-  });
+  const access = getSeasonAccess(
+    {
+      openingKickoff: entry.season.openingKickoff,
+      revealPredictions: entry.season.revealPredictions,
+      submissionDeadline: entry.season.submissionDeadline,
+      submissionsLocked: entry.season.submissionsLocked,
+    },
+    entry.databaseNow,
+  );
   const isOwnerReceipt = entry.receiptTokenHash
     ? await hasPredictionReceipt(entry.id, entry.receiptTokenHash)
     : false;
@@ -112,9 +119,20 @@ export async function getEntryComparison(
         .from(standingsItems)
         .where(eq(standingsItems.snapshotId, snapshot.id))
     : [];
-  const scoring = snapshot
-    ? scorePredictionIfActive(predictedRows, actualRows)
-    : { status: "not-started" as const };
+  const observedSnapshotAt = snapshot
+    ? (entry.season.standingsAcceptedThrough ?? snapshot.capturedAt)
+    : null;
+  const snapshotObservedAfterKickoff = observedSnapshotAt
+    ? hasSeasonStarted(observedSnapshotAt, entry.season.openingKickoff)
+    : false;
+  const scoring =
+    snapshot && observedSnapshotAt
+      ? scorePredictionIfActive(
+          predictedRows,
+          actualRows,
+          access.seasonStarted && snapshotObservedAfterKickoff,
+        )
+      : { status: "not-started" as const };
   const scoredByTeam = new Map(
     scoring.status === "scored"
       ? scoring.summary.items.map((item) => [item.teamId, item] as const)
@@ -139,8 +157,7 @@ export async function getEntryComparison(
     predictionsRevealed: access.predictionsRevealed,
     snapshot: snapshot
       ? {
-          capturedAt:
-            entry.season.standingsAcceptedThrough ?? snapshot.capturedAt,
+          capturedAt: observedSnapshotAt ?? snapshot.capturedAt,
           isFinal: snapshot.isFinal,
           matchweek: snapshot.matchweek,
         }

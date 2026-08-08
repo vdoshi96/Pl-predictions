@@ -118,8 +118,9 @@ describe("source-neutral standings import helpers", () => {
 });
 
 describe("seed deadline", () => {
-  it("defaults to an open season when no timestamp is supplied", () => {
+  it("uses null as the automatic Gameweek 1 deadline sentinel", () => {
     expect(parseSeedDeadline("")).toBeNull();
+    expect(parseSeedDeadline("2026-08-21T19:00:00.000Z")).toBeNull();
   });
 
   it("accepts an explicit ISO timestamp", () => {
@@ -131,6 +132,18 @@ describe("seed deadline", () => {
   it("rejects an invalid timestamp", () => {
     expect(() => parseSeedDeadline("not-a-date")).toThrow(
       "PREDICTION_DEADLINE_ISO",
+    );
+  });
+
+  it("rejects timestamps without an explicit timezone", () => {
+    expect(() => parseSeedDeadline("2026-08-21T18:00:00")).toThrow(
+      "explicit UTC offset",
+    );
+  });
+
+  it("rejects a seed deadline after the opening kickoff", () => {
+    expect(() => parseSeedDeadline("2026-08-21T19:00:00.001Z")).toThrow(
+      "cannot be after the Gameweek 1 opening kickoff",
     );
   });
 });

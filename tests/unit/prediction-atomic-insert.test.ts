@@ -21,16 +21,20 @@ const input: AtomicPredictionInsertInput = {
 };
 
 describe("atomic prediction insertion", () => {
-  it("locks and checks the season with the database clock before either insert", () => {
+  it("locks the season before checking the wall clock and either insert", () => {
     const rendered = new PgDialect().sqlToQuery(
       buildAtomicPredictionInsertQuery(input),
     );
     const statement = rendered.sql.replaceAll(/\s+/g, " ").trim();
 
+    expect(statement).toContain("locked_season as materialized");
+    expect(statement).toContain("deadline_check as materialized");
     expect(statement).toContain("eligible_season as materialized");
-    expect(statement).toContain('and "submissions_locked" = false');
+    expect(statement).toContain('where "submissions_locked" = false');
     expect(statement).toContain('and "reveal_predictions" = false');
-    expect(statement).toContain('or now() < "submission_deadline"');
+    expect(statement).toContain('and "checked_at" < "opening_kickoff"');
+    expect(statement).toContain('or "checked_at" < "submission_deadline"');
+    expect(statement).toContain('clock_timestamp() as "checked_at"');
     expect(statement).toContain("for update");
     expect(statement).toContain(
       "from inserted_prediction cross join jsonb_to_recordset",

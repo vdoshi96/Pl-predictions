@@ -51,16 +51,17 @@ export type CreatedPrediction = {
 
 export async function createPrediction(
   input: unknown,
-  now = new Date(),
+  now?: Date,
 ): Promise<CreatedPrediction> {
-  const { season, teams } = await getActiveSeasonView();
+  const { databaseNow, season, teams } = await getActiveSeasonView();
   const access = getSeasonAccess(
     {
+      openingKickoff: season.openingKickoff,
       revealPredictions: season.revealPredictions,
       submissionDeadline: season.submissionDeadline,
       submissionsLocked: season.submissionsLocked,
     },
-    now,
+    now ?? databaseNow,
   );
 
   if (!access.submissionsOpen) {

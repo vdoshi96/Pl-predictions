@@ -3,6 +3,7 @@ import { expect, test } from "@playwright/test";
 import { inArray } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/neon-http";
 
+import { PREMIER_LEAGUE_2026_27_TEAMS } from "../../src/data/teams";
 import { predictions } from "../../src/db/schema";
 
 const reflowProjects = new Set(["reflow-320-chromium", "reflow-430-chromium"]);
@@ -83,7 +84,14 @@ test("320–430px reflow keeps private identifiers out of HTML and RSC", async (
   expect(htmlResponse.headers()["content-type"]).toContain("text/html");
   const rawHtml = await htmlResponse.text();
   expect(rawHtml).toContain(participantName);
+  expect(rawHtml).toContain("Arsenal");
   expect(rawHtml).not.toContain(predictionId);
+  for (const privateTeam of PREMIER_LEAGUE_2026_27_TEAMS.filter(
+    (team) => team.slug !== "arsenal",
+  )) {
+    expect(rawHtml).not.toContain(privateTeam.displayName);
+    expect(rawHtml).not.toContain(privateTeam.assetPath);
+  }
 
   const rscResponse = await page.request.get("/leaderboard?_rsc=privacy", {
     headers: { accept: "text/x-component", rsc: "1" },
@@ -92,7 +100,14 @@ test("320–430px reflow keeps private identifiers out of HTML and RSC", async (
   expect(rscResponse.headers()["content-type"]).toContain("text/x-component");
   const rawRsc = await rscResponse.text();
   expect(rawRsc).toContain(participantName);
+  expect(rawRsc).toContain("Arsenal");
   expect(rawRsc).not.toContain(predictionId);
+  for (const privateTeam of PREMIER_LEAGUE_2026_27_TEAMS.filter(
+    (team) => team.slug !== "arsenal",
+  )) {
+    expect(rawRsc).not.toContain(privateTeam.displayName);
+    expect(rawRsc).not.toContain(privateTeam.assetPath);
+  }
 
   await confirmationLink.click();
   await expect(
@@ -122,7 +137,14 @@ test("320–430px reflow keeps private identifiers out of HTML and RSC", async (
   await expectNoHorizontalOverflow(page);
 
   await page.goto("/leaderboard");
-  await expect(page.getByText("Tables are still private")).toBeVisible();
+  await expect(page.getByText("Full tables are still private")).toBeVisible();
+  const leaderboardEntry = page.getByLabel(
+    `${participantName} leaderboard entry`,
+  );
+  await expect(
+    leaderboardEntry.getByText("Arsenal", { exact: true }),
+  ).toBeVisible();
+  await expect(leaderboardEntry.getByText("0", { exact: true })).toBeVisible();
   const rosterName = page.getByText(participantName, { exact: true });
   await expect(rosterName).toBeVisible();
   expect(

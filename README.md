@@ -1,6 +1,6 @@
 # Dranx Prediction League
 
-Dranx Prediction League is an unofficial, mobile-first prediction game for a private invited group. Each participant orders the 20 verified 2026/27 Premier League clubs, reviews an immutable 1–20 table, and submits one display name. Once entries are revealed, every score is recalculated from the latest validated standings snapshot; scores are never accumulated between matchweeks.
+Dranx Prediction League is an unofficial, mobile-first prediction game for a private invited group. Each participant orders the 20 verified 2026/27 Premier League clubs, reviews an immutable 1–20 table, and submits one display name. The leaderboard shows every participant on 0 points with only their predicted champion before the season starts. After kickoff, every score is recalculated from the latest validated standings snapshot; scores are never accumulated between matchweeks.
 
 Production: [https://pl-predictions-2026.vercel.app](https://pl-predictions-2026.vercel.app)
 
@@ -17,12 +17,14 @@ FotMob crest downloads and the official Premier League logo were not added. Repo
 ## Product behavior
 
 - `/` presents an alphabetical 20-club sorter, name field, review dialog, and receipt confirmation.
-- `/leaderboard` shows the participant roster before reveal and shared-rank scores afterward.
+- `/leaderboard` always shows every participant's current total and predicted champion mark. Before kickoff, totals remain 0 and no actual position is shown. Once scoring starts, the card also reports whether that champion is on track in 1st or off track in its current actual position.
 - `/entries/[id]` is private to the receipt browser or administrator before reveal, then becomes the public club-by-club comparison.
 - `/admin` provides owner-only settings, submission deletion, manual standings, import history, and final-table controls.
 - `/api/automation/standings` accepts a source-neutral, bearer-authenticated snapshot or failure record. It never fetches a football-data service itself.
 
-Scoring is mutually exclusive per club: 5 points exact, otherwise 3 within three places, otherwise 1 in the same half, otherwise 0. An exact table scores 100.
+Scoring is mutually exclusive per club: 5 points exact, otherwise 3 within three places, otherwise 1 in the same half, otherwise 0. An exact table scores 100. No snapshot is scored before the verified Gameweek 1 opener, and a table last observed before kickoff remains at 0 afterward until a post-kickoff observation is accepted.
+
+Submissions close no later than Arsenal v Coventry City's opening kickoff at `2026-08-21T19:00:00.000Z` (20:00 BST on Friday 21 August 2026). That season-scoped instant is persisted in PostgreSQL. An owner deadline may close entries earlier but cannot extend the ceiling. Public access uses the database clock, and the guarded insert acquires the season-row lock before rechecking PostgreSQL's live wall clock so a request blocked across kickoff is rejected.
 
 ## Mobile-first interaction
 
@@ -81,16 +83,16 @@ Open [http://localhost:3000](http://localhost:3000). Never commit `.env.local` o
 
 ### Environment variables
 
-| Variable                  | Required               | Purpose                                                                                                                                                                                       |
-| ------------------------- | ---------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `DATABASE_URL`            | Yes                    | Pooled production/development Neon connection used by the application, migrations, seed, and local import script. Never point the automated integration or browser journeys at this database. |
-| `DATABASE_URL_UNPOOLED`   | Provisioned            | Direct Neon connection supplied by the Marketplace integration; retained for provider tooling even though this app currently uses `DATABASE_URL`.                                             |
-| `TEST_DATABASE_URL`       | Tests                  | Preferred explicit connection to an isolated test database or branch. The safety wrapper rejects a target that resolves to `DATABASE_URL`.                                                    |
-| `TEST_DATABASE_NAME`      | Local test alternative | Local-only database name used to derive an isolated target from `DATABASE_URL` when `TEST_DATABASE_URL` is not set.                                                                           |
-| `ADMIN_SECRET`            | Yes                    | Owner login credential; server-only.                                                                                                                                                          |
-| `ADMIN_SESSION_SECRET`    | Yes                    | HMAC key for the signed, eight-hour HttpOnly admin session.                                                                                                                                   |
-| `STANDINGS_INGEST_SECRET` | For automated imports  | Bearer credential for `/api/automation/standings`; server-only.                                                                                                                               |
-| `PREDICTION_DEADLINE_ISO` | Optional seed input    | Initial ISO deadline for a newly inserted season. Later changes are made in `/admin/settings`.                                                                                                |
+| Variable                  | Required               | Purpose                                                                                                                                                                                                    |
+| ------------------------- | ---------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `DATABASE_URL`            | Yes                    | Pooled production/development Neon connection used by the application, migrations, seed, and local import script. Never point the automated integration or browser journeys at this database.              |
+| `DATABASE_URL_UNPOOLED`   | Provisioned            | Direct Neon connection supplied by the Marketplace integration; retained for provider tooling even though this app currently uses `DATABASE_URL`.                                                          |
+| `TEST_DATABASE_URL`       | Tests                  | Preferred explicit connection to an isolated test database or branch. The safety wrapper rejects a target that resolves to `DATABASE_URL`.                                                                 |
+| `TEST_DATABASE_NAME`      | Local test alternative | Local-only database name used to derive an isolated target from `DATABASE_URL` when `TEST_DATABASE_URL` is not set.                                                                                        |
+| `ADMIN_SECRET`            | Yes                    | Owner login credential; server-only.                                                                                                                                                                       |
+| `ADMIN_SESSION_SECRET`    | Yes                    | HMAC key for the signed, eight-hour HttpOnly admin session.                                                                                                                                                |
+| `STANDINGS_INGEST_SECRET` | For automated imports  | Bearer credential for `/api/automation/standings`; server-only.                                                                                                                                            |
+| `PREDICTION_DEADLINE_ISO` | Optional seed input    | Optional earlier initial deadline for a newly inserted season. It must include `Z` or an explicit UTC offset. Unset or exact-kickoff values retain the null automatic sentinel; later values are rejected. |
 
 There are no `NEXT_PUBLIC` secrets, football-provider token, or cron secret.
 
@@ -107,7 +109,7 @@ npm run test:integration    # isolated Neon integration suite; fails closed with
 npm run test:coverage       # coverage report
 npm run build               # normal Next.js production build
 npm run build:verify        # Webpack build used in restricted local QA
-npm run test:e2e            # desktop, 320/390/430px Chromium, and iPhone WebKit
+npm run test:e2e            # deterministic pre/post-kickoff desktop, 320/390/430px Chromium, and iPhone WebKit phases
 npm run test:production-smoke       # read-only public deployment checks
 npm run test:production-write-smoke # explicit opt-in, exact-ID submit/delete proof
 npm run check               # complete local verification chain
@@ -125,7 +127,7 @@ npm run db:test:migrate     # apply migrations only to the isolated test target
 npm run db:test:seed        # seed only the isolated test target
 ```
 
-The committed schema history starts with `drizzle/0000_oval_slyde.sql`. `drizzle/0001_left_iron_fist.sql` adds and backfills the season-level accepted-through standings watermark. Do not edit an already-applied migration; create a new forward migration.
+The committed schema history starts with `drizzle/0000_oval_slyde.sql`. `drizzle/0001_left_iron_fist.sql` adds and backfills the season-level accepted-through standings watermark. `drizzle/0002_breezy_king_cobra.sql` persists and backfills each season's reviewed opening kickoff while preserving the null automatic-deadline sentinel. Do not edit an already-applied migration; create a new forward migration.
 
 ## Standings operations
 
@@ -211,14 +213,14 @@ The application intentionally has one code-selected active season.
 3. Keep the old season rows; a new slug makes `npm run db:seed` insert a separate season. Do not recycle IDs.
 4. Run fixture, scoring, importer, integration, and browser tests, then seed and verify exactly 20 teams.
 5. If correcting membership after a season has already been seeded, create an explicit data migration. The idempotent seed updates known teams but deliberately does not delete referenced historical rows.
-6. Set the new deadline in `/admin/settings`, verify reveal/lock defaults, and deploy.
+6. Verify the first Gameweek 1 kickoff from an official source, update the auditable opening-fixture constant, and add a reviewed forward migration/data update for that season's `opening_kickoff`. If the opener changes, handle any stored deadline equal to the old automatic cutoff explicitly; never reopen a season after an effective cutoff or reveal. Set only an optional earlier owner deadline in `/admin/settings`.
 
 ## Current limitations
 
 - Club marks remain the 20 project-owned text monograms, not official crests. Names and badges remain the clubs' property; replace assets only after redistribution permission is documented. `TeamMark` already supports transparent authorized crest files without requiring a schema change.
 - Standings are manual or accepted through the authenticated canonical importer. There is no built-in provider fetch, sync-now source client, scheduled job, or live-data guarantee.
 - Participants have no accounts and cannot edit an entry. The administrator can delete an erroneous entry so it can be resubmitted.
-- The seed leaves a new season open when `PREDICTION_DEADLINE_ISO` is unset; the owner must set or lock it in `/admin/settings`.
+- The opening fixture is reviewed static season data, not a live schedule feed. Because Premier League fixtures can change, the owner must update both the canonical UTC fixture metadata and the persisted season row through a reviewed forward migration before the existing cutoff if the opener moves. A constant-only deploy does not change the database-enforced instant.
 - Season rollover currently requires a reviewed code and seed update.
 
 ## Data and rights attribution

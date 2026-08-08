@@ -3,6 +3,7 @@ import "server-only";
 import { sql, type SQL } from "drizzle-orm";
 
 import type { Database } from "@/db/client";
+import { authoritativeDatabaseTimeSql } from "@/features/seasons/clock";
 
 export type AtomicPredictionItem = {
   predictedPosition: number;
@@ -31,6 +32,7 @@ type AtomicPredictionInsertResultRow = {
  */
 export function buildAtomicPredictionInsertQuery(
   input: AtomicPredictionInsertInput,
+  authoritativeNow: SQL<Date> = authoritativeDatabaseTimeSql(),
 ): SQL {
   const itemsJson = JSON.stringify(
     input.items.map((item) => ({
@@ -40,17 +42,33 @@ export function buildAtomicPredictionInsertQuery(
   );
 
   return sql`
-    with eligible_season as materialized (
-      select "id"
+    with locked_season as materialized (
+      select
+        "id",
+        "opening_kickoff",
+        "reveal_predictions",
+        "submission_deadline",
+        "submissions_locked"
       from "seasons"
       where "id" = ${input.seasonId}::uuid
-        and "submissions_locked" = false
+      for update
+    ),
+    deadline_check as materialized (
+      select
+        locked_season.*,
+        ${authoritativeNow} as "checked_at"
+      from locked_season
+    ),
+    eligible_season as materialized (
+      select "id"
+      from deadline_check
+      where "submissions_locked" = false
         and "reveal_predictions" = false
+        and "checked_at" < "opening_kickoff"
         and (
           "submission_deadline" is null
-          or now() < "submission_deadline"
+          or "checked_at" < "submission_deadline"
         )
-      for update
     ),
     inserted_prediction as (
       insert into "predictions" (

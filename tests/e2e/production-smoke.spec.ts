@@ -98,65 +98,84 @@ test("production public routes are mobile-safe and healthy", async ({
   const participantName = page.getByRole("textbox", {
     name: "Your display name",
   });
-  await participantName.fill("Production review preview");
-  await expect(participantName).toHaveValue("Production review preview");
-
+  const reviewButton = page.getByRole("button", { name: "Review your 1–20" });
   await expectNoHorizontalOverflow(page);
 
-  let firstHandle = page.getByRole("button", { name: /^Move Arsenal,/ });
-  const secondHandle = page.getByRole("button", {
-    name: /^Move Aston Villa,/,
-  });
-  if (testInfo.project.name === "chromium") {
-    await dragWithMouse(page, firstHandle, secondHandle);
-  } else if (testInfo.project.name === "mobile-chromium") {
-    await dragWithChromiumTouch(page, firstHandle, secondHandle);
-  } else if (testInfo.project.name === "mobile-webkit") {
-    await dragWithWebKitTouch(page, firstHandle, secondHandle);
-  } else {
+  if (await reviewButton.isEnabled()) {
+    await participantName.fill("Production review preview");
+    await expect(participantName).toHaveValue("Production review preview");
+
+    let firstHandle = page.getByRole("button", { name: /^Move Arsenal,/ });
+    const secondHandle = page.getByRole("button", {
+      name: /^Move Aston Villa,/,
+    });
+    if (testInfo.project.name === "chromium") {
+      await dragWithMouse(page, firstHandle, secondHandle);
+    } else if (testInfo.project.name === "mobile-chromium") {
+      await dragWithChromiumTouch(page, firstHandle, secondHandle);
+    } else if (testInfo.project.name === "mobile-webkit") {
+      await dragWithWebKitTouch(page, firstHandle, secondHandle);
+    } else {
+      await firstHandle.focus();
+      await page.keyboard.press("ArrowDown");
+    }
+    await expect(
+      page
+        .getByRole("list", { name: "Premier League predicted positions" })
+        .getByRole("listitem")
+        .first(),
+    ).toHaveAttribute(
+      "aria-label",
+      /^Aston Villa, predicted position 1 of 20$/,
+    );
+    await expect(
+      page.locator("[data-dnd-dragging], [data-dnd-dropping]"),
+    ).toHaveCount(0);
+    await expect(participantName).toHaveValue("Production review preview");
+
+    await page
+      .getByRole("button", {
+        name: "Reset prediction table to alphabetical order",
+      })
+      .click();
+    firstHandle = page.getByRole("button", { name: /^Move Arsenal,/ });
     await firstHandle.focus();
     await page.keyboard.press("ArrowDown");
-  }
-  await expect(
-    page
-      .getByRole("list", { name: "Premier League predicted positions" })
-      .getByRole("listitem")
-      .first(),
-  ).toHaveAttribute("aria-label", /^Aston Villa, predicted position 1 of 20$/);
-  await expect(
-    page.locator("[data-dnd-dragging], [data-dnd-dropping]"),
-  ).toHaveCount(0);
-  await expect(participantName).toHaveValue("Production review preview");
+    await expect(
+      page.getByText(/^Arsenal moved to position 2 of 20\.$/u),
+    ).toBeVisible();
+    if (captureMobileEvidence) {
+      await page.screenshot({
+        path: path.join(screenshotDirectory!, "prediction-mobile.png"),
+      });
+    }
 
-  await page
-    .getByRole("button", {
-      name: "Reset prediction table to alphabetical order",
-    })
-    .click();
-  firstHandle = page.getByRole("button", { name: /^Move Arsenal,/ });
-  await firstHandle.focus();
-  await page.keyboard.press("ArrowDown");
-  await expect(
-    page.getByText(/^Arsenal moved to position 2 of 20\.$/u),
-  ).toBeVisible();
-  if (captureMobileEvidence) {
-    await page.screenshot({
-      path: path.join(screenshotDirectory!, "prediction-mobile.png"),
-    });
+    await reviewButton.click();
+    await expect(
+      page.getByRole("dialog", { name: "Check your 1–20" }),
+    ).toBeVisible();
+    if (captureMobileEvidence) {
+      await page.screenshot({
+        path: path.join(screenshotDirectory!, "review-mobile.png"),
+      });
+    }
+    await page.keyboard.press("Escape");
+  } else {
+    await expect(page.getByText("Closed", { exact: true })).toBeVisible();
+    await expect(
+      page.getByText("Submissions closed", { exact: true }),
+    ).toBeVisible();
+    await expect(participantName).toBeDisabled();
+    await expect(reviewButton).toBeDisabled();
+    if (captureMobileEvidence) {
+      await page.screenshot({
+        path: path.join(screenshotDirectory!, "prediction-mobile.png"),
+      });
+      await page.screenshot({
+        path: path.join(screenshotDirectory!, "review-mobile.png"),
+      });
+    }
   }
-
-  const reviewButton = page.getByRole("button", { name: "Review your 1–20" });
-  await expect(reviewButton).toBeEnabled();
-  await reviewButton.click();
-  await expect(
-    page.getByRole("dialog", { name: "Check your 1–20" }),
-  ).toBeVisible();
-  if (captureMobileEvidence) {
-    await page.screenshot({
-      path: path.join(screenshotDirectory!, "review-mobile.png"),
-    });
-  }
-  await page.keyboard.press("Escape");
 
   await page.goto("/leaderboard");
   await expect(

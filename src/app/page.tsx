@@ -17,12 +17,16 @@ const scoringRules = [
 ] as const;
 
 export default async function PredictionPage() {
-  const { season, teams } = await getActiveSeasonView();
-  const access = getSeasonAccess({
-    revealPredictions: season.revealPredictions,
-    submissionDeadline: season.submissionDeadline,
-    submissionsLocked: season.submissionsLocked,
-  });
+  const { databaseNow, season, teams } = await getActiveSeasonView();
+  const access = getSeasonAccess(
+    {
+      openingKickoff: season.openingKickoff,
+      revealPredictions: season.revealPredictions,
+      submissionDeadline: season.submissionDeadline,
+      submissionsLocked: season.submissionsLocked,
+    },
+    databaseNow,
+  );
 
   const closedReason = season.submissionsLocked
     ? "The owner has locked new predictions."
@@ -62,9 +66,12 @@ export default async function PredictionPage() {
                   : "Submissions closed"}
               </p>
               <p className="mt-1 text-xs leading-5 text-white/65">
-                {season.submissionDeadline
-                  ? `Deadline: ${formatUtcDateTime(season.submissionDeadline)}`
-                  : "The owner has not set a deadline yet. Server-side lock controls still apply."}
+                Submission deadline:{" "}
+                {formatUtcDateTime(access.submissionDeadline)}
+                {access.submissionDeadline.getTime() ===
+                season.openingKickoff.getTime()
+                  ? " · Arsenal v Coventry kickoff"
+                  : ` · hard ceiling ${formatUtcDateTime(season.openingKickoff)}`}
               </p>
             </div>
           </div>

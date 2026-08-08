@@ -8,7 +8,9 @@ import { z } from "zod";
 import { getDb } from "@/db/client";
 import { adminAuditLogs, seasons } from "@/db/schema";
 import { getAdminAuditMetadata, requireAdminMutation } from "@/features/admin";
+import { authoritativeDatabaseTimeSql } from "@/features/seasons/clock";
 import { getActiveSeasonView } from "@/features/seasons/queries";
+import { parseOptionalUtcDeadline } from "@/features/seasons/deadline";
 
 const settingsSchema = z.object({
   submissionDeadline: z
@@ -19,16 +21,6 @@ const settingsSchema = z.object({
   submissionsLocked: z.boolean(),
   revealPredictions: z.boolean(),
 });
-
-function parseUtcDeadline(value: string) {
-  if (!value) return null;
-  const normalized = `${value}:00.000Z`;
-  const parsed = new Date(normalized);
-  if (Number.isNaN(parsed.getTime()) || parsed.toISOString() !== normalized) {
-    throw new Error("Invalid deadline");
-  }
-  return parsed;
-}
 
 export async function updateSeasonSettings(formData: FormData) {
   await requireAdminMutation();
@@ -43,7 +35,10 @@ export async function updateSeasonSettings(formData: FormData) {
 
   let deadline: Date | null;
   try {
-    deadline = parseUtcDeadline(parsed.data.submissionDeadline);
+    deadline = parseOptionalUtcDeadline(
+      parsed.data.submissionDeadline,
+      season.openingKickoff,
+    );
   } catch {
     redirect("/admin/settings?error=deadline");
   }
@@ -51,15 +46,15 @@ export async function updateSeasonSettings(formData: FormData) {
   const audit = await getAdminAuditMetadata();
   const now = new Date();
   const db = getDb();
-  const requestedDeadlinePassed = deadline
-    ? sql<boolean>`${deadline} <= current_timestamp`
-    : sql<boolean>`false`;
+  const authoritativeNow = authoritativeDatabaseTimeSql();
+  const requestedEffectiveDeadline = deadline ?? season.openingKickoff;
+  const requestedDeadlinePassed = sql<boolean>`${requestedEffectiveDeadline} <= ${authoritativeNow}`;
   const irreversibleClosure = sql<boolean>`(
     ${seasons.revealPredictions}
     or ${seasons.submissionsLocked}
     or (
       ${seasons.submissionDeadline} is not null
-      and ${seasons.submissionDeadline} <= current_timestamp
+      and ${seasons.submissionDeadline} <= ${authoritativeNow}
     )
     or ${parsed.data.revealPredictions}
     or ${parsed.data.submissionsLocked}
@@ -85,6 +80,7 @@ export async function updateSeasonSettings(formData: FormData) {
       metadata: {
         fairnessRule: "reveal-is-irreversible",
         requestedDeadline: deadline?.toISOString() ?? null,
+        requestedEffectiveDeadline: requestedEffectiveDeadline.toISOString(),
         requestedRevealPredictions: parsed.data.revealPredictions,
         requestedSubmissionsLocked: parsed.data.submissionsLocked,
       },

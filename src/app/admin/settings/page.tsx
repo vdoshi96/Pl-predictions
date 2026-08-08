@@ -5,8 +5,10 @@ import { redirect } from "next/navigation";
 import { ConfirmSubmitButton } from "@/components/confirm-submit-button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
+import { ACTIVE_SEASON } from "@/data/season";
 import { getAdminSession } from "@/features/admin";
 import { getActiveSeasonView } from "@/features/seasons/queries";
+import { formatUtcDateTime } from "@/shared/format";
 import { getSeasonAccess } from "@/shared/policy";
 
 import { AdminNav } from "../admin-nav";
@@ -21,16 +23,23 @@ export default async function AdminSettingsPage({
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
   if (!(await getAdminSession())) redirect("/admin/login");
-  const { season } = await getActiveSeasonView();
+  const { databaseNow, season } = await getActiveSeasonView();
   const params = await searchParams;
-  const deadlineValue = season.submissionDeadline
-    ? season.submissionDeadline.toISOString().slice(0, 16)
-    : "";
-  const access = getSeasonAccess({
-    revealPredictions: season.revealPredictions,
-    submissionDeadline: season.submissionDeadline,
-    submissionsLocked: season.submissionsLocked,
-  });
+  const access = getSeasonAccess(
+    {
+      openingKickoff: season.openingKickoff,
+      revealPredictions: season.revealPredictions,
+      submissionDeadline: season.submissionDeadline,
+      submissionsLocked: season.submissionsLocked,
+    },
+    databaseNow,
+  );
+  const deadlineValue =
+    season.submissionDeadline?.toISOString().slice(0, 16) ?? "";
+  const openingKickoffValue = ACTIVE_SEASON.openingFixture.kickoffIso.slice(
+    0,
+    16,
+  );
 
   return (
     <main className="page-shell w-full flex-1 py-6 sm:py-10">
@@ -92,9 +101,22 @@ export default async function AdminSettingsPage({
                       className="mt-1 text-sm leading-6 text-slate-600"
                       id="submission-deadline-help"
                     >
-                      Entered and displayed in UTC. Leave blank to keep entries
-                      open until manually locked. Once predictions are visible,
-                      a later date cannot reopen submissions.
+                      Entered and displayed in UTC. The latest permitted time is
+                      Arsenal v Coventry&apos;s opening kickoff:{" "}
+                      {formatUtcDateTime(
+                        ACTIVE_SEASON.openingFixture.kickoffIso,
+                      )}
+                      . Leave blank to restore that automatic limit; an earlier
+                      time is still allowed.{" "}
+                      <a
+                        className="font-bold underline underline-offset-2"
+                        href={ACTIVE_SEASON.openingFixture.sourceUrl}
+                        rel="noreferrer"
+                        target="_blank"
+                      >
+                        Premier League fixture source
+                      </a>
+                      .
                     </p>
                   </div>
                 </div>
@@ -103,7 +125,9 @@ export default async function AdminSettingsPage({
                   className="mt-3 min-h-12 w-full rounded-xl border border-slate-300 bg-white px-3.5 text-base text-slate-950 outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100 sm:max-w-sm"
                   defaultValue={deadlineValue}
                   id="submissionDeadline"
+                  max={openingKickoffValue}
                   name="submissionDeadline"
+                  placeholder={openingKickoffValue}
                   type="datetime-local"
                 />
               </div>

@@ -1,6 +1,6 @@
 import "server-only";
 
-import { asc, eq, inArray } from "drizzle-orm";
+import { and, asc, eq, inArray } from "drizzle-orm";
 
 import { getDb } from "@/db/client";
 import {
@@ -11,21 +11,33 @@ import {
 } from "@/db/schema";
 import {
   assignSharedRanks,
+  isStandingsScoringActive,
   scorePredictionIfActive,
   type RankedLeaderboardEntry,
 } from "@/features/scoring";
+import { hasSeasonStarted } from "@/features/seasons/deadline";
 import { getSeasonAccess } from "@/shared/policy";
 
 import { getActiveSeasonView } from "../seasons/queries";
 
+export type LeaderboardChampion = {
+  actualPosition: number | null;
+  assetPath: string;
+  displayName: string;
+  shortName: string;
+};
+
 export type LeaderboardRosterEntry = {
+  champion: LeaderboardChampion;
   createdAt: Date;
   id: string | null;
   participantName: string;
   publicKey: string;
+  totalScore: 0;
 };
 
 export type ScoredLeaderboardEntry = RankedLeaderboardEntry<{
+  champion: LeaderboardChampion & { actualPosition: number };
   correctHalfCount: number;
   createdAt: Date;
   exactCount: number;
@@ -39,6 +51,7 @@ export type LeaderboardView = {
   entries: LeaderboardRosterEntry[];
   predictionsRevealed: boolean;
   scoredEntries: ScoredLeaderboardEntry[] | null;
+  seasonStarted: boolean;
   snapshot: {
     capturedAt: Date;
     id: string;
@@ -54,39 +67,22 @@ const nameCollator = new Intl.Collator("en-GB", {
 });
 
 export async function getLeaderboardView(): Promise<LeaderboardView> {
-  const { season } = await getActiveSeasonView();
+  const {
+    databaseNow,
+    season,
+    teams: seasonTeams,
+  } = await getActiveSeasonView();
   const db = getDb();
-  const access = getSeasonAccess({
-    revealPredictions: season.revealPredictions,
-    submissionDeadline: season.submissionDeadline,
-    submissionsLocked: season.submissionsLocked,
-  });
-
-  if (!access.predictionsRevealed) {
-    const publicEntries = await db
-      .select({
-        createdAt: predictions.createdAt,
-        participantName: predictions.participantName,
-        publicKey: predictions.normalizedParticipantName,
-      })
-      .from(predictions)
-      .where(eq(predictions.seasonId, season.id))
-      .orderBy(asc(predictions.normalizedParticipantName));
-    const entries = publicEntries.map((entry) => ({ ...entry, id: null }));
-
-    entries.sort((left, right) =>
-      nameCollator.compare(left.participantName, right.participantName),
-    );
-
-    return {
-      entries,
-      predictionsRevealed: false,
-      scoredEntries: null,
-      snapshot: null,
-    };
-  }
-
-  const entries = await db
+  const access = getSeasonAccess(
+    {
+      openingKickoff: season.openingKickoff,
+      revealPredictions: season.revealPredictions,
+      submissionDeadline: season.submissionDeadline,
+      submissionsLocked: season.submissionsLocked,
+    },
+    databaseNow,
+  );
+  const entryRows = await db
     .select({
       createdAt: predictions.createdAt,
       id: predictions.id,
@@ -97,15 +93,71 @@ export async function getLeaderboardView(): Promise<LeaderboardView> {
     .where(eq(predictions.seasonId, season.id))
     .orderBy(asc(predictions.normalizedParticipantName));
 
-  entries.sort((left, right) =>
+  entryRows.sort((left, right) =>
     nameCollator.compare(left.participantName, right.participantName),
   );
+
+  const championRows =
+    entryRows.length === 0
+      ? []
+      : await db
+          .select({
+            predictionId: predictionItems.predictionId,
+            teamId: predictionItems.teamId,
+          })
+          .from(predictionItems)
+          .where(
+            and(
+              inArray(
+                predictionItems.predictionId,
+                entryRows.map((entry) => entry.id),
+              ),
+              eq(predictionItems.predictedPosition, 1),
+            ),
+          );
+  const championTeamIdByPrediction = new Map(
+    championRows.map((row) => [row.predictionId, row.teamId] as const),
+  );
+  const teamById = new Map(seasonTeams.map((team) => [team.id, team] as const));
+
+  const entries = entryRows.map<LeaderboardRosterEntry>((entry) => {
+    const championTeamId = championTeamIdByPrediction.get(entry.id);
+    const champion = championTeamId ? teamById.get(championTeamId) : null;
+    if (!champion) {
+      throw new Error("Every leaderboard entry must have one champion pick.");
+    }
+
+    return {
+      champion: {
+        actualPosition: null,
+        assetPath: champion.assetPath,
+        displayName: champion.displayName,
+        shortName: champion.shortName,
+      },
+      createdAt: entry.createdAt,
+      id: access.predictionsRevealed ? entry.id : null,
+      participantName: entry.participantName,
+      publicKey: entry.publicKey,
+      totalScore: 0,
+    };
+  });
+
+  if (!access.predictionsRevealed) {
+    return {
+      entries,
+      predictionsRevealed: false,
+      scoredEntries: null,
+      seasonStarted: access.seasonStarted,
+      snapshot: null,
+    };
+  }
 
   if (!season.activeSnapshotId) {
     return {
       entries,
       predictionsRevealed: true,
       scoredEntries: null,
+      seasonStarted: access.seasonStarted,
       snapshot: null,
     };
   }
@@ -121,6 +173,7 @@ export async function getLeaderboardView(): Promise<LeaderboardView> {
       entries,
       predictionsRevealed: true,
       scoredEntries: null,
+      seasonStarted: access.seasonStarted,
       snapshot: null,
     };
   }
@@ -129,7 +182,10 @@ export async function getLeaderboardView(): Promise<LeaderboardView> {
     ...snapshot,
     capturedAt: season.standingsAcceptedThrough ?? snapshot.capturedAt,
   };
-
+  const snapshotObservedAfterKickoff = hasSeasonStarted(
+    observedSnapshot.capturedAt,
+    season.openingKickoff,
+  );
   const actualTable = await db
     .select({
       actualPosition: standingsItems.actualPosition,
@@ -139,11 +195,17 @@ export async function getLeaderboardView(): Promise<LeaderboardView> {
     .from(standingsItems)
     .where(eq(standingsItems.snapshotId, snapshot.id));
 
-  if (entries.length === 0) {
+  if (entryRows.length === 0) {
     return {
       entries,
       predictionsRevealed: true,
-      scoredEntries: [],
+      scoredEntries:
+        access.seasonStarted &&
+        snapshotObservedAfterKickoff &&
+        isStandingsScoringActive(actualTable)
+          ? []
+          : null,
+      seasonStarted: access.seasonStarted,
       snapshot: observedSnapshot,
     };
   }
@@ -158,7 +220,7 @@ export async function getLeaderboardView(): Promise<LeaderboardView> {
     .where(
       inArray(
         predictionItems.predictionId,
-        entries.map((entry) => entry.id),
+        entryRows.map((entry) => entry.id),
       ),
     );
   const itemsByPrediction = new Map<
@@ -172,15 +234,34 @@ export async function getLeaderboardView(): Promise<LeaderboardView> {
     itemsByPrediction.set(item.predictionId, group);
   }
 
-  const scored = entries.map((entry) => {
+  const actualPositionByTeamId = new Map(
+    actualTable.map((item) => [item.teamId, item.actualPosition] as const),
+  );
+  const scored = entryRows.map((entry) => {
     const state = scorePredictionIfActive(
       itemsByPrediction.get(entry.id) ?? [],
       actualTable,
+      access.seasonStarted && snapshotObservedAfterKickoff,
     );
 
     if (state.status === "not-started") return null;
 
+    const championTeamId = championTeamIdByPrediction.get(entry.id);
+    const champion = championTeamId ? teamById.get(championTeamId) : null;
+    const actualPosition = championTeamId
+      ? actualPositionByTeamId.get(championTeamId)
+      : null;
+    if (!champion || actualPosition === null || actualPosition === undefined) {
+      throw new Error("The champion pick must exist in the active standings.");
+    }
+
     return {
+      champion: {
+        actualPosition,
+        assetPath: champion.assetPath,
+        displayName: champion.displayName,
+        shortName: champion.shortName,
+      },
       correctHalfCount: state.summary.correctHalfCount,
       createdAt: entry.createdAt,
       exactCount: state.summary.exactCount,
@@ -201,6 +282,7 @@ export async function getLeaderboardView(): Promise<LeaderboardView> {
             Boolean(entry),
           ),
         ),
+    seasonStarted: access.seasonStarted,
     snapshot: observedSnapshot,
   };
 }

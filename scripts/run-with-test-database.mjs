@@ -63,6 +63,10 @@ const testDatabaseName = decodeURIComponent(testUrl.pathname.slice(1));
 const childEnvironment = {
   ...process.env,
   DATABASE_URL: testUrl.toString(),
+  PL_PREDICTIONS_ISOLATED_TEST_DATABASE: "verified-isolated-test-database",
+  PL_PREDICTIONS_TEST_NOW_ISO:
+    process.env.PL_PREDICTIONS_TEST_NOW_ISO?.trim() ||
+    "2026-08-08T12:00:00.000Z",
   TEST_DATABASE_URL: testUrl.toString(),
   PGDATABASE: testDatabaseName,
   POSTGRES_DATABASE: testDatabaseName,

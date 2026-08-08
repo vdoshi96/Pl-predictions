@@ -35,7 +35,7 @@ The public application never contacts FotMob or another football-data source. A 
 - Deployment protection: Vercel Authentication is `preview`; production is public and retained previews require Vercel sign-in.
 - Database: Neon resource `neon-coffee-queen`, provisioned through Vercel Marketplace before migrations and seed.
 - Runtime: Node.js 24.x, Next.js 16.3.0, React 19.2.8, Neon serverless HTTP, and Drizzle ORM.
-- Rendering: database-backed pages are dynamic; static local monogram assets may be cached.
+- Rendering: database-backed pages are dynamic; static local club badge assets may be cached and optimized by Next.js.
 - Configuration: server-only Vercel variables; no credential has a `NEXT_PUBLIC` prefix.
 
 ## Routes
@@ -127,7 +127,7 @@ Security headers set a self-restricted content security policy, deny framing, di
 
 The user-facing visual system is Dranx Prediction League: a Premier-League-inspired palette anchored on official purple `#37003c`, with cyan `#05f0ff`, green `#00ff87`, and pink `#ff2882` accents and an original Dranx mark. The official Premier League logo is not included.
 
-The 20 club assets remain independent text monograms with accessible club-name alternatives. FotMob crest downloads were not added because repository policy and current official terms require authorization before copying or redistributing those marks. `teams.asset_path` continues to provide the stable local-asset seam. The shared `TeamMark` uses contain sizing, a neutral backing, and a labelled initials fallback, so authorized transparent files can replace monograms later without changing the schema or public workflows.
+The 20 canonical club assets are owner-provided transparent PNG badges with accessible club-name alternatives. They are served from `public/team-marks/`; the application does not fetch or hotlink FotMob images. `teams.asset_path` remains the stable database-backed local-asset seam, and the idempotent seed updates existing rows after the PNGs are deployed. The shared `TeamMark` uses contain sizing, a neutral backing, and a labelled initials fallback. Original SVG monograms remain rollback-only for the first PNG release. The separate Premier League logo/lion/ball files are excluded.
 
 ## Failure behavior
 

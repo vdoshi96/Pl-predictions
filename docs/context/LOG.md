@@ -85,3 +85,10 @@
 - Reviewed Vercel runtime logs for the preceding 15 minutes and found zero error entries and zero HTTP 500 responses.
 - Kept browser verification read-only; no production prediction or standings rows were written. Recaptured and visually inspected the newest prediction, review, leaderboard, and administrator-login mobile evidence.
 - Regenerated and checked every HTML peer, published the evidence-only closeout through canonical `main`, synchronized local and remote `main`, removed completed branch/worktree state, and retained one primary worktree.
+
+### Owner-provided club badge iteration
+
+- Received a project-owner-supplied folder containing exactly one transparent 2048-by-2048 PNG badge for each of the 20 verified clubs plus eight out-of-scope Premier League logo/lion/ball/composite files.
+- Copied only the 20 club badges into `public/team-marks/` under canonical slug filenames, changed all fixture paths from SVG to PNG, retained the original monograms as rollback-only first-release files, and excluded all league-brand extras.
+- Kept the shared `TeamMark` contain sizing and labelled initials-on-error fallback, updated the user-facing rights wording, and added fixture coverage that requires a local PNG file for every canonical team path.
+- Planned the production transition as deploy first, then idempotent seed, so existing Neon SVG paths remain valid until the PNG files are available.

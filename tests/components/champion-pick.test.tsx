@@ -5,7 +5,7 @@ import { ChampionPick } from "@/features/leaderboard/champion-pick";
 
 const champion = {
   actualPosition: null,
-  assetPath: "/team-marks/arsenal.svg",
+  assetPath: "/team-marks/arsenal.png",
   displayName: "Arsenal",
   shortName: "Arsenal",
 };

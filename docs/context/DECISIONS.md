@@ -6,13 +6,17 @@ Treat the first 2026/27 league kickoff, Arsenal v Coventry City at `2026-08-21T1
 
 ## 2026-08-08: Public champion projection and preseason zero state
 
-Before full-table reveal, publish only each participant's name, submission time, 0-point total, and predicted champion name/project-owned mark. Keep the prediction UUID and positions 2–20 out of public HTML and RSC. Do not score any active standings snapshot before the opening kickoff or until that table has been accepted/re-observed after kickoff; retain the meaningful-table guard as well. Once scoring is active, show the champion's actual ordinal position and define “on track” narrowly as currently 1st.
+Before full-table reveal, publish only each participant's name, submission time, 0-point total, and predicted champion name/local club mark. Keep the prediction UUID and positions 2–20 out of public HTML and RSC. Do not score any active standings snapshot before the opening kickoff or until that table has been accepted/re-observed after kickoff; retain the meaningful-table guard as well. Once scoring is active, show the champion's actual ordinal position and define “on track” narrowly as currently 1st.
+
+## 2026-08-08: Owner-provided local club badge set
+
+The project owner supplied one transparent PNG badge for each of the 20 verified clubs and explicitly directed use of that exact set. Make slug-named PNGs the canonical `teams.asset_path` values and update existing rows through the idempotent seed only after the files are deployed. Keep the original SVG monograms as rollback-only files for this first release so either database path remains valid during the transition. Continue using the original Dranx identity and exclude the supplied Premier League logo/lion/ball/composite extras. This decision records project-owner direction for these local files; it does not claim original ownership, affiliation, or permission for additional third-party artwork.
 
 ## 2026-08-08: Dranx identity and authorized-asset boundary
 
 Adopt **Dranx Prediction League** as the user-facing name while preserving existing `pl-predictions` repository, Vercel, database, URL, and environment identifiers. Use a Premier-League-inspired visual system anchored on the league's official purple, `#37003c`, with cyan `#05f0ff`, green `#00ff87`, and pink `#ff2882` accents and an original Dranx mark.
 
-This decision supersedes the launch identity but does not erase the historical monogram decision below. FotMob crest downloads and the official Premier League logo were not added because repository policy and the current official terms require appropriate authorization before copying or redistributing those marks. Keep the 20 local monograms and prepare the shared `TeamMark` presentation for transparent local crest assets that can be introduced later without a schema or flow change.
+This decision superseded the launch identity but does not erase the historical monogram decision below. At that point, FotMob crest downloads and the official Premier League logo were not added because repository policy and the current official terms required appropriate authorization before copying or redistributing those marks. The owner-provided local club badge decision above later superseded the monogram presentation while retaining the prepared `TeamMark` seam.
 
 ## 2026-08-08: Static operational data boundary
 

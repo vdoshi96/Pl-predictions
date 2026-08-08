@@ -17,7 +17,7 @@ Sources:
 
 The user-facing name is **Dranx Prediction League**. The visual direction is Premier-League-inspired rather than an imitation: it uses the league's official purple, `#37003c`, with cyan `#05f0ff`, green `#00ff87`, and pink `#ff2882` accents and an original Dranx mark. Existing repository, deployment, database, URL, and environment identifiers retain their operational `pl-predictions` names.
 
-The official Premier League logo was not added. The Premier League trademark FAQ states that club names and badges remain member-club marks, and repository policy requires authorization before third-party marks are copied or redistributed. An original Dranx mark keeps the product identity distinct while retaining the requested color reference.
+The official Premier League logo was not added. The Premier League trademark FAQ states that club names and badges remain member-club marks. The project owner later supplied one transparent local PNG badge per verified club and explicitly directed use of that exact set. This repository records that owner direction without claiming original ownership, affiliation, or broader permission for the unused league logo/lion/ball files. An original Dranx mark keeps the product identity distinct while retaining the requested color reference.
 
 ## FotMob data and rights
 
@@ -27,7 +27,7 @@ FotMob's current terms, checked 2026-08-08, prohibit robots/crawlers and systema
 
 Decision: do not implement recurring FotMob scraping in the product. A future owner-run Codex workflow may submit a permitted/licensed export through the source-neutral importer. The app also supports manual standings. It stores no source HTML, browser cookies, or subscription credentials.
 
-Crest decision: FotMob's image URLs identify the genuine marks but do not grant redistribution or hotlinking rights. FotMob crest downloads were therefore not added. The 20 local text monograms remain, while the shared `TeamMark` now uses contain sizing and a safe initials fallback so authorized transparent crests can replace them later without schema or workflow changes.
+Crest decision: FotMob's image URLs identify the genuine marks but do not grant redistribution or hotlinking rights, so the application does not fetch or hotlink them. The project owner's later 20-file PNG handoff supersedes the presentation portion of the original monogram decision for this exact local set. `TeamMark` uses contain sizing and a safe initials fallback; original SVG monograms remain rollback-only during the first PNG release.
 
 Sources:
 

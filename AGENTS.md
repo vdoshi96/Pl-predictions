@@ -14,7 +14,7 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 
 PL Predictions is a mobile-first friends game for the 2026/27 Premier League. It is one Next.js 16 App Router application deployed on Vercel, with Vercel Marketplace Neon PostgreSQL accessed through Drizzle and the Neon HTTP driver. Public pages, authenticated administrator pages, server actions, and the source-neutral standings import endpoint live in the same application.
 
-There is no runtime football API client, production scraper, or Vercel Cron. Standings enter through the authenticated canonical importer or manual administrator form. Do not add automated FotMob extraction without written data-licence permission covering the intended use. Local monogram marks are the documented rights-safe fallback until real crest redistribution permission exists.
+There is no runtime football API client, production scraper, or Vercel Cron. Standings enter through the authenticated canonical importer or manual administrator form. Do not add automated FotMob extraction without written data-licence permission covering the intended use. The 20 owner-provided club badge PNGs are the canonical local team marks; the original monograms remain rollback-only fallbacks for the first badge release.
 
 ## Important paths
 
@@ -25,7 +25,7 @@ There is no runtime football API client, production scraper, or Vercel Cron. Sta
 - `scripts/` — seed, standings import, test-database safety wrapper, and documentation generator.
 - `tests/` — unit/component, isolated Neon integration, and Playwright browser suites.
 - `docs/` — canonical architecture, research, QA, decisions, status, and generated HTML peers.
-- `public/team-marks/` — project-owned fallback monograms; do not substitute unlicensed crests.
+- `public/team-marks/` — owner-provided club badge PNGs plus rollback-only monograms; do not add the separate Premier League logo/lion/ball assets or unapproved replacements.
 
 ## Commands
 

@@ -1,3 +1,6 @@
+import { existsSync } from "node:fs";
+import { join } from "node:path";
+
 import { describe, expect, it } from "vitest";
 
 import {
@@ -18,7 +21,12 @@ describe("2026/27 team fixture", () => {
     ).toBe(PREMIER_LEAGUE_TEAM_COUNT);
     expect(
       PREMIER_LEAGUE_2026_27_TEAMS.every((team) =>
-        team.assetPath.startsWith("/team-marks/"),
+        /^\/team-marks\/[a-z0-9-]+\.png$/u.test(team.assetPath),
+      ),
+    ).toBe(true);
+    expect(
+      PREMIER_LEAGUE_2026_27_TEAMS.every((team) =>
+        existsSync(join(process.cwd(), "public", team.assetPath.slice(1))),
       ),
     ).toBe(true);
   });

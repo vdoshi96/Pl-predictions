@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="canonical-source" content="AGENTS.md" />
-    <meta name="canonical-source-sha256" content="47dc204cdc50d021ab806a5cb4bea0963ee66926bee8ad1fd622e0e57aac57c3" />
+    <meta name="canonical-source-sha256" content="00aebee8263805e3d910cbac5384ecbfc7bb0935a6a49032e999004434e78491" />
     <title>This is NOT the Next.js you know</title>
     <style>
       :root { color-scheme: light dark; font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
@@ -44,7 +44,7 @@
 <!-- END:nextjs-agent-rules --><h1>PL Predictions project guide</h1>
 <h2>Product and architecture</h2>
 <p>PL Predictions is a mobile-first friends game for the 2026/27 Premier League. It is one Next.js 16 App Router application deployed on Vercel, with Vercel Marketplace Neon PostgreSQL accessed through Drizzle and the Neon HTTP driver. Public pages, authenticated administrator pages, server actions, and the source-neutral standings import endpoint live in the same application.</p>
-<p>There is no runtime football API client, production scraper, or Vercel Cron. Standings enter through the authenticated canonical importer or manual administrator form. Do not add automated FotMob extraction without written data-licence permission covering the intended use. Local monogram marks are the documented rights-safe fallback until real crest redistribution permission exists.</p>
+<p>There is no runtime football API client, production scraper, or Vercel Cron. Standings enter through the authenticated canonical importer or manual administrator form. Do not add automated FotMob extraction without written data-licence permission covering the intended use. The 20 owner-provided club badge PNGs are the canonical local team marks; the original monograms remain rollback-only fallbacks for the first badge release.</p>
 <h2>Important paths</h2>
 <ul>
 <li><code>src/app/</code> — public, administrator, and API routes.</li>
@@ -54,7 +54,7 @@
 <li><code>scripts/</code> — seed, standings import, test-database safety wrapper, and documentation generator.</li>
 <li><code>tests/</code> — unit/component, isolated Neon integration, and Playwright browser suites.</li>
 <li><code>docs/</code> — canonical architecture, research, QA, decisions, status, and generated HTML peers.</li>
-<li><code>public/team-marks/</code> — project-owned fallback monograms; do not substitute unlicensed crests.</li>
+<li><code>public/team-marks/</code> — owner-provided club badge PNGs plus rollback-only monograms; do not add the separate Premier League logo/lion/ball assets or unapproved replacements.</li>
 </ul>
 <h2>Commands</h2>
 <pre><code class="language-bash">npm ci
@@ -90,7 +90,7 @@ npm run docs:check
 <p>A change is complete only when relevant unit/component tests, isolated Neon integration tests, TypeScript, ESLint, formatting, documentation parity, production build, and desktop/mobile browser checks pass. Mobile QA must cover 320–430px reflow, 56px touch handles, mouse/touch/keyboard reorder, safe-area actions, long-name wrapping, and no horizontal overflow. Preserve exact cleanup evidence for any QA data.</p>
 <p>Keep canonical Markdown and generated HTML peers synchronized. Before finishing an iteration, correct stale status/QA documentation, push the feature branch, merge it to GitHub <code>main</code>, update local <code>main</code> to the same commit, and remove completed worktrees.</p>
 
-      <p class="source">Generated deterministically from <a href="AGENTS.md">AGENTS.md</a>. Canonical SHA-256: <code>47dc204cdc50d021ab806a5cb4bea0963ee66926bee8ad1fd622e0e57aac57c3</code>.</p>
+      <p class="source">Generated deterministically from <a href="AGENTS.md">AGENTS.md</a>. Canonical SHA-256: <code>00aebee8263805e3d910cbac5384ecbfc7bb0935a6a49032e999004434e78491</code>.</p>
     </main>
   </body>
 </html>

@@ -6,7 +6,7 @@ Production: [https://pl-predictions-2026.vercel.app](https://pl-predictions-2026
 
 GitHub: [https://github.com/vdoshi96/Pl-predictions](https://github.com/vdoshi96/Pl-predictions)
 
-Deployment status: the final production build is Ready, but Vercel Authentication currently protects every `vercel.app` deployment. Anonymous launch verification awaits explicit owner approval to switch the project to production-public/preview-protected access; previews will remain authenticated.
+Deployment status: production is public and Ready at the stable alias above. Vercel Authentication is set to `preview`, so retained preview deployments still require owner sign-in while production remains anonymously accessible. Final production browser and cleanup evidence is recorded in [docs/QA.md](docs/QA.md).
 
 ## Product behavior
 

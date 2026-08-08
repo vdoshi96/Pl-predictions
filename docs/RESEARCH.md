@@ -64,6 +64,8 @@ Sources:
 - [Drizzle Neon guide](https://orm.drizzle.team/docs/connect-neon)
 - [Drizzle batch API](https://orm.drizzle.team/docs/batch-api)
 - [Vercel GitHub integration](https://vercel.com/docs/git/vercel-for-github)
+- [Vercel framework preset](https://vercel.com/docs/builds/configure-a-build#framework-preset)
+- [Vercel deployment protection scopes](https://vercel.com/docs/deployment-protection)
 - [Vercel Authentication deployment protection](https://vercel.com/docs/deployment-protection/methods-to-protect-deployments/vercel-authentication)
 
 ## Rejected alternatives

@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="canonical-source" content="ARCHITECTURE.md" />
-    <meta name="canonical-source-sha256" content="b6fd299bbde154978ec23075961a1bc63d0988ac4f62d7591fd8f53ca90da794" />
+    <meta name="canonical-source-sha256" content="b8343ad3bc585ea8537ebe1ca9de815fac453683faaec837e5493455fa428b19" />
     <title>Architecture</title>
     <style>
       :root { color-scheme: light dark; font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
@@ -66,6 +66,7 @@ Next.js server components/actions                           |
 <ul>
 <li>Vercel project: <code>vdoshi96s-projects/pl-predictions</code>.</li>
 <li>Production alias: <code>https://pl-predictions-2026.vercel.app</code>.</li>
+<li>Deployment protection: Vercel Authentication is <code>preview</code>; production is public and retained previews require Vercel sign-in.</li>
 <li>Database: Neon resource <code>neon-coffee-queen</code>, provisioned through Vercel Marketplace before migrations and seed.</li>
 <li>Runtime: Node.js 24.x, Next.js 16.3.0, React 19.2.8, Neon serverless HTTP, and Drizzle ORM.</li>
 <li>Rendering: database-backed pages are dynamic; static local monogram assets may be cached.</li>
@@ -146,7 +147,7 @@ Next.js server components/actions                           |
 <li>Manual standings remain available when external acquisition is unavailable.</li>
 </ul>
 
-      <p class="source">Generated deterministically from <a href="ARCHITECTURE.md">docs/ARCHITECTURE.md</a>. Canonical SHA-256: <code>b6fd299bbde154978ec23075961a1bc63d0988ac4f62d7591fd8f53ca90da794</code>.</p>
+      <p class="source">Generated deterministically from <a href="ARCHITECTURE.md">docs/ARCHITECTURE.md</a>. Canonical SHA-256: <code>b8343ad3bc585ea8537ebe1ca9de815fac453683faaec837e5493455fa428b19</code>.</p>
     </main>
   </body>
 </html>

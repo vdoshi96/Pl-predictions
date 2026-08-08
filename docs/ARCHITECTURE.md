@@ -32,6 +32,7 @@ The public application never contacts FotMob or another football-data source. A 
 
 - Vercel project: `vdoshi96s-projects/pl-predictions`.
 - Production alias: `https://pl-predictions-2026.vercel.app`.
+- Deployment protection: Vercel Authentication is `preview`; production is public and retained previews require Vercel sign-in.
 - Database: Neon resource `neon-coffee-queen`, provisioned through Vercel Marketplace before migrations and seed.
 - Runtime: Node.js 24.x, Next.js 16.3.0, React 19.2.8, Neon serverless HTTP, and Drizzle ORM.
 - Rendering: database-backed pages are dynamic; static local monogram assets may be cached.

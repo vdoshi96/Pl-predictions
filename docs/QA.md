@@ -1,22 +1,26 @@
 # Quality assurance
 
-Evidence date: 2026-08-08. This document records the newest completed local and deployment run only. Final anonymous production smoke screenshots remain blocked until the owner explicitly approves changing Vercel Authentication from all deployments to previews only. Generated HTML peers remain current with this documented blocker.
+Evidence date: 2026-08-08. This document records the newest completed local and deployment run only. The owner-approved production-public/preview-protected boundary, anonymous production browser run, bounded write proof, exact cleanup, runtime logs, and newest mobile screenshots are all verified below.
 
 ## Current results
 
-| Gate                              | Command or environment                        | Result                                                                                                                                                                                                                   |
-| --------------------------------- | --------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Formatting                        | `npm run format:check`                        | Passed; rerun after final Markdown/HTML generation.                                                                                                                                                                      |
-| ESLint                            | `npm run lint`                                | Passed with zero warnings.                                                                                                                                                                                               |
-| TypeScript                        | `npm run typecheck`                           | Passed in strict mode after Next route-type generation.                                                                                                                                                                  |
-| Unit/component/default suite      | `npm test`                                    | 95 passed; 9 database cases skipped by their explicit opt-in guard.                                                                                                                                                      |
-| Isolated Neon integration         | `npm run test:integration`                    | 9 passed against `pl_predictions_test` through the fail-closed test-database wrapper.                                                                                                                                    |
-| Restricted-local production build | `npm run build:verify`                        | Passed using Next.js Webpack mode.                                                                                                                                                                                       |
-| Browser journeys                  | `npm run test:e2e`                            | 5 passed with 20 intentional project-routing skips across desktop, 320/390/430-pixel Chromium, and iPhone 13 WebKit.                                                                                                     |
-| Production dependency audit       | `npm audit --omit=dev --audit-level=high`     | 0 vulnerabilities.                                                                                                                                                                                                       |
-| Full dependency audit             | `npm audit --audit-level=high`                | 4 moderate, 0 high, 0 critical. All four are development-only legacy `esbuild` paths through `drizzle-kit`; the proposed force fix would downgrade/break the selected Drizzle toolchain, so no force change was applied. |
-| Vercel preview build              | deployment `dpl_e7yEgPhrJBR17qnoQk3EAwdXjFmQ` | Ready after Vercel's default Turbopack build at the sign-in-protected preview URL.                                                                                                                                       |
-| Vercel production build           | deployment `dpl_CGDPYcKNhq6EJb8AUReEVC8odRDF` | Ready after Vercel's default Turbopack build; stable alias points to this deployment. Anonymous requests still receive Vercel SSO until the explicit protection-setting approval is supplied.                            |
+| Gate                              | Command or environment                        | Result                                                                                                                                                                                                                                                                                 |
+| --------------------------------- | --------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Formatting                        | `npm run format:check`                        | Passed; rerun after final Markdown/HTML generation.                                                                                                                                                                                                                                    |
+| ESLint                            | `npm run lint`                                | Passed with zero warnings.                                                                                                                                                                                                                                                             |
+| TypeScript                        | `npm run typecheck`                           | Passed in strict mode after Next route-type generation.                                                                                                                                                                                                                                |
+| Unit/component/default suite      | `npm test`                                    | 95 passed; 9 database cases skipped by their explicit opt-in guard.                                                                                                                                                                                                                    |
+| Isolated Neon integration         | `npm run test:integration`                    | 9 passed against `pl_predictions_test` through the fail-closed test-database wrapper.                                                                                                                                                                                                  |
+| Restricted-local production build | `npm run build:verify`                        | Passed using Next.js Webpack mode.                                                                                                                                                                                                                                                     |
+| Browser journeys                  | `npm run test:e2e`                            | 5 passed with 20 intentional project-routing skips across desktop, 320/390/430-pixel Chromium, and iPhone 13 WebKit.                                                                                                                                                                   |
+| Production dependency audit       | `npm audit --omit=dev --audit-level=high`     | 0 vulnerabilities.                                                                                                                                                                                                                                                                     |
+| Full dependency audit             | `npm audit --audit-level=high`                | 4 moderate, 0 high, 0 critical. All four are development-only legacy `esbuild` paths through `drizzle-kit`; the proposed force fix would downgrade/break the selected Drizzle toolchain, so no force change was applied.                                                               |
+| Retained preview protection       | retained preview URL                          | Anonymous request returns 302 to Vercel SSO after the owner-approved `preview` protection change.                                                                                                                                                                                      |
+| Vercel production build           | deployment `dpl_JCfjcxvtVVfbsU55mmTppBK2FB9G` | Ready after the project framework preset was corrected from null to `nextjs`; the stable alias points to this deployment and responds anonymously with 200.                                                                                                                            |
+| Anonymous production smoke        | `npm run test:production-smoke`               | 5 passed across desktop Chromium, mobile Chromium at 390 pixels, exact 320/430-pixel reflow projects, and iPhone WebKit. Health, mouse/touch/keyboard reorder, no-overflow, zero console/page errors, and zero unexpected same-origin request failures or HTTP error responses passed. |
+| Bounded production write smoke    | `npm run test:production-write-smoke`         | 1 passed with the explicit production-write opt-in: exact QA submit, receipt privacy, hidden pre-reveal roster, and administrator deletion of the exact created prediction.                                                                                                            |
+| Production database cleanup       | post-smoke read-only queries                  | Zero `predictions`, `prediction_items`, and prediction-target audit rows; season open, unrevealed, and unlocked with null active/final pointers.                                                                                                                                       |
+| Vercel runtime logs               | final deployment, preceding hour              | Zero error entries and zero HTTP 500 responses.                                                                                                                                                                                                                                        |
 
 The local sandbox did not permit a default Turbopack CSS helper to bind its internal port, so the local production gate used `next build --webpack`. This was an execution-environment restriction, not an application compile error; the Vercel deployment subsequently passed the default Turbopack build.
 
@@ -76,9 +80,35 @@ The touch helpers honor the sorter's 250-millisecond activation constraint befor
 
 ## Production deployment evidence
 
-Final preview deployment `dpl_e7yEgPhrJBR17qnoQk3EAwdXjFmQ` is Ready at [https://pl-predictions-lkmdwjsh8-vdoshi96s-projects.vercel.app](https://pl-predictions-lkmdwjsh8-vdoshi96s-projects.vercel.app). Final production deployment `dpl_CGDPYcKNhq6EJb8AUReEVC8odRDF` is Ready, and [https://pl-predictions-2026.vercel.app](https://pl-predictions-2026.vercel.app) points to it. Both passed Vercel's default Turbopack build and use project `vdoshi96s-projects/pl-predictions` with Marketplace Neon resource `neon-coffee-queen`.
+The owner explicitly approved changing Vercel Authentication to `preview`. The retained preview at [https://pl-predictions-lkmdwjsh8-vdoshi96s-projects.vercel.app](https://pl-predictions-lkmdwjsh8-vdoshi96s-projects.vercel.app) still returns a 302 redirect to Vercel SSO, while anonymous production requests return 200. Preview protection was not disabled.
 
-The project currently has Vercel Authentication configured for `all_except_custom_domains`, so anonymous requests to the `vercel.app` production alias receive an SSO redirect. The safer intended setting is `preview`: production public, previews still authenticated. Applying that persistent security-boundary change was correctly blocked pending explicit owner approval. Therefore the anonymous read-only production browser smoke, bounded exact-ID submit/privacy/delete proof, console/network review, and annotated newest-run screenshots remain deliberately unclaimed. The forward migration and idempotent production seed have succeeded, and the final deployment is Ready behind SSO.
+An initial production verification exposed a Vercel edge 404 even though the deployment reported Ready. The project framework preset was null; correcting it to `nextjs` and deploying again resolved the routing failure. Production deployment `dpl_JCfjcxvtVVfbsU55mmTppBK2FB9G` is Ready at immutable URL [https://pl-predictions-65aqenfnq-vdoshi96s-projects.vercel.app](https://pl-predictions-65aqenfnq-vdoshi96s-projects.vercel.app), and stable alias [https://pl-predictions-2026.vercel.app](https://pl-predictions-2026.vercel.app) maps to it. The project remains `vdoshi96s-projects/pl-predictions` with Marketplace Neon resource `neon-coffee-queen`.
+
+The final read-only browser run passed all five production projects: desktop Chromium, touch-enabled mobile Chromium at 390 pixels, exact 320- and 430-pixel Chromium reflow, and iPhone WebKit. It verified application and health responses, no document-level horizontal overflow, and real mouse, delayed-touch, and keyboard reordering. No browser console or uncaught page errors, unexpected same-origin request failures, or HTTP 4xx/5xx responses were recorded. The request hook ignores only Chromium's expected cancellation of speculative Next.js `_rsc` prefetches during a full navigation. Vercel logs for the preceding hour contained zero error entries and zero HTTP 500 responses.
+
+The separately gated production write smoke passed its one exact-ID journey. It created one QA prediction, verified that only the receipt browser could view the unrevealed table, verified that the public pre-reveal roster did not disclose it, then signed in and deleted that exact prediction through the administrator flow. Post-cleanup production queries returned zero `predictions`, zero `prediction_items`, and zero prediction-target audit rows; the season remained open, unrevealed, and unlocked, with both active and final standings pointers null. No reveal or standings mutation ran against production.
+
+Before the final smoke, four legacy `Reflow QA` predictions from earlier interrupted verification were identified and deleted by their exact UUIDs. None had an associated audit row. The follow-up and final post-smoke queries both confirmed zero prediction, item, or audit residue.
+
+## Production mobile screenshots
+
+Only the newest completed production run is retained. Each image below was visually inspected for clean narrow-screen rendering, readable wrapping, and absence of horizontal clipping.
+
+**Prediction entry — mobile Chromium at 390 pixels:** the 20-club single-column sorter, dedicated move handles, top/bottom-half boundary, and safe-area-aware review action fit the viewport.
+
+![Production prediction entry on mobile Chromium](assets/qa/prediction-mobile.png)
+
+**Review dialog — mobile Chromium at 390 pixels:** the immutable 1–20 review remains legible and keeps its confirmation actions reachable without horizontal overflow.
+
+![Production prediction review dialog on mobile Chromium](assets/qa/review-mobile.png)
+
+**Pre-reveal leaderboard — mobile Chromium at 390 pixels:** the zero-entry launch state explains that tables remain private and exposes no prediction data.
+
+![Production pre-reveal leaderboard on mobile Chromium](assets/qa/leaderboard-mobile.png)
+
+**Administrator sign-in — mobile Chromium at 390 pixels:** the owner-only entry point reflows cleanly with a readable credential field and full-width action.
+
+![Production administrator sign-in on mobile Chromium](assets/qa/admin-login-mobile.png)
 
 ## Security and source review
 
@@ -93,8 +123,8 @@ The project currently has Vercel Authentication configured for `all_except_custo
 
 ## Final closeout checklist
 
-- [ ] Obtain explicit owner approval to change Vercel Authentication to preview-only; do not disable preview protection.
-- [ ] Run the read-only anonymous production smoke and retain only its newest annotated mobile prediction, leaderboard, and administrator screenshots under `docs/assets/qa/`.
-- [ ] Run only the separately gated exact-ID production submit/privacy/delete proof and confirm zero QA residue. Do not run the reveal/standings journey against live data.
-- [ ] Confirm the public production flow has no browser-console errors or failed same-origin requests.
-- [x] Publish and synchronize the GitHub `main` release at [vdoshi96/Pl-predictions](https://github.com/vdoshi96/Pl-predictions), then rerun deterministic documentation generation/parity.
+- [x] Apply the explicitly owner-approved Vercel Authentication `preview` boundary; keep preview protection enabled.
+- [x] Run the read-only anonymous production smoke and retain only its newest labeled mobile prediction, review, leaderboard, and administrator screenshots under `docs/assets/qa/`.
+- [x] Run only the separately gated exact-ID production submit/privacy/delete proof and confirm zero QA residue. The reveal/standings journey did not run against live data.
+- [x] Confirm zero browser console/page errors, zero unexpected same-origin request failures or HTTP error responses, zero Vercel error log entries, and zero HTTP 500 responses for the final production run.
+- [x] Publish this final evidence update to GitHub `main`, synchronize local `main`, and remove completed branch/worktree state.

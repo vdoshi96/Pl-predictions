@@ -22,6 +22,27 @@
       "when": 1786208039254,
       "tag": "0002_breezy_king_cobra",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1786230384859,
+      "tag": "0003_fluffy_franklin_richards",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1786231893289,
+      "tag": "0004_aromatic_kat_farrell",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1786232002819,
+      "tag": "0005_enforce_spotlight_seasons",
+      "breakpoints": true
     }
   ]
 }

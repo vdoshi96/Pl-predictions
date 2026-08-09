@@ -1,4 +1,4 @@
-import { count, desc, eq } from "drizzle-orm";
+import { count, desc, eq, inArray } from "drizzle-orm";
 import { Trash2, Users } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
@@ -8,7 +8,11 @@ import { ConfirmSubmitButton } from "@/components/confirm-submit-button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { getDb } from "@/db/client";
-import { predictionItems, predictions } from "@/db/schema";
+import {
+  predictionCategoryPicks,
+  predictionItems,
+  predictions,
+} from "@/db/schema";
 import { getAdminSession } from "@/features/admin";
 import { getActiveSeasonView } from "@/features/seasons/queries";
 import { formatUtcDateTime } from "@/shared/format";
@@ -27,7 +31,8 @@ export default async function AdminSubmissionsPage({
   if (!(await getAdminSession())) redirect("/admin/login");
   const { season } = await getActiveSeasonView();
   const params = await searchParams;
-  const rows = await getDb()
+  const db = getDb();
+  const rows = await db
     .select({
       createdAt: predictions.createdAt,
       id: predictions.id,
@@ -39,6 +44,25 @@ export default async function AdminSubmissionsPage({
     .where(eq(predictions.seasonId, season.id))
     .groupBy(predictions.id)
     .orderBy(desc(predictions.createdAt));
+  const pickCountRows =
+    rows.length === 0
+      ? []
+      : await db
+          .select({
+            pickCount: count(predictionCategoryPicks.category),
+            predictionId: predictionCategoryPicks.predictionId,
+          })
+          .from(predictionCategoryPicks)
+          .where(
+            inArray(
+              predictionCategoryPicks.predictionId,
+              rows.map((row) => row.id),
+            ),
+          )
+          .groupBy(predictionCategoryPicks.predictionId);
+  const pickCountByPredictionId = new Map(
+    pickCountRows.map((row) => [row.predictionId, row.pickCount] as const),
+  );
 
   return (
     <main className="page-shell w-full flex-1 py-6 sm:py-10">
@@ -61,7 +85,7 @@ export default async function AdminSubmissionsPage({
             className="rounded-xl border border-emerald-200 bg-emerald-50 p-3 text-sm font-bold text-emerald-900"
             role="status"
           >
-            Submission and all 20 position rows deleted.
+            Entire submission deleted: table, spotlight picks, and receipt.
           </p>
         ) : null}
 
@@ -104,7 +128,8 @@ export default async function AdminSubmissionsPage({
                       </Link>
                       <p className="mt-1 text-xs text-slate-500">
                         {formatUtcDateTime(entry.createdAt)} · {entry.itemCount}{" "}
-                        positions
+                        positions · {pickCountByPredictionId.get(entry.id) ?? 0}{" "}
+                        spotlight picks
                       </p>
                     </div>
                     <form action={deleteSubmission}>
@@ -115,7 +140,7 @@ export default async function AdminSubmissionsPage({
                       />
                       <ConfirmSubmitButton
                         className="w-full sm:w-auto"
-                        confirmation={`Delete ${entry.participantName}'s immutable prediction? This removes all 20 rows and allows the name to submit again.`}
+                        confirmation={`Delete ${entry.participantName}'s immutable prediction? This removes the 20 table rows, all spotlight picks, and allows the name to submit again.`}
                         size="md"
                         variant="danger"
                       >

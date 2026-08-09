@@ -1,12 +1,11 @@
 "use server";
 
-import { and, eq } from "drizzle-orm";
+import { sql } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 
 import { getDb } from "@/db/client";
-import { adminAuditLogs, predictions } from "@/db/schema";
 import { getAdminAuditMetadata, requireAdminMutation } from "@/features/admin";
 import { getActiveSeasonView } from "@/features/seasons/queries";
 
@@ -18,22 +17,39 @@ export async function deleteSubmission(formData: FormData) {
   const { season } = await getActiveSeasonView();
   const audit = await getAdminAuditMetadata();
   const db = getDb();
-  await db.batch([
-    db
-      .delete(predictions)
-      .where(
-        and(eq(predictions.id, id.data), eq(predictions.seasonId, season.id)),
-      ),
-    db.insert(adminAuditLogs).values({
-      seasonId: season.id,
-      actor: "admin",
-      action: "prediction.deleted",
-      targetType: "prediction",
-      targetId: id.data,
-      requestId: audit.requestId,
-      metadata: {},
-    }),
-  ]);
+  const result = await db.execute<{ deleted: boolean }>(sql`
+    with deleted_prediction as (
+      delete from "predictions"
+      where "id" = ${id.data}::uuid
+        and "season_id" = ${season.id}::uuid
+      returning "id"
+    ),
+    inserted_audit as (
+      insert into "admin_audit_logs" (
+        "season_id",
+        "actor",
+        "action",
+        "target_type",
+        "target_id",
+        "request_id",
+        "metadata"
+      )
+      select
+        ${season.id}::uuid,
+        'admin',
+        'prediction.deleted',
+        'prediction',
+        deleted_prediction."id"::text,
+        ${audit.requestId},
+        jsonb_build_object()
+      from deleted_prediction
+      returning "id"
+    )
+    select exists (select 1 from inserted_audit) as "deleted"
+  `);
+  if (!result.rows[0]?.deleted) {
+    redirect("/admin/submissions?error=missing");
+  }
 
   revalidatePath("/leaderboard");
   revalidatePath("/admin");

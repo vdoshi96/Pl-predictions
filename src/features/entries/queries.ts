@@ -14,6 +14,9 @@ import {
 } from "@/db/schema";
 import { getAdminSession } from "@/features/admin";
 import { hasPredictionReceipt } from "@/features/predictions/receipt";
+import { getSpotlightPicksByPredictionId } from "@/features/leaderboard/pick-queries";
+import { getLeaderboardView } from "@/features/leaderboard/queries";
+import type { SpotlightPickDisplay } from "@/features/leaderboard/spotlight-pick-grid";
 import { authoritativeDatabaseTimeSql } from "@/features/seasons/clock";
 import { hasSeasonStarted } from "@/features/seasons/deadline";
 import {
@@ -47,6 +50,9 @@ export type EntryComparisonView = {
     isFinal: boolean;
     matchweek: number | null;
   } | null;
+  spotlightPicks: SpotlightPickDisplay[];
+  spotlightScore: number | null;
+  tableScore: number | null;
   totalScore: number | null;
 };
 
@@ -88,6 +94,9 @@ export async function getEntryComparison(
   const isAdmin = Boolean(await getAdminSession());
 
   if (!access.predictionsRevealed && !isOwnerReceipt && !isAdmin) return null;
+
+  const spotlightPicks =
+    (await getSpotlightPicksByPredictionId([entry.id])).get(entry.id) ?? [];
 
   const predictedRows = await db
     .select({
@@ -138,6 +147,12 @@ export async function getEntryComparison(
       ? scoring.summary.items.map((item) => [item.teamId, item] as const)
       : [],
   );
+  const rankedLeaderboardEntry =
+    scoring.status === "scored"
+      ? (await getLeaderboardView()).scoredEntries?.find(
+          (leaderboardEntry) => leaderboardEntry.id === entry.id,
+        )
+      : null;
 
   return {
     comparisonItems: predictedRows.map((item) => {
@@ -162,6 +177,11 @@ export async function getEntryComparison(
           matchweek: snapshot.matchweek,
         }
       : null,
-    totalScore: scoring.status === "scored" ? scoring.summary.total : null,
+    spotlightPicks: rankedLeaderboardEntry?.spotlightPicks ?? spotlightPicks,
+    spotlightScore: rankedLeaderboardEntry?.spotlightScore ?? null,
+    tableScore: scoring.status === "scored" ? scoring.summary.total : null,
+    totalScore:
+      rankedLeaderboardEntry?.totalScore ??
+      (scoring.status === "scored" ? scoring.summary.total : null),
   };
 }

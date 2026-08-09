@@ -180,6 +180,112 @@ export const predictionItems = pgTable(
   ],
 );
 
+export const players = pgTable(
+  "players",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    seasonId: uuid("season_id")
+      .notNull()
+      .references(() => seasons.id, { onDelete: "cascade" }),
+    teamId: uuid("team_id").references(() => teams.id, {
+      onDelete: "set null",
+    }),
+    slug: varchar("slug", { length: 96 }).notNull(),
+    externalId: integer("external_id"),
+    firstName: varchar("first_name", { length: 80 }),
+    lastName: varchar("last_name", { length: 80 }),
+    displayName: varchar("display_name", { length: 120 }).notNull(),
+    sortName: varchar("sort_name", { length: 120 }).notNull(),
+    assetPath: text("asset_path"),
+    isActive: boolean("is_active").default(true).notNull(),
+    createdAt: timestamp("created_at", { mode: "date", withTimezone: true })
+      .defaultNow()
+      .notNull(),
+    updatedAt: timestamp("updated_at", { mode: "date", withTimezone: true })
+      .defaultNow()
+      .notNull(),
+  },
+  (table) => [
+    uniqueIndex("players_season_slug_unique").on(table.seasonId, table.slug),
+    uniqueIndex("players_season_external_id_unique").on(
+      table.seasonId,
+      table.externalId,
+    ),
+    index("players_season_sort_name_idx").on(table.seasonId, table.sortName),
+    index("players_team_id_idx").on(table.teamId),
+    check(
+      "players_slug_check",
+      sql`${table.slug} ~ '^[a-z0-9]+(?:-[a-z0-9]+)*$'`,
+    ),
+    check(
+      "players_external_id_check",
+      sql`${table.externalId} is null or ${table.externalId} > 0`,
+    ),
+    check(
+      "players_asset_path_check",
+      sql`${table.assetPath} is null or ${table.assetPath} like '/player-faces/%'`,
+    ),
+  ],
+);
+
+export const predictionCategoryPicks = pgTable(
+  "prediction_category_picks",
+  {
+    predictionId: uuid("prediction_id")
+      .notNull()
+      .references(() => predictions.id, { onDelete: "cascade" }),
+    category: varchar("category", { length: 32 }).notNull(),
+    playerId: uuid("player_id").references(() => players.id, {
+      onDelete: "restrict",
+    }),
+    teamId: uuid("team_id").references(() => teams.id, {
+      onDelete: "restrict",
+    }),
+    customPlayerName: varchar("custom_player_name", { length: 120 }),
+    normalizedCustomPlayerName: varchar("normalized_custom_player_name", {
+      length: 120,
+    }),
+  },
+  (table) => [
+    primaryKey({
+      name: "prediction_category_picks_prediction_category_pk",
+      columns: [table.predictionId, table.category],
+    }),
+    index("prediction_category_picks_player_id_idx").on(table.playerId),
+    index("prediction_category_picks_team_id_idx").on(table.teamId),
+    check(
+      "prediction_category_picks_category_check",
+      sql`${table.category} in ('top_scorer', 'top_assister', 'most_clean_sheets', 'underdog_team', 'overrated_team', 'underdog_player', 'overrated_player')`,
+    ),
+    check(
+      "prediction_category_picks_subject_check",
+      sql`(
+        ${table.category} in ('most_clean_sheets', 'underdog_team', 'overrated_team')
+        and ${table.teamId} is not null
+        and ${table.playerId} is null
+        and ${table.customPlayerName} is null
+        and ${table.normalizedCustomPlayerName} is null
+      ) or (
+        ${table.category} in ('top_scorer', 'top_assister', 'underdog_player', 'overrated_player')
+        and ${table.teamId} is null
+        and (
+          (
+            ${table.playerId} is not null
+            and ${table.customPlayerName} is null
+            and ${table.normalizedCustomPlayerName} is null
+          ) or (
+            ${table.playerId} is null
+            and ${table.customPlayerName} is not null
+            and ${table.normalizedCustomPlayerName} is not null
+            and char_length(${table.customPlayerName}) between 2 and 120
+            and char_length(${table.normalizedCustomPlayerName}) between 2 and 120
+          )
+        )
+      )`,
+    ),
+  ],
+);
+
 export const standingsSnapshots = pgTable(
   "standings_snapshots",
   {
@@ -405,6 +511,12 @@ export type Prediction = typeof predictions.$inferSelect;
 export type NewPrediction = typeof predictions.$inferInsert;
 export type PredictionItem = typeof predictionItems.$inferSelect;
 export type NewPredictionItem = typeof predictionItems.$inferInsert;
+export type Player = typeof players.$inferSelect;
+export type NewPlayer = typeof players.$inferInsert;
+export type PredictionCategoryPick =
+  typeof predictionCategoryPicks.$inferSelect;
+export type NewPredictionCategoryPick =
+  typeof predictionCategoryPicks.$inferInsert;
 export type StandingsSnapshot = typeof standingsSnapshots.$inferSelect;
 export type NewStandingsSnapshot = typeof standingsSnapshots.$inferInsert;
 export type StandingsItem = typeof standingsItems.$inferSelect;

@@ -3,15 +3,18 @@
 import * as Dialog from "@radix-ui/react-dialog";
 import { AlertCircle, Check, X } from "lucide-react";
 
+import { PlayerMark } from "@/components/player-mark";
 import { TeamMark } from "@/components/team-mark";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 
 import type { PredictionTeam } from "./prediction-sorter";
+import type { SpotlightReviewItem } from "./spotlight-predictions-form";
 
 export interface ReviewDialogProps {
   open: boolean;
   participantName: string;
+  spotlightPicks: SpotlightReviewItem[];
   teams: PredictionTeam[];
   pending: boolean;
   error?: string | null;
@@ -22,6 +25,7 @@ export interface ReviewDialogProps {
 export function ReviewDialog({
   open,
   participantName,
+  spotlightPicks,
   teams,
   pending,
   error,
@@ -44,16 +48,17 @@ export function ReviewDialog({
           onInteractOutside={(event) => {
             if (pending) event.preventDefault();
           }}
-          className="border-border text-foreground fixed inset-x-2 top-[max(0.5rem,env(safe-area-inset-top))] bottom-2 z-50 flex flex-col overflow-hidden rounded-2xl border bg-white shadow-2xl outline-none sm:inset-x-auto sm:top-1/2 sm:bottom-auto sm:left-1/2 sm:max-h-[min(860px,calc(100dvh-2rem))] sm:w-[min(36rem,calc(100vw-2rem))] sm:-translate-x-1/2 sm:-translate-y-1/2"
+          className="border-border text-foreground fixed inset-x-2 top-[max(0.5rem,env(safe-area-inset-top))] bottom-2 z-50 flex flex-col overflow-hidden rounded-2xl border bg-white shadow-2xl outline-none sm:inset-x-auto sm:top-1/2 sm:bottom-auto sm:left-1/2 sm:max-h-[min(900px,calc(100dvh-2rem))] sm:w-[min(48rem,calc(100vw-2rem))] sm:-translate-x-1/2 sm:-translate-y-1/2"
         >
           <div className="border-border flex shrink-0 items-start justify-between gap-3 border-b px-4 py-4 sm:px-6">
             <div className="min-w-0">
               <div className="mb-2 flex flex-wrap items-center gap-2">
                 <Badge variant="accent">Final review</Badge>
                 <Badge>{teams.length} clubs</Badge>
+                <Badge>{spotlightPicks.length} spotlight picks</Badge>
               </div>
               <Dialog.Title className="text-brand-strong text-xl font-black tracking-tight sm:text-2xl">
-                Check your 1–20
+                Review every prediction
               </Dialog.Title>
               <Dialog.Description
                 id="prediction-review-description"
@@ -63,7 +68,8 @@ export function ReviewDialog({
                 <span className="text-brand-strong font-bold">
                   {participantName}
                 </span>
-                . Predictions cannot be edited after submission.
+                . Your table and spotlight picks cannot be edited after
+                submission.
               </Dialog.Description>
             </div>
             <Dialog.Close asChild>
@@ -80,39 +86,88 @@ export function ReviewDialog({
           </div>
 
           <div className="min-h-0 grow overflow-y-auto overscroll-contain px-3 py-3 sm:px-5">
-            <ol
-              aria-label="Prediction review, positions 1 through 20"
-              className="grid gap-1.5"
-            >
-              {teams.map((team, index) => {
-                const position = index + 1;
-
-                return (
-                  <li
-                    key={team.id}
-                    value={position}
-                    className="border-border flex min-h-12 min-w-0 items-center gap-3 rounded-xl border bg-[#fcf9fd] px-2.5 py-1.5"
+            <section aria-labelledby="spotlight-review-heading">
+              <h2
+                id="spotlight-review-heading"
+                className="text-brand-strong px-1 text-sm font-black"
+              >
+                Spotlight picks
+              </h2>
+              <div className="mt-2 grid gap-2 sm:grid-cols-2">
+                {spotlightPicks.map((pick) => (
+                  <div
+                    className="border-border flex min-h-16 min-w-0 items-center gap-3 rounded-xl border bg-[#fcf9fd] p-2.5"
+                    data-category={pick.category}
+                    key={pick.category}
                   >
-                    <span className="bg-brand grid size-8 shrink-0 place-items-center rounded-lg font-mono text-xs font-black text-white tabular-nums">
-                      {position}
-                    </span>
-                    <TeamMark
-                      name={team.displayName}
-                      initials={team.shortName}
-                      src={team.assetPath}
-                      size="sm"
-                    />
-                    <span className="text-brand-strong min-w-0 grow text-sm leading-4 font-bold break-words">
-                      {team.displayName}
-                    </span>
-                    <Check
-                      aria-hidden="true"
-                      className="size-4 shrink-0 text-[#08734f]"
-                    />
-                  </li>
-                );
-              })}
-            </ol>
+                    {pick.subject === "team" ? (
+                      <TeamMark
+                        name={pick.displayName}
+                        initials={pick.shortName}
+                        src={pick.assetPath}
+                        size="md"
+                      />
+                    ) : (
+                      <PlayerMark
+                        name={pick.displayName}
+                        src={pick.assetPath}
+                        size="md"
+                      />
+                    )}
+                    <div className="min-w-0">
+                      <span className="text-[0.65rem] font-black tracking-wide text-[#8f0033] uppercase">
+                        {pick.label}
+                      </span>
+                      <strong className="text-brand-strong mt-0.5 block text-sm leading-5 break-words">
+                        {pick.displayName}
+                      </strong>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </section>
+
+            <section className="mt-5" aria-labelledby="table-review-heading">
+              <h2
+                id="table-review-heading"
+                className="text-brand-strong px-1 text-sm font-black"
+              >
+                Predicted table
+              </h2>
+              <ol
+                aria-label="Prediction review, positions 1 through 20"
+                className="mt-2 grid gap-1.5"
+              >
+                {teams.map((team, index) => {
+                  const position = index + 1;
+
+                  return (
+                    <li
+                      key={team.id}
+                      value={position}
+                      className="border-border flex min-h-12 min-w-0 items-center gap-3 rounded-xl border bg-[#fcf9fd] px-2.5 py-1.5"
+                    >
+                      <span className="bg-brand grid size-8 shrink-0 place-items-center rounded-lg font-mono text-xs font-black text-white tabular-nums">
+                        {position}
+                      </span>
+                      <TeamMark
+                        name={team.displayName}
+                        initials={team.shortName}
+                        src={team.assetPath}
+                        size="sm"
+                      />
+                      <span className="text-brand-strong min-w-0 grow text-sm leading-4 font-bold break-words">
+                        {team.displayName}
+                      </span>
+                      <Check
+                        aria-hidden="true"
+                        className="size-4 shrink-0 text-[#08734f]"
+                      />
+                    </li>
+                  );
+                })}
+              </ol>
+            </section>
           </div>
 
           <div className="border-border shrink-0 border-t bg-white px-4 pt-3 pb-[max(1rem,env(safe-area-inset-bottom))] sm:px-6">

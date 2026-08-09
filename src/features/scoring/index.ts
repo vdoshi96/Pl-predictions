@@ -13,6 +13,7 @@ import type {
 } from "./types";
 
 export * from "./types";
+export * from "./categories";
 
 function assertLeaguePosition(position: number, label: string): void {
   if (

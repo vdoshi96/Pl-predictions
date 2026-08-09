@@ -3,23 +3,33 @@ import "./server-only";
 import {
   createHash,
   createHmac,
+  pbkdf2,
+  pbkdf2Sync,
   randomBytes,
   timingSafeEqual,
 } from "node:crypto";
 import { cookies, headers } from "next/headers";
+import { promisify } from "node:util";
 
 export const ADMIN_SESSION_COOKIE = "plp_admin_session";
 export const ADMIN_SESSION_TTL_SECONDS = 8 * 60 * 60;
 
 const ADMIN_SESSION_VERSION = 1;
 const ADMIN_SESSION_SUBJECT = "admin";
+const DEFAULT_ADMIN_USERNAME = "admin";
 const MAX_CREDENTIAL_BYTES = 4_096;
 const MAX_SESSION_TOKEN_BYTES = 2_048;
 const MIN_ADMIN_SECRET_BYTES = 16;
+const MIN_ADMIN_PASSWORD_BYTES = 9;
 const MIN_SESSION_SECRET_BYTES = 32;
 const CLOCK_SKEW_SECONDS = 60;
 const NONCE_BYTES = 16;
 const BASE64URL_PATTERN = /^[A-Za-z0-9_-]+$/;
+const PASSWORD_HASH_ALGORITHM = "pbkdf2_sha256";
+const PASSWORD_HASH_ITERATIONS = 600_000;
+const PASSWORD_HASH_BYTES = 32;
+const PASSWORD_SALT_BYTES = 16;
+const pbkdf2Async = promisify(pbkdf2);
 
 export type AdminSecurityErrorCode =
   | "ADMIN_AUTHENTICATION_REQUIRED"
@@ -121,6 +131,18 @@ function adminCredentialSecret(): string {
   );
 }
 
+function configuredAdminUsername(): string {
+  const username = process.env.ADMIN_USERNAME?.trim() || DEFAULT_ADMIN_USERNAME;
+  if (
+    utf8ByteLength(username) < 3 ||
+    utf8ByteLength(username) > 64 ||
+    !/^[A-Za-z0-9._-]+$/u.test(username)
+  ) {
+    throw new AdminSecurityConfigurationError();
+  }
+  return username;
+}
+
 function adminSessionSecret(): string {
   return requireConfiguredSecret(
     process.env.ADMIN_SESSION_SECRET,
@@ -137,15 +159,170 @@ function sha256(value: string): Buffer {
  * length. Oversized input is replaced with a fixed invalid value before the
  * constant-time comparison to avoid turning login into a hashing DoS vector.
  */
-export function verifyAdminCredential(candidate: unknown): boolean {
-  const expected = adminCredentialSecret();
-  const usableCandidate =
+function usableCredential(
+  candidate: unknown,
+  fallback: string,
+): { inputValid: boolean; value: string } {
+  if (
     typeof candidate === "string" &&
     utf8ByteLength(candidate) <= MAX_CREDENTIAL_BYTES
-      ? candidate
-      : "invalid-admin-credential";
+  ) {
+    return { inputValid: true, value: candidate };
+  }
+  return { inputValid: false, value: fallback };
+}
 
-  return timingSafeEqual(sha256(expected), sha256(usableCandidate));
+function parsePasswordHash(value: string): {
+  digest: Buffer;
+  iterations: number;
+  salt: Buffer;
+} | null {
+  const [algorithm, iterationsValue, saltValue, digestValue, ...extra] =
+    value.split("$");
+  const iterations = Number(iterationsValue);
+  if (
+    extra.length > 0 ||
+    algorithm !== PASSWORD_HASH_ALGORITHM ||
+    !Number.isSafeInteger(iterations) ||
+    iterations < PASSWORD_HASH_ITERATIONS ||
+    iterations > 1_000_000 ||
+    !saltValue ||
+    !digestValue ||
+    !BASE64URL_PATTERN.test(saltValue) ||
+    !BASE64URL_PATTERN.test(digestValue)
+  ) {
+    return null;
+  }
+
+  const salt = Buffer.from(saltValue, "base64url");
+  const digest = Buffer.from(digestValue, "base64url");
+  if (
+    salt.toString("base64url") !== saltValue ||
+    digest.toString("base64url") !== digestValue ||
+    salt.byteLength < PASSWORD_SALT_BYTES ||
+    digest.byteLength !== PASSWORD_HASH_BYTES
+  ) {
+    return null;
+  }
+
+  return { digest, iterations, salt };
+}
+
+export function createAdminPasswordHash(
+  password: string,
+  salt = randomBytes(PASSWORD_SALT_BYTES),
+): string {
+  if (
+    utf8ByteLength(password) < MIN_ADMIN_PASSWORD_BYTES ||
+    utf8ByteLength(password) > MAX_CREDENTIAL_BYTES ||
+    salt.byteLength < PASSWORD_SALT_BYTES
+  ) {
+    throw new TypeError("The administrator password cannot be hashed.");
+  }
+
+  const digest = pbkdf2Sync(
+    password,
+    salt,
+    PASSWORD_HASH_ITERATIONS,
+    PASSWORD_HASH_BYTES,
+    "sha256",
+  );
+  return [
+    PASSWORD_HASH_ALGORITHM,
+    PASSWORD_HASH_ITERATIONS,
+    salt.toString("base64url"),
+    digest.toString("base64url"),
+  ].join("$");
+}
+
+function verifyConfiguredPassword(candidate: string): boolean {
+  const configuredHash = process.env.ADMIN_PASSWORD_HASH?.trim();
+  if (!configuredHash) {
+    return timingSafeEqual(sha256(adminCredentialSecret()), sha256(candidate));
+  }
+
+  const parsed = parsePasswordHash(configuredHash);
+  if (!parsed) throw new AdminSecurityConfigurationError();
+  const supplied = pbkdf2Sync(
+    candidate,
+    parsed.salt,
+    parsed.iterations,
+    parsed.digest.byteLength,
+    "sha256",
+  );
+  return timingSafeEqual(parsed.digest, supplied);
+}
+
+async function verifyConfiguredPasswordAsync(
+  candidate: string,
+): Promise<boolean> {
+  const configuredHash = process.env.ADMIN_PASSWORD_HASH?.trim();
+  if (!configuredHash) {
+    return timingSafeEqual(sha256(adminCredentialSecret()), sha256(candidate));
+  }
+
+  const parsed = parsePasswordHash(configuredHash);
+  if (!parsed) throw new AdminSecurityConfigurationError();
+  const supplied = await pbkdf2Async(
+    candidate,
+    parsed.salt,
+    parsed.iterations,
+    parsed.digest.byteLength,
+    "sha256",
+  );
+  return timingSafeEqual(parsed.digest, supplied);
+}
+
+export function verifyAdminCredentials(
+  candidateUsername: unknown,
+  candidatePassword: unknown,
+): boolean {
+  const expectedUsername = configuredAdminUsername();
+  const username = usableCredential(
+    candidateUsername,
+    "invalid-admin-username",
+  );
+  const password = usableCredential(
+    candidatePassword,
+    "invalid-admin-password",
+  );
+  const usernameMatches = timingSafeEqual(
+    sha256(expectedUsername),
+    sha256(username.value),
+  );
+  const passwordMatches = verifyConfiguredPassword(password.value);
+  return (
+    username.inputValid &&
+    password.inputValid &&
+    usernameMatches &&
+    passwordMatches
+  );
+}
+
+async function verifyAdminCredentialsAsync(
+  candidateUsername: unknown,
+  candidatePassword: unknown,
+): Promise<boolean> {
+  const expectedUsername = configuredAdminUsername();
+  const username = usableCredential(
+    candidateUsername,
+    "invalid-admin-username",
+  );
+  const password = usableCredential(
+    candidatePassword,
+    "invalid-admin-password",
+  );
+  const usernameMatches = timingSafeEqual(
+    sha256(expectedUsername),
+    sha256(username.value),
+  );
+  const passwordMatches = await verifyConfiguredPasswordAsync(password.value);
+  return (
+    username.inputValid &&
+    password.inputValid &&
+    usernameMatches &&
+    passwordMatches
+  );
 }
 
 function hmac(payloadSegment: string, secret: string): Buffer {
@@ -303,10 +480,15 @@ function adminCookieOptions(expires: Date) {
 }
 
 /** Verifies the credential and creates the admin cookie on success. */
-export async function loginAdmin(candidate: unknown): Promise<boolean> {
+export async function loginAdmin(
+  candidateUsername: unknown,
+  candidatePassword: unknown,
+): Promise<boolean> {
   await requireSameOrigin();
 
-  if (!verifyAdminCredential(candidate)) {
+  if (
+    !(await verifyAdminCredentialsAsync(candidateUsername, candidatePassword))
+  ) {
     return false;
   }
 

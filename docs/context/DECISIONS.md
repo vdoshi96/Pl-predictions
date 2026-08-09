@@ -1,5 +1,37 @@
 # Decisions
 
+## 2026-08-08: Owner-provided player snapshot import
+
+Use the owner's dated `premier-league-players-2026-08-08/` handoff as the local selector snapshot for the 2026/27 season. Import all 587 players across the application's 20 clubs, copy the 580 supplied portraits to `/player-faces/`, and deliberately show the `PlayerMark` silhouette for the seven players without a supplied image. Keep Other player available for unavailable or newly added players instead of inventing a catalogue row or portrait.
+
+Preserve the raw handoff as owner-provided provenance, but do not run its acquisition scripts, fetch its upstream sources, or hotlink its images in production. This decision imports roster identity and portrait data only. It does not provide the reviewed goals, assists, club clean-sheets, or average season rating rankings needed for the five pending spotlight outcomes, and it does not change the source-neutral result-ingestion boundary.
+
+## 2026-08-08: Three-stage immutable entry and spotlight placeholders
+
+Treat the table and seven spotlight choices as one immutable submission. Stage 1 orders all 20 active clubs and captures the display name, stage 2 requires exactly one top scorer, top assister, most clean sheets, underdog team, overrated team, underdog player, and overrated player choice, and stage 3 reviews both sets before confirmation. The deadline-guarded PostgreSQL statement writes the parent, all 20 table rows, and all seven category rows together and verifies both child counts; a closed or partial attempt writes none of them.
+
+Use season-scoped `players` and `prediction_category_picks` tables as the durable catalogue and selection seams. Player selectors search first, last, and full names and allow a normalized Other-player value; club categories reference existing season teams. The catalogue began empty while the roster handoff was pending, rather than fabricating entries. The later owner-provided player snapshot decision above supersedes that temporary empty state while retaining local-only `/player-faces/` paths and the generic `PlayerMark` fallback. Most clean sheets always chooses a club.
+
+## 2026-08-08: Unified 240-point derived scoring and pending outcomes
+
+Retain the mutually exclusive 5–3–1–0 table tiers and 100-point exact-table maximum. The champion remains the team predicted first and receives no separate bonus. The owner specified occupied-rank judging but not an additive point conversion, so adopt a clearly published working scale: 20 points for rank 1, 19 for rank 2, through 1 for rank 20 and 0 below rank 20. Equal metric values share rank and points. Seven perfect spotlight picks add 140, so the combined maximum is 240; totals remain derived on read rather than editable stored values. This conversion is an implementation decision and can be revised before competition scoring if the owner chooses a different scale.
+
+Define underdog-team index as `average predicted position - actual position` and overrated-team index as `actual position - average predicted position`; rank the largest value first using unrounded precision. An average prediction of 2.4 and actual position 10 therefore produces -7.6 underdog and +7.6 overrated. Top scorer, top assister, and most clean sheets use reviewed result-list positions. Underdog player ranks reviewed FotMob average season ratings descending, while overrated player ranks them ascending.
+
+The metric definition does not authorize data acquisition. The deployed application must not contact or scrape FotMob. Team expectation outcomes may derive from submitted tables and the active standings, but the other five categories remain pending until a permitted, reviewed source-neutral outcome and custom-name reconciliation path exists. Pending means unavailable, not an incorrect zero-point result. The visible leaderboard test run is hard-coded presentation evidence only and never enters stored standings, predictions, or real totals.
+
+## 2026-08-08: Spotlight privacy, PBKDF2 admin login, and cascade deletion
+
+Extend the existing pre-reveal privacy boundary to all seven spotlight picks: publicly expose only participant name, submission time, 0 points, and the predicted champion, while withholding prediction IDs, positions 2–20, and category choices from HTML and RSC. A matching receipt browser and administrator retain private access; full picks become public only after the established deadline, lock, or early-reveal policy. Publish `/rules` as the participant-facing explanation of the expanded game.
+
+Use `ADMIN_USERNAME` with default `admin` and a server-only `ADMIN_PASSWORD_HASH` encoded as salted PBKDF2-SHA-256 with 600,000 iterations. Keep `ADMIN_SECRET` only as a migration fallback when no hash is configured, and never store the raw owner password in source or documentation. Preserve the signed eight-hour HttpOnly session and exact same-origin mutation checks. Run the derivation asynchronously and pair the public production login with a per-source platform rate limit so the deliberately short owner-supplied credential is not an unbounded CPU or online-guessing path.
+
+Administrator deletion removes the prediction parent in the active-season scope and records the audit action. Database cascades remove its 20 table rows and seven spotlight rows, making the receipt unusable and allowing that normalized display name to submit again. Because leaderboard totals and team expectation averages are derived, deletion naturally recalculates them from the remaining submissions.
+
+## 2026-08-08: Honor-system public submission boundary
+
+Keep participant entry account-free for the private invited group: collect only a display name, use the honeypot and one normalized name per season, and let the administrator remove mistakes or fabricated entries. Treat this as a social invitation boundary, not technical access control. A person with the public URL can submit under an unused name and influence consensus-based team indexes; add invitation tokens or participant authentication before kickoff if that risk is no longer acceptable.
+
 ## 2026-08-08: Opening-kickoff submission ceiling
 
 Treat the first 2026/27 league kickoff, Arsenal v Coventry City at `2026-08-21T19:00:00.000Z`, as the non-extendable submission ceiling. Persist the reviewed instant on the season row so historical entries retain their own start boundary after rollover. An administrator may select an earlier deadline, manually lock, or reveal early, but neither a null nor later stored deadline can permit an entry at or after kickoff. Use the database clock for public access decisions and sample PostgreSQL's live wall clock only after the atomic write has acquired the season lock. Keep the official fixture URL and verification date with the season data because fixtures remain subject to change and this application has no live schedule feed; a reschedule requires a reviewed code and forward data migration.

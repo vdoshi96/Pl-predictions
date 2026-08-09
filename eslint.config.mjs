@@ -12,6 +12,9 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Owner-provided raw player-source handoff. Only normalized fixtures and
+    // reviewed portraits are application inputs; do not lint its bundled venv.
+    "premier-league-players-2026-08-08/**",
   ]),
 ]);
 

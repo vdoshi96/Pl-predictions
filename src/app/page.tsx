@@ -1,6 +1,7 @@
 import { CalendarClock, Check, Trophy } from "lucide-react";
 
 import { submitPrediction } from "@/app/actions/predictions";
+import { SubmissionCountdown } from "@/components/submission-countdown";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { PredictionForm } from "@/features/predictions/prediction-form";
@@ -33,6 +34,12 @@ export default async function PredictionPage() {
     : access.deadlinePassed
       ? "The submission deadline has passed."
       : "Predictions have been revealed, so new entries are permanently closed.";
+  const initialRemainingSeconds = Math.max(
+    0,
+    Math.ceil(
+      (access.submissionDeadline.getTime() - databaseNow.getTime()) / 1_000,
+    ),
+  );
 
   return (
     <main className="page-shell w-full flex-1 py-6 sm:py-10">
@@ -60,7 +67,7 @@ export default async function PredictionPage() {
               aria-hidden="true"
               className="text-accent-blue mt-0.5 size-5 shrink-0"
             />
-            <div>
+            <div className="min-w-0 flex-1">
               <p className="text-sm font-bold">
                 {access.submissionsOpen
                   ? "Submissions open"
@@ -74,6 +81,12 @@ export default async function PredictionPage() {
                   ? " · Arsenal v Coventry kickoff"
                   : ` · hard ceiling ${formatUtcDateTime(season.openingKickoff)}`}
               </p>
+              {access.submissionsOpen ? (
+                <SubmissionCountdown
+                  deadlineIso={access.submissionDeadline.toISOString()}
+                  initialRemainingSeconds={initialRemainingSeconds}
+                />
+              ) : null}
             </div>
           </div>
         </section>

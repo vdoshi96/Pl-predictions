@@ -6,7 +6,7 @@ const navigation = [
   { href: "/", label: "Predict" },
   { href: "/leaderboard", label: "Table" },
   { href: "/spotlight", label: "Spotlight" },
-  { href: "/rules", label: "Rules" },
+  { href: "/rules", label: "How to play" },
   { href: "/admin", label: "Admin" },
 ] as const;
 
@@ -38,7 +38,7 @@ export function SiteHeader() {
               <li key={item.href} className="min-w-0">
                 <Link
                   href={item.href}
-                  className="focus-visible:ring-accent-blue inline-flex min-h-12 w-full min-w-0 items-center justify-center rounded-xl px-0.5 text-xs font-bold text-white/80 transition-colors outline-none hover:bg-white/10 hover:text-white focus-visible:ring-2 motion-reduce:transition-none sm:w-auto sm:px-3 sm:text-sm"
+                  className="focus-visible:ring-accent-blue inline-flex min-h-12 w-full min-w-0 items-center justify-center rounded-xl px-0.5 text-center text-xs leading-4 font-bold text-white/80 transition-colors outline-none hover:bg-white/10 hover:text-white focus-visible:ring-2 motion-reduce:transition-none sm:w-auto sm:px-3 sm:text-sm"
                 >
                   {item.label}
                 </Link>

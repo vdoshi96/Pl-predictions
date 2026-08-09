@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="canonical-source" content="LOG.md" />
-    <meta name="canonical-source-sha256" content="86d1f497f4fde942803e789b3b3817ecdf7539a411137787e6ed26a333019a76" />
+    <meta name="canonical-source-sha256" content="7d9860bc8fe321bf9bfaa7d4165a375382612c875e99298e6e4bd5b86c863949" />
     <title>Session log</title>
     <style>
       :root { color-scheme: light dark; font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
@@ -40,6 +40,16 @@
     <main>
       <h1>Session log</h1>
 <h2>2026-08-08</h2>
+<h3>How-to, countdown, and complete test-entry iteration (release in progress)</h3>
+<ul>
+<li>Traced the live Demo Alex and Demo Jordan spotlight cards to the hard-coded <code>LeaderboardDemo</code> component. A read-only production aggregate found zero prediction parents, table items, and category picks before the requested test entry, proving there were no malformed spotlight-only rows to delete.</li>
+<li>Removed the fixture component, its unconditional <code>/spotlight</code> render path, and demo-specific component/browser assertions. The real spotlight view now counts or ranks only complete persisted brackets.</li>
+<li>Added a compact calendar-flip days/hours/minutes/seconds timer beside “Submissions open”. Its starting duration is calculated from database time, its browser progression uses monotonic elapsed time, and it refreshes at zero without replacing the guarded PostgreSQL deadline check.</li>
+<li>Captured three 390-by-844 screens from the live public mobile flow and added them to <code>/rules</code> as a responsive three-step walkthrough. Numbered overlay pins have matching accessible callout text; the unsaved walkthrough draft created no production entry.</li>
+<li>Submitted the retained <code>Dranx Test Entry</code> through the supported public three-stage flow. Safe follow-up verification found one parent, 20 ordered table rows, and seven spotlight rows; <code>/leaderboard</code> shows the entry while <code>/spotlight</code> keeps its subjects private before reveal.</li>
+<li>Passed uninterrupted <code>CI=1 npm run check</code>: documentation/player parity, formatting, ESLint, strict TypeScript, 150 default tests with 10 guarded skips, all 10 isolated Neon integration cases, the Webpack production build, five pre-kickoff browser projects with 20 intentional skips, and three post-kickoff browser projects with two intentional skips. An earlier attempt stopped at Prettier before any lint or test phase and was corrected before the clean run.</li>
+<li>Production publication, final read-only smoke, newest-only QA evidence, and GitHub/local cleanup remain pending release-closeout work.</li>
+</ul>
 <h3>Research and provisioning</h3>
 <ul>
 <li>Read the complete greenfield product brief and the owner&#39;s no-live-API/no-cron and mobile-first overrides.</li>
@@ -187,7 +197,7 @@
 <li>Next handoff: use <code>main</code> as the base for future pull requests. No GitHub access blocker remains for the current repository workflow.</li>
 </ul>
 
-      <p class="source">Generated deterministically from <a href="LOG.md">docs/context/LOG.md</a>. Canonical SHA-256: <code>86d1f497f4fde942803e789b3b3817ecdf7539a411137787e6ed26a333019a76</code>.</p>
+      <p class="source">Generated deterministically from <a href="LOG.md">docs/context/LOG.md</a>. Canonical SHA-256: <code>7d9860bc8fe321bf9bfaa7d4165a375382612c875e99298e6e4bd5b86c863949</code>.</p>
     </main>
   </body>
 </html>

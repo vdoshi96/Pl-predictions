@@ -2,6 +2,16 @@
 
 ## 2026-08-08
 
+### How-to, countdown, and complete test-entry iteration (release in progress)
+
+- Traced the live Demo Alex and Demo Jordan spotlight cards to the hard-coded `LeaderboardDemo` component. A read-only production aggregate found zero prediction parents, table items, and category picks before the requested test entry, proving there were no malformed spotlight-only rows to delete.
+- Removed the fixture component, its unconditional `/spotlight` render path, and demo-specific component/browser assertions. The real spotlight view now counts or ranks only complete persisted brackets.
+- Added a compact calendar-flip days/hours/minutes/seconds timer beside “Submissions open”. Its starting duration is calculated from database time, its browser progression uses monotonic elapsed time, and it refreshes at zero without replacing the guarded PostgreSQL deadline check.
+- Captured three 390-by-844 screens from the live public mobile flow and added them to `/rules` as a responsive three-step walkthrough. Numbered overlay pins have matching accessible callout text; the unsaved walkthrough draft created no production entry.
+- Submitted the retained `Dranx Test Entry` through the supported public three-stage flow. Safe follow-up verification found one parent, 20 ordered table rows, and seven spotlight rows; `/leaderboard` shows the entry while `/spotlight` keeps its subjects private before reveal.
+- Passed uninterrupted `CI=1 npm run check`: documentation/player parity, formatting, ESLint, strict TypeScript, 150 default tests with 10 guarded skips, all 10 isolated Neon integration cases, the Webpack production build, five pre-kickoff browser projects with 20 intentional skips, and three post-kickoff browser projects with two intentional skips. An earlier attempt stopped at Prettier before any lint or test phase and was corrected before the clean run.
+- Production publication, final read-only smoke, newest-only QA evidence, and GitHub/local cleanup remain pending release-closeout work.
+
 ### Research and provisioning
 
 - Read the complete greenfield product brief and the owner's no-live-API/no-cron and mobile-first overrides.

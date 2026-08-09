@@ -257,6 +257,9 @@ test("desktop public routes render the complete league without overflow", async 
       .getByRole("list", { name: "Premier League predicted positions" })
       .getByRole("listitem"),
   ).toHaveCount(20);
+  await expect(
+    page.getByRole("timer", { name: /until submissions lock$/u }),
+  ).toBeVisible();
   const clubMarks = page.getByRole("img", { name: / club mark$/u });
   await expect(clubMarks).toHaveCount(20);
   await expect
@@ -331,9 +334,17 @@ test("desktop public routes render the complete league without overflow", async 
 
   await page.goto("/rules");
   await expect(
-    page.getByRole("heading", { level: 1, name: "Rules and scoring" }),
+    page.getByRole("heading", { level: 1, name: "How to play & scoring" }),
   ).toBeVisible();
-  await expect(page.getByRole("heading", { level: 3 })).toHaveCount(7);
+  await expect(
+    page.getByRole("heading", { name: "How to play in three steps" }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("img", { name: /Mobile .* screen/u }),
+  ).toHaveCount(3);
+  await expect(
+    page.getByRole("heading", { level: 3, name: "Top scorer" }),
+  ).toBeVisible();
   await expectNoHorizontalOverflow(page);
 });
 
@@ -390,6 +401,9 @@ test("mobile journey preserves privacy and gives the owner full control", async 
   ).toBe(true);
 
   await page.goto("/");
+  await expect(
+    page.getByRole("timer", { name: /until submissions lock$/u }),
+  ).toBeVisible();
   const table = page.getByRole("list", {
     name: "Premier League predicted positions",
   });

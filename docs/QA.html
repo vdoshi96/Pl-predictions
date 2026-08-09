@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="canonical-source" content="QA.md" />
-    <meta name="canonical-source-sha256" content="1b2c75ad1e4ec440734699458544860fba06f51ec8c0c46cdc8cfe2d4e67546d" />
+    <meta name="canonical-source-sha256" content="4875172d74847e5aa137d705401dc4061389f0b86b2e490cf2b8ac9f5fa3f945" />
     <title>Quality assurance</title>
     <style>
       :root { color-scheme: light dark; font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
@@ -39,7 +39,7 @@
   <body>
     <main>
       <h1>Quality assurance</h1>
-<p>Evidence date: 2026-08-08. This document records the newest completed local and production verification for the table-only leaderboard and separate spotlight-accuracy iteration. The administrator-login rate limit is live. Earlier release history remains in <code>docs/context/LOG.md</code>.</p>
+<p>Evidence date: 2026-08-08. This document records the newest verification for the annotated how-to, database-time countdown, complete retained test entry, and removal of the hard-coded spotlight demonstration. Earlier release history remains in <code>docs/context/LOG.md</code>.</p>
 <h2>Current results</h2>
 <table>
 <thead>
@@ -50,160 +50,98 @@
 </tr>
 </thead>
 <tbody><tr>
-<td>Focused Markdown formatting</td>
-<td><code>npx prettier --check docs/QA.md docs/context/STATUS.md docs/context/LOG.md</code></td>
-<td>Passed for the three updated canonical records. HTML peers are regenerated separately by the canonical documentation workflow.</td>
-</tr>
-<tr>
 <td>Complete local chain</td>
 <td><code>CI=1 npm run check</code></td>
-<td>Passed on the tested feature revision: documentation and player-catalogue parity checks, formatting, ESLint, strict TypeScript, the default suite, isolated Neon integration, the Webpack production build, and both deterministic browser phases.</td>
-</tr>
-<tr>
-<td>Unit/component/default suite</td>
-<td><code>npm test</code> within the aggregate check</td>
-<td>148 passed; 10 database cases were skipped by their explicit opt-in guard.</td>
-</tr>
-<tr>
-<td>Isolated Neon integration</td>
-<td><code>npm run test:integration</code></td>
-<td>10 passed through the fail-closed test-database wrapper. The atomic prediction case persists one parent, exactly 20 ordered table rows, and exactly seven spotlight rows or persists none.</td>
-</tr>
-<tr>
-<td>Pre-kickoff browser phase</td>
-<td>deterministic Playwright phase</td>
-<td>5 passed with 20 intentional project-routing skips across desktop Chromium, 320/390/430-pixel Chromium, and iPhone 13 WebKit.</td>
-</tr>
-<tr>
-<td>Post-kickoff browser phase</td>
-<td>deterministic Playwright phase</td>
-<td>3 passed with 2 intentional project-routing skips.</td>
+<td>Passed documentation/player parity, formatting, ESLint, strict TypeScript, 150 default tests with 10 guarded skips, all 10 isolated Neon integration tests, the Webpack production build, five pre-kickoff browser projects with 20 intentional skips, and three post-kickoff browser projects with two intentional skips.</td>
 </tr>
 <tr>
 <td>Reviewed player catalogue</td>
 <td><code>npm run players:check</code> within the aggregate check</td>
-<td>Exact reviewed result: 587 players across the 20 clubs, 580 local portrait PNGs, and seven intentional silhouette fallbacks.</td>
+<td>Verified 587 players, 580 portraits, and seven silhouette fallbacks.</td>
 </tr>
 <tr>
-<td>Vercel production build</td>
-<td>deployment <code>dpl_3tyxwNSXGwTSuLctieAiJHYB2K9d</code></td>
-<td>Ready with target <code>production</code> for exact Git SHA <code>dc7b91ffd20200b79a51593c15b7dcb92cb493ab</code>. The stable alias resolves to its immutable deployment URL.</td>
+<td>Production data preflight</td>
+<td>read-only aggregate query plus public page inspection</td>
+<td>Found zero prediction parents, table items, or spotlight picks before the requested test entry. Alex and Jordan existed only in a hard-coded component, not in Neon.</td>
 </tr>
 <tr>
-<td>Anonymous production smoke</td>
-<td>strengthened <code>npm run test:production-smoke</code></td>
-<td>5 of 5 projects passed against the stable alias. The run covered the table-only leaderboard, separate spotlight page, all seven available demo portraits, Alysson&#39;s silhouette, rules, administrator login, narrow reflow, and browser/network guards.</td>
+<td>Retained production entry</td>
+<td>supported public three-stage form</td>
+<td>Created <code>Dranx Test Entry</code>; follow-up verification found one parent with exactly 20 ordered table rows and seven spotlight rows. The public table leaderboard shows one entry, while unrevealed private picks remain absent from <code>/spotlight</code>.</td>
 </tr>
 <tr>
-<td>Production write smoke</td>
-<td>not run for this iteration</td>
-<td>This presentation-only release performs no schema, seed, standings, prediction, administrator, or other production-data mutation. The prior approved exact create-and-delete evidence remains in history.</td>
-</tr>
-<tr>
-<td>Production database baseline</td>
-<td>migrations <code>0000</code> through <code>0005</code></td>
-<td>This iteration adds no schema or seed change. The reviewed catalogue remains 587 players with 580 portrait paths and seven null fallbacks.</td>
-</tr>
-<tr>
-<td>Production mobile evidence</td>
+<td>Live how-to sources</td>
 <td>mobile Chromium at 390 by 844 pixels</td>
-<td>The prediction, review, spotlight-accuracy demo, and administrator-login screenshots were refreshed from the exact deployment and visually inspected.</td>
+<td>Captured stage 1, stage 2, and final review from the public live flow without submitting the walkthrough draft. All three PNGs were visually inspected.</td>
 </tr>
 <tr>
-<td>Administrator credential path</td>
-<td>prior bounded write smoke</td>
-<td>The configured administrator username plus salted PBKDF2-SHA-256 password hash authenticated successfully. The raw owner password was not written to source, logs, or documentation.</td>
-</tr>
-<tr>
-<td>Legacy administrator fallback</td>
-<td>prior deployment metadata plus bounded login</td>
-<td><code>ADMIN_SECRET</code> is absent from production, preview, and development inventories and from the running production deployment. <code>ADMIN_USERNAME</code> and <code>ADMIN_PASSWORD_HASH</code> are present.</td>
-</tr>
-<tr>
-<td>Administrator login WAF</td>
-<td><code>vercel firewall publish --yes</code> plus read-back</td>
-<td>Live rule <code>rule_admin_login_protection_b4i7gM</code> limits <code>POST /admin/login</code> to 10 requests per 60 seconds for each IP. Excess requests receive HTTP 429. The read-back found active version 2 and no remaining draft.</td>
+<td>Production release smoke</td>
+<td><code>npm run test:production-smoke</code></td>
+<td>Pending publication of the release candidate to <code>main</code>. The final read-only five-project result and newest-only screenshot set will replace this row during release closeout.</td>
 </tr>
 </tbody></table>
-<p>The local environment uses the repository&#39;s verified Webpack production-build command because its restricted sandbox does not allow a default Turbopack helper to bind an internal port. Vercel built the release successfully, so this remains an execution-environment limitation rather than an application compile failure.</p>
-<h2>Unit and component coverage</h2>
-<p>The 148-test default run covers the earlier table, season, standings, privacy, and administrator invariants plus the new spotlight scope:</p>
+<p>The first aggregate-check attempt stopped at Prettier before lint, tests, integration, or build ran. After formatting the one flagged mobile test, the clean uninterrupted run above passed. The local environment uses the repository&#39;s verified Webpack build because the restricted sandbox does not permit a default Turbopack helper to bind its internal port.</p>
+<h2>Feature coverage</h2>
+<p>The default, integration, and browser suites now cover:</p>
 <ul>
-<li>canonical seven-category taxonomy and exact-cardinality validation;</li>
-<li>club-only validation for most clean sheets, underdog team, and overrated team, plus player-only validation for top scorer, top assister, underdog player, and overrated player;</li>
-<li>first-name, last-name, and full-name player search, keyboard-accessible combobox behavior, and a required custom name for Other player;</li>
-<li>exact normalization of the owner-provided 587-player snapshot, canonical mapping to all 20 clubs, duplicate/unreferenced-asset rejection, 580 local portraits, and seven null portrait paths;</li>
-<li><code>PlayerMark</code> portrait rendering with an accessible generic silhouette when a path is absent or a browser image fails;</li>
-<li>atomic acceptance of one prediction parent, all 20 ordered clubs, and exactly seven category picks;</li>
-<li>derived table scoring capped at 100, occupied category ranks, shared ranks, team expectation indexes, and opposite player-rating directions;</li>
-<li>authenticated exact prediction deletion, cascade behavior for all table items and spotlight picks, deletion audit preservation, and normalized-name reuse;</li>
-<li>PBKDF2-backed administrator login, malformed-hash and sentinel-value failure handling, legacy-fallback migration coverage, signed-session expiry/tamper protection, strict cookie attributes, and same-origin administrator mutations;</li>
-<li>pre-reveal privacy that withholds prediction identifiers, positions 2–20, and all seven spotlight picks from public HTML, RSC, and route payloads; and</li>
-<li>the existing database-clock cutoff, irreversible reveal, importer last-good preservation, standings finalization, and compare-and-swap race protections.</li>
+<li>a compact four-tile days/hours/minutes/seconds countdown beside the open-submissions status;</li>
+<li>database-time-derived initial duration, monotonic elapsed-time updates, zero clamping, padded digits, and exactly one server refresh at zero;</li>
+<li>the three-card live-mobile how-to section, all three images, numbered callouts, renamed navigation, and the <code>How to play &amp; scoring</code> page heading;</li>
+<li>320-, 390-, and 430-pixel Chromium reflow plus iPhone WebKit, with no document-level horizontal overflow;</li>
+<li>the complete journey from 20-club ordering through seven spotlight selectors to one review and atomic submit;</li>
+<li>pre-reveal privacy for prediction identifiers, positions 2–20, all seven spotlight subjects, and hidden accuracy ordering;</li>
+<li>absence of the former Alex/Jordan component and its dedicated demo assertions; and</li>
+<li>the existing 56-pixel mouse/touch/keyboard reorder handles, searchable selectors, Other-player path, safe-area action, long-name wrapping, table scoring, standings, administrator deletion, and compare-and-swap protections.</li>
 </ul>
-<h2>Scoring behavior and open outcome inputs</h2>
-<p>The main leaderboard uses table points only and remains capped at 100. The predicted champion remains table position 1 and has no separate bonus. Spotlight accuracy is a separate fun view. Let <code>N</code> be the current number of active, nondeleted season brackets. Accuracy points are <code>max(0, N + 1 - outcome rank)</code>. Overall accuracy sums only resolved categories. A resolved zero-point result still counts as available. Pending categories remain unavailable. Equal overall scores share a competition rank. Category sorts use outcome rank from low to high and put pending entries last.</p>
-<p>Team expectation outcomes are derivable from submitted tables plus actual standings. Underdog uses <code>average predicted position - actual position</code>; overrated uses the exact inverse. Each list is ranked largest first with full precision before the occupied-rank curve is applied.</p>
-<p>Five category outcome rankings still require reviewed input: top scorer, top assister, most clean sheets, underdog player, and overrated player. A future owner-run Codex automation will enter them manually. The two player-opinion lists rank season-average ratings in opposite directions. Custom Other-player names still require reconciliation. The roster import supplies selector identities and portraits only. Missing outcomes remain pending and do not receive zero.</p>
-<h2>Database and production data verification</h2>
-<p>The isolated Neon integration suite passed all ten cases through <code>scripts/run-with-test-database.mjs</code>. Its prediction lifecycle now proves that a successful write contains exactly one parent, 20 table rows, and seven spotlight rows; deletion cascades through both child sets. The other cases retain the deadline, lock serialization, revealed-season, last-good import, monotonic watermark, future-time, and active-pointer protections. The wrapper refuses to run against production, and deterministic clock overrides remain disabled outside the wrapper-attested test target.</p>
-<p>Production was inspected before migration and contained zero predictions and zero prediction items; the player and category-pick tables did not yet exist. Migrations <code>0003</code>, <code>0004</code>, and <code>0005</code> then completed before the idempotent seed. Post-seed verification found 587 active players, 580 portrait paths, seven intentional null portrait paths, and both cross-season integrity triggers. The bounded write smoke subsequently created and removed only its unique QA entry. Final exact queries returned zero QA prediction parents, zero table items, zero category picks, and zero deletion-audit rows.</p>
-<h2>Browser and mobile verification</h2>
-<p>The deterministic browser phases cover desktop Chromium, touch-enabled Chromium at 390 by 844, exact 320- and 430-pixel Chromium reflow, and iPhone 13 WebKit. Verified behavior includes:</p>
+<p>The countdown is an informational display. The server calculates its starting duration from PostgreSQL time, while the atomic submission statement still locks the season and rechecks PostgreSQL <code>clock_timestamp()</code> against the effective deadline. Device-clock changes or a stale open page therefore cannot authorize a late write.</p>
+<h2>Production data verification</h2>
+<p>Read-only live inspection established the baseline before any requested mutation:</p>
 <ul>
-<li>the complete three-stage path from ordering all 20 clubs, through seven spotlight selectors, to one review dialog and atomic submit;</li>
-<li>56-pixel move handles, mouse/touch/keyboard table reorder, safe-area actions, long-name wrapping, and no document-level horizontal overflow;</li>
-<li>searchable keyboard-accessible player selectors using real catalogue names and images, including first-name and last-name queries;</li>
-<li>the Other-player text path and generic silhouette, while most clean sheets and the team-opinion categories show club crests rather than players;</li>
-<li>exactly seven spotlight rows in review, decoded real portraits for selected catalogue players, a rendered silhouette with no nested image for the custom player, and all 20 decoded club marks;</li>
-<li>receipt-only access before reveal and withholding of the other participant details from clean browser contexts and public serialization;</li>
-<li>the separate spotlight-accuracy test run with real player names, real available portraits, club crests, and an intentional silhouette example;</li>
-<li>the rules page, administrator sign-in, exact submission deletion, deletion audit, and complete isolated cleanup; and</li>
-<li>the existing deterministic pre/post-kickoff table scores, champion status, standings import, finalization, and undo paths.</li>
+<li><code>/leaderboard</code> showed no entries;</li>
+<li><code>/spotlight</code> showed zero active brackets but rendered Demo Alex and Demo Jordan;</li>
+<li>the production database contained zero prediction parents, zero table items, and zero category picks.</li>
 </ul>
-<p>The production harness retains three earlier browser boundaries. A touch drag receives one bounded retry but still has to change the club order. Cancelled optimized portrait candidates are ignored only while rendered-image assertions require the selected portraits. Both demo detail panels open before the test requires every available portrait and Alysson&#39;s silhouette. This iteration also ignores only Mobile WebKit&#39;s exact cancelled unauthenticated <code>/admin?_rsc</code> prefetch message and gives the complete production journey 90 seconds instead of the generic 30. The final read-only run passed all five projects.</p>
-<p>Automated WebKit emulation is strong regression evidence but is not a substitute for a final spot check on the owner&#39;s physical iPhone when one is available.</p>
-<h2>Production deployment evidence</h2>
-<p>GitHub <a href="https://github.com/vdoshi96/Pl-predictions/pull/10">PR #10</a> merged the table and spotlight split into <code>main</code> at exact merge SHA <code>dc7b91ffd20200b79a51593c15b7dcb92cb493ab</code>. Deployment <code>dpl_3tyxwNSXGwTSuLctieAiJHYB2K9d</code> is Ready with target <code>production</code> at immutable URL <a href="https://pl-predictions-6yyae7a73-vdoshi96s-projects.vercel.app">https://pl-predictions-6yyae7a73-vdoshi96s-projects.vercel.app</a>. Its metadata identifies that exact SHA. Read-back proves that the stable public alias <a href="https://pl-predictions-2026.vercel.app">https://pl-predictions-2026.vercel.app</a> resolves to it.</p>
-<p>The final read-only production smoke passed 5 of 5 browser projects. It verified application health, the three-stage preview, seven completed picks, the table-only leaderboard, the separate spotlight-accuracy page, all seven available demo portraits, the intentional Alysson silhouette, the rules page, administrator sign-in, 320–430-pixel reflow, no horizontal overflow, and no unexpected browser, same-origin request, or HTTP response errors. The harness ignores only Mobile WebKit&#39;s exact cancelled unauthenticated <code>/admin?_rsc</code> prefetch message; direct administrator-login navigation, HTTP failures, and every other error remain enforced. A 90-second project timeout keeps cold production plus the full selector journey from inheriting the generic 30-second limit.</p>
-<p>No production write smoke ran for this iteration because the release changes derived presentation, documentation, and smoke assertions only. The prior separately approved exact create-and-delete journey remains preserved in the earlier release history.</p>
-<p>The successful post-removal login proves the configured hash path because deployment metadata contains <code>ADMIN_USERNAME</code> and <code>ADMIN_PASSWORD_HASH</code> but not <code>ADMIN_SECRET</code>. The legacy name is also absent from production, preview, and development environment inventories. The raw credential remained in macOS Keychain only and was never written to source, browser artifacts, logs, or documentation.</p>
-<p>The administrator-login WAF rule is live. It matches only <code>POST /admin/login</code>. Each IP can send 10 requests in 60 seconds. Excess requests receive HTTP 429. The post-publication read-back found active version 2 and no remaining draft.</p>
-<h2>Production mobile screenshots</h2>
-<p>Only the newest completed production run is retained. All four screenshots were refreshed from deployment <code>dpl_3tyxwNSXGwTSuLctieAiJHYB2K9d</code> at 390 by 844 pixels and visually inspected for readable wrapping, reachable actions, painted local imagery, and absence of horizontal clipping.</p>
-<p><strong>Prediction entry — mobile Chromium at 390 pixels:</strong> stage one shows all 20 club crests in the mobile sorter after a verified keyboard move, with the display-name field and safe-area-aware spotlight action fitting the viewport.</p>
-<p><img src="assets/qa/prediction-mobile.png" alt="Production prediction entry on mobile Chromium"></p>
-<p><strong>Review dialog — mobile Chromium at 390 pixels:</strong> the complete review contains the ordered 20-club table and all seven spotlight categories. Assertions before capture verify real portraits for Cole Palmer, Declan Rice, and Elliot Anderson, plus the generic silhouette for the custom Other player.</p>
-<p><img src="assets/qa/review-mobile.png" alt="Production prediction review dialog on mobile Chromium"></p>
-<p><strong>Spotlight accuracy demonstration — mobile Chromium at 390 pixels:</strong> the separate page labels the test run and bracket-count formula, shows a ranked demo entry, and never changes the table leaderboard. Browser assertions also require all seven available demo portraits, club crests, and Alysson&#39;s intentional silhouette to render.</p>
-<p><img src="assets/qa/leaderboard-mobile.png" alt="Production spotlight leaderboard demonstration on mobile Chromium"></p>
-<p><strong>Administrator sign-in — mobile Chromium at 390 pixels:</strong> the owner-only username-and-password entry point reflows cleanly with labelled fields and a full-width action.</p>
-<p><img src="assets/qa/admin-login-mobile.png" alt="Production administrator sign-in on mobile Chromium"></p>
-<h2>Security and source review</h2>
+<p>Source tracing proved the two names were rendered unconditionally by <code>src/features/leaderboard/leaderboard-demo.tsx</code>. They were never partial stage-two submissions, so deleting database rows would have been both unnecessary and incorrect. The release removes the import, render path, component, and demo-specific tests.</p>
+<p>The retained <code>Dranx Test Entry</code> was then submitted through the public three-stage UI. It contains:</p>
 <ul>
-<li>No environment value, receipt token, database URL, administrator credential, or subscription cookie is committed or exposed through a public variable.</li>
-<li>Administrator writes require both a valid signed session and exact same-origin request metadata. The configured password is stored as a salted PBKDF2-SHA-256 hash; the raw owner password is absent from source and documentation.</li>
-<li>Public pre-reveal data withholds prediction identifiers, positions 2–20, and all seven spotlight picks. The only intentional public projection remains the display name and predicted champion.</li>
-<li>A prediction is accepted only when one transaction can persist the parent, all 20 ordered team rows, and exactly seven category rows.</li>
-<li>The owner-provided raw roster handoff is normalized into reviewed local data and images. Its acquisition scripts are not used at runtime, and the application performs no live football API request, FotMob extraction, scraper, or Vercel Cron.</li>
-<li>A future owner-run Codex automation will enter the five pending result rankings manually. Missing outcomes remain unavailable until that entry and Other-player reconciliation are complete.</li>
-<li>The official Premier League logo/lion/ball assets remain excluded. The 20 owner-provided local club crests and imported player portraits are the only selector imagery used for this release, with the established labelled fallbacks.</li>
+<li>20 ordered clubs, headed by Arsenal, Liverpool, Manchester City, and Chelsea;</li>
+<li>top scorer Erling Haaland;</li>
+<li>top assister Bruno Fernandes;</li>
+<li>most clean sheets Arsenal;</li>
+<li>underdog team Sunderland;</li>
+<li>overrated team Manchester United;</li>
+<li>underdog player Chris Rigg; and</li>
+<li>overrated player Alysson.</li>
+</ul>
+<p>The database verification exposed only safe aggregate facts: one parent, 20 child positions, seven category picks, and the display name. It did not print prediction IDs, receipt material, database URLs, or private credentials. Before reveal, the public spotlight page reports one active bracket but does not serialize or display those seven choices.</p>
+<h2>Annotated live-mobile walkthrough</h2>
+<p>The participant-facing <code>/rules</code> section uses three first-party captures from the live 390 by 844 public flow:</p>
+<ol>
+<li><code>public/how-to-play/step-1-table-mobile.png</code> — ordered club table, reorder handles, display-name field, and continue action.</li>
+<li><code>public/how-to-play/step-2-spotlight-mobile.png</code> — selected player/club controls and the review action.</li>
+<li><code>public/how-to-play/step-3-review-mobile.png</code> — the complete 20-position and seven-pick review with the final submit action.</li>
+</ol>
+<p>Each image receives two numbered overlay pins at render time. The same numbers and instructions appear as adjacent HTML text, so the annotations remain accessible, selectable, responsive, and understandable without colour. The walkthrough draft used the unsaved display name “How to play preview”; it never created a second production entry.</p>
+<h2>Security and cleanup boundaries</h2>
+<ul>
+<li>No environment value, receipt token, database URL, administrator credential, or subscription cookie is committed or printed.</li>
+<li>Production creation was limited to the explicitly requested retained test entry. The destructive production-write smoke was not used because that harness intentionally deletes its QA entry.</li>
+<li>The retained entry followed the same atomic write path as every participant: parent plus 20 table rows plus seven spotlight rows, or nothing.</li>
+<li>Alex/Jordan removal is a code cleanup, not a data deletion. No legitimate production submission was deleted.</li>
+<li>Public pre-reveal output continues to expose only the permitted table-leaderboard projection and complete-bracket count.</li>
+<li>The owner-provided raw roster and club-asset handoffs remain untouched and untracked.</li>
 </ul>
 <h2>Release closeout state</h2>
 <ul>
-<li><input checked="" disabled="" type="checkbox"> Merge GitHub PR #10 into <code>main</code> at exact SHA <code>dc7b91ffd20200b79a51593c15b7dcb92cb493ab</code>.</li>
-<li><input checked="" disabled="" type="checkbox"> Verify Ready production deployment <code>dpl_3tyxwNSXGwTSuLctieAiJHYB2K9d</code>, its immutable URL, exact SHA, and stable alias mapping.</li>
-<li><input checked="" disabled="" type="checkbox"> Preserve migrations <code>0000</code> through <code>0005</code> and the reviewed 587-player catalogue without a production database write.</li>
-<li><input checked="" disabled="" type="checkbox"> Pass the strengthened five-project read-only smoke; no production write smoke was needed or run.</li>
-<li><input checked="" disabled="" type="checkbox"> Refresh and visually inspect the newest four mobile screenshots.</li>
-<li><input checked="" disabled="" type="checkbox"> Confirm username-plus-PBKDF2 authentication, remove <code>ADMIN_SECRET</code> from Vercel inventories, deploy without it, and pass the bounded owner-login check against that exact runtime.</li>
-<li><input checked="" disabled="" type="checkbox"> Publish the 10-per-60-second, per-IP administrator-login rate limit and make sure that no draft remains.</li>
-<li><input checked="" disabled="" type="checkbox"> Implement and fully verify the table-only main leaderboard and separate dynamic spotlight-accuracy page locally.</li>
-<li><input disabled="" type="checkbox"> Set up the future owner-run Codex automation for the five pending outcome rankings and custom Other-player reconciliation.</li>
-<li><input checked="" disabled="" type="checkbox"> Deploy the score split, pass the read-only production smoke, replace the retained mobile evidence, publish final HTML parity, synchronize local and remote <code>main</code>, and remove completed branch state. The self-referential final evidence merge SHA is intentionally not pinned here.</li>
+<li><input checked="" disabled="" type="checkbox"> Implement and locally verify the countdown, annotated walkthrough, navigation copy, and fixture removal.</li>
+<li><input checked="" disabled="" type="checkbox"> Create and verify one complete retained production test bracket.</li>
+<li><input checked="" disabled="" type="checkbox"> Pass the uninterrupted full local verification chain.</li>
+<li><input disabled="" type="checkbox"> Merge the release through GitHub <code>main</code> and verify the Ready production deployment.</li>
+<li><input disabled="" type="checkbox"> Pass the final five-project read-only production smoke and visually inspect its newest screenshots.</li>
+<li><input disabled="" type="checkbox"> Regenerate final HTML peers, synchronize local and remote <code>main</code>, and remove completed branch state.</li>
 </ul>
 
-      <p class="source">Generated deterministically from <a href="QA.md">docs/QA.md</a>. Canonical SHA-256: <code>1b2c75ad1e4ec440734699458544860fba06f51ec8c0c46cdc8cfe2d4e67546d</code>.</p>
+      <p class="source">Generated deterministically from <a href="QA.md">docs/QA.md</a>. Canonical SHA-256: <code>4875172d74847e5aa137d705401dc4061389f0b86b2e490cf2b8ac9f5fa3f945</code>.</p>
     </main>
   </body>
 </html>

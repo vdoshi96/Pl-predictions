@@ -4,7 +4,6 @@ import Link from "next/link";
 
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
-import { LeaderboardDemo } from "@/features/leaderboard/leaderboard-demo";
 import { LeaderboardEntryLink } from "@/features/leaderboard/entry-link";
 import { getLeaderboardView } from "@/features/leaderboard/queries";
 import { SpotlightPickGrid } from "@/features/leaderboard/spotlight-pick-grid";
@@ -156,8 +155,6 @@ export default async function SpotlightPage({
           </CardContent>
         </Card>
 
-        <LeaderboardDemo />
-
         <section
           aria-labelledby="spotlight-sort-heading"
           className="grid gap-3"
@@ -214,9 +211,9 @@ export default async function SpotlightPage({
                   Spotlight picks are still private
                 </h2>
                 <p className="mt-1 text-sm leading-6 text-slate-600">
-                  The real accuracy table appears only after the season reveal.
-                  The demonstration above uses fixed sample data and exposes no
-                  participant picks.
+                  The accuracy table appears only after the season reveal. The
+                  active bracket count includes only complete entries containing
+                  all 20 table positions and all seven spotlight picks.
                 </p>
               </div>
             </CardContent>

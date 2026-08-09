@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="canonical-source" content="DECISIONS.md" />
-    <meta name="canonical-source-sha256" content="ef8c6fbde18766246f01213f8cbf3e6fa2b5e5e72a7be8fadec2a5d61c9a6d53" />
+    <meta name="canonical-source-sha256" content="c3d7123fd4041b32ad02dba5777d1aa31a0456182f421844d9feb2f38350ab81" />
     <title>Decisions</title>
     <style>
       :root { color-scheme: light dark; font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
@@ -39,6 +39,11 @@
   <body>
     <main>
       <h1>Decisions</h1>
+<h2>2026-08-08: Complete-entry test data, fixture retirement, and deadline countdown</h2>
+<p>Remove the hard-coded Alex/Jordan spotlight presentation cards. Read-only live-page and production-database checks proved they were component fixtures, not prediction parents or partial stage-two writes, so no production deletion is warranted. The public spotlight page must derive its bracket count and, after reveal, every displayed pick and accuracy result from complete persisted submissions only.</p>
+<p>Create the retained <code>Dranx Test Entry</code> through the same public three-stage flow used by a participant. Treat it as product test data, not a seed or demo shortcut. Verification must find one parent, exactly 20 ordered table rows, and exactly seven category-pick rows. Before reveal, the main leaderboard may show its permitted participant/champion projection and <code>/spotlight</code> may count the bracket, but neither route may expose its spotlight subjects, private table positions, or prediction identifier.</p>
+<p>Show a compact days/hours/minutes/seconds calendar-flip countdown beside the server-derived open-submissions status. Calculate the initial remaining duration from PostgreSQL time and the effective deadline, then advance that duration with a monotonic client timer so a participant&#39;s device clock cannot move the display. Refresh the server page at zero. The countdown is informational; only the post-lock PostgreSQL <code>clock_timestamp()</code> check can authorize or reject a submission.</p>
+<p>Use three 390 × 844 captures from the live mobile flow for the public how-to section. Keep each screenshot&#39;s numbered overlay pins synchronized with adjacent text callouts so the instructions remain understandable to screen-reader users and without relying on colour alone.</p>
 <h2>2026-08-08: Owner-provided player snapshot import</h2>
 <p>Use the owner&#39;s dated <code>premier-league-players-2026-08-08/</code> handoff as the local selector snapshot for the 2026/27 season. Import all 587 players across the application&#39;s 20 clubs, copy the 580 supplied portraits to <code>/player-faces/</code>, and deliberately show the <code>PlayerMark</code> silhouette for the seven players without a supplied image. Keep Other player available for unavailable or newly added players instead of inventing a catalogue row or portrait.</p>
 <p>Preserve the raw handoff as owner-provided provenance, but do not run its acquisition scripts, fetch its upstream sources, or hotlink its images in production. This decision imports roster identity and portrait data only. It does not provide the reviewed goals, assists, club clean-sheets, or average season rating rankings needed for the five pending spotlight outcomes, and it does not change the source-neutral result-ingestion boundary.</p>
@@ -52,7 +57,7 @@
 <h2>2026-08-08: Superseded unified 240-point working rule</h2>
 <p>This earlier implementation rule used the mutually exclusive 5–3–1–0 table tiers and a combined 240-point total. It gave 20 points for spotlight rank 1 through 1 point for rank 20. The separate table-leaderboard decision above supersedes this working rule before competition scoring.</p>
 <p>Define underdog-team index as <code>average predicted position - actual position</code> and overrated-team index as <code>actual position - average predicted position</code>; rank the largest value first using unrounded precision. An average prediction of 2.4 and actual position 10 therefore produces -7.6 underdog and +7.6 overrated. Top scorer, top assister, and most clean sheets use reviewed result-list positions. Underdog player ranks reviewed FotMob average season ratings descending, while overrated player ranks them ascending.</p>
-<p>The metric definition does not authorize data acquisition. The deployed application must not contact or scrape FotMob. Team expectation outcomes may derive from submitted tables and the active standings, but the other five categories remain pending until a permitted, reviewed source-neutral outcome and custom-name reconciliation path exists. Pending means unavailable, not an incorrect zero-point result. The visible leaderboard test run is hard-coded presentation evidence only and never enters stored standings, predictions, or real totals.</p>
+<p>The metric definition does not authorize data acquisition. The deployed application must not contact or scrape FotMob. Team expectation outcomes may derive from submitted tables and the active standings, but the other five categories remain pending until a permitted, reviewed source-neutral outcome and custom-name reconciliation path exists. Pending means unavailable, not an incorrect zero-point result. The then-visible leaderboard test run was hard-coded presentation evidence only and never entered stored standings, predictions, or real totals; the later complete-entry decision above retires that fixture.</p>
 <h2>2026-08-08: Spotlight privacy, PBKDF2 admin login, and cascade deletion</h2>
 <p>Extend the existing pre-reveal privacy boundary to all seven spotlight picks: publicly expose only participant name, submission time, 0 points, and the predicted champion, while withholding prediction IDs, positions 2–20, and category choices from HTML and RSC. A matching receipt browser and administrator retain private access; full picks become public only after the established deadline, lock, or early-reveal policy. Publish <code>/rules</code> as the participant-facing explanation of the expanded game.</p>
 <p>Use <code>ADMIN_USERNAME</code> with default <code>admin</code> and a server-only <code>ADMIN_PASSWORD_HASH</code> encoded as salted PBKDF2-SHA-256 with 600,000 iterations. Keep <code>ADMIN_SECRET</code> only as a migration fallback when no hash is configured, and never store the raw owner password in source or documentation. Preserve the signed eight-hour HttpOnly session and exact same-origin mutation checks. Run the derivation asynchronously and pair the public production login with a per-source platform rate limit so the deliberately short owner-supplied credential is not an unbounded CPU or online-guessing path.</p>
@@ -91,7 +96,7 @@
 <h2>2026-08-08: Production public, previews protected</h2>
 <p>Use the Vercel Authentication boundary <code>preview</code>: the finished production site is public while preview deployments require owner sign-in. This is narrower than disabling deployment protection. The owner explicitly approved the persistent change from all-deployments protection; anonymous production access now returns 200, and the retained preview URL still redirects to Vercel SSO with 302.</p>
 
-      <p class="source">Generated deterministically from <a href="DECISIONS.md">docs/context/DECISIONS.md</a>. Canonical SHA-256: <code>ef8c6fbde18766246f01213f8cbf3e6fa2b5e5e72a7be8fadec2a5d61c9a6d53</code>.</p>
+      <p class="source">Generated deterministically from <a href="DECISIONS.md">docs/context/DECISIONS.md</a>. Canonical SHA-256: <code>c3d7123fd4041b32ad02dba5777d1aa31a0456182f421844d9feb2f38350ab81</code>.</p>
     </main>
   </body>
 </html>

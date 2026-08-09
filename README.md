@@ -31,9 +31,9 @@ The owner also supplied the dated `premier-league-players-2026-08-08/` roster sn
 
 - `/` presents the three-stage table, spotlight-pick, and final-review journey, followed by receipt confirmation.
 - `/leaderboard` shows table points only, with a maximum of 100. Before reveal, totals remain 0 and spotlight picks stay private. After scoring starts, each card shows the table score and the champion's current position.
-- `/spotlight` tracks the seven predictions for fun. Users can sort by overall available accuracy or one category. Its labelled test run shows real player portraits, the silhouette fallback, and club crests.
+- `/spotlight` tracks the seven predictions for fun. Users can sort by overall available accuracy or one category. Before reveal it publishes only the complete-bracket count; real picks and accuracy ordering stay private.
 - `/entries/[id]` is private to the receipt browser or administrator before reveal, then becomes the public club-by-club comparison.
-- `/rules` explains the table tiers, seven spotlight categories, ranking formulas, privacy boundary, and current data status.
+- `/rules` opens with a three-step how-to-play walkthrough using annotated 390 × 844 screenshots captured from the live mobile site, then explains the table tiers, seven spotlight categories, ranking formulas, privacy boundary, and current data status.
 - `/admin` provides owner-only settings, submission deletion, manual standings, import history, and final-table controls.
 - `/api/automation/standings` accepts a source-neutral, bearer-authenticated snapshot or failure record. It never fetches a football-data service itself.
 
@@ -54,11 +54,11 @@ Table scoring is mutually exclusive for each club: 5 points exact, 3 within thre
 
 Underdog-team and overrated-team rankings use submitted tables and the active standings. For example, an average prediction of 2.4 and actual position 10 gives an underdog index of `-7.6`. The overrated index is `+7.6`. Full precision determines rank. A future owner-run Codex automation will enter the other five reviewed outcomes manually. No table receives points before the verified Gameweek 1 opener. A table snapshot from before kickoff remains inactive afterward.
 
-Submissions close no later than Arsenal v Coventry City's opening kickoff at `2026-08-21T19:00:00.000Z` (20:00 BST on Friday 21 August 2026). That season-scoped instant is persisted in PostgreSQL. An owner deadline may close entries earlier but cannot extend the ceiling. Public access uses the database clock, and the guarded insert acquires the season-row lock before rechecking PostgreSQL's live wall clock so a request blocked across kickoff is rejected.
+Submissions close no later than Arsenal v Coventry City's opening kickoff at `2026-08-21T19:00:00.000Z` (20:00 BST on Friday 21 August 2026). That season-scoped instant is persisted in PostgreSQL. An owner deadline may close entries earlier but cannot extend the ceiling. A compact calendar-flip countdown beside the open-submissions status begins from the server's database-time reading; it is presentation only. The guarded insert still acquires the season-row lock before rechecking PostgreSQL's live wall clock, so a stale page or request blocked across kickoff cannot submit late.
 
 ## Mobile-first interaction
 
-The prediction and manual-standings lists are single-column and have no horizontal overflow at narrow widths. Each row has a dedicated 56 by 56 pixel move handle; `touch-action: none` is limited to the handle so the rest of the page still scrolls naturally. The same handle supports pointer dragging and direct Arrow Up/Arrow Down reordering with live screen-reader announcements. Position numbers update immediately, the top/bottom-half boundary is visible, focus states are explicit, reduced-motion preferences are respected, and the review action remains reachable above the mobile safe area.
+The prediction and manual-standings lists are single-column and have no horizontal overflow at narrow widths. Each row has a dedicated 56 by 56 pixel move handle; `touch-action: none` is limited to the handle so the rest of the page still scrolls naturally. The same handle supports pointer dragging and direct Arrow Up/Arrow Down reordering with live screen-reader announcements. Position numbers update immediately, the top/bottom-half boundary is visible, focus states are explicit, reduced-motion preferences are respected, and the review action remains reachable above the mobile safe area. The how-to cards use horizontal snap scrolling on phones and a three-column layout on wide screens; numbered overlay pins have matching text callouts so the screenshot annotations are not colour- or vision-dependent.
 
 ## Architecture
 
@@ -248,7 +248,7 @@ The application intentionally has one code-selected active season.
 - Club marks use the 20 owner-provided local PNG badges. Names and marks remain their respective owners' property; the repository records the project owner's direction to use this exact set, not a broader licence for other league or club artwork. The original monograms remain rollback-only during the first PNG release.
 - Standings are manual or accepted through the authenticated canonical importer. There is no built-in provider fetch, sync-now source client, scheduled job, or live-data guarantee.
 - The owner-provided 2026-08-08 snapshot supplies 587 player options and 580 local portraits. Seven catalogued players use the generic silhouette, and Other player remains available for unavailable or newly added players.
-- Only underdog-team and overrated-team outcomes are currently derivable. A future owner-run Codex automation will enter the other five reviewed result lists manually. The visible spotlight test run is illustrative and never affects real entries.
+- Only underdog-team and overrated-team outcomes are currently derivable. A future owner-run Codex automation will enter the other five reviewed result lists manually. The former Alex/Jordan spotlight cards were hard-coded presentation fixtures, not stored submissions; they were retired so `/spotlight` now represents only complete real entries.
 - Participants have no accounts and cannot edit an entry. The administrator can delete an erroneous parent entry, cascading through all 20 table rows and seven spotlight picks so it can be resubmitted.
 - The opening fixture is reviewed static season data, not a live schedule feed. Because Premier League fixtures can change, the owner must update both the canonical UTC fixture metadata and the persisted season row through a reviewed forward migration before the existing cutoff if the opener moves. A constant-only deploy does not change the database-enforced instant.
 - Season rollover currently requires a reviewed code and seed update.

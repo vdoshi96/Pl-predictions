@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="canonical-source" content="STATUS.md" />
-    <meta name="canonical-source-sha256" content="31fda68e00749511347ee9778c3b20e47ea491928582329172b4806bb2e48465" />
+    <meta name="canonical-source-sha256" content="e25a05040906c9cd3d7bc7f71b39ae7e944411b42ac11d3be95fbb912fbf14e9" />
     <title>Status</title>
     <style>
       :root { color-scheme: light dark; font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
@@ -60,12 +60,12 @@
 <li>Local verification: the current feature revision passed uninterrupted <code>CI=1 npm run check</code>, including 148 default tests with 10 guarded skips, all 10 isolated Neon integration cases, the Webpack production build, five pre-kickoff browser journeys with 20 intentional routing skips, and three post-kickoff journeys with two intentional skips. The catalogue check proved 587 players, 580 portraits, and seven fallbacks.</li>
 <li>Production verification: the exact deployment passed 5 of 5 read-only projects across desktop Chromium, mobile Chromium at 390 pixels, exact 320/430-pixel reflow, and mobile WebKit. All seven available demo portraits and Alysson&#39;s silhouette rendered. The exact-deployment error and HTTP 500 log queries returned no records. No production write ran for this presentation-only iteration.</li>
 <li>Mobile evidence: only the newest prediction, review, spotlight-accuracy, and administrator-login screenshots are retained. All four were refreshed at 390 by 844 pixels and visually inspected.</li>
-<li>Access boundary: the stable public alias is available anonymously, while retained preview protection remains separate. GitHub still reports <code>agent/build-pl-predictions</code> as the configured default branch. The current fine-grained token lacks repository Administration permission, so changing the default to <code>main</code> remains blocked on a token limited to this repository with Administration read and write.</li>
+<li>Access boundary: the stable public alias is available anonymously, while retained preview protection remains separate. GitHub reports <code>main</code> as the configured default branch. The fully merged legacy <code>agent/build-pl-predictions</code> remote branch is deleted, and local <code>origin/HEAD</code> points to <code>main</code>.</li>
 <li>Brand and assets: the original Dranx identity and palette remain. The owner-provided 20 local PNG club crests are canonical team marks, the original monograms remain rollback-only, and no Premier League logo/lion/ball asset is used. Player portraits are local reviewed selector assets with the generic silhouette fallback.</li>
-<li>Documentation and repository closeout: canonical Markdown and generated HTML record the score split, live WAF, exact production deployment, read-only smoke, and retained mobile evidence. PR #10 is merged, local and remote <code>main</code> are synchronized, and the closeout branch is removed after its final evidence merge. Raw owner handoff folders remain untouched and untracked.</li>
+<li>Documentation and repository closeout: canonical Markdown and generated HTML record the score split, live WAF, exact production deployment, read-only smoke, retained mobile evidence, and completed GitHub default-branch repair. Local and remote <code>main</code> are synchronized, the legacy remote branch is deleted, and only the primary worktree remains. Raw owner handoff folders remain untouched and untracked.</li>
 </ul>
 
-      <p class="source">Generated deterministically from <a href="STATUS.md">docs/context/STATUS.md</a>. Canonical SHA-256: <code>31fda68e00749511347ee9778c3b20e47ea491928582329172b4806bb2e48465</code>.</p>
+      <p class="source">Generated deterministically from <a href="STATUS.md">docs/context/STATUS.md</a>. Canonical SHA-256: <code>e25a05040906c9cd3d7bc7f71b39ae7e944411b42ac11d3be95fbb912fbf14e9</code>.</p>
     </main>
   </body>
 </html>

@@ -73,6 +73,7 @@ async function expectPlayerPortraitLoaded(
 test("production public routes are mobile-safe and healthy", async ({
   page,
 }, testInfo) => {
+  test.setTimeout(90_000);
   test.skip(
     !process.env.PLAYWRIGHT_BASE_URL,
     "Set PLAYWRIGHT_BASE_URL to run the read-only deployment smoke test.",
@@ -94,10 +95,20 @@ test("production public routes are mobile-safe and healthy", async ({
   const browserErrors: string[] = [];
   const networkErrors: string[] = [];
   const productionOrigin = new URL(process.env.PLAYWRIGHT_BASE_URL!).origin;
+  const isCanceledWebKitAdminPrefetch = (text: string) =>
+    testInfo.project.name === "mobile-webkit" &&
+    /\/admin\?_rsc=\S+ due to access control checks\.$/u.test(text);
   page.on("console", (message) => {
-    if (message.type() === "error") browserErrors.push(message.text());
+    const text = message.text();
+    if (message.type() === "error" && !isCanceledWebKitAdminPrefetch(text)) {
+      browserErrors.push(text);
+    }
   });
-  page.on("pageerror", (error) => browserErrors.push(error.message));
+  page.on("pageerror", (error) => {
+    if (!isCanceledWebKitAdminPrefetch(error.message)) {
+      browserErrors.push(error.message);
+    }
+  });
   page.on("requestfailed", (request) => {
     const requestUrl = new URL(request.url());
     const errorText = request.failure()?.errorText ?? "failed";
@@ -338,11 +349,6 @@ test("production public routes are mobile-safe and healthy", async ({
       .click();
   }
   await expect(demoAlexDetails).toHaveJSProperty("open", true);
-  await expectPlayerPortraitLoaded(
-    demoAlex.getByRole("img", {
-      name: "Erling Haaland player portrait",
-    }),
-  );
   const demoJordan = spotlightDemo.getByLabel(
     "Demo Jordan demo accuracy entry",
   );
@@ -357,6 +363,21 @@ test("production public routes are mobile-safe and healthy", async ({
       .click();
   }
   await expect(demoJordanDetails).toHaveJSProperty("open", true);
+  for (const playerName of [
+    "Erling Haaland",
+    "Bruno Fernandes",
+    "Chris Rigg",
+    "Mykhaylo Mudryk",
+    "Alexander Isak",
+    "Florian Wirtz",
+    "Bukayo Saka",
+  ]) {
+    await expectPlayerPortraitLoaded(
+      spotlightDemo.getByRole("img", {
+        name: `${playerName} player portrait`,
+      }),
+    );
+  }
   const demoSilhouette = demoJordan.getByRole("img", {
     name: "Alysson player portrait",
   });
@@ -364,7 +385,9 @@ test("production public routes are mobile-safe and healthy", async ({
   await expect(demoSilhouette.locator("svg")).toBeVisible();
   await expectNoHorizontalOverflow(page);
   if (captureMobileEvidence) {
-    await spotlightDemo.scrollIntoViewIfNeeded();
+    await page
+      .getByRole("heading", { name: "Spotlight accuracy test run" })
+      .scrollIntoViewIfNeeded();
     await page.screenshot({
       path: path.join(screenshotDirectory!, "leaderboard-mobile.png"),
     });

@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="canonical-source" content="LOG.md" />
-    <meta name="canonical-source-sha256" content="5dd8f96cda13cad08203b8f16bc3ca13117ba5af6f1095925950656fc9a92045" />
+    <meta name="canonical-source-sha256" content="8d91d40f34088454c2147b41ce1db8760ef5db2c0cae152285fcecc244d6d585" />
     <title>Session log</title>
     <style>
       :root { color-scheme: light dark; font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
@@ -165,18 +165,21 @@
 <li>Left the administrator-login WAF in its live log-only state for verification; the final metrics query recorded exactly four intended bounded-login <code>POST</code> requests. Prepared a per-IP rate limit of 10 requests per 60 seconds with HTTP 429 on excess requests, but did not publish it because owner publication remains required. The staged rule is not live.</li>
 <li>Regenerated and checked all HTML peers, published the final evidence through working <code>main</code>, synchronized local and remote <code>main</code>, removed completed branch state, and retained one primary worktree. The self-referential final evidence merge SHA is intentionally not pinned in this durable end-state note.</li>
 </ul>
-<h3>Table-only leaderboard and spotlight accuracy iteration (locally verified; release pending)</h3>
+<h3>Table-only leaderboard and spotlight accuracy iteration (complete)</h3>
 <ul>
 <li>Applied the owner&#39;s scoring clarification: the main leaderboard now uses only table-prediction points and remains capped at 100. Spotlight picks never change that score.</li>
 <li>Added a separate <code>/spotlight</code> page with overall and seven category sorts. With <code>N</code> active nondeleted brackets, a selected subject at outcome rank <code>r</code> earns <code>max(0, N + 1 - r)</code> accuracy points. Pending outcomes are excluded, resolved zero-point outcomes remain available, and equal overall totals share a competition rank.</li>
 <li>Kept the five non-table-derived outcomes pending for a future owner-run Codex automation. The application still has no runtime football API, production scraper, or Vercel Cron.</li>
 <li>Published the approved Vercel WAF rule for <code>POST /admin/login</code>: 10 requests per 60 seconds for each IP, with HTTP 429 for excess requests. Read-back found active version 2 and no draft.</li>
 <li>Passed uninterrupted <code>CI=1 npm run check</code>: 148 default tests with 10 guarded skips, 10 isolated Neon integration cases, the Webpack production build, five pre-kickoff browser journeys with 20 intentional skips, and three post-kickoff journeys with two intentional skips.</li>
-<li>Kept the current production deployment and screenshots labelled as prior-release evidence until this branch is merged and receives a new read-only production smoke. No production write ran for this iteration.</li>
+<li>Merged <a href="https://github.com/vdoshi96/Pl-predictions/pull/10">PR #10</a> into <code>main</code> at exact SHA <code>dc7b91ffd20200b79a51593c15b7dcb92cb493ab</code>. Verified Ready production deployment <code>dpl_3tyxwNSXGwTSuLctieAiJHYB2K9d</code> at <a href="https://pl-predictions-6yyae7a73-vdoshi96s-projects.vercel.app">https://pl-predictions-6yyae7a73-vdoshi96s-projects.vercel.app</a>, then pointed the stable alias to it and read back the exact mapping.</li>
+<li>Strengthened the read-only production smoke to require all seven available demo portraits plus Alysson&#39;s silhouette. Added a narrow Mobile WebKit guard only for its cancelled unauthenticated <code>/admin?_rsc</code> prefetch message and a 90-second project timeout for the full selector journey. The final clean run passed all five browser projects.</li>
+<li>Refreshed and visually inspected the newest 390-by-844 prediction, review, spotlight-accuracy, and administrator-login screenshots. Exact-deployment queries found no error logs or HTTP 500 records in the preceding 30 minutes.</li>
+<li>Kept this presentation-only release read-only in production. No prediction, standings, administrator, schema, seed, or other production-data write ran.</li>
 <li>Audited the GitHub default-branch blocker. The repository account has administrator access, but the active fine-grained token lacks repository Administration permission. Changing the default branch to <code>main</code> requires Administration read and write for this repository; branch deletion also requires Contents read and write.</li>
 </ul>
 
-      <p class="source">Generated deterministically from <a href="LOG.md">docs/context/LOG.md</a>. Canonical SHA-256: <code>5dd8f96cda13cad08203b8f16bc3ca13117ba5af6f1095925950656fc9a92045</code>.</p>
+      <p class="source">Generated deterministically from <a href="LOG.md">docs/context/LOG.md</a>. Canonical SHA-256: <code>8d91d40f34088454c2147b41ce1db8760ef5db2c0cae152285fcecc244d6d585</code>.</p>
     </main>
   </body>
 </html>

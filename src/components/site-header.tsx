@@ -5,6 +5,7 @@ import { BrandMark } from "./brand-mark";
 const navigation = [
   { href: "/", label: "Predict" },
   { href: "/leaderboard", label: "Leaderboard" },
+  { href: "/rules", label: "Rules" },
   { href: "/admin", label: "Admin" },
 ] as const;
 
@@ -31,7 +32,7 @@ export function SiteHeader() {
           aria-label="Primary navigation"
           className="min-w-0 basis-full sm:basis-auto"
         >
-          <ul className="grid grid-cols-3 gap-1 sm:flex sm:items-center sm:justify-end">
+          <ul className="grid grid-cols-4 gap-1 sm:flex sm:items-center sm:justify-end">
             {navigation.map((item) => (
               <li key={item.href} className="min-w-0">
                 <Link

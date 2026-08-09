@@ -5,9 +5,15 @@ import { drizzle } from "drizzle-orm/neon-http";
 
 import { PREMIER_LEAGUE_2026_27_TEAMS } from "../../src/data/teams";
 import { predictions } from "../../src/db/schema";
+import { completeSpotlightPicks } from "./spotlight-helpers";
 
 const reflowProjects = new Set(["reflow-320-chromium", "reflow-430-chromium"]);
 const createdPredictionIds = new Set<string>();
+const privateTeamSentinels = PREMIER_LEAGUE_2026_27_TEAMS.filter((team) =>
+  ["aston-villa", "brighton-and-hove-albion", "tottenham-hotspur"].includes(
+    team.slug,
+  ),
+);
 
 function getQaDb() {
   const connectionString = process.env.DATABASE_URL;
@@ -60,11 +66,18 @@ test("320–430px reflow keeps private identifiers out of HTML and RSC", async (
   await expect(
     page.getByRole("textbox", { name: "Your display name" }),
   ).toHaveValue(participantName);
-  const reviewButton = page.getByRole("button", { name: "Review your 1–20" });
-  await expect(reviewButton).toBeEnabled();
-  await reviewButton.click();
+  const continueButton = page.getByRole("button", {
+    name: "Continue to spotlight picks",
+  });
+  await expect(continueButton).toBeEnabled();
+  await continueButton.click();
+  const customPlayerNames = await completeSpotlightPicks(
+    page,
+    `${uniquePrefix}Private`,
+  );
+  await page.getByRole("button", { name: "Review all predictions" }).click();
   await page
-    .getByRole("dialog", { name: "Check your 1–20" })
+    .getByRole("dialog", { name: "Review every prediction" })
     .getByRole("button", { name: "Submit prediction" })
     .click();
 
@@ -86,9 +99,11 @@ test("320–430px reflow keeps private identifiers out of HTML and RSC", async (
   expect(rawHtml).toContain(participantName);
   expect(rawHtml).toContain("Arsenal");
   expect(rawHtml).not.toContain(predictionId);
-  for (const privateTeam of PREMIER_LEAGUE_2026_27_TEAMS.filter(
-    (team) => team.slug !== "arsenal",
-  )) {
+  for (const customPlayerName of customPlayerNames) {
+    expect(rawHtml).not.toContain(customPlayerName);
+  }
+  expect(privateTeamSentinels).toHaveLength(3);
+  for (const privateTeam of privateTeamSentinels) {
     expect(rawHtml).not.toContain(privateTeam.displayName);
     expect(rawHtml).not.toContain(privateTeam.assetPath);
   }
@@ -102,9 +117,10 @@ test("320–430px reflow keeps private identifiers out of HTML and RSC", async (
   expect(rawRsc).toContain(participantName);
   expect(rawRsc).toContain("Arsenal");
   expect(rawRsc).not.toContain(predictionId);
-  for (const privateTeam of PREMIER_LEAGUE_2026_27_TEAMS.filter(
-    (team) => team.slug !== "arsenal",
-  )) {
+  for (const customPlayerName of customPlayerNames) {
+    expect(rawRsc).not.toContain(customPlayerName);
+  }
+  for (const privateTeam of privateTeamSentinels) {
     expect(rawRsc).not.toContain(privateTeam.displayName);
     expect(rawRsc).not.toContain(privateTeam.assetPath);
   }
@@ -113,8 +129,11 @@ test("320–430px reflow keeps private identifiers out of HTML and RSC", async (
   await expect(
     page.getByRole("heading", {
       level: 1,
-      name: `${participantName}'s table`,
+      name: `${participantName}'s prediction`,
     }),
+  ).toBeVisible();
+  await expect(
+    page.getByText(customPlayerNames[0]!, { exact: true }),
   ).toBeVisible();
   const entryTable = page.getByRole("list", {
     name: `${participantName}'s predicted table`,

@@ -13,6 +13,7 @@ export interface TeamMarkProps {
   initials?: string | null;
   size?: TeamMarkSize;
   className?: string;
+  decorative?: boolean;
 }
 
 const sizeClasses: Record<TeamMarkSize, string> = {
@@ -46,15 +47,18 @@ function deriveInitials(name: string) {
 
 function MonogramFallback({
   accessibleName,
+  decorative,
   initials,
 }: {
   accessibleName: string;
+  decorative: boolean;
   initials: string;
 }) {
   return (
     <span
-      role="img"
-      aria-label={accessibleName}
+      role={decorative ? undefined : "img"}
+      aria-hidden={decorative || undefined}
+      aria-label={decorative ? undefined : accessibleName}
       className="bg-brand flex size-full items-center justify-center overflow-hidden rounded-[0.7rem] font-black tracking-tight text-white"
     >
       {initials}
@@ -68,6 +72,7 @@ export function TeamMark({
   initials,
   size = "md",
   className,
+  decorative = false,
 }: TeamMarkProps) {
   const [failedSource, setFailedSource] = useState<string | null>(null);
   const initialsCandidate = initials?.trim();
@@ -89,7 +94,7 @@ export function TeamMark({
       {showImage && src ? (
         <Image
           src={src}
-          alt={accessibleName}
+          alt={decorative ? "" : accessibleName}
           width={pixelSizes[size]}
           height={pixelSizes[size]}
           className="size-full object-contain p-0.5"
@@ -97,7 +102,8 @@ export function TeamMark({
         />
       ) : (
         <MonogramFallback
-          accessibleName={`${name} initials`}
+          accessibleName={decorative ? "" : `${name} initials`}
+          decorative={decorative}
           initials={resolvedInitials}
         />
       )}

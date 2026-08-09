@@ -12,13 +12,21 @@ import { insertPredictionAtomically } from "./atomic-insert";
 import { normalizedParticipantNameKey } from "./normalization";
 import { createReceiptToken, hashReceiptToken } from "./receipt";
 import {
+  createPredictionCategoryPicksSchema,
   createPredictionItemsSchema,
   participantNameSchema,
 } from "./validation";
 
-function inputSchema(activeTeamIds: readonly string[]) {
+function inputSchema(
+  activeTeamIds: readonly string[],
+  activePlayerIds: readonly string[],
+) {
   return z
     .object({
+      categoryPicks: createPredictionCategoryPicksSchema(
+        activeTeamIds,
+        activePlayerIds,
+      ),
       honeypot: z.string().max(200).default(""),
       items: createPredictionItemsSchema(activeTeamIds),
       participantName: participantNameSchema,
@@ -53,7 +61,7 @@ export async function createPrediction(
   input: unknown,
   now?: Date,
 ): Promise<CreatedPrediction> {
-  const { databaseNow, season, teams } = await getActiveSeasonView();
+  const { databaseNow, players, season, teams } = await getActiveSeasonView();
   const access = getSeasonAccess(
     {
       openingKickoff: season.openingKickoff,
@@ -71,7 +79,10 @@ export async function createPrediction(
     );
   }
 
-  const parsed = inputSchema(teams.map((team) => team.id)).safeParse(input);
+  const parsed = inputSchema(
+    teams.map((team) => team.id),
+    players.map((player) => player.id),
+  ).safeParse(input);
   if (!parsed.success) {
     throw new PublicError(
       "BAD_REQUEST",
@@ -95,6 +106,7 @@ export async function createPrediction(
 
   try {
     const inserted = await insertPredictionAtomically(db, {
+      categoryPicks: parsed.data.categoryPicks,
       id: predictionId,
       items: parsed.data.items,
       normalizedParticipantName: normalizedName,

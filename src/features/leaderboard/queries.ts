@@ -4,6 +4,7 @@ import { and, asc, eq, inArray } from "drizzle-orm";
 
 import { getDb } from "@/db/client";
 import {
+  predictionCategoryPicks,
   predictionItems,
   predictions,
   standingsItems,
@@ -11,7 +12,10 @@ import {
 } from "@/db/schema";
 import {
   assignSharedRanks,
+  calculateTeamExpectationIndexes,
   isStandingsScoringActive,
+  rankTeamExpectationIndexes,
+  scoreCategoryRank,
   scorePredictionIfActive,
   type RankedLeaderboardEntry,
 } from "@/features/scoring";
@@ -19,6 +23,8 @@ import { hasSeasonStarted } from "@/features/seasons/deadline";
 import { getSeasonAccess } from "@/shared/policy";
 
 import { getActiveSeasonView } from "../seasons/queries";
+import { getSpotlightPicksByPredictionId } from "./pick-queries";
+import type { SpotlightPickDisplay } from "./spotlight-pick-grid";
 
 export type LeaderboardChampion = {
   actualPosition: number | null;
@@ -33,6 +39,7 @@ export type LeaderboardRosterEntry = {
   id: string | null;
   participantName: string;
   publicKey: string;
+  spotlightPicks: SpotlightPickDisplay[] | null;
   totalScore: 0;
 };
 
@@ -43,6 +50,9 @@ export type ScoredLeaderboardEntry = RankedLeaderboardEntry<{
   exactCount: number;
   id: string;
   participantName: string;
+  spotlightPicks: SpotlightPickDisplay[];
+  spotlightScore: number;
+  tableScore: number;
   totalScore: number;
   withinThreeCount: number;
 }>;
@@ -65,6 +75,12 @@ const nameCollator = new Intl.Collator("en-GB", {
   numeric: true,
   sensitivity: "base",
 });
+
+function formatExpectationIndex(value: number): string {
+  const rounded = Math.round(value * 10) / 10;
+  const normalized = Object.is(rounded, -0) ? 0 : rounded;
+  return `Index ${normalized > 0 ? "+" : ""}${normalized.toFixed(1)}`;
+}
 
 export async function getLeaderboardView(): Promise<LeaderboardView> {
   const {
@@ -138,6 +154,7 @@ export async function getLeaderboardView(): Promise<LeaderboardView> {
       id: access.predictionsRevealed ? entry.id : null,
       participantName: entry.participantName,
       publicKey: entry.publicKey,
+      spotlightPicks: null,
       totalScore: 0,
     };
   });
@@ -152,9 +169,18 @@ export async function getLeaderboardView(): Promise<LeaderboardView> {
     };
   }
 
+  const spotlightPicksByPredictionId = await getSpotlightPicksByPredictionId(
+    entryRows.map((entry) => entry.id),
+  );
+  const revealedEntries = entries.map((entry, index) => ({
+    ...entry,
+    spotlightPicks:
+      spotlightPicksByPredictionId.get(entryRows[index]?.id ?? "") ?? [],
+  }));
+
   if (!season.activeSnapshotId) {
     return {
-      entries,
+      entries: revealedEntries,
       predictionsRevealed: true,
       scoredEntries: null,
       seasonStarted: access.seasonStarted,
@@ -170,7 +196,7 @@ export async function getLeaderboardView(): Promise<LeaderboardView> {
 
   if (!snapshot) {
     return {
-      entries,
+      entries: revealedEntries,
       predictionsRevealed: true,
       scoredEntries: null,
       seasonStarted: access.seasonStarted,
@@ -197,7 +223,7 @@ export async function getLeaderboardView(): Promise<LeaderboardView> {
 
   if (entryRows.length === 0) {
     return {
-      entries,
+      entries: revealedEntries,
       predictionsRevealed: true,
       scoredEntries:
         access.seasonStarted &&
@@ -234,6 +260,72 @@ export async function getLeaderboardView(): Promise<LeaderboardView> {
     itemsByPrediction.set(item.predictionId, group);
   }
 
+  const teamSpotlightRows = await db
+    .select({
+      category: predictionCategoryPicks.category,
+      predictionId: predictionCategoryPicks.predictionId,
+      teamId: predictionCategoryPicks.teamId,
+    })
+    .from(predictionCategoryPicks)
+    .where(
+      and(
+        inArray(
+          predictionCategoryPicks.predictionId,
+          entryRows.map((entry) => entry.id),
+        ),
+        inArray(predictionCategoryPicks.category, [
+          "underdog_team",
+          "overrated_team",
+        ]),
+      ),
+    );
+
+  const scoringWindowOpen =
+    access.seasonStarted && snapshotObservedAfterKickoff;
+  const scoringActive =
+    scoringWindowOpen && isStandingsScoringActive(actualTable);
+  const expectationIndexes = scoringActive
+    ? calculateTeamExpectationIndexes(
+        entryRows.map((entry) => itemsByPrediction.get(entry.id) ?? []),
+        actualTable,
+      )
+    : [];
+  const underdogResultByTeamId = new Map(
+    rankTeamExpectationIndexes(expectationIndexes, "underdog").map((item) => [
+      item.teamId,
+      { index: item.underdogIndex, rank: item.rank },
+    ]),
+  );
+  const overratedResultByTeamId = new Map(
+    rankTeamExpectationIndexes(expectationIndexes, "overrated").map((item) => [
+      item.teamId,
+      { index: item.overratedIndex, rank: item.rank },
+    ]),
+  );
+  const rankedTeamPicksByPredictionId = new Map<
+    string,
+    Map<string, { metricLabel: string; points: number; rank: number }>
+  >();
+
+  for (const pick of teamSpotlightRows) {
+    if (!pick.teamId) continue;
+    const result =
+      pick.category === "underdog_team"
+        ? underdogResultByTeamId.get(pick.teamId)
+        : pick.category === "overrated_team"
+          ? overratedResultByTeamId.get(pick.teamId)
+          : undefined;
+    if (!result) continue;
+    const byCategory =
+      rankedTeamPicksByPredictionId.get(pick.predictionId) ?? new Map();
+    byCategory.set(pick.category, {
+      metricLabel: formatExpectationIndex(result.index),
+      points: scoreCategoryRank(result.rank),
+      rank: result.rank,
+    });
+    rankedTeamPicksByPredictionId.set(pick.predictionId, byCategory);
+  }
+
   const actualPositionByTeamId = new Map(
     actualTable.map((item) => [item.teamId, item.actualPosition] as const),
   );
@@ -241,7 +333,7 @@ export async function getLeaderboardView(): Promise<LeaderboardView> {
     const state = scorePredictionIfActive(
       itemsByPrediction.get(entry.id) ?? [],
       actualTable,
-      access.seasonStarted && snapshotObservedAfterKickoff,
+      scoringWindowOpen,
     );
 
     if (state.status === "not-started") return null;
@@ -255,6 +347,18 @@ export async function getLeaderboardView(): Promise<LeaderboardView> {
       throw new Error("The champion pick must exist in the active standings.");
     }
 
+    const rankedTeamPicks = rankedTeamPicksByPredictionId.get(entry.id);
+    const spotlightPicks = (
+      spotlightPicksByPredictionId.get(entry.id) ?? []
+    ).map((pick) => {
+      const result = rankedTeamPicks?.get(pick.category);
+      return result ? { ...pick, ...result } : pick;
+    });
+    const spotlightScore = spotlightPicks.reduce(
+      (total, pick) => total + (pick.points ?? 0),
+      0,
+    );
+
     return {
       champion: {
         actualPosition,
@@ -267,13 +371,16 @@ export async function getLeaderboardView(): Promise<LeaderboardView> {
       exactCount: state.summary.exactCount,
       id: entry.id,
       participantName: entry.participantName,
-      totalScore: state.summary.total,
+      spotlightPicks,
+      spotlightScore,
+      tableScore: state.summary.total,
+      totalScore: state.summary.total + spotlightScore,
       withinThreeCount: state.summary.withinThreeCount,
     };
   });
 
   return {
-    entries,
+    entries: revealedEntries,
     predictionsRevealed: true,
     scoredEntries: scored.some((entry) => entry === null)
       ? null

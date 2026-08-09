@@ -10,6 +10,7 @@ import {
   standingsImportRuns,
   standingsSnapshots,
 } from "../../src/db/schema";
+import { completeSpotlightPicks } from "./spotlight-helpers";
 
 const qaName = `Mobile QA ${Date.now().toString().slice(-8)}`;
 let qaEntryId: string | null = null;
@@ -318,6 +319,13 @@ test("desktop public routes render the complete league without overflow", async 
     page.getByRole("heading", { level: 1, name: "Dranx Prediction League" }),
   ).toBeVisible();
   await expectNoHorizontalOverflow(page);
+
+  await page.goto("/rules");
+  await expect(
+    page.getByRole("heading", { level: 1, name: "Rules and scoring" }),
+  ).toBeVisible();
+  await expect(page.getByRole("heading", { level: 3 })).toHaveCount(7);
+  await expectNoHorizontalOverflow(page);
 });
 
 test("mobile journey preserves privacy and gives the owner full control", async ({
@@ -330,10 +338,11 @@ test("mobile journey preserves privacy and gives the owner full control", async 
   );
   test.setTimeout(120_000);
 
-  const adminSecret = process.env.ADMIN_SECRET;
+  const adminSecret =
+    process.env.PLAYWRIGHT_ADMIN_PASSWORD ?? process.env.ADMIN_SECRET;
   expect(
     adminSecret,
-    "ADMIN_SECRET must be loaded from .env.local",
+    "PLAYWRIGHT_ADMIN_PASSWORD or ADMIN_SECRET must be available for E2E",
   ).toBeTruthy();
 
   qaStartedAt = new Date(Date.now() - 1_000);
@@ -388,21 +397,28 @@ test("mobile journey preserves privacy and gives the owner full control", async 
     ),
   ).toBe("none");
 
-  const secondHandle = page.getByRole("button", { name: /^Move Aston Villa,/ });
+  const touchTarget = page.getByRole("button", {
+    name: /^Move AFC Bournemouth,/,
+  });
   if (testInfo.project.name === "mobile-chromium") {
-    await dragWithChromiumTouch(page, firstHandle, secondHandle);
+    await dragWithChromiumTouch(page, firstHandle, touchTarget);
+    if (
+      (await table.getByRole("listitem").first().getAttribute("aria-label")) ===
+      "Arsenal, predicted position 1 of 20"
+    ) {
+      await dragWithChromiumTouch(page, firstHandle, touchTarget);
+    }
   } else {
-    await dragWithWebKitTouch(page, firstHandle, secondHandle);
+    await dragWithWebKitTouch(page, firstHandle, touchTarget);
   }
-  await expect(table.getByRole("listitem").first()).toHaveAttribute(
+  await expect(table.getByRole("listitem").first()).not.toHaveAttribute(
     "aria-label",
-    /^Aston Villa, predicted position 1 of 20$/,
+    /^Arsenal, predicted position 1 of 20$/,
   );
 
-  // A real pointer can resolve to either adjacent insertion boundary as rows
-  // move beneath it, so keep touch proof independent from the exact scoring
-  // fixture. Reset, then use the deterministic keyboard path to place Arsenal
-  // second before submitting.
+  // A real pointer can resolve to nearby insertion boundaries as rows move
+  // beneath it, so keep touch proof independent from the exact scoring fixture.
+  // Reset, then use the deterministic keyboard path before submitting.
   await page
     .getByRole("button", {
       name: "Reset prediction table to alphabetical order",
@@ -424,9 +440,19 @@ test("mobile journey preserves privacy and gives the owner full control", async 
   );
 
   await page.getByRole("textbox", { name: "Your display name" }).fill(qaName);
-  await page.getByRole("button", { name: "Review your 1–20" }).click();
-  const review = page.getByRole("dialog", { name: "Check your 1–20" });
+  await page
+    .getByRole("button", { name: "Continue to spotlight picks" })
+    .click();
+  await expect(
+    page.getByRole("heading", { name: "Make your spotlight picks" }),
+  ).toBeVisible();
+  const customPlayerNames = await completeSpotlightPicks(page, qaName);
+  await page.getByRole("button", { name: "Review all predictions" }).click();
+  const review = page.getByRole("dialog", {
+    name: "Review every prediction",
+  });
   await expect(review).toBeVisible();
+  await expect(review.locator("[data-category]")).toHaveCount(7);
   await expect(
     review
       .getByRole("list", { name: "Prediction review, positions 1 through 20" })
@@ -446,7 +472,10 @@ test("mobile journey preserves privacy and gives the owner full control", async 
 
   await confirmationLink.click();
   await expect(
-    page.getByRole("heading", { level: 1, name: `${qaName}'s table` }),
+    page.getByRole("heading", { level: 1, name: `${qaName}'s prediction` }),
+  ).toBeVisible();
+  await expect(
+    page.getByText(customPlayerNames[0]!, { exact: true }),
   ).toBeVisible();
   await expect(
     page.getByText("Only this browser can see the table"),
@@ -480,10 +509,16 @@ test("mobile journey preserves privacy and gives the owner full control", async 
   ).toBeVisible();
   await expect(preseasonEntry.getByText("0", { exact: true })).toBeVisible();
   await expect(preseasonEntry.getByText(/track/u)).toHaveCount(0);
+  for (const customPlayerName of customPlayerNames) {
+    await expect(
+      preseasonEntry.getByText(customPlayerName, { exact: true }),
+    ).toHaveCount(0);
+  }
   await expectNoHorizontalOverflow(page);
 
   await page.goto("/admin/login");
-  await page.getByLabel("Admin secret").fill(adminSecret!);
+  await page.getByLabel("Username").fill("admin");
+  await page.getByLabel("Password").fill(adminSecret!);
   await page.getByRole("button", { name: "Sign in securely" }).click();
   await expect(page).toHaveURL(/\/admin$/u);
   await expect(
@@ -583,8 +618,14 @@ test("mobile journey preserves privacy and gives the owner full control", async 
   await page.goto("/leaderboard", { waitUntil: "networkidle" });
   await expect(page.getByRole("link", { name: qaName })).toBeVisible();
   const revealedPreseasonEntry = page.getByLabel(`${qaName} leaderboard entry`);
+  await revealedPreseasonEntry
+    .getByText("View 7 spotlight picks · results pending", { exact: true })
+    .click();
   await expect(
-    revealedPreseasonEntry.getByText("Aston Villa", { exact: true }),
+    revealedPreseasonEntry.getByText(customPlayerNames[0]!, { exact: true }),
+  ).toBeVisible();
+  await expect(
+    revealedPreseasonEntry.getByLabel("Predicted champion: Aston Villa"),
   ).toBeVisible();
   await expect(
     revealedPreseasonEntry.getByText("0", { exact: true }),
@@ -594,18 +635,23 @@ test("mobile journey preserves privacy and gives the owner full control", async 
   await expect(page.getByText("Provisional", { exact: true })).toBeVisible();
   await page.getByRole("link", { name: qaName }).click();
   await expect(
-    page.getByRole("heading", { level: 1, name: `${qaName}'s table` }),
+    page.getByRole("heading", { level: 1, name: `${qaName}'s prediction` }),
   ).toBeVisible();
   await expect(page.getByText("96 points", { exact: true })).toHaveCount(0);
   await expect(page.getByText("Not scored")).toHaveCount(20);
   await expectNoHorizontalOverflow(page);
 
   await page.goto("/admin/submissions", { waitUntil: "networkidle" });
-  await expect(page.getByRole("link", { name: qaName })).toBeVisible();
+  const submissionRow = page
+    .getByRole("list", { name: "All submissions" })
+    .getByRole("listitem")
+    .filter({ has: page.getByRole("link", { name: qaName }) });
+  await expect(submissionRow).toHaveCount(1);
+  await expect(submissionRow).toContainText("20 positions · 7 spotlight picks");
   page.once("dialog", (dialog) => dialog.accept());
-  await page.getByRole("button", { name: "Delete entry" }).click();
+  await submissionRow.getByRole("button", { name: "Delete entry" }).click();
   await expect(page.getByRole("status")).toContainText(
-    "Submission and all 20 position rows deleted.",
+    "Entire submission deleted: table, spotlight picks, and receipt.",
   );
   await expect(page.getByRole("link", { name: qaName })).toHaveCount(0);
   const deletionAudits = await getQaDb()

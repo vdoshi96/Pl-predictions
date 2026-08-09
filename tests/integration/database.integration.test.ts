@@ -9,6 +9,8 @@ import { afterEach, describe, expect, it } from "vitest";
 import { ACTIVE_SEASON } from "@/data";
 import { getDb } from "@/db/client";
 import {
+  players,
+  predictionCategoryPicks,
   predictionItems,
   predictions,
   seasons,
@@ -22,6 +24,7 @@ import {
 } from "@/features/predictions/atomic-insert";
 import { normalizedParticipantNameKey } from "@/features/predictions/normalization";
 import { createPrediction } from "@/features/predictions/service";
+import type { ValidatedPredictionCategoryPick } from "@/features/predictions/validation";
 import { resolveIsolatedTestNow } from "@/features/seasons/clock";
 import { PublicError } from "@/shared/errors";
 import { STANDINGS_FUTURE_TIMESTAMP_ERROR_CODE } from "@/features/standings/validation";
@@ -63,6 +66,25 @@ async function activeFixture() {
     .from(teams)
     .where(eq(teams.seasonId, season.id));
   return { activeTeams, db, season };
+}
+
+function categoryPicksFor(
+  activeTeams: Awaited<ReturnType<typeof activeFixture>>["activeTeams"],
+): ValidatedPredictionCategoryPick[] {
+  const [cleanSheetsTeam, underdogTeam, overratedTeam] = activeTeams;
+  if (!cleanSheetsTeam || !underdogTeam || !overratedTeam) {
+    throw new Error("Three seeded teams are required for spotlight picks.");
+  }
+
+  return [
+    { category: "top_scorer", customPlayerName: "Fixture Top Scorer" },
+    { category: "top_assister", customPlayerName: "Fixture Top Assister" },
+    { category: "most_clean_sheets", teamId: cleanSheetsTeam.id },
+    { category: "underdog_team", teamId: underdogTeam.id },
+    { category: "overrated_team", teamId: overratedTeam.id },
+    { category: "underdog_player", customPlayerName: "Fixture Underdog" },
+    { category: "overrated_player", customPlayerName: "Fixture Overrated" },
+  ];
 }
 
 function rememberSeasonSubmissionSettings(
@@ -186,10 +208,11 @@ afterEach(async () => {
 });
 
 describe.runIf(enabled)("Neon integration", () => {
-  it("atomically creates one prediction with exactly 20 rows", async () => {
+  it("atomically creates and cascades one prediction with 20 table rows and 7 spotlight picks", async () => {
     const { activeTeams, db } = await activeFixture();
     const suffix = randomUUID().slice(0, 8);
     const created = await createPrediction({
+      categoryPicks: categoryPicksFor(activeTeams),
       honeypot: "",
       participantName: `QA ${suffix}`,
       items: activeTeams.map((team, index) => ({
@@ -199,11 +222,87 @@ describe.runIf(enabled)("Neon integration", () => {
     });
     createdPredictionIds.add(created.id);
 
-    const [rowCount] = await db
-      .select({ value: count() })
-      .from(predictionItems)
-      .where(eq(predictionItems.predictionId, created.id));
-    expect(rowCount?.value).toBe(20);
+    const [[itemCount], [pickCount]] = await Promise.all([
+      db
+        .select({ value: count() })
+        .from(predictionItems)
+        .where(eq(predictionItems.predictionId, created.id)),
+      db
+        .select({ value: count() })
+        .from(predictionCategoryPicks)
+        .where(eq(predictionCategoryPicks.predictionId, created.id)),
+    ]);
+    expect(itemCount?.value).toBe(20);
+    expect(pickCount?.value).toBe(7);
+
+    await db
+      .delete(predictionCategoryPicks)
+      .where(
+        and(
+          eq(predictionCategoryPicks.predictionId, created.id),
+          eq(predictionCategoryPicks.category, "top_scorer"),
+        ),
+      );
+    await expect(
+      db.insert(predictionCategoryPicks).values({
+        category: "top_scorer",
+        predictionId: created.id,
+      }),
+    ).rejects.toThrow();
+
+    const otherSeasonId = randomUUID();
+    const otherPlayerId = randomUUID();
+    await db.insert(seasons).values({
+      competitionCode: "QA",
+      id: otherSeasonId,
+      name: "Cross-season QA",
+      openingKickoff: new Date("2099-08-01T12:00:00.000Z"),
+      slug: `qa-${suffix}`,
+      startYear: 2099,
+    });
+    try {
+      await expect(
+        db.insert(players).values({
+          displayName: "Wrong-season club player",
+          seasonId: otherSeasonId,
+          slug: "wrong-season-club-player",
+          sortName: "Wrong-season club player",
+          teamId: activeTeams[0]!.id,
+        }),
+      ).rejects.toThrow();
+      await db.insert(players).values({
+        displayName: "Other-season player",
+        id: otherPlayerId,
+        seasonId: otherSeasonId,
+        slug: "other-season-player",
+        sortName: "Other-season player",
+      });
+      await expect(
+        db.insert(predictionCategoryPicks).values({
+          category: "top_scorer",
+          playerId: otherPlayerId,
+          predictionId: created.id,
+        }),
+      ).rejects.toThrow();
+    } finally {
+      await db.delete(seasons).where(eq(seasons.id, otherSeasonId));
+    }
+
+    await db.delete(predictions).where(eq(predictions.id, created.id));
+    createdPredictionIds.delete(created.id);
+
+    const [[remainingItems], [remainingPicks]] = await Promise.all([
+      db
+        .select({ value: count() })
+        .from(predictionItems)
+        .where(eq(predictionItems.predictionId, created.id)),
+      db
+        .select({ value: count() })
+        .from(predictionCategoryPicks)
+        .where(eq(predictionCategoryPicks.predictionId, created.id)),
+    ]);
+    expect(remainingItems?.value).toBe(0);
+    expect(remainingPicks?.value).toBe(0);
   });
 
   it("enforces case-insensitive participant uniqueness in Postgres", async () => {
@@ -214,6 +313,7 @@ describe.runIf(enabled)("Neon integration", () => {
       teamId: team.id,
     }));
     const created = await createPrediction({
+      categoryPicks: categoryPicksFor(activeTeams),
       honeypot: "",
       participantName: `Friend ${suffix}`,
       items,
@@ -222,6 +322,7 @@ describe.runIf(enabled)("Neon integration", () => {
 
     await expect(
       createPrediction({
+        categoryPicks: categoryPicksFor(activeTeams),
         honeypot: "",
         participantName: `  FRIEND   ${suffix.toUpperCase()}  `,
         items,
@@ -252,7 +353,12 @@ describe.runIf(enabled)("Neon integration", () => {
 
     await expect(
       createPrediction(
-        { honeypot: "", items, participantName },
+        {
+          categoryPicks: categoryPicksFor(activeTeams),
+          honeypot: "",
+          items,
+          participantName,
+        },
         new Date("2000-01-01T00:00:00.000Z"),
       ),
     ).rejects.toEqual(
@@ -302,6 +408,7 @@ describe.runIf(enabled)("Neon integration", () => {
 
       let insertSettled = false;
       const insertOutcome = insertPredictionAtomically(db, {
+        categoryPicks: categoryPicksFor(activeTeams),
         id: predictionId,
         items: activeTeams.map((team, index) => ({
           predictedPosition: index + 1,
@@ -330,7 +437,7 @@ describe.runIf(enabled)("Neon integration", () => {
       const outcome = await insertOutcome;
       expect(outcome).toEqual({ status: "fulfilled", value: false });
 
-      const [[predictionCount], [itemCount]] = await Promise.all([
+      const [[predictionCount], [itemCount], [pickCount]] = await Promise.all([
         db
           .select({ value: count() })
           .from(predictions)
@@ -339,9 +446,14 @@ describe.runIf(enabled)("Neon integration", () => {
           .select({ value: count() })
           .from(predictionItems)
           .where(eq(predictionItems.predictionId, predictionId)),
+        db
+          .select({ value: count() })
+          .from(predictionCategoryPicks)
+          .where(eq(predictionCategoryPicks.predictionId, predictionId)),
       ]);
       expect(predictionCount?.value).toBe(0);
       expect(itemCount?.value).toBe(0);
+      expect(pickCount?.value).toBe(0);
     } finally {
       if (transactionOpen) await admin.query("rollback");
       admin.release();
@@ -382,6 +494,7 @@ describe.runIf(enabled)("Neon integration", () => {
         .execute(
           buildAtomicPredictionInsertQuery(
             {
+              categoryPicks: categoryPicksFor(activeTeams),
               id: predictionId,
               items: activeTeams.map((team, index) => ({
                 predictedPosition: index + 1,
@@ -407,7 +520,11 @@ describe.runIf(enabled)("Neon integration", () => {
       await blocker.query("commit");
       transactionOpen = false;
       const result = await insertOutcome;
-      expect(result.rows[0]).toMatchObject({ inserted: false, itemCount: 0 });
+      expect(result.rows[0]).toMatchObject({
+        inserted: false,
+        itemCount: 0,
+        pickCount: 0,
+      });
 
       const [persisted] = await db
         .select({ value: count() })
@@ -437,6 +554,7 @@ describe.runIf(enabled)("Neon integration", () => {
     createdPredictionIds.add(predictionId);
     await expect(
       insertPredictionAtomically(db, {
+        categoryPicks: categoryPicksFor(activeTeams),
         id: predictionId,
         items: activeTeams.map((team, index) => ({
           predictedPosition: index + 1,

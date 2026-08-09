@@ -1,0 +1,5872 @@
+[
+  {
+    "assetPath": "/player-faces/afc_bournemouth_aarons_max.png",
+    "displayName": "Max Aarons",
+    "externalId": 471690,
+    "firstName": "Max",
+    "lastName": "Aarons",
+    "slug": "max-aarons-471690",
+    "sortName": "Aarons, Max",
+    "teamSlug": "afc-bournemouth"
+  },
+  {
+    "assetPath": "/player-faces/afc_bournemouth_adams_tyler.png",
+    "displayName": "Tyler Adams",
+    "externalId": 332705,
+    "firstName": "Tyler",
+    "lastName": "Adams",
+    "slug": "tyler-adams-332705",
+    "sortName": "Adams, Tyler",
+    "teamSlug": "afc-bournemouth"
+  },
+  {
+    "assetPath": "/player-faces/afc_bournemouth_adli_amine.png",
+    "displayName": "Amine Adli",
+    "externalId": 532776,
+    "firstName": "Amine",
+    "lastName": "Adli",
+    "slug": "amine-adli-532776",
+    "sortName": "Adli, Amine",
+    "teamSlug": "afc-bournemouth"
+  },
+  {
+    "assetPath": "/player-faces/afc_bournemouth_akinmboni_matai.png",
+    "displayName": "Matai Akinmboni",
+    "externalId": 994604,
+    "firstName": "Matai",
+    "lastName": "Akinmboni",
+    "slug": "matai-akinmboni-994604",
+    "sortName": "Akinmboni, Matai",
+    "teamSlug": "afc-bournemouth"
+  },
+  {
+    "assetPath": "/player-faces/afc_bournemouth_araujo_julian.png",
+    "displayName": "Julián Araujo",
+    "externalId": 513970,
+    "firstName": "Julián",
+    "lastName": "Araujo",
+    "slug": "julian-araujo-513970",
+    "sortName": "Araujo, Julián",
+    "teamSlug": "afc-bournemouth"
+  },
+  {
+    "assetPath": "/player-faces/afc_bournemouth_brooks_david.png",
+    "displayName": "David Brooks",
+    "externalId": 277033,
+    "firstName": "David",
+    "lastName": "Brooks",
+    "slug": "david-brooks-277033",
+    "sortName": "Brooks, David",
+    "teamSlug": "afc-bournemouth"
+  },
+  {
+    "assetPath": "/player-faces/afc_bournemouth_christie_ryan.png",
+    "displayName": "Ryan Christie",
+    "externalId": 188077,
+    "firstName": "Ryan",
+    "lastName": "Christie",
+    "slug": "ryan-christie-188077",
+    "sortName": "Christie, Ryan",
+    "teamSlug": "afc-bournemouth"
+  },
+  {
+    "assetPath": "/player-faces/afc_bournemouth_cook_lewis.png",
+    "displayName": "Lewis Cook",
+    "externalId": 249089,
+    "firstName": "Lewis",
+    "lastName": "Cook",
+    "slug": "lewis-cook-249089",
+    "sortName": "Cook, Lewis",
+    "teamSlug": "afc-bournemouth"
+  },
+  {
+    "assetPath": "/player-faces/afc_bournemouth_dennis_will.png",
+    "displayName": "Will Dennis",
+    "externalId": 582078,
+    "firstName": "Will",
+    "lastName": "Dennis",
+    "slug": "will-dennis-582078",
+    "sortName": "Dennis, Will",
+    "teamSlug": "afc-bournemouth"
+  },
+  {
+    "assetPath": "/player-faces/afc_bournemouth_diakite_bafode.png",
+    "displayName": "Bafodé Diakité",
+    "externalId": 463605,
+    "firstName": "Bafodé",
+    "lastName": "Diakité",
+    "slug": "bafode-diakite-463605",
+    "sortName": "Diakité, Bafodé",
+    "teamSlug": "afc-bournemouth"
+  },
+  {
+    "assetPath": "/player-faces/afc_bournemouth_x_evanilson.png",
+    "displayName": "Evanilson",
+    "externalId": 711337,
+    "firstName": "Evanilson",
+    "lastName": null,
+    "slug": "evanilson-711337",
+    "sortName": "Evanilson",
+    "teamSlug": "afc-bournemouth"
+  },
+  {
+    "assetPath": "/player-faces/afc_bournemouth_forster_fraser.png",
+    "displayName": "Fraser Forster",
+    "externalId": 52570,
+    "firstName": "Fraser",
+    "lastName": "Forster",
+    "slug": "fraser-forster-52570",
+    "sortName": "Forster, Fraser",
+    "teamSlug": "afc-bournemouth"
+  },
+  {
+    "assetPath": "/player-faces/afc_bournemouth_gannon_doak_ben.png",
+    "displayName": "Ben Gannon-Doak",
+    "externalId": 719673,
+    "firstName": "Ben",
+    "lastName": "Gannon-Doak",
+    "slug": "ben-gannon-doak-719673",
+    "sortName": "Gannon-Doak, Ben",
+    "teamSlug": "afc-bournemouth"
+  },
+  {
+    "assetPath": "/player-faces/afc_bournemouth_hill_james.png",
+    "displayName": "James Hill",
+    "externalId": 611793,
+    "firstName": "James",
+    "lastName": "Hill",
+    "slug": "james-hill-611793",
+    "sortName": "Hill, James",
+    "teamSlug": "afc-bournemouth"
+  },
+  {
+    "assetPath": "/player-faces/afc_bournemouth_jebbison_daniel.png",
+    "displayName": "Daniel Jebbison",
+    "externalId": 746740,
+    "firstName": "Daniel",
+    "lastName": "Jebbison",
+    "slug": "daniel-jebbison-746740",
+    "sortName": "Jebbison, Daniel",
+    "teamSlug": "afc-bournemouth"
+  },
+  {
+    "assetPath": "/player-faces/afc_bournemouth_kluivert_justin.png",
+    "displayName": "Justin Kluivert",
+    "externalId": 330659,
+    "firstName": "Justin",
+    "lastName": "Kluivert",
+    "slug": "justin-kluivert-330659",
+    "sortName": "Kluivert, Justin",
+    "teamSlug": "afc-bournemouth"
+  },
+  {
+    "assetPath": "/player-faces/afc_bournemouth_kroupi_junior.png",
+    "displayName": "Junior Kroupi",
+    "externalId": 955357,
+    "firstName": "Junior",
+    "lastName": "Kroupi",
+    "slug": "junior-kroupi-955357",
+    "sortName": "Kroupi, Junior",
+    "teamSlug": "afc-bournemouth"
+  },
+  {
+    "assetPath": "/player-faces/afc_bournemouth_milosavljevic_veljko.png",
+    "displayName": "Veljko Milosavljevic",
+    "externalId": 989112,
+    "firstName": "Veljko",
+    "lastName": "Milosavljevic",
+    "slug": "veljko-milosavljevic-989112",
+    "sortName": "Milosavljevic, Veljko",
+    "teamSlug": "afc-bournemouth"
+  },
+  {
+    "assetPath": "/player-faces/afc_bournemouth_petrovic_djordje.png",
+    "displayName": "Djordje Petrovic",
+    "externalId": 465555,
+    "firstName": "Djordje",
+    "lastName": "Petrovic",
+    "slug": "djordje-petrovic-465555",
+    "sortName": "Petrovic, Djordje",
+    "teamSlug": "afc-bournemouth"
+  },
+  {
+    "assetPath": "/player-faces/afc_bournemouth_x_rayan.png",
+    "displayName": "Rayan",
+    "externalId": 1012564,
+    "firstName": "Rayan",
+    "lastName": null,
+    "slug": "rayan-1012564",
+    "sortName": "Rayan",
+    "teamSlug": "afc-bournemouth"
+  },
+  {
+    "assetPath": "/player-faces/afc_bournemouth_rodriguez_alvaro.png",
+    "displayName": "Álvaro Rodríguez",
+    "externalId": 948275,
+    "firstName": "Álvaro",
+    "lastName": "Rodríguez",
+    "slug": "alvaro-rodriguez-948275",
+    "sortName": "Rodríguez, Álvaro",
+    "teamSlug": "afc-bournemouth"
+  },
+  {
+    "assetPath": "/player-faces/afc_bournemouth_scott_alex.png",
+    "displayName": "Alex Scott",
+    "externalId": 855256,
+    "firstName": "Alex",
+    "lastName": "Scott",
+    "slug": "alex-scott-855256",
+    "sortName": "Scott, Alex",
+    "teamSlug": "afc-bournemouth"
+  },
+  {
+    "assetPath": "/player-faces/afc_bournemouth_silva_antonio.png",
+    "displayName": "António Silva",
+    "externalId": 650568,
+    "firstName": "António",
+    "lastName": "Silva",
+    "slug": "antonio-silva-650568",
+    "sortName": "Silva, António",
+    "teamSlug": "afc-bournemouth"
+  },
+  {
+    "assetPath": "/player-faces/afc_bournemouth_smith_adam.png",
+    "displayName": "Adam Smith",
+    "externalId": 61841,
+    "firstName": "Adam",
+    "lastName": "Smith",
+    "slug": "adam-smith-61841",
+    "sortName": "Smith, Adam",
+    "teamSlug": "afc-bournemouth"
+  },
+  {
+    "assetPath": "/player-faces/afc_bournemouth_soler_julio.png",
+    "displayName": "Julio Soler",
+    "externalId": 1009658,
+    "firstName": "Julio",
+    "lastName": "Soler",
+    "slug": "julio-soler-1009658",
+    "sortName": "Soler, Julio",
+    "teamSlug": "afc-bournemouth"
+  },
+  {
+    "assetPath": "/player-faces/afc_bournemouth_sanchez_juanlu.png",
+    "displayName": "Juanlu Sánchez",
+    "externalId": 676042,
+    "firstName": "Juanlu",
+    "lastName": "Sánchez",
+    "slug": "juanlu-sanchez-676042",
+    "sortName": "Sánchez, Juanlu",
+    "teamSlug": "afc-bournemouth"
+  },
+  {
+    "assetPath": "/player-faces/afc_bournemouth_tavernier_marcus.png",
+    "displayName": "Marcus Tavernier",
+    "externalId": 399434,
+    "firstName": "Marcus",
+    "lastName": "Tavernier",
+    "slug": "marcus-tavernier-399434",
+    "sortName": "Tavernier, Marcus",
+    "teamSlug": "afc-bournemouth"
+  },
+  {
+    "assetPath": "/player-faces/afc_bournemouth_truffert_adrien.png",
+    "displayName": "Adrien Truffert",
+    "externalId": 654539,
+    "firstName": "Adrien",
+    "lastName": "Truffert",
+    "slug": "adrien-truffert-654539",
+    "sortName": "Truffert, Adrien",
+    "teamSlug": "afc-bournemouth"
+  },
+  {
+    "assetPath": "/player-faces/afc_bournemouth_toth_alex.png",
+    "displayName": "Alex Tóth",
+    "externalId": 998101,
+    "firstName": "Alex",
+    "lastName": "Tóth",
+    "slug": "alex-toth-998101",
+    "sortName": "Tóth, Alex",
+    "teamSlug": "afc-bournemouth"
+  },
+  {
+    "assetPath": "/player-faces/afc_bournemouth_winterburn_ben.png",
+    "displayName": "Ben Winterburn",
+    "externalId": 854721,
+    "firstName": "Ben",
+    "lastName": "Winterburn",
+    "slug": "ben-winterburn-854721",
+    "sortName": "Winterburn, Ben",
+    "teamSlug": "afc-bournemouth"
+  },
+  {
+    "assetPath": "/player-faces/afc_bournemouth_unal_enes.png",
+    "displayName": "Enes Ünal",
+    "externalId": 251106,
+    "firstName": "Enes",
+    "lastName": "Ünal",
+    "slug": "enes-unal-251106",
+    "sortName": "Ünal, Enes",
+    "teamSlug": "afc-bournemouth"
+  },
+  {
+    "assetPath": "/player-faces/fc_arsenal_arrizabalaga_kepa.png",
+    "displayName": "Kepa Arrizabalaga",
+    "externalId": 192279,
+    "firstName": "Kepa",
+    "lastName": "Arrizabalaga",
+    "slug": "kepa-arrizabalaga-192279",
+    "sortName": "Arrizabalaga, Kepa",
+    "teamSlug": "arsenal"
+  },
+  {
+    "assetPath": "/player-faces/fc_arsenal_calafiori_riccardo.png",
+    "displayName": "Riccardo Calafiori",
+    "externalId": 502821,
+    "firstName": "Riccardo",
+    "lastName": "Calafiori",
+    "slug": "riccardo-calafiori-502821",
+    "sortName": "Calafiori, Riccardo",
+    "teamSlug": "arsenal"
+  },
+  {
+    "assetPath": "/player-faces/fc_arsenal_dowman_max.png",
+    "displayName": "Max Dowman",
+    "externalId": 1187629,
+    "firstName": "Max",
+    "lastName": "Dowman",
+    "slug": "max-dowman-1187629",
+    "sortName": "Dowman, Max",
+    "teamSlug": "arsenal"
+  },
+  {
+    "assetPath": "/player-faces/fc_arsenal_eze_eberechi.png",
+    "displayName": "Eberechi Eze",
+    "externalId": 479999,
+    "firstName": "Eberechi",
+    "lastName": "Eze",
+    "slug": "eberechi-eze-479999",
+    "sortName": "Eze, Eberechi",
+    "teamSlug": "arsenal"
+  },
+  {
+    "assetPath": "/player-faces/fc_arsenal_x_gabriel.png",
+    "displayName": "Gabriel",
+    "externalId": 435338,
+    "firstName": "Gabriel",
+    "lastName": null,
+    "slug": "gabriel-435338",
+    "sortName": "Gabriel",
+    "teamSlug": "arsenal"
+  },
+  {
+    "assetPath": "/player-faces/fc_arsenal_guimaraes_bruno.png",
+    "displayName": "Bruno Guimarães",
+    "externalId": 520624,
+    "firstName": "Bruno",
+    "lastName": "Guimarães",
+    "slug": "bruno-guimaraes-520624",
+    "sortName": "Guimarães, Bruno",
+    "teamSlug": "arsenal"
+  },
+  {
+    "assetPath": "/player-faces/fc_arsenal_gyokeres_viktor.png",
+    "displayName": "Viktor Gyökeres",
+    "externalId": 325443,
+    "firstName": "Viktor",
+    "lastName": "Gyökeres",
+    "slug": "viktor-gyokeres-325443",
+    "sortName": "Gyökeres, Viktor",
+    "teamSlug": "arsenal"
+  },
+  {
+    "assetPath": "/player-faces/fc_arsenal_havertz_kai.png",
+    "displayName": "Kai Havertz",
+    "externalId": 309400,
+    "firstName": "Kai",
+    "lastName": "Havertz",
+    "slug": "kai-havertz-309400",
+    "sortName": "Havertz, Kai",
+    "teamSlug": "arsenal"
+  },
+  {
+    "assetPath": "/player-faces/fc_arsenal_hincapie_piero.png",
+    "displayName": "Piero Hincapié",
+    "externalId": 659813,
+    "firstName": "Piero",
+    "lastName": "Hincapié",
+    "slug": "piero-hincapie-659813",
+    "sortName": "Hincapié, Piero",
+    "teamSlug": "arsenal"
+  },
+  {
+    "assetPath": "/player-faces/fc_arsenal_jesus_gabriel.png",
+    "displayName": "Gabriel Jesus",
+    "externalId": 363205,
+    "firstName": "Gabriel",
+    "lastName": "Jesus",
+    "slug": "gabriel-jesus-363205",
+    "sortName": "Jesus, Gabriel",
+    "teamSlug": "arsenal"
+  },
+  {
+    "assetPath": "/player-faces/fc_arsenal_lewis_skelly_myles.png",
+    "displayName": "Myles Lewis-Skelly",
+    "externalId": 890721,
+    "firstName": "Myles",
+    "lastName": "Lewis-Skelly",
+    "slug": "myles-lewis-skelly-890721",
+    "sortName": "Lewis-Skelly, Myles",
+    "teamSlug": "arsenal"
+  },
+  {
+    "assetPath": "/player-faces/fc_arsenal_madueke_noni.png",
+    "displayName": "Noni Madueke",
+    "externalId": 503987,
+    "firstName": "Noni",
+    "lastName": "Madueke",
+    "slug": "noni-madueke-503987",
+    "sortName": "Madueke, Noni",
+    "teamSlug": "arsenal"
+  },
+  {
+    "assetPath": "/player-faces/fc_arsenal_martinelli_gabriel.png",
+    "displayName": "Gabriel Martinelli",
+    "externalId": 655488,
+    "firstName": "Gabriel",
+    "lastName": "Martinelli",
+    "slug": "gabriel-martinelli-655488",
+    "sortName": "Martinelli, Gabriel",
+    "teamSlug": "arsenal"
+  },
+  {
+    "assetPath": "/player-faces/fc_arsenal_merino_mikel.png",
+    "displayName": "Mikel Merino",
+    "externalId": 338424,
+    "firstName": "Mikel",
+    "lastName": "Merino",
+    "slug": "mikel-merino-338424",
+    "sortName": "Merino, Mikel",
+    "teamSlug": "arsenal"
+  },
+  {
+    "assetPath": "/player-faces/fc_arsenal_meslier_illan.png",
+    "displayName": "Illan Meslier",
+    "externalId": 542586,
+    "firstName": "Illan",
+    "lastName": "Meslier",
+    "slug": "illan-meslier-542586",
+    "sortName": "Meslier, Illan",
+    "teamSlug": "arsenal"
+  },
+  {
+    "assetPath": "/player-faces/fc_arsenal_mosquera_cristhian.png",
+    "displayName": "Cristhian Mosquera",
+    "externalId": 646750,
+    "firstName": "Cristhian",
+    "lastName": "Mosquera",
+    "slug": "cristhian-mosquera-646750",
+    "sortName": "Mosquera, Cristhian",
+    "teamSlug": "arsenal"
+  },
+  {
+    "assetPath": "/player-faces/fc_arsenal_nelson_reiss.png",
+    "displayName": "Reiss Nelson",
+    "externalId": 340325,
+    "firstName": "Reiss",
+    "lastName": "Nelson",
+    "slug": "reiss-nelson-340325",
+    "sortName": "Nelson, Reiss",
+    "teamSlug": "arsenal"
+  },
+  {
+    "assetPath": "/player-faces/fc_arsenal_nwaneri_ethan.png",
+    "displayName": "Ethan Nwaneri",
+    "externalId": 890719,
+    "firstName": "Ethan",
+    "lastName": "Nwaneri",
+    "slug": "ethan-nwaneri-890719",
+    "sortName": "Nwaneri, Ethan",
+    "teamSlug": "arsenal"
+  },
+  {
+    "assetPath": "/player-faces/fc_arsenal_raya_david.png",
+    "displayName": "David Raya",
+    "externalId": 262749,
+    "firstName": "David",
+    "lastName": "Raya",
+    "slug": "david-raya-262749",
+    "sortName": "Raya, David",
+    "teamSlug": "arsenal"
+  },
+  {
+    "assetPath": "/player-faces/fc_arsenal_rice_declan.png",
+    "displayName": "Declan Rice",
+    "externalId": 357662,
+    "firstName": "Declan",
+    "lastName": "Rice",
+    "slug": "declan-rice-357662",
+    "sortName": "Rice, Declan",
+    "teamSlug": "arsenal"
+  },
+  {
+    "assetPath": "/player-faces/fc_arsenal_saka_bukayo.png",
+    "displayName": "Bukayo Saka",
+    "externalId": 433177,
+    "firstName": "Bukayo",
+    "lastName": "Saka",
+    "slug": "bukayo-saka-433177",
+    "sortName": "Saka, Bukayo",
+    "teamSlug": "arsenal"
+  },
+  {
+    "assetPath": "/player-faces/fc_arsenal_saliba_william.png",
+    "displayName": "William Saliba",
+    "externalId": 495666,
+    "firstName": "William",
+    "lastName": "Saliba",
+    "slug": "william-saliba-495666",
+    "sortName": "Saliba, William",
+    "teamSlug": "arsenal"
+  },
+  {
+    "assetPath": "/player-faces/fc_arsenal_setford_tommy.png",
+    "displayName": "Tommy Setford",
+    "externalId": 848753,
+    "firstName": "Tommy",
+    "lastName": "Setford",
+    "slug": "tommy-setford-848753",
+    "sortName": "Setford, Tommy",
+    "teamSlug": "arsenal"
+  },
+  {
+    "assetPath": "/player-faces/fc_arsenal_timber_jurrien.png",
+    "displayName": "Jurriën Timber",
+    "externalId": 420243,
+    "firstName": "Jurriën",
+    "lastName": "Timber",
+    "slug": "jurrien-timber-420243",
+    "sortName": "Timber, Jurriën",
+    "teamSlug": "arsenal"
+  },
+  {
+    "assetPath": "/player-faces/fc_arsenal_tzolis_christos.png",
+    "displayName": "Christos Tzolis",
+    "externalId": 451677,
+    "firstName": "Christos",
+    "lastName": "Tzolis",
+    "slug": "christos-tzolis-451677",
+    "sortName": "Tzolis, Christos",
+    "teamSlug": "arsenal"
+  },
+  {
+    "assetPath": "/player-faces/fc_arsenal_vieira_fabio.png",
+    "displayName": "Fábio Vieira",
+    "externalId": 537598,
+    "firstName": "Fábio",
+    "lastName": "Vieira",
+    "slug": "fabio-vieira-537598",
+    "sortName": "Vieira, Fábio",
+    "teamSlug": "arsenal"
+  },
+  {
+    "assetPath": "/player-faces/fc_arsenal_white_ben.png",
+    "displayName": "Ben White",
+    "externalId": 335721,
+    "firstName": "Ben",
+    "lastName": "White",
+    "slug": "ben-white-335721",
+    "sortName": "White, Ben",
+    "teamSlug": "arsenal"
+  },
+  {
+    "assetPath": "/player-faces/fc_arsenal_zubimendi_martin.png",
+    "displayName": "Martín Zubimendi",
+    "externalId": 423440,
+    "firstName": "Martín",
+    "lastName": "Zubimendi",
+    "slug": "martin-zubimendi-423440",
+    "sortName": "Zubimendi, Martín",
+    "teamSlug": "arsenal"
+  },
+  {
+    "assetPath": "/player-faces/fc_arsenal_degaard_martin.png",
+    "displayName": "Martin Ødegaard",
+    "externalId": 316264,
+    "firstName": "Martin",
+    "lastName": "Ødegaard",
+    "slug": "martin-odegaard-316264",
+    "sortName": "Ødegaard, Martin",
+    "teamSlug": "arsenal"
+  },
+  {
+    "assetPath": "/player-faces/aston_villa_abraham_tammy.png",
+    "displayName": "Tammy Abraham",
+    "externalId": 331726,
+    "firstName": "Tammy",
+    "lastName": "Abraham",
+    "slug": "tammy-abraham-331726",
+    "sortName": "Abraham, Tammy",
+    "teamSlug": "aston-villa"
+  },
+  {
+    "assetPath": null,
+    "displayName": "Alysson",
+    "externalId": 1005583,
+    "firstName": "Alysson",
+    "lastName": null,
+    "slug": "alysson-1005583",
+    "sortName": "Alysson",
+    "teamSlug": "aston-villa"
+  },
+  {
+    "assetPath": "/player-faces/aston_villa_bailey_leon.png",
+    "displayName": "Leon Bailey",
+    "externalId": 387626,
+    "firstName": "Leon",
+    "lastName": "Bailey",
+    "slug": "leon-bailey-387626",
+    "sortName": "Bailey, Leon",
+    "teamSlug": "aston-villa"
+  },
+  {
+    "assetPath": "/player-faces/aston_villa_barkley_ross.png",
+    "displayName": "Ross Barkley",
+    "externalId": 131978,
+    "firstName": "Ross",
+    "lastName": "Barkley",
+    "slug": "ross-barkley-131978",
+    "sortName": "Barkley, Ross",
+    "teamSlug": "aston-villa"
+  },
+  {
+    "assetPath": "/player-faces/aston_villa_bizot_marco.png",
+    "displayName": "Marco Bizot",
+    "externalId": 124884,
+    "firstName": "Marco",
+    "lastName": "Bizot",
+    "slug": "marco-bizot-124884",
+    "sortName": "Bizot, Marco",
+    "teamSlug": "aston-villa"
+  },
+  {
+    "assetPath": "/player-faces/aston_villa_bogarde_lamare.png",
+    "displayName": "Lamare Bogarde",
+    "externalId": 645686,
+    "firstName": "Lamare",
+    "lastName": "Bogarde",
+    "slug": "lamare-bogarde-645686",
+    "sortName": "Bogarde, Lamare",
+    "teamSlug": "aston-villa"
+  },
+  {
+    "assetPath": "/player-faces/aston_villa_buendia_emiliano.png",
+    "displayName": "Emiliano Buendía",
+    "externalId": 321247,
+    "firstName": "Emiliano",
+    "lastName": "Buendía",
+    "slug": "emiliano-buendia-321247",
+    "sortName": "Buendía, Emiliano",
+    "teamSlug": "aston-villa"
+  },
+  {
+    "assetPath": "/player-faces/aston_villa_cash_matty.png",
+    "displayName": "Matty Cash",
+    "externalId": 425334,
+    "firstName": "Matty",
+    "lastName": "Cash",
+    "slug": "matty-cash-425334",
+    "sortName": "Cash, Matty",
+    "teamSlug": "aston-villa"
+  },
+  {
+    "assetPath": "/player-faces/aston_villa_digne_lucas.png",
+    "displayName": "Lucas Digne",
+    "externalId": 126664,
+    "firstName": "Lucas",
+    "lastName": "Digne",
+    "slug": "lucas-digne-126664",
+    "sortName": "Digne, Lucas",
+    "teamSlug": "aston-villa"
+  },
+  {
+    "assetPath": "/player-faces/aston_villa_garnacho_alejandro.png",
+    "displayName": "Alejandro Garnacho",
+    "externalId": 811779,
+    "firstName": "Alejandro",
+    "lastName": "Garnacho",
+    "slug": "alejandro-garnacho-811779",
+    "sortName": "Garnacho, Alejandro",
+    "teamSlug": "aston-villa"
+  },
+  {
+    "assetPath": "/player-faces/aston_villa_gomes_joao.png",
+    "displayName": "João Gomes",
+    "externalId": 735570,
+    "firstName": "João",
+    "lastName": "Gomes",
+    "slug": "joao-gomes-735570",
+    "sortName": "Gomes, João",
+    "teamSlug": "aston-villa"
+  },
+  {
+    "assetPath": "/player-faces/aston_villa_guessand_evann.png",
+    "displayName": "Evann Guessand",
+    "externalId": 500689,
+    "firstName": "Evann",
+    "lastName": "Guessand",
+    "slug": "evann-guessand-500689",
+    "sortName": "Guessand, Evann",
+    "teamSlug": "aston-villa"
+  },
+  {
+    "assetPath": "/player-faces/aston_villa_iling_junior_samuel.png",
+    "displayName": "Samuel Iling-Junior",
+    "externalId": 581672,
+    "firstName": "Samuel",
+    "lastName": "Iling-Junior",
+    "slug": "samuel-iling-junior-581672",
+    "sortName": "Iling-Junior, Samuel",
+    "teamSlug": "aston-villa"
+  },
+  {
+    "assetPath": "/player-faces/aston_villa_kamara_boubacar.png",
+    "displayName": "Boubacar Kamara",
+    "externalId": 394327,
+    "firstName": "Boubacar",
+    "lastName": "Kamara",
+    "slug": "boubacar-kamara-394327",
+    "sortName": "Kamara, Boubacar",
+    "teamSlug": "aston-villa"
+  },
+  {
+    "assetPath": "/player-faces/aston_villa_konsa_ezri.png",
+    "displayName": "Ezri Konsa",
+    "externalId": 413403,
+    "firstName": "Ezri",
+    "lastName": "Konsa",
+    "slug": "ezri-konsa-413403",
+    "sortName": "Konsa, Ezri",
+    "teamSlug": "aston-villa"
+  },
+  {
+    "assetPath": "/player-faces/aston_villa_keba_cisse_modou.png",
+    "displayName": "Modou Kéba Cissé",
+    "externalId": 1282860,
+    "firstName": "Modou",
+    "lastName": "Kéba Cissé",
+    "slug": "modou-keba-cisse-1282860",
+    "sortName": "Kéba Cissé, Modou",
+    "teamSlug": "aston-villa"
+  },
+  {
+    "assetPath": "/player-faces/aston_villa_lindelof_victor.png",
+    "displayName": "Victor Lindelöf",
+    "externalId": 184573,
+    "firstName": "Victor",
+    "lastName": "Lindelöf",
+    "slug": "victor-lindelof-184573",
+    "sortName": "Lindelöf, Victor",
+    "teamSlug": "aston-villa"
+  },
+  {
+    "assetPath": "/player-faces/aston_villa_maatsen_ian.png",
+    "displayName": "Ian Maatsen",
+    "externalId": 485585,
+    "firstName": "Ian",
+    "lastName": "Maatsen",
+    "slug": "ian-maatsen-485585",
+    "sortName": "Maatsen, Ian",
+    "teamSlug": "aston-villa"
+  },
+  {
+    "assetPath": "/player-faces/aston_villa_madjo_brian.png",
+    "displayName": "Brian Madjo",
+    "externalId": 1226357,
+    "firstName": "Brian",
+    "lastName": "Madjo",
+    "slug": "brian-madjo-1226357",
+    "sortName": "Madjo, Brian",
+    "teamSlug": "aston-villa"
+  },
+  {
+    "assetPath": "/player-faces/aston_villa_manzambi_johan.png",
+    "displayName": "Johan Manzambi",
+    "externalId": 927353,
+    "firstName": "Johan",
+    "lastName": "Manzambi",
+    "slug": "johan-manzambi-927353",
+    "sortName": "Manzambi, Johan",
+    "teamSlug": "aston-villa"
+  },
+  {
+    "assetPath": "/player-faces/aston_villa_martinez_emiliano.png",
+    "displayName": "Emiliano Martínez",
+    "externalId": 111873,
+    "firstName": "Emiliano",
+    "lastName": "Martínez",
+    "slug": "emiliano-martinez-111873",
+    "sortName": "Martínez, Emiliano",
+    "teamSlug": "aston-villa"
+  },
+  {
+    "assetPath": "/player-faces/aston_villa_mcginn_john.png",
+    "displayName": "John McGinn",
+    "externalId": 193116,
+    "firstName": "John",
+    "lastName": "McGinn",
+    "slug": "john-mcginn-193116",
+    "sortName": "McGinn, John",
+    "teamSlug": "aston-villa"
+  },
+  {
+    "assetPath": "/player-faces/aston_villa_mings_tyrone.png",
+    "displayName": "Tyrone Mings",
+    "externalId": 253677,
+    "firstName": "Tyrone",
+    "lastName": "Mings",
+    "slug": "tyrone-mings-253677",
+    "sortName": "Mings, Tyrone",
+    "teamSlug": "aston-villa"
+  },
+  {
+    "assetPath": "/player-faces/aston_villa_nedeljkovic_kosta.png",
+    "displayName": "Kosta Nedeljkovic",
+    "externalId": 848682,
+    "firstName": "Kosta",
+    "lastName": "Nedeljkovic",
+    "slug": "kosta-nedeljkovic-848682",
+    "sortName": "Nedeljkovic, Kosta",
+    "teamSlug": "aston-villa"
+  },
+  {
+    "assetPath": "/player-faces/aston_villa_onana_amadou.png",
+    "displayName": "Amadou Onana",
+    "externalId": 485706,
+    "firstName": "Amadou",
+    "lastName": "Onana",
+    "slug": "amadou-onana-485706",
+    "sortName": "Onana, Amadou",
+    "teamSlug": "aston-villa"
+  },
+  {
+    "assetPath": "/player-faces/aston_villa_torres_pau.png",
+    "displayName": "Pau Torres",
+    "externalId": 399776,
+    "firstName": "Pau",
+    "lastName": "Torres",
+    "slug": "pau-torres-399776",
+    "sortName": "Torres, Pau",
+    "teamSlug": "aston-villa"
+  },
+  {
+    "assetPath": "/player-faces/aston_villa_watkins_ollie.png",
+    "displayName": "Ollie Watkins",
+    "externalId": 324358,
+    "firstName": "Ollie",
+    "lastName": "Watkins",
+    "slug": "ollie-watkins-324358",
+    "sortName": "Watkins, Ollie",
+    "teamSlug": "aston-villa"
+  },
+  {
+    "assetPath": "/player-faces/fc_brentford_ajer_kristoffer.png",
+    "displayName": "Kristoffer Ajer",
+    "externalId": 328658,
+    "firstName": "Kristoffer",
+    "lastName": "Ajer",
+    "slug": "kristoffer-ajer-328658",
+    "sortName": "Ajer, Kristoffer",
+    "teamSlug": "brentford"
+  },
+  {
+    "assetPath": "/player-faces/fc_brentford_anthony_jaidon.png",
+    "displayName": "Jaidon Anthony",
+    "externalId": 684210,
+    "firstName": "Jaidon",
+    "lastName": "Anthony",
+    "slug": "jaidon-anthony-684210",
+    "sortName": "Anthony, Jaidon",
+    "teamSlug": "brentford"
+  },
+  {
+    "assetPath": "/player-faces/fc_brentford_arthur_benjamin.png",
+    "displayName": "Benjamin Arthur",
+    "externalId": 1144158,
+    "firstName": "Benjamin",
+    "lastName": "Arthur",
+    "slug": "benjamin-arthur-1144158",
+    "sortName": "Arthur, Benjamin",
+    "teamSlug": "brentford"
+  },
+  {
+    "assetPath": "/player-faces/fc_brentford_balcombe_ellery.png",
+    "displayName": "Ellery Balcombe",
+    "externalId": 456292,
+    "firstName": "Ellery",
+    "lastName": "Balcombe",
+    "slug": "ellery-balcombe-456292",
+    "sortName": "Balcombe, Ellery",
+    "teamSlug": "brentford"
+  },
+  {
+    "assetPath": "/player-faces/fc_brentford_carvalho_fabio.png",
+    "displayName": "Fábio Carvalho",
+    "externalId": 559263,
+    "firstName": "Fábio",
+    "lastName": "Carvalho",
+    "slug": "fabio-carvalho-559263",
+    "sortName": "Carvalho, Fábio",
+    "teamSlug": "brentford"
+  },
+  {
+    "assetPath": "/player-faces/fc_brentford_collins_nathan.png",
+    "displayName": "Nathan Collins",
+    "externalId": 469050,
+    "firstName": "Nathan",
+    "lastName": "Collins",
+    "slug": "nathan-collins-469050",
+    "sortName": "Collins, Nathan",
+    "teamSlug": "brentford"
+  },
+  {
+    "assetPath": "/player-faces/fc_brentford_damsgaard_mikkel.png",
+    "displayName": "Mikkel Damsgaard",
+    "externalId": 540941,
+    "firstName": "Mikkel",
+    "lastName": "Damsgaard",
+    "slug": "mikkel-damsgaard-540941",
+    "sortName": "Damsgaard, Mikkel",
+    "teamSlug": "brentford"
+  },
+  {
+    "assetPath": "/player-faces/fc_brentford_dasilva_josh.png",
+    "displayName": "Josh Dasilva",
+    "externalId": 340321,
+    "firstName": "Josh",
+    "lastName": "Dasilva",
+    "slug": "josh-dasilva-340321",
+    "sortName": "Dasilva, Josh",
+    "teamSlug": "brentford"
+  },
+  {
+    "assetPath": "/player-faces/fc_brentford_eyestone_julian.png",
+    "displayName": "Julian Eyestone",
+    "externalId": 1008553,
+    "firstName": "Julian",
+    "lastName": "Eyestone",
+    "slug": "julian-eyestone-1008553",
+    "sortName": "Eyestone, Julian",
+    "teamSlug": "brentford"
+  },
+  {
+    "assetPath": "/player-faces/fc_brentford_fredrick_benjamin.png",
+    "displayName": "Benjamin Fredrick",
+    "externalId": 1071138,
+    "firstName": "Benjamin",
+    "lastName": "Fredrick",
+    "slug": "benjamin-fredrick-1071138",
+    "sortName": "Fredrick, Benjamin",
+    "teamSlug": "brentford"
+  },
+  {
+    "assetPath": "/player-faces/fc_brentford_furo_kaye.png",
+    "displayName": "Kaye Furo",
+    "externalId": 1011936,
+    "firstName": "Kaye",
+    "lastName": "Furo",
+    "slug": "kaye-furo-1011936",
+    "sortName": "Furo, Kaye",
+    "teamSlug": "brentford"
+  },
+  {
+    "assetPath": "/player-faces/fc_brentford_henry_rico.png",
+    "displayName": "Rico Henry",
+    "externalId": 339556,
+    "firstName": "Rico",
+    "lastName": "Henry",
+    "slug": "rico-henry-339556",
+    "sortName": "Henry, Rico",
+    "teamSlug": "brentford"
+  },
+  {
+    "assetPath": "/player-faces/fc_brentford_hickey_aaron.png",
+    "displayName": "Aaron Hickey",
+    "externalId": 591949,
+    "firstName": "Aaron",
+    "lastName": "Hickey",
+    "slug": "aaron-hickey-591949",
+    "sortName": "Hickey, Aaron",
+    "teamSlug": "brentford"
+  },
+  {
+    "assetPath": "/player-faces/fc_brentford_janelt_vitaly.png",
+    "displayName": "Vitaly Janelt",
+    "externalId": 270171,
+    "firstName": "Vitaly",
+    "lastName": "Janelt",
+    "slug": "vitaly-janelt-270171",
+    "sortName": "Janelt, Vitaly",
+    "teamSlug": "brentford"
+  },
+  {
+    "assetPath": "/player-faces/fc_brentford_jensen_mathias.png",
+    "displayName": "Mathias Jensen",
+    "externalId": 319859,
+    "firstName": "Mathias",
+    "lastName": "Jensen",
+    "slug": "mathias-jensen-319859",
+    "sortName": "Jensen, Mathias",
+    "teamSlug": "brentford"
+  },
+  {
+    "assetPath": "/player-faces/fc_brentford_kayode_michael.png",
+    "displayName": "Michael Kayode",
+    "externalId": 823486,
+    "firstName": "Michael",
+    "lastName": "Kayode",
+    "slug": "michael-kayode-823486",
+    "sortName": "Kayode, Michael",
+    "teamSlug": "brentford"
+  },
+  {
+    "assetPath": "/player-faces/fc_brentford_kelleher_caoimhin.png",
+    "displayName": "Caoimhín Kelleher",
+    "externalId": 340918,
+    "firstName": "Caoimhín",
+    "lastName": "Kelleher",
+    "slug": "caoimhin-kelleher-340918",
+    "sortName": "Kelleher, Caoimhín",
+    "teamSlug": "brentford"
+  },
+  {
+    "assetPath": "/player-faces/fc_brentford_soo_kim_ji.png",
+    "displayName": "Ji-soo Kim",
+    "externalId": 709767,
+    "firstName": "Ji-soo",
+    "lastName": "Kim",
+    "slug": "ji-soo-kim-709767",
+    "sortName": "Kim, Ji-soo",
+    "teamSlug": "brentford"
+  },
+  {
+    "assetPath": "/player-faces/fc_brentford_konak_yunus.png",
+    "displayName": "Yunus Konak",
+    "externalId": 1141628,
+    "firstName": "Yunus",
+    "lastName": "Konak",
+    "slug": "yunus-konak-1141628",
+    "sortName": "Konak, Yunus",
+    "teamSlug": "brentford"
+  },
+  {
+    "assetPath": "/player-faces/fc_brentford_lewis_potter_keane.png",
+    "displayName": "Keane Lewis-Potter",
+    "externalId": 644401,
+    "firstName": "Keane",
+    "lastName": "Lewis-Potter",
+    "slug": "keane-lewis-potter-644401",
+    "sortName": "Lewis-Potter, Keane",
+    "teamSlug": "brentford"
+  },
+  {
+    "assetPath": "/player-faces/fc_brentford_meghoma_jayden.png",
+    "displayName": "Jayden Meghoma",
+    "externalId": 954104,
+    "firstName": "Jayden",
+    "lastName": "Meghoma",
+    "slug": "jayden-meghoma-954104",
+    "sortName": "Meghoma, Jayden",
+    "teamSlug": "brentford"
+  },
+  {
+    "assetPath": "/player-faces/fc_brentford_milambo_antoni.png",
+    "displayName": "Antoni Milambo",
+    "externalId": 683620,
+    "firstName": "Antoni",
+    "lastName": "Milambo",
+    "slug": "antoni-milambo-683620",
+    "sortName": "Milambo, Antoni",
+    "teamSlug": "brentford"
+  },
+  {
+    "assetPath": "/player-faces/fc_brentford_nunes_gustavo.png",
+    "displayName": "Gustavo Nunes",
+    "externalId": 1086375,
+    "firstName": "Gustavo",
+    "lastName": "Nunes",
+    "slug": "gustavo-nunes-1086375",
+    "sortName": "Nunes, Gustavo",
+    "teamSlug": "brentford"
+  },
+  {
+    "assetPath": "/player-faces/fc_brentford_ouattara_dango.png",
+    "displayName": "Dango Ouattara",
+    "externalId": 823231,
+    "firstName": "Dango",
+    "lastName": "Ouattara",
+    "slug": "dango-ouattara-823231",
+    "sortName": "Ouattara, Dango",
+    "teamSlug": "brentford"
+  },
+  {
+    "assetPath": "/player-faces/fc_brentford_pinnock_ethan.png",
+    "displayName": "Ethan Pinnock",
+    "externalId": 442248,
+    "firstName": "Ethan",
+    "lastName": "Pinnock",
+    "slug": "ethan-pinnock-442248",
+    "sortName": "Pinnock, Ethan",
+    "teamSlug": "brentford"
+  },
+  {
+    "assetPath": "/player-faces/fc_brentford_sangare_mamadou.png",
+    "displayName": "Mamadou Sangaré",
+    "externalId": 808348,
+    "firstName": "Mamadou",
+    "lastName": "Sangaré",
+    "slug": "mamadou-sangare-808348",
+    "sortName": "Sangaré, Mamadou",
+    "teamSlug": "brentford"
+  },
+  {
+    "assetPath": "/player-faces/fc_brentford_schade_kevin.png",
+    "displayName": "Kevin Schade",
+    "externalId": 473050,
+    "firstName": "Kevin",
+    "lastName": "Schade",
+    "slug": "kevin-schade-473050",
+    "sortName": "Schade, Kevin",
+    "teamSlug": "brentford"
+  },
+  {
+    "assetPath": "/player-faces/fc_brentford_schuster_jannik.png",
+    "displayName": "Jannik Schuster",
+    "externalId": 915418,
+    "firstName": "Jannik",
+    "lastName": "Schuster",
+    "slug": "jannik-schuster-915418",
+    "sortName": "Schuster, Jannik",
+    "teamSlug": "brentford"
+  },
+  {
+    "assetPath": "/player-faces/fc_brentford_thiago_igor.png",
+    "displayName": "Igor Thiago",
+    "externalId": 739443,
+    "firstName": "Igor",
+    "lastName": "Thiago",
+    "slug": "igor-thiago-739443",
+    "sortName": "Thiago, Igor",
+    "teamSlug": "brentford"
+  },
+  {
+    "assetPath": "/player-faces/fc_brentford_valdimarsson_hakon.png",
+    "displayName": "Hákon Valdimarsson",
+    "externalId": 488935,
+    "firstName": "Hákon",
+    "lastName": "Valdimarsson",
+    "slug": "hakon-valdimarsson-488935",
+    "sortName": "Valdimarsson, Hákon",
+    "teamSlug": "brentford"
+  },
+  {
+    "assetPath": "/player-faces/fc_brentford_van_den_berg_sepp.png",
+    "displayName": "Sepp van den Berg",
+    "externalId": 541231,
+    "firstName": "Sepp",
+    "lastName": "van den Berg",
+    "slug": "sepp-van-den-berg-541231",
+    "sortName": "van den Berg, Sepp",
+    "teamSlug": "brentford"
+  },
+  {
+    "assetPath": "/player-faces/fc_brentford_wilson_callum.png",
+    "displayName": "Callum Wilson",
+    "externalId": 123682,
+    "firstName": "Callum",
+    "lastName": "Wilson",
+    "slug": "callum-wilson-123682",
+    "sortName": "Wilson, Callum",
+    "teamSlug": "brentford"
+  },
+  {
+    "assetPath": "/player-faces/fc_brentford_yarmolyuk_yegor.png",
+    "displayName": "Yegor Yarmolyuk",
+    "externalId": 717411,
+    "firstName": "Yegor",
+    "lastName": "Yarmolyuk",
+    "slug": "yegor-yarmolyuk-717411",
+    "sortName": "Yarmolyuk, Yegor",
+    "teamSlug": "brentford"
+  },
+  {
+    "assetPath": "/player-faces/brighton_amp_hove_albion_ayari_yasin.png",
+    "displayName": "Yasin Ayari",
+    "externalId": 667287,
+    "firstName": "Yasin",
+    "lastName": "Ayari",
+    "slug": "yasin-ayari-667287",
+    "sortName": "Ayari, Yasin",
+    "teamSlug": "brighton-and-hove-albion"
+  },
+  {
+    "assetPath": "/player-faces/brighton_amp_hove_albion_baleba_carlos.png",
+    "displayName": "Carlos Baleba",
+    "externalId": 973085,
+    "firstName": "Carlos",
+    "lastName": "Baleba",
+    "slug": "carlos-baleba-973085",
+    "sortName": "Baleba, Carlos",
+    "teamSlug": "brighton-and-hove-albion"
+  },
+  {
+    "assetPath": "/player-faces/brighton_amp_hove_albion_boscagli_olivier.png",
+    "displayName": "Olivier Boscagli",
+    "externalId": 318508,
+    "firstName": "Olivier",
+    "lastName": "Boscagli",
+    "slug": "olivier-boscagli-318508",
+    "sortName": "Boscagli, Olivier",
+    "teamSlug": "brighton-and-hove-albion"
+  },
+  {
+    "assetPath": "/player-faces/brighton_amp_hove_albion_cashin_eiran.png",
+    "displayName": "Eiran Cashin",
+    "externalId": 581330,
+    "firstName": "Eiran",
+    "lastName": "Cashin",
+    "slug": "eiran-cashin-581330",
+    "sortName": "Cashin, Eiran",
+    "teamSlug": "brighton-and-hove-albion"
+  },
+  {
+    "assetPath": "/player-faces/brighton_amp_hove_albion_x_costinha.png",
+    "displayName": "Costinha",
+    "externalId": 539252,
+    "firstName": "Costinha",
+    "lastName": null,
+    "slug": "costinha-539252",
+    "sortName": "Costinha",
+    "teamSlug": "brighton-and-hove-albion"
+  },
+  {
+    "assetPath": "/player-faces/brighton_amp_hove_albion_cozier_duberry_amario.png",
+    "displayName": "Amario Cozier-Duberry",
+    "externalId": 878150,
+    "firstName": "Amario",
+    "lastName": "Cozier-Duberry",
+    "slug": "amario-cozier-duberry-878150",
+    "sortName": "Cozier-Duberry, Amario",
+    "teamSlug": "brighton-and-hove-albion"
+  },
+  {
+    "assetPath": "/player-faces/brighton_amp_hove_albion_de_cuyper_maxim.png",
+    "displayName": "Maxim De Cuyper",
+    "externalId": 429915,
+    "firstName": "Maxim",
+    "lastName": "De Cuyper",
+    "slug": "maxim-de-cuyper-429915",
+    "sortName": "De Cuyper, Maxim",
+    "teamSlug": "brighton-and-hove-albion"
+  },
+  {
+    "assetPath": "/player-faces/brighton_amp_hove_albion_dunk_lewis.png",
+    "displayName": "Lewis Dunk",
+    "externalId": 148153,
+    "firstName": "Lewis",
+    "lastName": "Dunk",
+    "slug": "lewis-dunk-148153",
+    "sortName": "Dunk, Lewis",
+    "teamSlug": "brighton-and-hove-albion"
+  },
+  {
+    "assetPath": "/player-faces/brighton_amp_hove_albion_ferguson_evan.png",
+    "displayName": "Evan Ferguson",
+    "externalId": 648046,
+    "firstName": "Evan",
+    "lastName": "Ferguson",
+    "slug": "evan-ferguson-648046",
+    "sortName": "Ferguson, Evan",
+    "teamSlug": "brighton-and-hove-albion"
+  },
+  {
+    "assetPath": "/player-faces/brighton_amp_hove_albion_gro_pascal.png",
+    "displayName": "Pascal Groß",
+    "externalId": 82873,
+    "firstName": "Pascal",
+    "lastName": "Groß",
+    "slug": "pascal-gross-82873",
+    "sortName": "Groß, Pascal",
+    "teamSlug": "brighton-and-hove-albion"
+  },
+  {
+    "assetPath": "/player-faces/brighton_amp_hove_albion_gomez_diego.png",
+    "displayName": "Diego Gómez",
+    "externalId": 996897,
+    "firstName": "Diego",
+    "lastName": "Gómez",
+    "slug": "diego-gomez-996897",
+    "sortName": "Gómez, Diego",
+    "teamSlug": "brighton-and-hove-albion"
+  },
+  {
+    "assetPath": "/player-faces/brighton_amp_hove_albion_hinshelwood_jack.png",
+    "displayName": "Jack Hinshelwood",
+    "externalId": 867688,
+    "firstName": "Jack",
+    "lastName": "Hinshelwood",
+    "slug": "jack-hinshelwood-867688",
+    "sortName": "Hinshelwood, Jack",
+    "teamSlug": "brighton-and-hove-albion"
+  },
+  {
+    "assetPath": "/player-faces/brighton_amp_hove_albion_julio_igor.png",
+    "displayName": "Igor Julio",
+    "externalId": 380350,
+    "firstName": "Igor",
+    "lastName": "Julio",
+    "slug": "igor-julio-380350",
+    "sortName": "Julio, Igor",
+    "teamSlug": "brighton-and-hove-albion"
+  },
+  {
+    "assetPath": "/player-faces/brighton_amp_hove_albion_kadoglu_ferdi.png",
+    "displayName": "Ferdi Kadıoğlu",
+    "externalId": 369316,
+    "firstName": "Ferdi",
+    "lastName": "Kadıoğlu",
+    "slug": "ferdi-kad-oglu-369316",
+    "sortName": "Kadıoğlu, Ferdi",
+    "teamSlug": "brighton-and-hove-albion"
+  },
+  {
+    "assetPath": "/player-faces/brighton_amp_hove_albion_kostoulas_charalampos.png",
+    "displayName": "Charalampos Kostoulas",
+    "externalId": 1060087,
+    "firstName": "Charalampos",
+    "lastName": "Kostoulas",
+    "slug": "charalampos-kostoulas-1060087",
+    "sortName": "Kostoulas, Charalampos",
+    "teamSlug": "brighton-and-hove-albion"
+  },
+  {
+    "assetPath": null,
+    "displayName": "Tom McGill",
+    "externalId": 406556,
+    "firstName": "Tom",
+    "lastName": "McGill",
+    "slug": "tom-mcgill-406556",
+    "sortName": "McGill, Tom",
+    "teamSlug": "brighton-and-hove-albion"
+  },
+  {
+    "assetPath": "/player-faces/brighton_amp_hove_albion_minteh_yankuba.png",
+    "displayName": "Yankuba Minteh",
+    "externalId": 1012534,
+    "firstName": "Yankuba",
+    "lastName": "Minteh",
+    "slug": "yankuba-minteh-1012534",
+    "sortName": "Minteh, Yankuba",
+    "teamSlug": "brighton-and-hove-albion"
+  },
+  {
+    "assetPath": "/player-faces/brighton_amp_hove_albion_mitoma_kaoru.png",
+    "displayName": "Kaoru Mitoma",
+    "externalId": 504849,
+    "firstName": "Kaoru",
+    "lastName": "Mitoma",
+    "slug": "kaoru-mitoma-504849",
+    "sortName": "Mitoma, Kaoru",
+    "teamSlug": "brighton-and-hove-albion"
+  },
+  {
+    "assetPath": "/player-faces/brighton_amp_hove_albion_o_riley_matt.png",
+    "displayName": "Matt O'Riley",
+    "externalId": 406634,
+    "firstName": "Matt",
+    "lastName": "O'Riley",
+    "slug": "matt-oriley-406634",
+    "sortName": "O'Riley, Matt",
+    "teamSlug": "brighton-and-hove-albion"
+  },
+  {
+    "assetPath": "/player-faces/brighton_amp_hove_albion_osman_ibrahim.png",
+    "displayName": "Ibrahim Osman",
+    "externalId": 1110406,
+    "firstName": "Ibrahim",
+    "lastName": "Osman",
+    "slug": "ibrahim-osman-1110406",
+    "sortName": "Osman, Ibrahim",
+    "teamSlug": "brighton-and-hove-albion"
+  },
+  {
+    "assetPath": "/player-faces/brighton_amp_hove_albion_rutter_georginio.png",
+    "displayName": "Georginio Rutter",
+    "externalId": 538977,
+    "firstName": "Georginio",
+    "lastName": "Rutter",
+    "slug": "georginio-rutter-538977",
+    "sortName": "Rutter, Georginio",
+    "teamSlug": "brighton-and-hove-albion"
+  },
+  {
+    "assetPath": "/player-faces/brighton_amp_hove_albion_steele_jason.png",
+    "displayName": "Jason Steele",
+    "externalId": 73564,
+    "firstName": "Jason",
+    "lastName": "Steele",
+    "slug": "jason-steele-73564",
+    "sortName": "Steele, Jason",
+    "teamSlug": "brighton-and-hove-albion"
+  },
+  {
+    "assetPath": "/player-faces/brighton_amp_hove_albion_struijk_pascal.png",
+    "displayName": "Pascal Struijk",
+    "externalId": 410708,
+    "firstName": "Pascal",
+    "lastName": "Struijk",
+    "slug": "pascal-struijk-410708",
+    "sortName": "Struijk, Pascal",
+    "teamSlug": "brighton-and-hove-albion"
+  },
+  {
+    "assetPath": "/player-faces/brighton_amp_hove_albion_svoboda_michael.png",
+    "displayName": "Michael Svoboda",
+    "externalId": 438961,
+    "firstName": "Michael",
+    "lastName": "Svoboda",
+    "slug": "michael-svoboda-438961",
+    "sortName": "Svoboda, Michael",
+    "teamSlug": "brighton-and-hove-albion"
+  },
+  {
+    "assetPath": "/player-faces/brighton_amp_hove_albion_tzimas_stefanos.png",
+    "displayName": "Stefanos Tzimas",
+    "externalId": 950091,
+    "firstName": "Stefanos",
+    "lastName": "Tzimas",
+    "slug": "stefanos-tzimas-950091",
+    "sortName": "Tzimas, Stefanos",
+    "teamSlug": "brighton-and-hove-albion"
+  },
+  {
+    "assetPath": "/player-faces/brighton_amp_hove_albion_verbruggen_bart.png",
+    "displayName": "Bart Verbruggen",
+    "externalId": 565093,
+    "firstName": "Bart",
+    "lastName": "Verbruggen",
+    "slug": "bart-verbruggen-565093",
+    "sortName": "Verbruggen, Bart",
+    "teamSlug": "brighton-and-hove-albion"
+  },
+  {
+    "assetPath": "/player-faces/brighton_amp_hove_albion_vuskovic_luka.png",
+    "displayName": "Luka Vuskovic",
+    "externalId": 892160,
+    "firstName": "Luka",
+    "lastName": "Vuskovic",
+    "slug": "luka-vuskovic-892160",
+    "sortName": "Vuskovic, Luka",
+    "teamSlug": "brighton-and-hove-albion"
+  },
+  {
+    "assetPath": "/player-faces/brighton_amp_hove_albion_wieffer_mats.png",
+    "displayName": "Mats Wieffer",
+    "externalId": 415381,
+    "firstName": "Mats",
+    "lastName": "Wieffer",
+    "slug": "mats-wieffer-415381",
+    "sortName": "Wieffer, Mats",
+    "teamSlug": "brighton-and-hove-albion"
+  },
+  {
+    "assetPath": "/player-faces/brighton_amp_hove_albion_yalcouye_malick.png",
+    "displayName": "Malick Yalcouyé",
+    "externalId": 1178758,
+    "firstName": "Malick",
+    "lastName": "Yalcouyé",
+    "slug": "malick-yalcouye-1178758",
+    "sortName": "Yalcouyé, Malick",
+    "teamSlug": "brighton-and-hove-albion"
+  },
+  {
+    "assetPath": "/player-faces/brighton_amp_hove_albion_yohanna_zadok.png",
+    "displayName": "Zadok Yohanna",
+    "externalId": 1421433,
+    "firstName": "Zadok",
+    "lastName": "Yohanna",
+    "slug": "zadok-yohanna-1421433",
+    "sortName": "Yohanna, Zadok",
+    "teamSlug": "brighton-and-hove-albion"
+  },
+  {
+    "assetPath": "/player-faces/fc_chelsea_acheampong_josh.png",
+    "displayName": "Josh Acheampong",
+    "externalId": 1004708,
+    "firstName": "Josh",
+    "lastName": "Acheampong",
+    "slug": "josh-acheampong-1004708",
+    "sortName": "Acheampong, Josh",
+    "teamSlug": "chelsea"
+  },
+  {
+    "assetPath": "/player-faces/fc_chelsea_adarabioyo_tosin.png",
+    "displayName": "Tosin Adarabioyo",
+    "externalId": 258878,
+    "firstName": "Tosin",
+    "lastName": "Adarabioyo",
+    "slug": "tosin-adarabioyo-258878",
+    "sortName": "Adarabioyo, Tosin",
+    "teamSlug": "chelsea"
+  },
+  {
+    "assetPath": "/player-faces/fc_chelsea_anselmino_aaron.png",
+    "displayName": "Aarón Anselmino",
+    "externalId": 1145504,
+    "firstName": "Aarón",
+    "lastName": "Anselmino",
+    "slug": "aaron-anselmino-1145504",
+    "sortName": "Anselmino, Aarón",
+    "teamSlug": "chelsea"
+  },
+  {
+    "assetPath": "/player-faces/fc_chelsea_badiashile_benoit.png",
+    "displayName": "Benoît Badiashile",
+    "externalId": 463603,
+    "firstName": "Benoît",
+    "lastName": "Badiashile",
+    "slug": "benoit-badiashile-463603",
+    "sortName": "Badiashile, Benoît",
+    "teamSlug": "chelsea"
+  },
+  {
+    "assetPath": "/player-faces/fc_chelsea_barco_valentin.png",
+    "displayName": "Valentín Barco",
+    "externalId": 849410,
+    "firstName": "Valentín",
+    "lastName": "Barco",
+    "slug": "valentin-barco-849410",
+    "sortName": "Barco, Valentín",
+    "teamSlug": "chelsea"
+  },
+  {
+    "assetPath": "/player-faces/fc_chelsea_caicedo_moises.png",
+    "displayName": "Moisés Caicedo",
+    "externalId": 687626,
+    "firstName": "Moisés",
+    "lastName": "Caicedo",
+    "slug": "moises-caicedo-687626",
+    "sortName": "Caicedo, Moisés",
+    "teamSlug": "chelsea"
+  },
+  {
+    "assetPath": "/player-faces/fc_chelsea_chalobah_trevoh.png",
+    "displayName": "Trevoh Chalobah",
+    "externalId": 346314,
+    "firstName": "Trevoh",
+    "lastName": "Chalobah",
+    "slug": "trevoh-chalobah-346314",
+    "sortName": "Chalobah, Trevoh",
+    "teamSlug": "chelsea"
+  },
+  {
+    "assetPath": "/player-faces/fc_chelsea_colwill_levi.png",
+    "displayName": "Levi Colwill",
+    "externalId": 614258,
+    "firstName": "Levi",
+    "lastName": "Colwill",
+    "slug": "levi-colwill-614258",
+    "sortName": "Colwill, Levi",
+    "teamSlug": "chelsea"
+  },
+  {
+    "assetPath": "/player-faces/fc_chelsea_datro_fofana_david.png",
+    "displayName": "David Datro Fofana",
+    "externalId": 787232,
+    "firstName": "David",
+    "lastName": "Datro Fofana",
+    "slug": "david-datro-fofana-787232",
+    "sortName": "Datro Fofana, David",
+    "teamSlug": "chelsea"
+  },
+  {
+    "assetPath": "/player-faces/fc_chelsea_delap_liam.png",
+    "displayName": "Liam Delap",
+    "externalId": 610849,
+    "firstName": "Liam",
+    "lastName": "Delap",
+    "slug": "liam-delap-610849",
+    "sortName": "Delap, Liam",
+    "teamSlug": "chelsea"
+  },
+  {
+    "assetPath": null,
+    "displayName": "Denner",
+    "externalId": 1261640,
+    "firstName": "Denner",
+    "lastName": null,
+    "slug": "denner-1261640",
+    "sortName": "Denner",
+    "teamSlug": "chelsea"
+  },
+  {
+    "assetPath": "/player-faces/fc_chelsea_disasi_axel.png",
+    "displayName": "Axel Disasi",
+    "externalId": 386047,
+    "firstName": "Axel",
+    "lastName": "Disasi",
+    "slug": "axel-disasi-386047",
+    "sortName": "Disasi, Axel",
+    "teamSlug": "chelsea"
+  },
+  {
+    "assetPath": "/player-faces/fc_chelsea_emegha_emmanuel.png",
+    "displayName": "Emmanuel Emegha",
+    "externalId": 559328,
+    "firstName": "Emmanuel",
+    "lastName": "Emegha",
+    "slug": "emmanuel-emegha-559328",
+    "sortName": "Emegha, Emmanuel",
+    "teamSlug": "chelsea"
+  },
+  {
+    "assetPath": "/player-faces/fc_chelsea_essugo_dario.png",
+    "displayName": "Dário Essugo",
+    "externalId": 670717,
+    "firstName": "Dário",
+    "lastName": "Essugo",
+    "slug": "dario-essugo-670717",
+    "sortName": "Essugo, Dário",
+    "teamSlug": "chelsea"
+  },
+  {
+    "assetPath": "/player-faces/fc_chelsea_x_estevao.png",
+    "displayName": "Estêvão",
+    "externalId": 1056993,
+    "firstName": "Estêvão",
+    "lastName": null,
+    "slug": "estevao-1056993",
+    "sortName": "Estêvão",
+    "teamSlug": "chelsea"
+  },
+  {
+    "assetPath": "/player-faces/fc_chelsea_fernandez_enzo.png",
+    "displayName": "Enzo Fernández",
+    "externalId": 648195,
+    "firstName": "Enzo",
+    "lastName": "Fernández",
+    "slug": "enzo-fernandez-648195",
+    "sortName": "Fernández, Enzo",
+    "teamSlug": "chelsea"
+  },
+  {
+    "assetPath": "/player-faces/fc_chelsea_fofana_wesley.png",
+    "displayName": "Wesley Fofana",
+    "externalId": 475411,
+    "firstName": "Wesley",
+    "lastName": "Fofana",
+    "slug": "wesley-fofana-475411",
+    "sortName": "Fofana, Wesley",
+    "teamSlug": "chelsea"
+  },
+  {
+    "assetPath": "/player-faces/fc_chelsea_gittens_jamie.png",
+    "displayName": "Jamie Gittens",
+    "externalId": 670882,
+    "firstName": "Jamie",
+    "lastName": "Gittens",
+    "slug": "jamie-gittens-670882",
+    "sortName": "Gittens, Jamie",
+    "teamSlug": "chelsea"
+  },
+  {
+    "assetPath": "/player-faces/fc_chelsea_guiu_marc.png",
+    "displayName": "Marc Guiu",
+    "externalId": 938158,
+    "firstName": "Marc",
+    "lastName": "Guiu",
+    "slug": "marc-guiu-938158",
+    "sortName": "Guiu, Marc",
+    "teamSlug": "chelsea"
+  },
+  {
+    "assetPath": "/player-faces/fc_chelsea_gusto_malo.png",
+    "displayName": "Malo Gusto",
+    "externalId": 620322,
+    "firstName": "Malo",
+    "lastName": "Gusto",
+    "slug": "malo-gusto-620322",
+    "sortName": "Gusto, Malo",
+    "teamSlug": "chelsea"
+  },
+  {
+    "assetPath": "/player-faces/fc_chelsea_hato_jorrel.png",
+    "displayName": "Jorrel Hato",
+    "externalId": 904802,
+    "firstName": "Jorrel",
+    "lastName": "Hato",
+    "slug": "jorrel-hato-904802",
+    "sortName": "Hato, Jorrel",
+    "teamSlug": "chelsea"
+  },
+  {
+    "assetPath": "/player-faces/fc_chelsea_henderson_jordan.png",
+    "displayName": "Jordan Henderson",
+    "externalId": 61651,
+    "firstName": "Jordan",
+    "lastName": "Henderson",
+    "slug": "jordan-henderson-61651",
+    "sortName": "Henderson, Jordan",
+    "teamSlug": "chelsea"
+  },
+  {
+    "assetPath": "/player-faces/fc_chelsea_jackson_nicolas.png",
+    "displayName": "Nicolas Jackson",
+    "externalId": 776890,
+    "firstName": "Nicolas",
+    "lastName": "Jackson",
+    "slug": "nicolas-jackson-776890",
+    "sortName": "Jackson, Nicolas",
+    "teamSlug": "chelsea"
+  },
+  {
+    "assetPath": "/player-faces/fc_chelsea_james_reece.png",
+    "displayName": "Reece James",
+    "externalId": 472423,
+    "firstName": "Reece",
+    "lastName": "James",
+    "slug": "reece-james-472423",
+    "sortName": "James, Reece",
+    "teamSlug": "chelsea"
+  },
+  {
+    "assetPath": "/player-faces/fc_chelsea_jrgensen_filip.png",
+    "displayName": "Filip Jørgensen",
+    "externalId": 585323,
+    "firstName": "Filip",
+    "lastName": "Jørgensen",
+    "slug": "filip-jorgensen-585323",
+    "sortName": "Jørgensen, Filip",
+    "teamSlug": "chelsea"
+  },
+  {
+    "assetPath": "/player-faces/fc_chelsea_lacroix_maxence.png",
+    "displayName": "Maxence Lacroix",
+    "externalId": 434224,
+    "firstName": "Maxence",
+    "lastName": "Lacroix",
+    "slug": "maxence-lacroix-434224",
+    "sortName": "Lacroix, Maxence",
+    "teamSlug": "chelsea"
+  },
+  {
+    "assetPath": "/player-faces/fc_chelsea_lavia_romeo.png",
+    "displayName": "Roméo Lavia",
+    "externalId": 628451,
+    "firstName": "Roméo",
+    "lastName": "Lavia",
+    "slug": "romeo-lavia-628451",
+    "sortName": "Lavia, Roméo",
+    "teamSlug": "chelsea"
+  },
+  {
+    "assetPath": "/player-faces/fc_chelsea_mudryk_mykhaylo.png",
+    "displayName": "Mykhaylo Mudryk",
+    "externalId": 537860,
+    "firstName": "Mykhaylo",
+    "lastName": "Mudryk",
+    "slug": "mykhaylo-mudryk-537860",
+    "sortName": "Mudryk, Mykhaylo",
+    "teamSlug": "chelsea"
+  },
+  {
+    "assetPath": "/player-faces/fc_chelsea_neto_pedro.png",
+    "displayName": "Pedro Neto",
+    "externalId": 487465,
+    "firstName": "Pedro",
+    "lastName": "Neto",
+    "slug": "pedro-neto-487465",
+    "sortName": "Neto, Pedro",
+    "teamSlug": "chelsea"
+  },
+  {
+    "assetPath": "/player-faces/fc_chelsea_palestra_marco.png",
+    "displayName": "Marco Palestra",
+    "externalId": 895937,
+    "firstName": "Marco",
+    "lastName": "Palestra",
+    "slug": "marco-palestra-895937",
+    "sortName": "Palestra, Marco",
+    "teamSlug": "chelsea"
+  },
+  {
+    "assetPath": "/player-faces/fc_chelsea_palmer_cole.png",
+    "displayName": "Cole Palmer",
+    "externalId": 568177,
+    "firstName": "Cole",
+    "lastName": "Palmer",
+    "slug": "cole-palmer-568177",
+    "sortName": "Palmer, Cole",
+    "teamSlug": "chelsea"
+  },
+  {
+    "assetPath": "/player-faces/fc_chelsea_pedro_joao.png",
+    "displayName": "João Pedro",
+    "externalId": 626724,
+    "firstName": "João",
+    "lastName": "Pedro",
+    "slug": "joao-pedro-626724",
+    "sortName": "Pedro, João",
+    "teamSlug": "chelsea"
+  },
+  {
+    "assetPath": "/player-faces/fc_chelsea_penders_mike.png",
+    "displayName": "Mike Penders",
+    "externalId": 834397,
+    "firstName": "Mike",
+    "lastName": "Penders",
+    "slug": "mike-penders-834397",
+    "sortName": "Penders, Mike",
+    "teamSlug": "chelsea"
+  },
+  {
+    "assetPath": "/player-faces/fc_chelsea_quenda_geovany.png",
+    "displayName": "Geovany Quenda",
+    "externalId": 1138758,
+    "firstName": "Geovany",
+    "lastName": "Quenda",
+    "slug": "geovany-quenda-1138758",
+    "sortName": "Quenda, Geovany",
+    "teamSlug": "chelsea"
+  },
+  {
+    "assetPath": "/player-faces/fc_chelsea_rogers_morgan.png",
+    "displayName": "Morgan Rogers",
+    "externalId": 503743,
+    "firstName": "Morgan",
+    "lastName": "Rogers",
+    "slug": "morgan-rogers-503743",
+    "sortName": "Rogers, Morgan",
+    "teamSlug": "chelsea"
+  },
+  {
+    "assetPath": "/player-faces/fc_chelsea_sarr_mamadou.png",
+    "displayName": "Mamadou Sarr",
+    "externalId": 910905,
+    "firstName": "Mamadou",
+    "lastName": "Sarr",
+    "slug": "mamadou-sarr-910905",
+    "sortName": "Sarr, Mamadou",
+    "teamSlug": "chelsea"
+  },
+  {
+    "assetPath": "/player-faces/fc_chelsea_sharman_lowe_teddy.png",
+    "displayName": "Teddy Sharman-Lowe",
+    "externalId": 731466,
+    "firstName": "Teddy",
+    "lastName": "Sharman-Lowe",
+    "slug": "teddy-sharman-lowe-731466",
+    "sortName": "Sharman-Lowe, Teddy",
+    "teamSlug": "chelsea"
+  },
+  {
+    "assetPath": "/player-faces/fc_chelsea_slonina_gabriel.png",
+    "displayName": "Gabriel Slonina",
+    "externalId": 656316,
+    "firstName": "Gabriel",
+    "lastName": "Slonina",
+    "slug": "gabriel-slonina-656316",
+    "sortName": "Slonina, Gabriel",
+    "teamSlug": "chelsea"
+  },
+  {
+    "assetPath": "/player-faces/fc_chelsea_sanchez_robert.png",
+    "displayName": "Robert Sánchez",
+    "externalId": 403151,
+    "firstName": "Robert",
+    "lastName": "Sánchez",
+    "slug": "robert-sanchez-403151",
+    "sortName": "Sánchez, Robert",
+    "teamSlug": "chelsea"
+  },
+  {
+    "assetPath": "/player-faces/fc_chelsea_welbeck_danny.png",
+    "displayName": "Danny Welbeck",
+    "externalId": 67063,
+    "firstName": "Danny",
+    "lastName": "Welbeck",
+    "slug": "danny-welbeck-67063",
+    "sortName": "Welbeck, Danny",
+    "teamSlug": "chelsea"
+  },
+  {
+    "assetPath": "/player-faces/fc_chelsea_wiley_caleb.png",
+    "displayName": "Caleb Wiley",
+    "externalId": 746833,
+    "firstName": "Caleb",
+    "lastName": "Wiley",
+    "slug": "caleb-wiley-746833",
+    "sortName": "Wiley, Caleb",
+    "teamSlug": "chelsea"
+  },
+  {
+    "assetPath": "/player-faces/coventry_city_amenda_aurele.png",
+    "displayName": "Aurèle Amenda",
+    "externalId": 635645,
+    "firstName": "Aurèle",
+    "lastName": "Amenda",
+    "slug": "aurele-amenda-635645",
+    "sortName": "Amenda, Aurèle",
+    "teamSlug": "coventry-city"
+  },
+  {
+    "assetPath": "/player-faces/coventry_city_andrews_kai.png",
+    "displayName": "Kai Andrews",
+    "externalId": 965924,
+    "firstName": "Kai",
+    "lastName": "Andrews",
+    "slug": "kai-andrews-965924",
+    "sortName": "Andrews, Kai",
+    "teamSlug": "coventry-city"
+  },
+  {
+    "assetPath": "/player-faces/coventry_city_bidwell_jake.png",
+    "displayName": "Jake Bidwell",
+    "externalId": 121250,
+    "firstName": "Jake",
+    "lastName": "Bidwell",
+    "slug": "jake-bidwell-121250",
+    "sortName": "Bidwell, Jake",
+    "teamSlug": "coventry-city"
+  },
+  {
+    "assetPath": "/player-faces/coventry_city_borges_rodrigues_raphael.png",
+    "displayName": "Raphael Borges Rodrigues",
+    "externalId": 704398,
+    "firstName": "Raphael",
+    "lastName": "Borges Rodrigues",
+    "slug": "raphael-borges-rodrigues-704398",
+    "sortName": "Borges Rodrigues, Raphael",
+    "teamSlug": "coventry-city"
+  },
+  {
+    "assetPath": "/player-faces/coventry_city_dasilva_jay.png",
+    "displayName": "Jay Dasilva",
+    "externalId": 258915,
+    "firstName": "Jay",
+    "lastName": "Dasilva",
+    "slug": "jay-dasilva-258915",
+    "sortName": "Dasilva, Jay",
+    "teamSlug": "coventry-city"
+  },
+  {
+    "assetPath": "/player-faces/coventry_city_dovin_oliver.png",
+    "displayName": "Oliver Dovin",
+    "externalId": 527329,
+    "firstName": "Oliver",
+    "lastName": "Dovin",
+    "slug": "oliver-dovin-527329",
+    "sortName": "Dovin, Oliver",
+    "teamSlug": "coventry-city"
+  },
+  {
+    "assetPath": "/player-faces/coventry_city_eccles_josh.png",
+    "displayName": "Josh Eccles",
+    "externalId": 618903,
+    "firstName": "Josh",
+    "lastName": "Eccles",
+    "slug": "josh-eccles-618903",
+    "sortName": "Eccles, Josh",
+    "teamSlug": "coventry-city"
+  },
+  {
+    "assetPath": "/player-faces/coventry_city_grimes_matt.png",
+    "displayName": "Matt Grimes",
+    "externalId": 265471,
+    "firstName": "Matt",
+    "lastName": "Grimes",
+    "slug": "matt-grimes-265471",
+    "sortName": "Grimes, Matt",
+    "teamSlug": "coventry-city"
+  },
+  {
+    "assetPath": "/player-faces/coventry_city_kesler_hayden_kaine.png",
+    "displayName": "Kaine Kesler-Hayden",
+    "externalId": 626888,
+    "firstName": "Kaine",
+    "lastName": "Kesler-Hayden",
+    "slug": "kaine-kesler-hayden-626888",
+    "sortName": "Kesler-Hayden, Kaine",
+    "teamSlug": "coventry-city"
+  },
+  {
+    "assetPath": "/player-faces/coventry_city_kitching_liam.png",
+    "displayName": "Liam Kitching",
+    "externalId": 534701,
+    "firstName": "Liam",
+    "lastName": "Kitching",
+    "slug": "liam-kitching-534701",
+    "sortName": "Kitching, Liam",
+    "teamSlug": "coventry-city"
+  },
+  {
+    "assetPath": "/player-faces/coventry_city_latibeaudiere_joel.png",
+    "displayName": "Joel Latibeaudiere",
+    "externalId": 412823,
+    "firstName": "Joel",
+    "lastName": "Latibeaudiere",
+    "slug": "joel-latibeaudiere-412823",
+    "sortName": "Latibeaudiere, Joel",
+    "teamSlug": "coventry-city"
+  },
+  {
+    "assetPath": "/player-faces/coventry_city_markelo_jahnoah.png",
+    "displayName": "Jahnoah Markelo",
+    "externalId": 677382,
+    "firstName": "Jahnoah",
+    "lastName": "Markelo",
+    "slug": "jahnoah-markelo-677382",
+    "sortName": "Markelo, Jahnoah",
+    "teamSlug": "coventry-city"
+  },
+  {
+    "assetPath": "/player-faces/coventry_city_mason_clark_ephron.png",
+    "displayName": "Ephron Mason-Clark",
+    "externalId": 466637,
+    "firstName": "Ephron",
+    "lastName": "Mason-Clark",
+    "slug": "ephron-mason-clark-466637",
+    "sortName": "Mason-Clark, Ephron",
+    "teamSlug": "coventry-city"
+  },
+  {
+    "assetPath": "/player-faces/coventry_city_onyeka_frank.png",
+    "displayName": "Frank Onyeka",
+    "externalId": 421637,
+    "firstName": "Frank",
+    "lastName": "Onyeka",
+    "slug": "frank-onyeka-421637",
+    "sortName": "Onyeka, Frank",
+    "teamSlug": "coventry-city"
+  },
+  {
+    "assetPath": "/player-faces/coventry_city_rudoni_jack.png",
+    "displayName": "Jack Rudoni",
+    "externalId": 662476,
+    "firstName": "Jack",
+    "lastName": "Rudoni",
+    "slug": "jack-rudoni-662476",
+    "sortName": "Rudoni, Jack",
+    "teamSlug": "coventry-city"
+  },
+  {
+    "assetPath": "/player-faces/coventry_city_rushworth_carl.png",
+    "displayName": "Carl Rushworth",
+    "externalId": 646353,
+    "firstName": "Carl",
+    "lastName": "Rushworth",
+    "slug": "carl-rushworth-646353",
+    "sortName": "Rushworth, Carl",
+    "teamSlug": "coventry-city"
+  },
+  {
+    "assetPath": "/player-faces/coventry_city_sakamoto_tatsuhiro.png",
+    "displayName": "Tatsuhiro Sakamoto",
+    "externalId": 617408,
+    "firstName": "Tatsuhiro",
+    "lastName": "Sakamoto",
+    "slug": "tatsuhiro-sakamoto-617408",
+    "sortName": "Sakamoto, Tatsuhiro",
+    "teamSlug": "coventry-city"
+  },
+  {
+    "assetPath": "/player-faces/coventry_city_simms_ellis.png",
+    "displayName": "Ellis Simms",
+    "externalId": 511550,
+    "firstName": "Ellis",
+    "lastName": "Simms",
+    "slug": "ellis-simms-511550",
+    "sortName": "Simms, Ellis",
+    "teamSlug": "coventry-city"
+  },
+  {
+    "assetPath": "/player-faces/coventry_city_tchaouna_loum.png",
+    "displayName": "Loum Tchaouna",
+    "externalId": 607226,
+    "firstName": "Loum",
+    "lastName": "Tchaouna",
+    "slug": "loum-tchaouna-607226",
+    "sortName": "Tchaouna, Loum",
+    "teamSlug": "coventry-city"
+  },
+  {
+    "assetPath": "/player-faces/coventry_city_thomas_bobby.png",
+    "displayName": "Bobby Thomas",
+    "externalId": 788283,
+    "firstName": "Bobby",
+    "lastName": "Thomas",
+    "slug": "bobby-thomas-788283",
+    "sortName": "Thomas, Bobby",
+    "teamSlug": "coventry-city"
+  },
+  {
+    "assetPath": "/player-faces/coventry_city_thomas_asante_brandon.png",
+    "displayName": "Brandon Thomas-Asante",
+    "externalId": 451747,
+    "firstName": "Brandon",
+    "lastName": "Thomas-Asante",
+    "slug": "brandon-thomas-asante-451747",
+    "sortName": "Thomas-Asante, Brandon",
+    "teamSlug": "coventry-city"
+  },
+  {
+    "assetPath": "/player-faces/coventry_city_torp_victor.png",
+    "displayName": "Victor Torp",
+    "externalId": 403692,
+    "firstName": "Victor",
+    "lastName": "Torp",
+    "slug": "victor-torp-403692",
+    "sortName": "Torp, Victor",
+    "teamSlug": "coventry-city"
+  },
+  {
+    "assetPath": "/player-faces/coventry_city_van_ewijk_milan.png",
+    "displayName": "Milan van Ewijk",
+    "externalId": 587335,
+    "firstName": "Milan",
+    "lastName": "van Ewijk",
+    "slug": "milan-van-ewijk-587335",
+    "sortName": "van Ewijk, Milan",
+    "teamSlug": "coventry-city"
+  },
+  {
+    "assetPath": "/player-faces/coventry_city_wilson_ben.png",
+    "displayName": "Ben Wilson",
+    "externalId": 121352,
+    "firstName": "Ben",
+    "lastName": "Wilson",
+    "slug": "ben-wilson-121352",
+    "sortName": "Wilson, Ben",
+    "teamSlug": "coventry-city"
+  },
+  {
+    "assetPath": "/player-faces/coventry_city_woolfenden_luke.png",
+    "displayName": "Luke Woolfenden",
+    "externalId": 527425,
+    "firstName": "Luke",
+    "lastName": "Woolfenden",
+    "slug": "luke-woolfenden-527425",
+    "sortName": "Woolfenden, Luke",
+    "teamSlug": "coventry-city"
+  },
+  {
+    "assetPath": "/player-faces/coventry_city_wright_haji.png",
+    "displayName": "Haji Wright",
+    "externalId": 315291,
+    "firstName": "Haji",
+    "lastName": "Wright",
+    "slug": "haji-wright-315291",
+    "sortName": "Wright, Haji",
+    "teamSlug": "coventry-city"
+  },
+  {
+    "assetPath": "/player-faces/coventry_city_angel_brau_miguel.png",
+    "displayName": "Miguel Ángel Brau",
+    "externalId": 713649,
+    "firstName": "Miguel",
+    "lastName": "Ángel Brau",
+    "slug": "miguel-angel-brau-713649",
+    "sortName": "Ángel Brau, Miguel",
+    "teamSlug": "coventry-city"
+  },
+  {
+    "assetPath": "/player-faces/crystal_palace_benitez_walter.png",
+    "displayName": "Walter Benítez",
+    "externalId": 296802,
+    "firstName": "Walter",
+    "lastName": "Benítez",
+    "slug": "walter-benitez-296802",
+    "sortName": "Benítez, Walter",
+    "teamSlug": "crystal-palace"
+  },
+  {
+    "assetPath": "/player-faces/crystal_palace_canvot_jaydee.png",
+    "displayName": "Jaydee Canvot",
+    "externalId": 1006411,
+    "firstName": "Jaydee",
+    "lastName": "Canvot",
+    "slug": "jaydee-canvot-1006411",
+    "sortName": "Canvot, Jaydee",
+    "teamSlug": "crystal-palace"
+  },
+  {
+    "assetPath": "/player-faces/crystal_palace_cardines_rio.png",
+    "displayName": "Rio Cardines",
+    "externalId": 1047257,
+    "firstName": "Rio",
+    "lastName": "Cardines",
+    "slug": "rio-cardines-1047257",
+    "sortName": "Cardines, Rio",
+    "teamSlug": "crystal-palace"
+  },
+  {
+    "assetPath": "/player-faces/crystal_palace_devenny_justin.png",
+    "displayName": "Justin Devenny",
+    "externalId": 747009,
+    "firstName": "Justin",
+    "lastName": "Devenny",
+    "slug": "justin-devenny-747009",
+    "sortName": "Devenny, Justin",
+    "teamSlug": "crystal-palace"
+  },
+  {
+    "assetPath": "/player-faces/crystal_palace_doucoure_cheick.png",
+    "displayName": "Cheick Doucouré",
+    "externalId": 543387,
+    "firstName": "Cheick",
+    "lastName": "Doucouré",
+    "slug": "cheick-doucoure-543387",
+    "sortName": "Doucouré, Cheick",
+    "teamSlug": "crystal-palace"
+  },
+  {
+    "assetPath": "/player-faces/crystal_palace_esse_romain.png",
+    "displayName": "Romain Esse",
+    "externalId": 967319,
+    "firstName": "Romain",
+    "lastName": "Esse",
+    "slug": "romain-esse-967319",
+    "sortName": "Esse, Romain",
+    "teamSlug": "crystal-palace"
+  },
+  {
+    "assetPath": "/player-faces/crystal_palace_franca_matheus.png",
+    "displayName": "Matheus França",
+    "externalId": 743597,
+    "firstName": "Matheus",
+    "lastName": "França",
+    "slug": "matheus-franca-743597",
+    "sortName": "França, Matheus",
+    "teamSlug": "crystal-palace"
+  },
+  {
+    "assetPath": "/player-faces/crystal_palace_henderson_dean.png",
+    "displayName": "Dean Henderson",
+    "externalId": 258919,
+    "firstName": "Dean",
+    "lastName": "Henderson",
+    "slug": "dean-henderson-258919",
+    "sortName": "Henderson, Dean",
+    "teamSlug": "crystal-palace"
+  },
+  {
+    "assetPath": "/player-faces/crystal_palace_hughes_will.png",
+    "displayName": "Will Hughes",
+    "externalId": 207014,
+    "firstName": "Will",
+    "lastName": "Hughes",
+    "slug": "will-hughes-207014",
+    "sortName": "Hughes, Will",
+    "teamSlug": "crystal-palace"
+  },
+  {
+    "assetPath": "/player-faces/crystal_palace_johnson_brennan.png",
+    "displayName": "Brennan Johnson",
+    "externalId": 470607,
+    "firstName": "Brennan",
+    "lastName": "Johnson",
+    "slug": "brennan-johnson-470607",
+    "sortName": "Johnson, Brennan",
+    "teamSlug": "crystal-palace"
+  },
+  {
+    "assetPath": "/player-faces/crystal_palace_kamada_daichi.png",
+    "displayName": "Daichi Kamada",
+    "externalId": 356141,
+    "firstName": "Daichi",
+    "lastName": "Kamada",
+    "slug": "daichi-kamada-356141",
+    "sortName": "Kamada, Daichi",
+    "teamSlug": "crystal-palace"
+  },
+  {
+    "assetPath": "/player-faces/crystal_palace_kporha_caleb.png",
+    "displayName": "Caleb Kporha",
+    "externalId": 1047261,
+    "firstName": "Caleb",
+    "lastName": "Kporha",
+    "slug": "caleb-kporha-1047261",
+    "sortName": "Kporha, Caleb",
+    "teamSlug": "crystal-palace"
+  },
+  {
+    "assetPath": "/player-faces/crystal_palace_lerma_jefferson.png",
+    "displayName": "Jefferson Lerma",
+    "externalId": 262980,
+    "firstName": "Jefferson",
+    "lastName": "Lerma",
+    "slug": "jefferson-lerma-262980",
+    "sortName": "Lerma, Jefferson",
+    "teamSlug": "crystal-palace"
+  },
+  {
+    "assetPath": "/player-faces/crystal_palace_philippe_mateta_jean.png",
+    "displayName": "Jean-Philippe Mateta",
+    "externalId": 420002,
+    "firstName": "Jean-Philippe",
+    "lastName": "Mateta",
+    "slug": "jean-philippe-mateta-420002",
+    "sortName": "Mateta, Jean-Philippe",
+    "teamSlug": "crystal-palace"
+  },
+  {
+    "assetPath": "/player-faces/crystal_palace_matthews_remi.png",
+    "displayName": "Remi Matthews",
+    "externalId": 196722,
+    "firstName": "Remi",
+    "lastName": "Matthews",
+    "slug": "remi-matthews-196722",
+    "sortName": "Matthews, Remi",
+    "teamSlug": "crystal-palace"
+  },
+  {
+    "assetPath": "/player-faces/crystal_palace_mingueza_oscar.png",
+    "displayName": "Óscar Mingueza",
+    "externalId": 331505,
+    "firstName": "Óscar",
+    "lastName": "Mingueza",
+    "slug": "oscar-mingueza-331505",
+    "sortName": "Mingueza, Óscar",
+    "teamSlug": "crystal-palace"
+  },
+  {
+    "assetPath": "/player-faces/crystal_palace_mitchell_tyrick.png",
+    "displayName": "Tyrick Mitchell",
+    "externalId": 730893,
+    "firstName": "Tyrick",
+    "lastName": "Mitchell",
+    "slug": "tyrick-mitchell-730893",
+    "sortName": "Mitchell, Tyrick",
+    "teamSlug": "crystal-palace"
+  },
+  {
+    "assetPath": "/player-faces/crystal_palace_munoz_daniel.png",
+    "displayName": "Daniel Muñoz",
+    "externalId": 493003,
+    "firstName": "Daniel",
+    "lastName": "Muñoz",
+    "slug": "daniel-munoz-493003",
+    "sortName": "Muñoz, Daniel",
+    "teamSlug": "crystal-palace"
+  },
+  {
+    "assetPath": "/player-faces/crystal_palace_nketiah_eddie.png",
+    "displayName": "Eddie Nketiah",
+    "externalId": 340324,
+    "firstName": "Eddie",
+    "lastName": "Nketiah",
+    "slug": "eddie-nketiah-340324",
+    "sortName": "Nketiah, Eddie",
+    "teamSlug": "crystal-palace"
+  },
+  {
+    "assetPath": "/player-faces/crystal_palace_ozoh_david.png",
+    "displayName": "David Ozoh",
+    "externalId": 865993,
+    "firstName": "David",
+    "lastName": "Ozoh",
+    "slug": "david-ozoh-865993",
+    "sortName": "Ozoh, David",
+    "teamSlug": "crystal-palace"
+  },
+  {
+    "assetPath": "/player-faces/crystal_palace_pino_yeremy.png",
+    "displayName": "Yéremy Pino",
+    "externalId": 568157,
+    "firstName": "Yéremy",
+    "lastName": "Pino",
+    "slug": "yeremy-pino-568157",
+    "sortName": "Pino, Yéremy",
+    "teamSlug": "crystal-palace"
+  },
+  {
+    "assetPath": "/player-faces/crystal_palace_rak_sakyi_jesurun.png",
+    "displayName": "Jesurun Rak-Sakyi",
+    "externalId": 586834,
+    "firstName": "Jesurun",
+    "lastName": "Rak-Sakyi",
+    "slug": "jesurun-rak-sakyi-586834",
+    "sortName": "Rak-Sakyi, Jesurun",
+    "teamSlug": "crystal-palace"
+  },
+  {
+    "assetPath": "/player-faces/crystal_palace_riad_chadi.png",
+    "displayName": "Chadi Riad",
+    "externalId": 689637,
+    "firstName": "Chadi",
+    "lastName": "Riad",
+    "slug": "chadi-riad-689637",
+    "sortName": "Riad, Chadi",
+    "teamSlug": "crystal-palace"
+  },
+  {
+    "assetPath": "/player-faces/crystal_palace_richards_chris.png",
+    "displayName": "Chris Richards",
+    "externalId": 578539,
+    "firstName": "Chris",
+    "lastName": "Richards",
+    "slug": "chris-richards-578539",
+    "sortName": "Richards, Chris",
+    "teamSlug": "crystal-palace"
+  },
+  {
+    "assetPath": "/player-faces/crystal_palace_sarr_ismaila.png",
+    "displayName": "Ismaïla Sarr",
+    "externalId": 410225,
+    "firstName": "Ismaïla",
+    "lastName": "Sarr",
+    "slug": "ismaila-sarr-410225",
+    "sortName": "Sarr, Ismaïla",
+    "teamSlug": "crystal-palace"
+  },
+  {
+    "assetPath": "/player-faces/crystal_palace_sosa_borna.png",
+    "displayName": "Borna Sosa",
+    "externalId": 293194,
+    "firstName": "Borna",
+    "lastName": "Sosa",
+    "slug": "borna-sosa-293194",
+    "sortName": "Sosa, Borna",
+    "teamSlug": "crystal-palace"
+  },
+  {
+    "assetPath": "/player-faces/crystal_palace_strand_larsen_jrgen.png",
+    "displayName": "Jørgen Strand Larsen",
+    "externalId": 429983,
+    "firstName": "Jørgen",
+    "lastName": "Strand Larsen",
+    "slug": "jorgen-strand-larsen-429983",
+    "sortName": "Strand Larsen, Jørgen",
+    "teamSlug": "crystal-palace"
+  },
+  {
+    "assetPath": "/player-faces/crystal_palace_tomiyasu_takehiro.png",
+    "displayName": "Takehiro Tomiyasu",
+    "externalId": 331560,
+    "firstName": "Takehiro",
+    "lastName": "Tomiyasu",
+    "slug": "takehiro-tomiyasu-331560",
+    "sortName": "Tomiyasu, Takehiro",
+    "teamSlug": "crystal-palace"
+  },
+  {
+    "assetPath": "/player-faces/crystal_palace_wharton_adam.png",
+    "displayName": "Adam Wharton",
+    "externalId": 744149,
+    "firstName": "Adam",
+    "lastName": "Wharton",
+    "slug": "adam-wharton-744149",
+    "sortName": "Wharton, Adam",
+    "teamSlug": "crystal-palace"
+  },
+  {
+    "assetPath": "/player-faces/fc_everton_alcaraz_carlos.png",
+    "displayName": "Carlos Alcaraz",
+    "externalId": 748319,
+    "firstName": "Carlos",
+    "lastName": "Alcaraz",
+    "slug": "carlos-alcaraz-748319",
+    "sortName": "Alcaraz, Carlos",
+    "teamSlug": "everton"
+  },
+  {
+    "assetPath": "/player-faces/fc_everton_armstrong_harrison.png",
+    "displayName": "Harrison Armstrong",
+    "externalId": 1107733,
+    "firstName": "Harrison",
+    "lastName": "Armstrong",
+    "slug": "harrison-armstrong-1107733",
+    "sortName": "Armstrong, Harrison",
+    "teamSlug": "everton"
+  },
+  {
+    "assetPath": "/player-faces/fc_everton_aznou_adam.png",
+    "displayName": "Adam Aznou",
+    "externalId": 938146,
+    "firstName": "Adam",
+    "lastName": "Aznou",
+    "slug": "adam-aznou-938146",
+    "sortName": "Aznou, Adam",
+    "teamSlug": "everton"
+  },
+  {
+    "assetPath": "/player-faces/fc_everton_barry_thierno.png",
+    "displayName": "Thierno Barry",
+    "externalId": 937941,
+    "firstName": "Thierno",
+    "lastName": "Barry",
+    "slug": "thierno-barry-937941",
+    "sortName": "Barry, Thierno",
+    "teamSlug": "everton"
+  },
+  {
+    "assetPath": "/player-faces/fc_everton_x_beto.png",
+    "displayName": "Beto",
+    "externalId": 595809,
+    "firstName": "Beto",
+    "lastName": null,
+    "slug": "beto-595809",
+    "sortName": "Beto",
+    "teamSlug": "everton"
+  },
+  {
+    "assetPath": "/player-faces/fc_everton_branthwaite_jarrad.png",
+    "displayName": "Jarrad Branthwaite",
+    "externalId": 661053,
+    "firstName": "Jarrad",
+    "lastName": "Branthwaite",
+    "slug": "jarrad-branthwaite-661053",
+    "sortName": "Branthwaite, Jarrad",
+    "teamSlug": "everton"
+  },
+  {
+    "assetPath": "/player-faces/fc_everton_dewsbury_hall_kiernan.png",
+    "displayName": "Kiernan Dewsbury-Hall",
+    "externalId": 475188,
+    "firstName": "Kiernan",
+    "lastName": "Dewsbury-Hall",
+    "slug": "kiernan-dewsbury-hall-475188",
+    "sortName": "Dewsbury-Hall, Kiernan",
+    "teamSlug": "everton"
+  },
+  {
+    "assetPath": "/player-faces/fc_everton_dibling_tyler.png",
+    "displayName": "Tyler Dibling",
+    "externalId": 866655,
+    "firstName": "Tyler",
+    "lastName": "Dibling",
+    "slug": "tyler-dibling-866655",
+    "sortName": "Dibling, Tyler",
+    "teamSlug": "everton"
+  },
+  {
+    "assetPath": "/player-faces/fc_everton_garner_james.png",
+    "displayName": "James Garner",
+    "externalId": 505219,
+    "firstName": "James",
+    "lastName": "Garner",
+    "slug": "james-garner-505219",
+    "sortName": "Garner, James",
+    "teamSlug": "everton"
+  },
+  {
+    "assetPath": "/player-faces/fc_everton_george_tyrique.png",
+    "displayName": "Tyrique George",
+    "externalId": 936874,
+    "firstName": "Tyrique",
+    "lastName": "George",
+    "slug": "tyrique-george-936874",
+    "sortName": "George, Tyrique",
+    "teamSlug": "everton"
+  },
+  {
+    "assetPath": "/player-faces/fc_everton_hackney_hayden.png",
+    "displayName": "Hayden Hackney",
+    "externalId": 538216,
+    "firstName": "Hayden",
+    "lastName": "Hackney",
+    "slug": "hayden-hackney-538216",
+    "sortName": "Hackney, Hayden",
+    "teamSlug": "everton"
+  },
+  {
+    "assetPath": "/player-faces/fc_everton_iroegbunam_tim.png",
+    "displayName": "Tim Iroegbunam",
+    "externalId": 696589,
+    "firstName": "Tim",
+    "lastName": "Iroegbunam",
+    "slug": "tim-iroegbunam-696589",
+    "sortName": "Iroegbunam, Tim",
+    "teamSlug": "everton"
+  },
+  {
+    "assetPath": "/player-faces/fc_everton_keane_michael.png",
+    "displayName": "Michael Keane",
+    "externalId": 118534,
+    "firstName": "Michael",
+    "lastName": "Keane",
+    "slug": "michael-keane-118534",
+    "sortName": "Keane, Michael",
+    "teamSlug": "everton"
+  },
+  {
+    "assetPath": "/player-faces/fc_everton_king_tom.png",
+    "displayName": "Tom King",
+    "externalId": 215810,
+    "firstName": "Tom",
+    "lastName": "King",
+    "slug": "tom-king-215810",
+    "sortName": "King, Tom",
+    "teamSlug": "everton"
+  },
+  {
+    "assetPath": "/player-faces/fc_everton_mcneil_dwight.png",
+    "displayName": "Dwight McNeil",
+    "externalId": 584769,
+    "firstName": "Dwight",
+    "lastName": "McNeil",
+    "slug": "dwight-mcneil-584769",
+    "sortName": "McNeil, Dwight",
+    "teamSlug": "everton"
+  },
+  {
+    "assetPath": "/player-faces/fc_everton_mykolenko_vitaliy.png",
+    "displayName": "Vitaliy Mykolenko",
+    "externalId": 404842,
+    "firstName": "Vitaliy",
+    "lastName": "Mykolenko",
+    "slug": "vitaliy-mykolenko-404842",
+    "sortName": "Mykolenko, Vitaliy",
+    "teamSlug": "everton"
+  },
+  {
+    "assetPath": "/player-faces/fc_everton_ndiaye_iliman.png",
+    "displayName": "Iliman Ndiaye",
+    "externalId": 623570,
+    "firstName": "Iliman",
+    "lastName": "Ndiaye",
+    "slug": "iliman-ndiaye-623570",
+    "sortName": "Ndiaye, Iliman",
+    "teamSlug": "everton"
+  },
+  {
+    "assetPath": "/player-faces/fc_everton_nrgaard_christian.png",
+    "displayName": "Christian Nørgaard",
+    "externalId": 148367,
+    "firstName": "Christian",
+    "lastName": "Nørgaard",
+    "slug": "christian-norgaard-148367",
+    "sortName": "Nørgaard, Christian",
+    "teamSlug": "everton"
+  },
+  {
+    "assetPath": "/player-faces/fc_everton_o_brien_jake.png",
+    "displayName": "Jake O'Brien",
+    "externalId": 711544,
+    "firstName": "Jake",
+    "lastName": "O'Brien",
+    "slug": "jake-obrien-711544",
+    "sortName": "O'Brien, Jake",
+    "teamSlug": "everton"
+  },
+  {
+    "assetPath": "/player-faces/fc_everton_patterson_nathan.png",
+    "displayName": "Nathan Patterson",
+    "externalId": 424015,
+    "firstName": "Nathan",
+    "lastName": "Patterson",
+    "slug": "nathan-patterson-424015",
+    "sortName": "Patterson, Nathan",
+    "teamSlug": "everton"
+  },
+  {
+    "assetPath": "/player-faces/fc_everton_pickford_jordan.png",
+    "displayName": "Jordan Pickford",
+    "externalId": 130164,
+    "firstName": "Jordan",
+    "lastName": "Pickford",
+    "slug": "jordan-pickford-130164",
+    "sortName": "Pickford, Jordan",
+    "teamSlug": "everton"
+  },
+  {
+    "assetPath": "/player-faces/fc_everton_rohl_merlin.png",
+    "displayName": "Merlin Röhl",
+    "externalId": 608832,
+    "firstName": "Merlin",
+    "lastName": "Röhl",
+    "slug": "merlin-rohl-608832",
+    "sortName": "Röhl, Merlin",
+    "teamSlug": "everton"
+  },
+  {
+    "assetPath": "/player-faces/fc_everton_tarkowski_james.png",
+    "displayName": "James Tarkowski",
+    "externalId": 173504,
+    "firstName": "James",
+    "lastName": "Tarkowski",
+    "slug": "james-tarkowski-173504",
+    "sortName": "Tarkowski, James",
+    "teamSlug": "everton"
+  },
+  {
+    "assetPath": "/player-faces/fc_everton_travers_mark.png",
+    "displayName": "Mark Travers",
+    "externalId": 357658,
+    "firstName": "Mark",
+    "lastName": "Travers",
+    "slug": "mark-travers-357658",
+    "sortName": "Travers, Mark",
+    "teamSlug": "everton"
+  },
+  {
+    "assetPath": "/player-faces/fc_fulham_andersen_joachim.png",
+    "displayName": "Joachim Andersen",
+    "externalId": 260827,
+    "firstName": "Joachim",
+    "lastName": "Andersen",
+    "slug": "joachim-andersen-260827",
+    "sortName": "Andersen, Joachim",
+    "teamSlug": "fulham"
+  },
+  {
+    "assetPath": "/player-faces/fc_fulham_bassey_calvin.png",
+    "displayName": "Calvin Bassey",
+    "externalId": 461883,
+    "firstName": "Calvin",
+    "lastName": "Bassey",
+    "slug": "calvin-bassey-461883",
+    "sortName": "Bassey, Calvin",
+    "teamSlug": "fulham"
+  },
+  {
+    "assetPath": "/player-faces/fc_fulham_berge_sander.png",
+    "displayName": "Sander Berge",
+    "externalId": 333014,
+    "firstName": "Sander",
+    "lastName": "Berge",
+    "slug": "sander-berge-333014",
+    "sortName": "Berge, Sander",
+    "teamSlug": "fulham"
+  },
+  {
+    "assetPath": "/player-faces/fc_fulham_bobb_oscar.png",
+    "displayName": "Oscar Bobb",
+    "externalId": 661207,
+    "firstName": "Oscar",
+    "lastName": "Bobb",
+    "slug": "oscar-bobb-661207",
+    "sortName": "Bobb, Oscar",
+    "teamSlug": "fulham"
+  },
+  {
+    "assetPath": "/player-faces/fc_fulham_cairney_tom.png",
+    "displayName": "Tom Cairney",
+    "externalId": 123275,
+    "firstName": "Tom",
+    "lastName": "Cairney",
+    "slug": "tom-cairney-123275",
+    "sortName": "Cairney, Tom",
+    "teamSlug": "fulham"
+  },
+  {
+    "assetPath": "/player-faces/fc_fulham_castagne_timothy.png",
+    "displayName": "Timothy Castagne",
+    "externalId": 262226,
+    "firstName": "Timothy",
+    "lastName": "Castagne",
+    "slug": "timothy-castagne-262226",
+    "sortName": "Castagne, Timothy",
+    "teamSlug": "fulham"
+  },
+  {
+    "assetPath": "/player-faces/fc_fulham_cuenca_jorge.png",
+    "displayName": "Jorge Cuenca",
+    "externalId": 494880,
+    "firstName": "Jorge",
+    "lastName": "Cuenca",
+    "slug": "jorge-cuenca-494880",
+    "sortName": "Cuenca, Jorge",
+    "teamSlug": "fulham"
+  },
+  {
+    "assetPath": "/player-faces/fc_fulham_garcia_gonzalo.png",
+    "displayName": "Gonzalo García",
+    "externalId": 935230,
+    "firstName": "Gonzalo",
+    "lastName": "García",
+    "slug": "gonzalo-garcia-935230",
+    "sortName": "García, Gonzalo",
+    "teamSlug": "fulham"
+  },
+  {
+    "assetPath": "/player-faces/fc_fulham_iwobi_alex.png",
+    "displayName": "Alex Iwobi",
+    "externalId": 242631,
+    "firstName": "Alex",
+    "lastName": "Iwobi",
+    "slug": "alex-iwobi-242631",
+    "sortName": "Iwobi, Alex",
+    "teamSlug": "fulham"
+  },
+  {
+    "assetPath": "/player-faces/fc_fulham_x_kevin.png",
+    "displayName": "Kevin",
+    "externalId": 900195,
+    "firstName": "Kevin",
+    "lastName": null,
+    "slug": "kevin-900195",
+    "sortName": "Kevin",
+    "teamSlug": "fulham"
+  },
+  {
+    "assetPath": "/player-faces/fc_fulham_king_josh.png",
+    "displayName": "Josh King",
+    "externalId": 1011131,
+    "firstName": "Josh",
+    "lastName": "King",
+    "slug": "josh-king-1011131",
+    "sortName": "King, Josh",
+    "teamSlug": "fulham"
+  },
+  {
+    "assetPath": "/player-faces/fc_fulham_kusi_asare_jonah.png",
+    "displayName": "Jonah Kusi-Asare",
+    "externalId": 1069512,
+    "firstName": "Jonah",
+    "lastName": "Kusi-Asare",
+    "slug": "jonah-kusi-asare-1069512",
+    "sortName": "Kusi-Asare, Jonah",
+    "teamSlug": "fulham"
+  },
+  {
+    "assetPath": "/player-faces/fc_fulham_lecomte_benjamin.png",
+    "displayName": "Benjamin Lecomte",
+    "externalId": 127181,
+    "firstName": "Benjamin",
+    "lastName": "Lecomte",
+    "slug": "benjamin-lecomte-127181",
+    "sortName": "Lecomte, Benjamin",
+    "teamSlug": "fulham"
+  },
+  {
+    "assetPath": "/player-faces/fc_fulham_leno_bernd.png",
+    "displayName": "Bernd Leno",
+    "externalId": 72476,
+    "firstName": "Bernd",
+    "lastName": "Leno",
+    "slug": "bernd-leno-72476",
+    "sortName": "Leno, Bernd",
+    "teamSlug": "fulham"
+  },
+  {
+    "assetPath": "/player-faces/fc_fulham_lukic_sasa.png",
+    "displayName": "Saša Lukić",
+    "externalId": 245056,
+    "firstName": "Saša",
+    "lastName": "Lukić",
+    "slug": "sasa-lukic-245056",
+    "sortName": "Lukić, Saša",
+    "teamSlug": "fulham"
+  },
+  {
+    "assetPath": "/player-faces/fc_fulham_muniz_rodrigo.png",
+    "displayName": "Rodrigo Muniz",
+    "externalId": 735571,
+    "firstName": "Rodrigo",
+    "lastName": "Muniz",
+    "slug": "rodrigo-muniz-735571",
+    "sortName": "Muniz, Rodrigo",
+    "teamSlug": "fulham"
+  },
+  {
+    "assetPath": "/player-faces/fc_fulham_palacios_cesar.png",
+    "displayName": "César Palacios",
+    "externalId": 948272,
+    "firstName": "César",
+    "lastName": "Palacios",
+    "slug": "cesar-palacios-948272",
+    "sortName": "Palacios, César",
+    "teamSlug": "fulham"
+  },
+  {
+    "assetPath": "/player-faces/fc_fulham_reed_harrison.png",
+    "displayName": "Harrison Reed",
+    "externalId": 226973,
+    "firstName": "Harrison",
+    "lastName": "Reed",
+    "slug": "harrison-reed-226973",
+    "sortName": "Reed, Harrison",
+    "teamSlug": "fulham"
+  },
+  {
+    "assetPath": "/player-faces/fc_fulham_robinson_antonee.png",
+    "displayName": "Antonee Robinson",
+    "externalId": 349701,
+    "firstName": "Antonee",
+    "lastName": "Robinson",
+    "slug": "antonee-robinson-349701",
+    "sortName": "Robinson, Antonee",
+    "teamSlug": "fulham"
+  },
+  {
+    "assetPath": "/player-faces/fc_fulham_sessegnon_ryan.png",
+    "displayName": "Ryan Sessegnon",
+    "externalId": 392775,
+    "firstName": "Ryan",
+    "lastName": "Sessegnon",
+    "slug": "ryan-sessegnon-392775",
+    "sortName": "Sessegnon, Ryan",
+    "teamSlug": "fulham"
+  },
+  {
+    "assetPath": "/player-faces/fc_fulham_smith_rowe_emile.png",
+    "displayName": "Emile Smith Rowe",
+    "externalId": 392765,
+    "firstName": "Emile",
+    "lastName": "Smith Rowe",
+    "slug": "emile-smith-rowe-392765",
+    "sortName": "Smith Rowe, Emile",
+    "teamSlug": "fulham"
+  },
+  {
+    "assetPath": "/player-faces/fc_fulham_tete_kenny.png",
+    "displayName": "Kenny Tete",
+    "externalId": 206746,
+    "firstName": "Kenny",
+    "lastName": "Tete",
+    "slug": "kenny-tete-206746",
+    "sortName": "Tete, Kenny",
+    "teamSlug": "fulham"
+  },
+  {
+    "assetPath": "/player-faces/hull_city_ajayi_semi.png",
+    "displayName": "Semi Ajayi",
+    "externalId": 251912,
+    "firstName": "Semi",
+    "lastName": "Ajayi",
+    "slug": "semi-ajayi-251912",
+    "sortName": "Ajayi, Semi",
+    "teamSlug": "hull-city"
+  },
+  {
+    "assetPath": null,
+    "displayName": "David Akintola",
+    "externalId": 353775,
+    "firstName": "David",
+    "lastName": "Akintola",
+    "slug": "david-akintola-353775",
+    "sortName": "Akintola, David",
+    "teamSlug": "hull-city"
+  },
+  {
+    "assetPath": "/player-faces/hull_city_belloumi_mohamed.png",
+    "displayName": "Mohamed Belloumi",
+    "externalId": 857079,
+    "firstName": "Mohamed",
+    "lastName": "Belloumi",
+    "slug": "mohamed-belloumi-857079",
+    "sortName": "Belloumi, Mohamed",
+    "teamSlug": "hull-city"
+  },
+  {
+    "assetPath": "/player-faces/hull_city_butland_jack.png",
+    "displayName": "Jack Butland",
+    "externalId": 128899,
+    "firstName": "Jack",
+    "lastName": "Butland",
+    "slug": "jack-butland-128899",
+    "sortName": "Butland, Jack",
+    "teamSlug": "hull-city"
+  },
+  {
+    "assetPath": "/player-faces/hull_city_coyle_lewie.png",
+    "displayName": "Lewie Coyle",
+    "externalId": 413402,
+    "firstName": "Lewie",
+    "lastName": "Coyle",
+    "slug": "lewie-coyle-413402",
+    "sortName": "Coyle, Lewie",
+    "teamSlug": "hull-city"
+  },
+  {
+    "assetPath": "/player-faces/hull_city_crooks_matt.png",
+    "displayName": "Matt Crooks",
+    "externalId": 169416,
+    "firstName": "Matt",
+    "lastName": "Crooks",
+    "slug": "matt-crooks-169416",
+    "sortName": "Crooks, Matt",
+    "teamSlug": "hull-city"
+  },
+  {
+    "assetPath": "/player-faces/hull_city_destan_enis.png",
+    "displayName": "Enis Destan",
+    "externalId": 699980,
+    "firstName": "Enis",
+    "lastName": "Destan",
+    "slug": "enis-destan-699980",
+    "sortName": "Destan, Enis",
+    "teamSlug": "hull-city"
+  },
+  {
+    "assetPath": "/player-faces/hull_city_dowell_kieran.png",
+    "displayName": "Kieran Dowell",
+    "externalId": 258916,
+    "firstName": "Kieran",
+    "lastName": "Dowell",
+    "slug": "kieran-dowell-258916",
+    "sortName": "Dowell, Kieran",
+    "teamSlug": "hull-city"
+  },
+  {
+    "assetPath": "/player-faces/hull_city_drameh_cody.png",
+    "displayName": "Cody Drameh",
+    "externalId": 531957,
+    "firstName": "Cody",
+    "lastName": "Drameh",
+    "slug": "cody-drameh-531957",
+    "sortName": "Drameh, Cody",
+    "teamSlug": "hull-city"
+  },
+  {
+    "assetPath": "/player-faces/hull_city_egan_john.png",
+    "displayName": "John Egan",
+    "externalId": 121324,
+    "firstName": "John",
+    "lastName": "Egan",
+    "slug": "john-egan-121324",
+    "sortName": "Egan, John",
+    "teamSlug": "hull-city"
+  },
+  {
+    "assetPath": "/player-faces/hull_city_giles_ryan.png",
+    "displayName": "Ryan Giles",
+    "externalId": 504581,
+    "firstName": "Ryan",
+    "lastName": "Giles",
+    "slug": "ryan-giles-504581",
+    "sortName": "Giles, Ryan",
+    "teamSlug": "hull-city"
+  },
+  {
+    "assetPath": "/player-faces/hull_city_gyabi_darko.png",
+    "displayName": "Darko Gyabi",
+    "externalId": 663264,
+    "firstName": "Darko",
+    "lastName": "Gyabi",
+    "slug": "darko-gyabi-663264",
+    "sortName": "Gyabi, Darko",
+    "teamSlug": "hull-city"
+  },
+  {
+    "assetPath": "/player-faces/hull_city_hjert_dahl_jens.png",
+    "displayName": "Jens Hjertø-Dahl",
+    "externalId": 923535,
+    "firstName": "Jens",
+    "lastName": "Hjertø-Dahl",
+    "slug": "jens-hjerto-dahl-923535",
+    "sortName": "Hjertø-Dahl, Jens",
+    "teamSlug": "hull-city"
+  },
+  {
+    "assetPath": "/player-faces/hull_city_hughes_charlie.png",
+    "displayName": "Charlie Hughes",
+    "externalId": 746357,
+    "firstName": "Charlie",
+    "lastName": "Hughes",
+    "slug": "charlie-hughes-746357",
+    "sortName": "Hughes, Charlie",
+    "teamSlug": "hull-city"
+  },
+  {
+    "assetPath": "/player-faces/hull_city_jacob_matty.png",
+    "displayName": "Matty Jacob",
+    "externalId": 729940,
+    "firstName": "Matty",
+    "lastName": "Jacob",
+    "slug": "matty-jacob-729940",
+    "sortName": "Jacob, Matty",
+    "teamSlug": "hull-city"
+  },
+  {
+    "assetPath": "/player-faces/hull_city_kamara_abu.png",
+    "displayName": "Abu Kamara",
+    "externalId": 696764,
+    "firstName": "Abu",
+    "lastName": "Kamara",
+    "slug": "abu-kamara-696764",
+    "sortName": "Kamara, Abu",
+    "teamSlug": "hull-city"
+  },
+  {
+    "assetPath": "/player-faces/hull_city_matazo_eliot.png",
+    "displayName": "Eliot Matazo",
+    "externalId": 535834,
+    "firstName": "Eliot",
+    "lastName": "Matazo",
+    "slug": "eliot-matazo-535834",
+    "sortName": "Matazo, Eliot",
+    "teamSlug": "hull-city"
+  },
+  {
+    "assetPath": "/player-faces/hull_city_mcburnie_oli.png",
+    "displayName": "Oli McBurnie",
+    "externalId": 298477,
+    "firstName": "Oli",
+    "lastName": "McBurnie",
+    "slug": "oli-mcburnie-298477",
+    "sortName": "McBurnie, Oli",
+    "teamSlug": "hull-city"
+  },
+  {
+    "assetPath": "/player-faces/hull_city_mcnair_paddy.png",
+    "displayName": "Paddy McNair",
+    "externalId": 167268,
+    "firstName": "Paddy",
+    "lastName": "McNair",
+    "slug": "paddy-mcnair-167268",
+    "sortName": "McNair, Paddy",
+    "teamSlug": "hull-city"
+  },
+  {
+    "assetPath": "/player-faces/hull_city_millar_liam.png",
+    "displayName": "Liam Millar",
+    "externalId": 487417,
+    "firstName": "Liam",
+    "lastName": "Millar",
+    "slug": "liam-millar-487417",
+    "sortName": "Millar, Liam",
+    "teamSlug": "hull-city"
+  },
+  {
+    "assetPath": "/player-faces/hull_city_morita_hidemasa.png",
+    "displayName": "Hidemasa Morita",
+    "externalId": 524315,
+    "firstName": "Hidemasa",
+    "lastName": "Morita",
+    "slug": "hidemasa-morita-524315",
+    "sortName": "Morita, Hidemasa",
+    "teamSlug": "hull-city"
+  },
+  {
+    "assetPath": "/player-faces/hull_city_phillips_dillon.png",
+    "displayName": "Dillon Phillips",
+    "externalId": 308431,
+    "firstName": "Dillon",
+    "lastName": "Phillips",
+    "slug": "dillon-phillips-308431",
+    "sortName": "Phillips, Dillon",
+    "teamSlug": "hull-city"
+  },
+  {
+    "assetPath": "/player-faces/hull_city_slater_regan.png",
+    "displayName": "Regan Slater",
+    "externalId": 473080,
+    "firstName": "Regan",
+    "lastName": "Slater",
+    "slug": "regan-slater-473080",
+    "sortName": "Slater, Regan",
+    "teamSlug": "hull-city"
+  },
+  {
+    "assetPath": "/player-faces/hull_city_targett_matt.png",
+    "displayName": "Matt Targett",
+    "externalId": 250478,
+    "firstName": "Matt",
+    "lastName": "Targett",
+    "slug": "matt-targett-250478",
+    "sortName": "Targett, Matt",
+    "teamSlug": "hull-city"
+  },
+  {
+    "assetPath": "/player-faces/hull_city_tzolakis_konstantinos.png",
+    "displayName": "Konstantinos Tzolakis",
+    "externalId": 554389,
+    "firstName": "Konstantinos",
+    "lastName": "Tzolakis",
+    "slug": "konstantinos-tzolakis-554389",
+    "sortName": "Tzolakis, Konstantinos",
+    "teamSlug": "hull-city"
+  },
+  {
+    "assetPath": "/player-faces/hull_city_zambrano_oscar.png",
+    "displayName": "Óscar Zambrano",
+    "externalId": 893658,
+    "firstName": "Óscar",
+    "lastName": "Zambrano",
+    "slug": "oscar-zambrano-893658",
+    "sortName": "Zambrano, Óscar",
+    "teamSlug": "hull-city"
+  },
+  {
+    "assetPath": "/player-faces/hull_city_omur_abdulkadir.png",
+    "displayName": "Abdülkadir Ömür",
+    "externalId": 271495,
+    "firstName": "Abdülkadir",
+    "lastName": "Ömür",
+    "slug": "abdulkadir-omur-271495",
+    "sortName": "Ömür, Abdülkadir",
+    "teamSlug": "hull-city"
+  },
+  {
+    "assetPath": "/player-faces/ipswich_town_akpom_chuba.png",
+    "displayName": "Chuba Akpom",
+    "externalId": 197642,
+    "firstName": "Chuba",
+    "lastName": "Akpom",
+    "slug": "chuba-akpom-197642",
+    "sortName": "Akpom, Chuba",
+    "teamSlug": "ipswich-town"
+  },
+  {
+    "assetPath": "/player-faces/ipswich_town_al_hamadi_ali.png",
+    "displayName": "Ali Al-Hamadi",
+    "externalId": 610581,
+    "firstName": "Ali",
+    "lastName": "Al-Hamadi",
+    "slug": "ali-al-hamadi-610581",
+    "sortName": "Al-Hamadi, Ali",
+    "teamSlug": "ipswich-town"
+  },
+  {
+    "assetPath": "/player-faces/ipswich_town_button_david.png",
+    "displayName": "David Button",
+    "externalId": 61814,
+    "firstName": "David",
+    "lastName": "Button",
+    "slug": "david-button-61814",
+    "sortName": "Button, David",
+    "teamSlug": "ipswich-town"
+  },
+  {
+    "assetPath": "/player-faces/ipswich_town_clarke_harry.png",
+    "displayName": "Harry Clarke",
+    "externalId": 528892,
+    "firstName": "Harry",
+    "lastName": "Clarke",
+    "slug": "harry-clarke-528892",
+    "sortName": "Clarke, Harry",
+    "teamSlug": "ipswich-town"
+  },
+  {
+    "assetPath": "/player-faces/ipswich_town_clarke_jack.png",
+    "displayName": "Jack Clarke",
+    "externalId": 559794,
+    "firstName": "Jack",
+    "lastName": "Clarke",
+    "slug": "jack-clarke-559794",
+    "sortName": "Clarke, Jack",
+    "teamSlug": "ipswich-town"
+  },
+  {
+    "assetPath": "/player-faces/ipswich_town_davis_leif.png",
+    "displayName": "Leif Davis",
+    "externalId": 596446,
+    "firstName": "Leif",
+    "lastName": "Davis",
+    "slug": "leif-davis-596446",
+    "sortName": "Davis, Leif",
+    "teamSlug": "ipswich-town"
+  },
+  {
+    "assetPath": "/player-faces/ipswich_town_diop_issa.png",
+    "displayName": "Issa Diop",
+    "externalId": 272622,
+    "firstName": "Issa",
+    "lastName": "Diop",
+    "slug": "issa-diop-272622",
+    "sortName": "Diop, Issa",
+    "teamSlug": "ipswich-town"
+  },
+  {
+    "assetPath": "/player-faces/ipswich_town_x_emersonn.png",
+    "displayName": "Emersonn",
+    "externalId": 743599,
+    "firstName": "Emersonn",
+    "lastName": null,
+    "slug": "emersonn-743599",
+    "sortName": "Emersonn",
+    "teamSlug": "ipswich-town"
+  },
+  {
+    "assetPath": "/player-faces/ipswich_town_fatawu_abdul.png",
+    "displayName": "Abdul Fatawu",
+    "externalId": 864121,
+    "firstName": "Abdul",
+    "lastName": "Fatawu",
+    "slug": "abdul-fatawu-864121",
+    "sortName": "Fatawu, Abdul",
+    "teamSlug": "ipswich-town"
+  },
+  {
+    "assetPath": "/player-faces/ipswich_town_x_florentino.png",
+    "displayName": "Florentino",
+    "externalId": 357162,
+    "firstName": "Florentino",
+    "lastName": null,
+    "slug": "florentino-357162",
+    "sortName": "Florentino",
+    "teamSlug": "ipswich-town"
+  },
+  {
+    "assetPath": "/player-faces/ipswich_town_furlong_darnell.png",
+    "displayName": "Darnell Furlong",
+    "externalId": 351755,
+    "firstName": "Darnell",
+    "lastName": "Furlong",
+    "slug": "darnell-furlong-351755",
+    "sortName": "Furlong, Darnell",
+    "teamSlug": "ipswich-town"
+  },
+  {
+    "assetPath": "/player-faces/ipswich_town_greaves_jacob.png",
+    "displayName": "Jacob Greaves",
+    "externalId": 693095,
+    "firstName": "Jacob",
+    "lastName": "Greaves",
+    "slug": "jacob-greaves-693095",
+    "sortName": "Greaves, Jacob",
+    "teamSlug": "ipswich-town"
+  },
+  {
+    "assetPath": "/player-faces/ipswich_town_hirst_george.png",
+    "displayName": "George Hirst",
+    "externalId": 420808,
+    "firstName": "George",
+    "lastName": "Hirst",
+    "slug": "george-hirst-420808",
+    "sortName": "Hirst, George",
+    "teamSlug": "ipswich-town"
+  },
+  {
+    "assetPath": "/player-faces/ipswich_town_humphreys_cameron.png",
+    "displayName": "Cameron Humphreys",
+    "externalId": 871335,
+    "firstName": "Cameron",
+    "lastName": "Humphreys",
+    "slug": "cameron-humphreys-871335",
+    "sortName": "Humphreys, Cameron",
+    "teamSlug": "ipswich-town"
+  },
+  {
+    "assetPath": "/player-faces/ipswich_town_johnson_ben.png",
+    "displayName": "Ben Johnson",
+    "externalId": 468002,
+    "firstName": "Ben",
+    "lastName": "Johnson",
+    "slug": "ben-johnson-468002",
+    "sortName": "Johnson, Ben",
+    "teamSlug": "ipswich-town"
+  },
+  {
+    "assetPath": "/player-faces/ipswich_town_kipre_cedric.png",
+    "displayName": "Cédric Kipré",
+    "externalId": 364827,
+    "firstName": "Cédric",
+    "lastName": "Kipré",
+    "slug": "cedric-kipre-364827",
+    "sortName": "Kipré, Cédric",
+    "teamSlug": "ipswich-town"
+  },
+  {
+    "assetPath": "/player-faces/ipswich_town_maeda_daizen.png",
+    "displayName": "Daizen Maeda",
+    "externalId": 420931,
+    "firstName": "Daizen",
+    "lastName": "Maeda",
+    "slug": "daizen-maeda-420931",
+    "sortName": "Maeda, Daizen",
+    "teamSlug": "ipswich-town"
+  },
+  {
+    "assetPath": "/player-faces/ipswich_town_matusiwa_azor.png",
+    "displayName": "Azor Matusiwa",
+    "externalId": 315145,
+    "firstName": "Azor",
+    "lastName": "Matusiwa",
+    "slug": "azor-matusiwa-315145",
+    "sortName": "Matusiwa, Azor",
+    "teamSlug": "ipswich-town"
+  },
+  {
+    "assetPath": "/player-faces/ipswich_town_mcateer_kasey.png",
+    "displayName": "Kasey McAteer",
+    "externalId": 621193,
+    "firstName": "Kasey",
+    "lastName": "McAteer",
+    "slug": "kasey-mcateer-621193",
+    "sortName": "McAteer, Kasey",
+    "teamSlug": "ipswich-town"
+  },
+  {
+    "assetPath": "/player-faces/ipswich_town_mehmeti_anis.png",
+    "displayName": "Anis Mehmeti",
+    "externalId": 530813,
+    "firstName": "Anis",
+    "lastName": "Mehmeti",
+    "slug": "anis-mehmeti-530813",
+    "sortName": "Mehmeti, Anis",
+    "teamSlug": "ipswich-town"
+  },
+  {
+    "assetPath": "/player-faces/ipswich_town_nunez_marcelino.png",
+    "displayName": "Marcelino Núñez",
+    "externalId": 715558,
+    "firstName": "Marcelino",
+    "lastName": "Núñez",
+    "slug": "marcelino-nunez-715558",
+    "sortName": "Núñez, Marcelino",
+    "teamSlug": "ipswich-town"
+  },
+  {
+    "assetPath": "/player-faces/ipswich_town_o_shea_dara.png",
+    "displayName": "Dara O'Shea",
+    "externalId": 401320,
+    "firstName": "Dara",
+    "lastName": "O'Shea",
+    "slug": "dara-oshea-401320",
+    "sortName": "O'Shea, Dara",
+    "teamSlug": "ipswich-town"
+  },
+  {
+    "assetPath": "/player-faces/ipswich_town_ogbene_chiedozie.png",
+    "displayName": "Chiedozie Ogbene",
+    "externalId": 392591,
+    "firstName": "Chiedozie",
+    "lastName": "Ogbene",
+    "slug": "chiedozie-ogbene-392591",
+    "sortName": "Ogbene, Chiedozie",
+    "teamSlug": "ipswich-town"
+  },
+  {
+    "assetPath": "/player-faces/ipswich_town_palmer_alex.png",
+    "displayName": "Alex Palmer",
+    "externalId": 245625,
+    "firstName": "Alex",
+    "lastName": "Palmer",
+    "slug": "alex-palmer-245625",
+    "sortName": "Palmer, Alex",
+    "teamSlug": "ipswich-town"
+  },
+  {
+    "assetPath": "/player-faces/ipswich_town_philogene_jaden.png",
+    "displayName": "Jaden Philogene",
+    "externalId": 665390,
+    "firstName": "Jaden",
+    "lastName": "Philogene",
+    "slug": "jaden-philogene-665390",
+    "sortName": "Philogene, Jaden",
+    "teamSlug": "ipswich-town"
+  },
+  {
+    "assetPath": "/player-faces/ipswich_town_scherpen_kjell.png",
+    "displayName": "Kjell Scherpen",
+    "externalId": 463527,
+    "firstName": "Kjell",
+    "lastName": "Scherpen",
+    "slug": "kjell-scherpen-463527",
+    "sortName": "Scherpen, Kjell",
+    "teamSlug": "ipswich-town"
+  },
+  {
+    "assetPath": "/player-faces/ipswich_town_taylor_jack.png",
+    "displayName": "Jack Taylor",
+    "externalId": 458178,
+    "firstName": "Jack",
+    "lastName": "Taylor",
+    "slug": "jack-taylor-458178",
+    "sortName": "Taylor, Jack",
+    "teamSlug": "ipswich-town"
+  },
+  {
+    "assetPath": "/player-faces/ipswich_town_van_oevelen_kayne.png",
+    "displayName": "Kayne van Oevelen",
+    "externalId": 790669,
+    "firstName": "Kayne",
+    "lastName": "van Oevelen",
+    "slug": "kayne-van-oevelen-790669",
+    "sortName": "van Oevelen, Kayne",
+    "teamSlug": "ipswich-town"
+  },
+  {
+    "assetPath": "/player-faces/ipswich_town_walle_egeli_sindre.png",
+    "displayName": "Sindre Walle Egeli",
+    "externalId": 923504,
+    "firstName": "Sindre",
+    "lastName": "Walle Egeli",
+    "slug": "sindre-walle-egeli-923504",
+    "sortName": "Walle Egeli, Sindre",
+    "teamSlug": "ipswich-town"
+  },
+  {
+    "assetPath": "/player-faces/ipswich_town_walton_christian.png",
+    "displayName": "Christian Walton",
+    "externalId": 208379,
+    "firstName": "Christian",
+    "lastName": "Walton",
+    "slug": "christian-walton-208379",
+    "sortName": "Walton, Christian",
+    "teamSlug": "ipswich-town"
+  },
+  {
+    "assetPath": "/player-faces/leeds_united_aaronson_brenden.png",
+    "displayName": "Brenden Aaronson",
+    "externalId": 393323,
+    "firstName": "Brenden",
+    "lastName": "Aaronson",
+    "slug": "brenden-aaronson-393323",
+    "sortName": "Aaronson, Brenden",
+    "teamSlug": "leeds-united"
+  },
+  {
+    "assetPath": "/player-faces/leeds_united_ampadu_ethan.png",
+    "displayName": "Ethan Ampadu",
+    "externalId": 392771,
+    "firstName": "Ethan",
+    "lastName": "Ampadu",
+    "slug": "ethan-ampadu-392771",
+    "sortName": "Ampadu, Ethan",
+    "teamSlug": "leeds-united"
+  },
+  {
+    "assetPath": "/player-faces/leeds_united_bijol_jaka.png",
+    "displayName": "Jaka Bijol",
+    "externalId": 371851,
+    "firstName": "Jaka",
+    "lastName": "Bijol",
+    "slug": "jaka-bijol-371851",
+    "sortName": "Bijol, Jaka",
+    "teamSlug": "leeds-united"
+  },
+  {
+    "assetPath": "/player-faces/leeds_united_bogle_jayden.png",
+    "displayName": "Jayden Bogle",
+    "externalId": 465717,
+    "firstName": "Jayden",
+    "lastName": "Bogle",
+    "slug": "jayden-bogle-465717",
+    "sortName": "Bogle, Jayden",
+    "teamSlug": "leeds-united"
+  },
+  {
+    "assetPath": "/player-faces/leeds_united_bornauw_sebastiaan.png",
+    "displayName": "Sebastiaan Bornauw",
+    "externalId": 338629,
+    "firstName": "Sebastiaan",
+    "lastName": "Bornauw",
+    "slug": "sebastiaan-bornauw-338629",
+    "sortName": "Bornauw, Sebastiaan",
+    "teamSlug": "leeds-united"
+  },
+  {
+    "assetPath": "/player-faces/leeds_united_byram_sam.png",
+    "displayName": "Sam Byram",
+    "externalId": 236953,
+    "firstName": "Sam",
+    "lastName": "Byram",
+    "slug": "sam-byram-236953",
+    "sortName": "Byram, Sam",
+    "teamSlug": "leeds-united"
+  },
+  {
+    "assetPath": "/player-faces/leeds_united_cairns_alex.png",
+    "displayName": "Alex Cairns",
+    "externalId": 194386,
+    "firstName": "Alex",
+    "lastName": "Cairns",
+    "slug": "alex-cairns-194386",
+    "sortName": "Cairns, Alex",
+    "teamSlug": "leeds-united"
+  },
+  {
+    "assetPath": "/player-faces/leeds_united_calvert_lewin_dominic.png",
+    "displayName": "Dominic Calvert-Lewin",
+    "externalId": 306024,
+    "firstName": "Dominic",
+    "lastName": "Calvert-Lewin",
+    "slug": "dominic-calvert-lewin-306024",
+    "sortName": "Calvert-Lewin, Dominic",
+    "teamSlug": "leeds-united"
+  },
+  {
+    "assetPath": "/player-faces/leeds_united_gelhardt_joe.png",
+    "displayName": "Joe Gelhardt",
+    "externalId": 503980,
+    "firstName": "Joe",
+    "lastName": "Gelhardt",
+    "slug": "joe-gelhardt-503980",
+    "sortName": "Gelhardt, Joe",
+    "teamSlug": "leeds-united"
+  },
+  {
+    "assetPath": "/player-faces/leeds_united_gnonto_wilfried.png",
+    "displayName": "Wilfried Gnonto",
+    "externalId": 627626,
+    "firstName": "Wilfried",
+    "lastName": "Gnonto",
+    "slug": "wilfried-gnonto-627626",
+    "sortName": "Gnonto, Wilfried",
+    "teamSlug": "leeds-united"
+  },
+  {
+    "assetPath": "/player-faces/leeds_united_gruev_ilia.png",
+    "displayName": "Ilia Gruev",
+    "externalId": 381753,
+    "firstName": "Ilia",
+    "lastName": "Gruev",
+    "slug": "ilia-gruev-381753",
+    "sortName": "Gruev, Ilia",
+    "teamSlug": "leeds-united"
+  },
+  {
+    "assetPath": "/player-faces/leeds_united_gudmundsson_gabriel.png",
+    "displayName": "Gabriel Gudmundsson",
+    "externalId": 362108,
+    "firstName": "Gabriel",
+    "lastName": "Gudmundsson",
+    "slug": "gabriel-gudmundsson-362108",
+    "sortName": "Gudmundsson, Gabriel",
+    "teamSlug": "leeds-united"
+  },
+  {
+    "assetPath": "/player-faces/leeds_united_james_daniel.png",
+    "displayName": "Daniel James",
+    "externalId": 319301,
+    "firstName": "Daniel",
+    "lastName": "James",
+    "slug": "daniel-james-319301",
+    "sortName": "James, Daniel",
+    "teamSlug": "leeds-united"
+  },
+  {
+    "assetPath": "/player-faces/leeds_united_joseph_mateo.png",
+    "displayName": "Mateo Joseph",
+    "externalId": 834742,
+    "firstName": "Mateo",
+    "lastName": "Joseph",
+    "slug": "mateo-joseph-834742",
+    "sortName": "Joseph, Mateo",
+    "teamSlug": "leeds-united"
+  },
+  {
+    "assetPath": "/player-faces/leeds_united_justin_james.png",
+    "displayName": "James Justin",
+    "externalId": 413220,
+    "firstName": "James",
+    "lastName": "Justin",
+    "slug": "james-justin-413220",
+    "sortName": "Justin, James",
+    "teamSlug": "leeds-united"
+  },
+  {
+    "assetPath": "/player-faces/leeds_united_longstaff_sean.png",
+    "displayName": "Sean Longstaff",
+    "externalId": 346707,
+    "firstName": "Sean",
+    "lastName": "Longstaff",
+    "slug": "sean-longstaff-346707",
+    "sortName": "Longstaff, Sean",
+    "teamSlug": "leeds-united"
+  },
+  {
+    "assetPath": "/player-faces/leeds_united_muharemovic_tarik.png",
+    "displayName": "Tarik Muharemović",
+    "externalId": 679423,
+    "firstName": "Tarik",
+    "lastName": "Muharemović",
+    "slug": "tarik-muharemovic-679423",
+    "sortName": "Muharemović, Tarik",
+    "teamSlug": "leeds-united"
+  },
+  {
+    "assetPath": "/player-faces/leeds_united_nmecha_lukas.png",
+    "displayName": "Lukas Nmecha",
+    "externalId": 314288,
+    "firstName": "Lukas",
+    "lastName": "Nmecha",
+    "slug": "lukas-nmecha-314288",
+    "sortName": "Nmecha, Lukas",
+    "teamSlug": "leeds-united"
+  },
+  {
+    "assetPath": "/player-faces/leeds_united_okafor_noah.png",
+    "displayName": "Noah Okafor",
+    "externalId": 346890,
+    "firstName": "Noah",
+    "lastName": "Okafor",
+    "slug": "noah-okafor-346890",
+    "sortName": "Okafor, Noah",
+    "teamSlug": "leeds-united"
+  },
+  {
+    "assetPath": "/player-faces/leeds_united_perri_lucas.png",
+    "displayName": "Lucas Perri",
+    "externalId": 352041,
+    "firstName": "Lucas",
+    "lastName": "Perri",
+    "slug": "lucas-perri-352041",
+    "sortName": "Perri, Lucas",
+    "teamSlug": "leeds-united"
+  },
+  {
+    "assetPath": "/player-faces/leeds_united_piroe_joel.png",
+    "displayName": "Joël Piroe",
+    "externalId": 369962,
+    "firstName": "Joël",
+    "lastName": "Piroe",
+    "slug": "joel-piroe-369962",
+    "sortName": "Piroe, Joël",
+    "teamSlug": "leeds-united"
+  },
+  {
+    "assetPath": "/player-faces/leeds_united_ramazani_largie.png",
+    "displayName": "Largie Ramazani",
+    "externalId": 518644,
+    "firstName": "Largie",
+    "lastName": "Ramazani",
+    "slug": "largie-ramazani-518644",
+    "sortName": "Ramazani, Largie",
+    "teamSlug": "leeds-united"
+  },
+  {
+    "assetPath": "/player-faces/leeds_united_rodon_joe.png",
+    "displayName": "Joe Rodon",
+    "externalId": 297212,
+    "firstName": "Joe",
+    "lastName": "Rodon",
+    "slug": "joe-rodon-297212",
+    "sortName": "Rodon, Joe",
+    "teamSlug": "leeds-united"
+  },
+  {
+    "assetPath": "/player-faces/leeds_united_stach_anton.png",
+    "displayName": "Anton Stach",
+    "externalId": 344069,
+    "firstName": "Anton",
+    "lastName": "Stach",
+    "slug": "anton-stach-344069",
+    "sortName": "Stach, Anton",
+    "teamSlug": "leeds-united"
+  },
+  {
+    "assetPath": "/player-faces/leeds_united_tanaka_ao.png",
+    "displayName": "Ao Tanaka",
+    "externalId": 489359,
+    "firstName": "Ao",
+    "lastName": "Tanaka",
+    "slug": "ao-tanaka-489359",
+    "sortName": "Tanaka, Ao",
+    "teamSlug": "leeds-united"
+  },
+  {
+    "assetPath": "/player-faces/leeds_united_trafford_james.png",
+    "displayName": "James Trafford",
+    "externalId": 566799,
+    "firstName": "James",
+    "lastName": "Trafford",
+    "slug": "james-trafford-566799",
+    "sortName": "Trafford, James",
+    "teamSlug": "leeds-united"
+  },
+  {
+    "assetPath": "/player-faces/leeds_united_wilson_harry.png",
+    "displayName": "Harry Wilson",
+    "externalId": 279455,
+    "firstName": "Harry",
+    "lastName": "Wilson",
+    "slug": "harry-wilson-279455",
+    "sortName": "Wilson, Harry",
+    "teamSlug": "leeds-united"
+  },
+  {
+    "assetPath": "/player-faces/fc_liverpool_x_alisson.png",
+    "displayName": "Alisson",
+    "externalId": 105470,
+    "firstName": "Alisson",
+    "lastName": null,
+    "slug": "alisson-105470",
+    "sortName": "Alisson",
+    "teamSlug": "liverpool"
+  },
+  {
+    "assetPath": "/player-faces/fc_liverpool_bajcetic_stefan.png",
+    "displayName": "Stefan Bajcetic",
+    "externalId": 864799,
+    "firstName": "Stefan",
+    "lastName": "Bajcetic",
+    "slug": "stefan-bajcetic-864799",
+    "sortName": "Bajcetic, Stefan",
+    "teamSlug": "liverpool"
+  },
+  {
+    "assetPath": "/player-faces/fc_liverpool_bradley_conor.png",
+    "displayName": "Conor Bradley",
+    "externalId": 624258,
+    "firstName": "Conor",
+    "lastName": "Bradley",
+    "slug": "conor-bradley-624258",
+    "sortName": "Bradley, Conor",
+    "teamSlug": "liverpool"
+  },
+  {
+    "assetPath": "/player-faces/fc_liverpool_chiesa_federico.png",
+    "displayName": "Federico Chiesa",
+    "externalId": 341092,
+    "firstName": "Federico",
+    "lastName": "Chiesa",
+    "slug": "federico-chiesa-341092",
+    "sortName": "Chiesa, Federico",
+    "teamSlug": "liverpool"
+  },
+  {
+    "assetPath": "/player-faces/fc_liverpool_davies_harvey.png",
+    "displayName": "Harvey Davies",
+    "externalId": 706815,
+    "firstName": "Harvey",
+    "lastName": "Davies",
+    "slug": "harvey-davies-706815",
+    "sortName": "Davies, Harvey",
+    "teamSlug": "liverpool"
+  },
+  {
+    "assetPath": "/player-faces/fc_liverpool_ekitike_hugo.png",
+    "displayName": "Hugo Ekitiké",
+    "externalId": 709726,
+    "firstName": "Hugo",
+    "lastName": "Ekitiké",
+    "slug": "hugo-ekitike-709726",
+    "sortName": "Ekitiké, Hugo",
+    "teamSlug": "liverpool"
+  },
+  {
+    "assetPath": "/player-faces/fc_liverpool_elliott_harvey.png",
+    "displayName": "Harvey Elliott",
+    "externalId": 565822,
+    "firstName": "Harvey",
+    "lastName": "Elliott",
+    "slug": "harvey-elliott-565822",
+    "sortName": "Elliott, Harvey",
+    "teamSlug": "liverpool"
+  },
+  {
+    "assetPath": "/player-faces/fc_liverpool_endo_wataru.png",
+    "displayName": "Wataru Endo",
+    "externalId": 146310,
+    "firstName": "Wataru",
+    "lastName": "Endo",
+    "slug": "wataru-endo-146310",
+    "sortName": "Endo, Wataru",
+    "teamSlug": "liverpool"
+  },
+  {
+    "assetPath": "/player-faces/fc_liverpool_frimpong_jeremie.png",
+    "displayName": "Jeremie Frimpong",
+    "externalId": 484547,
+    "firstName": "Jeremie",
+    "lastName": "Frimpong",
+    "slug": "jeremie-frimpong-484547",
+    "sortName": "Frimpong, Jeremie",
+    "teamSlug": "liverpool"
+  },
+  {
+    "assetPath": "/player-faces/fc_liverpool_gakpo_cody.png",
+    "displayName": "Cody Gakpo",
+    "externalId": 434675,
+    "firstName": "Cody",
+    "lastName": "Gakpo",
+    "slug": "cody-gakpo-434675",
+    "sortName": "Gakpo, Cody",
+    "teamSlug": "liverpool"
+  },
+  {
+    "assetPath": "/player-faces/fc_liverpool_gomez_joe.png",
+    "displayName": "Joe Gomez",
+    "externalId": 256178,
+    "firstName": "Joe",
+    "lastName": "Gomez",
+    "slug": "joe-gomez-256178",
+    "sortName": "Gomez, Joe",
+    "teamSlug": "liverpool"
+  },
+  {
+    "assetPath": "/player-faces/fc_liverpool_gravenberch_ryan.png",
+    "displayName": "Ryan Gravenberch",
+    "externalId": 478573,
+    "firstName": "Ryan",
+    "lastName": "Gravenberch",
+    "slug": "ryan-gravenberch-478573",
+    "sortName": "Gravenberch, Ryan",
+    "teamSlug": "liverpool"
+  },
+  {
+    "assetPath": "/player-faces/fc_liverpool_isak_alexander.png",
+    "displayName": "Alexander Isak",
+    "externalId": 349066,
+    "firstName": "Alexander",
+    "lastName": "Isak",
+    "slug": "alexander-isak-349066",
+    "sortName": "Isak, Alexander",
+    "teamSlug": "liverpool"
+  },
+  {
+    "assetPath": "/player-faces/fc_liverpool_jacquet_jeremy.png",
+    "displayName": "Jérémy Jacquet",
+    "externalId": 1004301,
+    "firstName": "Jérémy",
+    "lastName": "Jacquet",
+    "slug": "jeremy-jacquet-1004301",
+    "sortName": "Jacquet, Jérémy",
+    "teamSlug": "liverpool"
+  },
+  {
+    "assetPath": "/player-faces/fc_liverpool_jaros_vitezslav.png",
+    "displayName": "Vitezslav Jaros",
+    "externalId": 486604,
+    "firstName": "Vitezslav",
+    "lastName": "Jaros",
+    "slug": "vitezslav-jaros-486604",
+    "sortName": "Jaros, Vitezslav",
+    "teamSlug": "liverpool"
+  },
+  {
+    "assetPath": "/player-faces/fc_liverpool_jones_curtis.png",
+    "displayName": "Curtis Jones",
+    "externalId": 433188,
+    "firstName": "Curtis",
+    "lastName": "Jones",
+    "slug": "curtis-jones-433188",
+    "sortName": "Jones, Curtis",
+    "teamSlug": "liverpool"
+  },
+  {
+    "assetPath": "/player-faces/fc_liverpool_kerkez_milos.png",
+    "displayName": "Milos Kerkez",
+    "externalId": 730861,
+    "firstName": "Milos",
+    "lastName": "Kerkez",
+    "slug": "milos-kerkez-730861",
+    "sortName": "Kerkez, Milos",
+    "teamSlug": "liverpool"
+  },
+  {
+    "assetPath": "/player-faces/fc_liverpool_leoni_giovanni.png",
+    "displayName": "Giovanni Leoni",
+    "externalId": 1086619,
+    "firstName": "Giovanni",
+    "lastName": "Leoni",
+    "slug": "giovanni-leoni-1086619",
+    "sortName": "Leoni, Giovanni",
+    "teamSlug": "liverpool"
+  },
+  {
+    "assetPath": "/player-faces/fc_liverpool_mac_allister_alexis.png",
+    "displayName": "Alexis Mac Allister",
+    "externalId": 534033,
+    "firstName": "Alexis",
+    "lastName": "Mac Allister",
+    "slug": "alexis-mac-allister-534033",
+    "sortName": "Mac Allister, Alexis",
+    "teamSlug": "liverpool"
+  },
+  {
+    "assetPath": "/player-faces/fc_liverpool_mamardashvili_giorgi.png",
+    "displayName": "Giorgi Mamardashvili",
+    "externalId": 502676,
+    "firstName": "Giorgi",
+    "lastName": "Mamardashvili",
+    "slug": "giorgi-mamardashvili-502676",
+    "sortName": "Mamardashvili, Giorgi",
+    "teamSlug": "liverpool"
+  },
+  {
+    "assetPath": "/player-faces/fc_liverpool_munoz_victor.png",
+    "displayName": "Víctor Muñoz",
+    "externalId": 935231,
+    "firstName": "Víctor",
+    "lastName": "Muñoz",
+    "slug": "victor-munoz-935231",
+    "sortName": "Muñoz, Víctor",
+    "teamSlug": "liverpool"
+  },
+  {
+    "assetPath": "/player-faces/fc_liverpool_ngumoha_rio.png",
+    "displayName": "Rio Ngumoha",
+    "externalId": 1108466,
+    "firstName": "Rio",
+    "lastName": "Ngumoha",
+    "slug": "rio-ngumoha-1108466",
+    "sortName": "Ngumoha, Rio",
+    "teamSlug": "liverpool"
+  },
+  {
+    "assetPath": "/player-faces/fc_liverpool_nyoni_trey.png",
+    "displayName": "Trey Nyoni",
+    "externalId": 1045123,
+    "firstName": "Trey",
+    "lastName": "Nyoni",
+    "slug": "trey-nyoni-1045123",
+    "sortName": "Nyoni, Trey",
+    "teamSlug": "liverpool"
+  },
+  {
+    "assetPath": "/player-faces/fc_liverpool_ramsay_calvin.png",
+    "displayName": "Calvin Ramsay",
+    "externalId": 633652,
+    "firstName": "Calvin",
+    "lastName": "Ramsay",
+    "slug": "calvin-ramsay-633652",
+    "sortName": "Ramsay, Calvin",
+    "teamSlug": "liverpool"
+  },
+  {
+    "assetPath": "/player-faces/fc_liverpool_szoboszlai_dominik.png",
+    "displayName": "Dominik Szoboszlai",
+    "externalId": 451276,
+    "firstName": "Dominik",
+    "lastName": "Szoboszlai",
+    "slug": "dominik-szoboszlai-451276",
+    "sortName": "Szoboszlai, Dominik",
+    "teamSlug": "liverpool"
+  },
+  {
+    "assetPath": "/player-faces/fc_liverpool_tsimikas_konstantinos.png",
+    "displayName": "Konstantinos Tsimikas",
+    "externalId": 338070,
+    "firstName": "Konstantinos",
+    "lastName": "Tsimikas",
+    "slug": "konstantinos-tsimikas-338070",
+    "sortName": "Tsimikas, Konstantinos",
+    "teamSlug": "liverpool"
+  },
+  {
+    "assetPath": "/player-faces/fc_liverpool_van_dijk_virgil.png",
+    "displayName": "Virgil van Dijk",
+    "externalId": 139208,
+    "firstName": "Virgil",
+    "lastName": "van Dijk",
+    "slug": "virgil-van-dijk-139208",
+    "sortName": "van Dijk, Virgil",
+    "teamSlug": "liverpool"
+  },
+  {
+    "assetPath": "/player-faces/fc_liverpool_wirtz_florian.png",
+    "displayName": "Florian Wirtz",
+    "externalId": 598577,
+    "firstName": "Florian",
+    "lastName": "Wirtz",
+    "slug": "florian-wirtz-598577",
+    "sortName": "Wirtz, Florian",
+    "teamSlug": "liverpool"
+  },
+  {
+    "assetPath": "/player-faces/fc_liverpool_woodman_freddie.png",
+    "displayName": "Freddie Woodman",
+    "externalId": 226049,
+    "firstName": "Freddie",
+    "lastName": "Woodman",
+    "slug": "freddie-woodman-226049",
+    "sortName": "Woodman, Freddie",
+    "teamSlug": "liverpool"
+  },
+  {
+    "assetPath": "/player-faces/manchester_city_alleyne_max.png",
+    "displayName": "Max Alleyne",
+    "externalId": 843595,
+    "firstName": "Max",
+    "lastName": "Alleyne",
+    "slug": "max-alleyne-843595",
+    "sortName": "Alleyne, Max",
+    "teamSlug": "manchester-city"
+  },
+  {
+    "assetPath": "/player-faces/manchester_city_anderson_elliot.png",
+    "displayName": "Elliot Anderson",
+    "externalId": 567576,
+    "firstName": "Elliot",
+    "lastName": "Anderson",
+    "slug": "elliot-anderson-567576",
+    "sortName": "Anderson, Elliot",
+    "teamSlug": "manchester-city"
+  },
+  {
+    "assetPath": "/player-faces/manchester_city_ait_nouri_rayan.png",
+    "displayName": "Rayan Aït-Nouri",
+    "externalId": 578391,
+    "firstName": "Rayan",
+    "lastName": "Aït-Nouri",
+    "slug": "rayan-ait-nouri-578391",
+    "sortName": "Aït-Nouri, Rayan",
+    "teamSlug": "manchester-city"
+  },
+  {
+    "assetPath": "/player-faces/manchester_city_bah_juma.png",
+    "displayName": "Juma Bah",
+    "externalId": 1121298,
+    "firstName": "Juma",
+    "lastName": "Bah",
+    "slug": "juma-bah-1121298",
+    "sortName": "Bah, Juma",
+    "teamSlug": "manchester-city"
+  },
+  {
+    "assetPath": "/player-faces/manchester_city_bettinelli_marcus.png",
+    "displayName": "Marcus Bettinelli",
+    "externalId": 116648,
+    "firstName": "Marcus",
+    "lastName": "Bettinelli",
+    "slug": "marcus-bettinelli-116648",
+    "sortName": "Bettinelli, Marcus",
+    "teamSlug": "manchester-city"
+  },
+  {
+    "assetPath": "/player-faces/manchester_city_cherki_rayan.png",
+    "displayName": "Rayan Cherki",
+    "externalId": 607223,
+    "firstName": "Rayan",
+    "lastName": "Cherki",
+    "slug": "rayan-cherki-607223",
+    "sortName": "Cherki, Rayan",
+    "teamSlug": "manchester-city"
+  },
+  {
+    "assetPath": "/player-faces/manchester_city_dias_ruben.png",
+    "displayName": "Rúben Dias",
+    "externalId": 258004,
+    "firstName": "Rúben",
+    "lastName": "Dias",
+    "slug": "ruben-dias-258004",
+    "sortName": "Dias, Rúben",
+    "teamSlug": "manchester-city"
+  },
+  {
+    "assetPath": "/player-faces/manchester_city_doku_jeremy.png",
+    "displayName": "Jérémy Doku",
+    "externalId": 486049,
+    "firstName": "Jérémy",
+    "lastName": "Doku",
+    "slug": "jeremy-doku-486049",
+    "sortName": "Doku, Jérémy",
+    "teamSlug": "manchester-city"
+  },
+  {
+    "assetPath": "/player-faces/manchester_city_donnarumma_gianluigi.png",
+    "displayName": "Gianluigi Donnarumma",
+    "externalId": 315858,
+    "firstName": "Gianluigi",
+    "lastName": "Donnarumma",
+    "slug": "gianluigi-donnarumma-315858",
+    "sortName": "Donnarumma, Gianluigi",
+    "teamSlug": "manchester-city"
+  },
+  {
+    "assetPath": "/player-faces/manchester_city_echeverri_claudio.png",
+    "displayName": "Claudio Echeverri",
+    "externalId": 994536,
+    "firstName": "Claudio",
+    "lastName": "Echeverri",
+    "slug": "claudio-echeverri-994536",
+    "sortName": "Echeverri, Claudio",
+    "teamSlug": "manchester-city"
+  },
+  {
+    "assetPath": "/player-faces/manchester_city_foden_phil.png",
+    "displayName": "Phil Foden",
+    "externalId": 406635,
+    "firstName": "Phil",
+    "lastName": "Foden",
+    "slug": "phil-foden-406635",
+    "sortName": "Foden, Phil",
+    "teamSlug": "manchester-city"
+  },
+  {
+    "assetPath": "/player-faces/manchester_city_gonzalez_nico.png",
+    "displayName": "Nico González",
+    "externalId": 466805,
+    "firstName": "Nico",
+    "lastName": "González",
+    "slug": "nico-gonzalez-466805",
+    "sortName": "González, Nico",
+    "teamSlug": "manchester-city"
+  },
+  {
+    "assetPath": "/player-faces/manchester_city_grealish_jack.png",
+    "displayName": "Jack Grealish",
+    "externalId": 203460,
+    "firstName": "Jack",
+    "lastName": "Grealish",
+    "slug": "jack-grealish-203460",
+    "sortName": "Grealish, Jack",
+    "teamSlug": "manchester-city"
+  },
+  {
+    "assetPath": "/player-faces/manchester_city_guehi_marc.png",
+    "displayName": "Marc Guéhi",
+    "externalId": 392757,
+    "firstName": "Marc",
+    "lastName": "Guéhi",
+    "slug": "marc-guehi-392757",
+    "sortName": "Guéhi, Marc",
+    "teamSlug": "manchester-city"
+  },
+  {
+    "assetPath": "/player-faces/manchester_city_gvardiol_josko.png",
+    "displayName": "Josko Gvardiol",
+    "externalId": 475959,
+    "firstName": "Josko",
+    "lastName": "Gvardiol",
+    "slug": "josko-gvardiol-475959",
+    "sortName": "Gvardiol, Josko",
+    "teamSlug": "manchester-city"
+  },
+  {
+    "assetPath": "/player-faces/manchester_city_haaland_erling.png",
+    "displayName": "Erling Haaland",
+    "externalId": 418560,
+    "firstName": "Erling",
+    "lastName": "Haaland",
+    "slug": "erling-haaland-418560",
+    "sortName": "Haaland, Erling",
+    "teamSlug": "manchester-city"
+  },
+  {
+    "assetPath": "/player-faces/manchester_city_kabore_issa.png",
+    "displayName": "Issa Kaboré",
+    "externalId": 649452,
+    "firstName": "Issa",
+    "lastName": "Kaboré",
+    "slug": "issa-kabore-649452",
+    "sortName": "Kaboré, Issa",
+    "teamSlug": "manchester-city"
+  },
+  {
+    "assetPath": "/player-faces/manchester_city_khusanov_abdukodir.png",
+    "displayName": "Abdukodir Khusanov",
+    "externalId": 763079,
+    "firstName": "Abdukodir",
+    "lastName": "Khusanov",
+    "slug": "abdukodir-khusanov-763079",
+    "sortName": "Khusanov, Abdukodir",
+    "teamSlug": "manchester-city"
+  },
+  {
+    "assetPath": "/player-faces/manchester_city_kovacic_mateo.png",
+    "displayName": "Mateo Kovacic",
+    "externalId": 51471,
+    "firstName": "Mateo",
+    "lastName": "Kovacic",
+    "slug": "mateo-kovacic-51471",
+    "sortName": "Kovacic, Mateo",
+    "teamSlug": "manchester-city"
+  },
+  {
+    "assetPath": "/player-faces/manchester_city_lewis_rico.png",
+    "displayName": "Rico Lewis",
+    "externalId": 701057,
+    "firstName": "Rico",
+    "lastName": "Lewis",
+    "slug": "rico-lewis-701057",
+    "sortName": "Lewis, Rico",
+    "teamSlug": "manchester-city"
+  },
+  {
+    "assetPath": "/player-faces/manchester_city_marmoush_omar.png",
+    "displayName": "Omar Marmoush",
+    "externalId": 445939,
+    "firstName": "Omar",
+    "lastName": "Marmoush",
+    "slug": "omar-marmoush-445939",
+    "sortName": "Marmoush, Omar",
+    "teamSlug": "manchester-city"
+  },
+  {
+    "assetPath": "/player-faces/manchester_city_monga_jeremy.png",
+    "displayName": "Jeremy Monga",
+    "externalId": 1245948,
+    "firstName": "Jeremy",
+    "lastName": "Monga",
+    "slug": "jeremy-monga-1245948",
+    "sortName": "Monga, Jeremy",
+    "teamSlug": "manchester-city"
+  },
+  {
+    "assetPath": "/player-faces/manchester_city_nunes_matheus.png",
+    "displayName": "Matheus Nunes",
+    "externalId": 601883,
+    "firstName": "Matheus",
+    "lastName": "Nunes",
+    "slug": "matheus-nunes-601883",
+    "sortName": "Nunes, Matheus",
+    "teamSlug": "manchester-city"
+  },
+  {
+    "assetPath": "/player-faces/manchester_city_o_reilly_nico.png",
+    "displayName": "Nico O'Reilly",
+    "externalId": 743413,
+    "firstName": "Nico",
+    "lastName": "O'Reilly",
+    "slug": "nico-oreilly-743413",
+    "sortName": "O'Reilly, Nico",
+    "teamSlug": "manchester-city"
+  },
+  {
+    "assetPath": "/player-faces/manchester_city_phillips_kalvin.png",
+    "displayName": "Kalvin Phillips",
+    "externalId": 351749,
+    "firstName": "Kalvin",
+    "lastName": "Phillips",
+    "slug": "kalvin-phillips-351749",
+    "sortName": "Phillips, Kalvin",
+    "teamSlug": "manchester-city"
+  },
+  {
+    "assetPath": "/player-faces/manchester_city_reijnders_tijjani.png",
+    "displayName": "Tijjani Reijnders",
+    "externalId": 460939,
+    "firstName": "Tijjani",
+    "lastName": "Reijnders",
+    "slug": "tijjani-reijnders-460939",
+    "sortName": "Reijnders, Tijjani",
+    "teamSlug": "manchester-city"
+  },
+  {
+    "assetPath": "/player-faces/manchester_city_reis_vitor.png",
+    "displayName": "Vitor Reis",
+    "externalId": 1005575,
+    "firstName": "Vitor",
+    "lastName": "Reis",
+    "slug": "vitor-reis-1005575",
+    "sortName": "Reis, Vitor",
+    "teamSlug": "manchester-city"
+  },
+  {
+    "assetPath": "/player-faces/manchester_city_x_rodri.png",
+    "displayName": "Rodri",
+    "externalId": 357565,
+    "firstName": "Rodri",
+    "lastName": null,
+    "slug": "rodri-357565",
+    "sortName": "Rodri",
+    "teamSlug": "manchester-city"
+  },
+  {
+    "assetPath": "/player-faces/manchester_city_x_savinho.png",
+    "displayName": "Savinho",
+    "externalId": 743591,
+    "firstName": "Savinho",
+    "lastName": null,
+    "slug": "savinho-743591",
+    "sortName": "Savinho",
+    "teamSlug": "manchester-city"
+  },
+  {
+    "assetPath": "/player-faces/manchester_city_semenyo_antoine.png",
+    "displayName": "Antoine Semenyo",
+    "externalId": 583255,
+    "firstName": "Antoine",
+    "lastName": "Semenyo",
+    "slug": "antoine-semenyo-583255",
+    "sortName": "Semenyo, Antoine",
+    "teamSlug": "manchester-city"
+  },
+  {
+    "assetPath": "/player-faces/manchester_city_wilson_esbrand_josh.png",
+    "displayName": "Josh Wilson-Esbrand",
+    "externalId": 576121,
+    "firstName": "Josh",
+    "lastName": "Wilson-Esbrand",
+    "slug": "josh-wilson-esbrand-576121",
+    "sortName": "Wilson-Esbrand, Josh",
+    "teamSlug": "manchester-city"
+  },
+  {
+    "assetPath": "/player-faces/manchester_united_amass_harry.png",
+    "displayName": "Harry Amass",
+    "externalId": 1011738,
+    "firstName": "Harry",
+    "lastName": "Amass",
+    "slug": "harry-amass-1011738",
+    "sortName": "Amass, Harry",
+    "teamSlug": "manchester-united"
+  },
+  {
+    "assetPath": "/player-faces/manchester_united_collyer_toby.png",
+    "displayName": "Toby Collyer",
+    "externalId": 654253,
+    "firstName": "Toby",
+    "lastName": "Collyer",
+    "slug": "toby-collyer-654253",
+    "sortName": "Collyer, Toby",
+    "teamSlug": "manchester-united"
+  },
+  {
+    "assetPath": "/player-faces/manchester_united_cunha_matheus.png",
+    "displayName": "Matheus Cunha",
+    "externalId": 517894,
+    "firstName": "Matheus",
+    "lastName": "Cunha",
+    "slug": "matheus-cunha-517894",
+    "sortName": "Cunha, Matheus",
+    "teamSlug": "manchester-united"
+  },
+  {
+    "assetPath": "/player-faces/manchester_united_dalot_diogo.png",
+    "displayName": "Diogo Dalot",
+    "externalId": 357147,
+    "firstName": "Diogo",
+    "lastName": "Dalot",
+    "slug": "diogo-dalot-357147",
+    "sortName": "Dalot, Diogo",
+    "teamSlug": "manchester-united"
+  },
+  {
+    "assetPath": "/player-faces/manchester_united_darlow_karl.png",
+    "displayName": "Karl Darlow",
+    "externalId": 99397,
+    "firstName": "Karl",
+    "lastName": "Darlow",
+    "slug": "karl-darlow-99397",
+    "sortName": "Darlow, Karl",
+    "teamSlug": "manchester-united"
+  },
+  {
+    "assetPath": "/player-faces/manchester_united_de_ligt_matthijs.png",
+    "displayName": "Matthijs de Ligt",
+    "externalId": 326031,
+    "firstName": "Matthijs",
+    "lastName": "de Ligt",
+    "slug": "matthijs-de-ligt-326031",
+    "sortName": "de Ligt, Matthijs",
+    "teamSlug": "manchester-united"
+  },
+  {
+    "assetPath": "/player-faces/manchester_united_diallo_amad.png",
+    "displayName": "Amad Diallo",
+    "externalId": 536835,
+    "firstName": "Amad",
+    "lastName": "Diallo",
+    "slug": "amad-diallo-536835",
+    "sortName": "Diallo, Amad",
+    "teamSlug": "manchester-united"
+  },
+  {
+    "assetPath": "/player-faces/manchester_united_dorgu_patrick.png",
+    "displayName": "Patrick Dorgu",
+    "externalId": 926952,
+    "firstName": "Patrick",
+    "lastName": "Dorgu",
+    "slug": "patrick-dorgu-926952",
+    "sortName": "Dorgu, Patrick",
+    "teamSlug": "manchester-united"
+  },
+  {
+    "assetPath": "/player-faces/manchester_united_fernandes_bruno.png",
+    "displayName": "Bruno Fernandes",
+    "externalId": 240306,
+    "firstName": "Bruno",
+    "lastName": "Fernandes",
+    "slug": "bruno-fernandes-240306",
+    "sortName": "Fernandes, Bruno",
+    "teamSlug": "manchester-united"
+  },
+  {
+    "assetPath": null,
+    "displayName": "Jack Fletcher",
+    "externalId": 1011140,
+    "firstName": "Jack",
+    "lastName": "Fletcher",
+    "slug": "jack-fletcher-1011140",
+    "sortName": "Fletcher, Jack",
+    "teamSlug": "manchester-united"
+  },
+  {
+    "assetPath": "/player-faces/manchester_united_fletcher_tyler.png",
+    "displayName": "Tyler Fletcher",
+    "externalId": 1049911,
+    "firstName": "Tyler",
+    "lastName": "Fletcher",
+    "slug": "tyler-fletcher-1049911",
+    "sortName": "Fletcher, Tyler",
+    "teamSlug": "manchester-united"
+  },
+  {
+    "assetPath": "/player-faces/manchester_united_heaton_tom.png",
+    "displayName": "Tom Heaton",
+    "externalId": 34130,
+    "firstName": "Tom",
+    "lastName": "Heaton",
+    "slug": "tom-heaton-34130",
+    "sortName": "Heaton, Tom",
+    "teamSlug": "manchester-united"
+  },
+  {
+    "assetPath": "/player-faces/manchester_united_heaven_ayden.png",
+    "displayName": "Ayden Heaven",
+    "externalId": 1078163,
+    "firstName": "Ayden",
+    "lastName": "Heaven",
+    "slug": "ayden-heaven-1078163",
+    "sortName": "Heaven, Ayden",
+    "teamSlug": "manchester-united"
+  },
+  {
+    "assetPath": "/player-faces/manchester_united_lacey_shea.png",
+    "displayName": "Shea Lacey",
+    "externalId": 926309,
+    "firstName": "Shea",
+    "lastName": "Lacey",
+    "slug": "shea-lacey-926309",
+    "sortName": "Lacey, Shea",
+    "teamSlug": "manchester-united"
+  },
+  {
+    "assetPath": "/player-faces/manchester_united_lammens_senne.png",
+    "displayName": "Senne Lammens",
+    "externalId": 503883,
+    "firstName": "Senne",
+    "lastName": "Lammens",
+    "slug": "senne-lammens-503883",
+    "sortName": "Lammens, Senne",
+    "teamSlug": "manchester-united"
+  },
+  {
+    "assetPath": "/player-faces/manchester_united_maguire_harry.png",
+    "displayName": "Harry Maguire",
+    "externalId": 177907,
+    "firstName": "Harry",
+    "lastName": "Maguire",
+    "slug": "harry-maguire-177907",
+    "sortName": "Maguire, Harry",
+    "teamSlug": "manchester-united"
+  },
+  {
+    "assetPath": "/player-faces/manchester_united_mainoo_kobbie.png",
+    "displayName": "Kobbie Mainoo",
+    "externalId": 820374,
+    "firstName": "Kobbie",
+    "lastName": "Mainoo",
+    "slug": "kobbie-mainoo-820374",
+    "sortName": "Mainoo, Kobbie",
+    "teamSlug": "manchester-united"
+  },
+  {
+    "assetPath": "/player-faces/manchester_united_martinez_lisandro.png",
+    "displayName": "Lisandro Martínez",
+    "externalId": 480762,
+    "firstName": "Lisandro",
+    "lastName": "Martínez",
+    "slug": "lisandro-martinez-480762",
+    "sortName": "Martínez, Lisandro",
+    "teamSlug": "manchester-united"
+  },
+  {
+    "assetPath": "/player-faces/manchester_united_mazraoui_noussair.png",
+    "displayName": "Noussair Mazraoui",
+    "externalId": 340456,
+    "firstName": "Noussair",
+    "lastName": "Mazraoui",
+    "slug": "noussair-mazraoui-340456",
+    "sortName": "Mazraoui, Noussair",
+    "teamSlug": "manchester-united"
+  },
+  {
+    "assetPath": "/player-faces/manchester_united_mbeumo_bryan.png",
+    "displayName": "Bryan Mbeumo",
+    "externalId": 413039,
+    "firstName": "Bryan",
+    "lastName": "Mbeumo",
+    "slug": "bryan-mbeumo-413039",
+    "sortName": "Mbeumo, Bryan",
+    "teamSlug": "manchester-united"
+  },
+  {
+    "assetPath": "/player-faces/manchester_united_mee_dermot.png",
+    "displayName": "Dermot Mee",
+    "externalId": 620362,
+    "firstName": "Dermot",
+    "lastName": "Mee",
+    "slug": "dermot-mee-620362",
+    "sortName": "Mee, Dermot",
+    "teamSlug": "manchester-united"
+  },
+  {
+    "assetPath": "/player-faces/manchester_united_mount_mason.png",
+    "displayName": "Mason Mount",
+    "externalId": 346483,
+    "firstName": "Mason",
+    "lastName": "Mount",
+    "slug": "mason-mount-346483",
+    "sortName": "Mount, Mason",
+    "teamSlug": "manchester-united"
+  },
+  {
+    "assetPath": "/player-faces/manchester_united_rashford_marcus.png",
+    "displayName": "Marcus Rashford",
+    "externalId": 258923,
+    "firstName": "Marcus",
+    "lastName": "Rashford",
+    "slug": "marcus-rashford-258923",
+    "sortName": "Rashford, Marcus",
+    "teamSlug": "manchester-united"
+  },
+  {
+    "assetPath": "/player-faces/manchester_united_santos_andrey.png",
+    "displayName": "Andrey Santos",
+    "externalId": 743600,
+    "firstName": "Andrey",
+    "lastName": "Santos",
+    "slug": "andrey-santos-743600",
+    "sortName": "Santos, Andrey",
+    "teamSlug": "manchester-united"
+  },
+  {
+    "assetPath": "/player-faces/manchester_united_sesko_benjamin.png",
+    "displayName": "Benjamin Sesko",
+    "externalId": 627442,
+    "firstName": "Benjamin",
+    "lastName": "Sesko",
+    "slug": "benjamin-sesko-627442",
+    "sortName": "Sesko, Benjamin",
+    "teamSlug": "manchester-united"
+  },
+  {
+    "assetPath": "/player-faces/manchester_united_shaw_luke.png",
+    "displayName": "Luke Shaw",
+    "externalId": 183288,
+    "firstName": "Luke",
+    "lastName": "Shaw",
+    "slug": "luke-shaw-183288",
+    "sortName": "Shaw, Luke",
+    "teamSlug": "manchester-united"
+  },
+  {
+    "assetPath": "/player-faces/manchester_united_tielemans_youri.png",
+    "displayName": "Youri Tielemans",
+    "externalId": 249565,
+    "firstName": "Youri",
+    "lastName": "Tielemans",
+    "slug": "youri-tielemans-249565",
+    "sortName": "Tielemans, Youri",
+    "teamSlug": "manchester-united"
+  },
+  {
+    "assetPath": "/player-faces/manchester_united_ugarte_manuel.png",
+    "displayName": "Manuel Ugarte",
+    "externalId": 476701,
+    "firstName": "Manuel",
+    "lastName": "Ugarte",
+    "slug": "manuel-ugarte-476701",
+    "sortName": "Ugarte, Manuel",
+    "teamSlug": "manchester-united"
+  },
+  {
+    "assetPath": "/player-faces/manchester_united_yoro_leny.png",
+    "displayName": "Leny Yoro",
+    "externalId": 923831,
+    "firstName": "Leny",
+    "lastName": "Yoro",
+    "slug": "leny-yoro-923831",
+    "sortName": "Yoro, Leny",
+    "teamSlug": "manchester-united"
+  },
+  {
+    "assetPath": "/player-faces/manchester_united_zirkzee_joshua.png",
+    "displayName": "Joshua Zirkzee",
+    "externalId": 435648,
+    "firstName": "Joshua",
+    "lastName": "Zirkzee",
+    "slug": "joshua-zirkzee-435648",
+    "sortName": "Zirkzee, Joshua",
+    "teamSlug": "manchester-united"
+  },
+  {
+    "assetPath": "/player-faces/newcastle_united_bamba_aladji.png",
+    "displayName": "Aladji Bamba",
+    "externalId": 975347,
+    "firstName": "Aladji",
+    "lastName": "Bamba",
+    "slug": "aladji-bamba-975347",
+    "sortName": "Bamba, Aladji",
+    "teamSlug": "newcastle-united"
+  },
+  {
+    "assetPath": "/player-faces/newcastle_united_barnes_harvey.png",
+    "displayName": "Harvey Barnes",
+    "externalId": 398065,
+    "firstName": "Harvey",
+    "lastName": "Barnes",
+    "slug": "harvey-barnes-398065",
+    "sortName": "Barnes, Harvey",
+    "teamSlug": "newcastle-united"
+  },
+  {
+    "assetPath": "/player-faces/newcastle_united_botman_sven.png",
+    "displayName": "Sven Botman",
+    "externalId": 361093,
+    "firstName": "Sven",
+    "lastName": "Botman",
+    "slug": "sven-botman-361093",
+    "sortName": "Botman, Sven",
+    "teamSlug": "newcastle-united"
+  },
+  {
+    "assetPath": "/player-faces/newcastle_united_burn_dan.png",
+    "displayName": "Dan Burn",
+    "externalId": 134270,
+    "firstName": "Dan",
+    "lastName": "Burn",
+    "slug": "dan-burn-134270",
+    "sortName": "Burn, Dan",
+    "teamSlug": "newcastle-united"
+  },
+  {
+    "assetPath": "/player-faces/newcastle_united_elanga_anthony.png",
+    "displayName": "Anthony Elanga",
+    "externalId": 583189,
+    "firstName": "Anthony",
+    "lastName": "Elanga",
+    "slug": "anthony-elanga-583189",
+    "sortName": "Elanga, Anthony",
+    "teamSlug": "newcastle-united"
+  },
+  {
+    "assetPath": "/player-faces/newcastle_united_gillespie_mark.png",
+    "displayName": "Mark Gillespie",
+    "externalId": 142389,
+    "firstName": "Mark",
+    "lastName": "Gillespie",
+    "slug": "mark-gillespie-142389",
+    "sortName": "Gillespie, Mark",
+    "teamSlug": "newcastle-united"
+  },
+  {
+    "assetPath": "/player-faces/newcastle_united_hall_lewis.png",
+    "displayName": "Lewis Hall",
+    "externalId": 670858,
+    "firstName": "Lewis",
+    "lastName": "Hall",
+    "slug": "lewis-hall-670858",
+    "sortName": "Hall, Lewis",
+    "teamSlug": "newcastle-united"
+  },
+  {
+    "assetPath": null,
+    "displayName": "Aidan Harris",
+    "externalId": 1019170,
+    "firstName": "Aidan",
+    "lastName": "Harris",
+    "slug": "aidan-harris-1019170",
+    "sortName": "Harris, Aidan",
+    "teamSlug": "newcastle-united"
+  },
+  {
+    "assetPath": "/player-faces/newcastle_united_hornicek_lukas.png",
+    "displayName": "Lukas Hornicek",
+    "externalId": 629773,
+    "firstName": "Lukas",
+    "lastName": "Hornicek",
+    "slug": "lukas-hornicek-629773",
+    "sortName": "Hornicek, Lukas",
+    "teamSlug": "newcastle-united"
+  },
+  {
+    "assetPath": "/player-faces/newcastle_united_jaouen_ewen.png",
+    "displayName": "Ewen Jaouen",
+    "externalId": 923757,
+    "firstName": "Ewen",
+    "lastName": "Jaouen",
+    "slug": "ewen-jaouen-923757",
+    "sortName": "Jaouen, Ewen",
+    "teamSlug": "newcastle-united"
+  },
+  {
+    "assetPath": "/player-faces/newcastle_united_x_joelinton.png",
+    "displayName": "Joelinton",
+    "externalId": 333241,
+    "firstName": "Joelinton",
+    "lastName": null,
+    "slug": "joelinton-333241",
+    "sortName": "Joelinton",
+    "teamSlug": "newcastle-united"
+  },
+  {
+    "assetPath": "/player-faces/newcastle_united_livramento_tino.png",
+    "displayName": "Tino Livramento",
+    "externalId": 503981,
+    "firstName": "Tino",
+    "lastName": "Livramento",
+    "slug": "tino-livramento-503981",
+    "sortName": "Livramento, Tino",
+    "teamSlug": "newcastle-united"
+  },
+  {
+    "assetPath": "/player-faces/newcastle_united_miley_lewis.png",
+    "displayName": "Lewis Miley",
+    "externalId": 922769,
+    "firstName": "Lewis",
+    "lastName": "Miley",
+    "slug": "lewis-miley-922769",
+    "sortName": "Miley, Lewis",
+    "teamSlug": "newcastle-united"
+  },
+  {
+    "assetPath": "/player-faces/newcastle_united_murphy_alex.png",
+    "displayName": "Alex Murphy",
+    "externalId": 900601,
+    "firstName": "Alex",
+    "lastName": "Murphy",
+    "slug": "alex-murphy-900601",
+    "sortName": "Murphy, Alex",
+    "teamSlug": "newcastle-united"
+  },
+  {
+    "assetPath": "/player-faces/newcastle_united_murphy_jacob.png",
+    "displayName": "Jacob Murphy",
+    "externalId": 199527,
+    "firstName": "Jacob",
+    "lastName": "Murphy",
+    "slug": "jacob-murphy-199527",
+    "sortName": "Murphy, Jacob",
+    "teamSlug": "newcastle-united"
+  },
+  {
+    "assetPath": "/player-faces/newcastle_united_osula_william.png",
+    "displayName": "William Osula",
+    "externalId": 609556,
+    "firstName": "William",
+    "lastName": "Osula",
+    "slug": "william-osula-609556",
+    "sortName": "Osula, William",
+    "teamSlug": "newcastle-united"
+  },
+  {
+    "assetPath": "/player-faces/newcastle_united_pope_nick.png",
+    "displayName": "Nick Pope",
+    "externalId": 192080,
+    "firstName": "Nick",
+    "lastName": "Pope",
+    "slug": "nick-pope-192080",
+    "sortName": "Pope, Nick",
+    "teamSlug": "newcastle-united"
+  },
+  {
+    "assetPath": "/player-faces/newcastle_united_ramsey_jacob.png",
+    "displayName": "Jacob Ramsey",
+    "externalId": 503749,
+    "firstName": "Jacob",
+    "lastName": "Ramsey",
+    "slug": "jacob-ramsey-503749",
+    "sortName": "Ramsey, Jacob",
+    "teamSlug": "newcastle-united"
+  },
+  {
+    "assetPath": "/player-faces/newcastle_united_schar_fabian.png",
+    "displayName": "Fabian Schär",
+    "externalId": 135343,
+    "firstName": "Fabian",
+    "lastName": "Schär",
+    "slug": "fabian-schar-135343",
+    "sortName": "Schär, Fabian",
+    "teamSlug": "newcastle-united"
+  },
+  {
+    "assetPath": "/player-faces/newcastle_united_shahar_leo.png",
+    "displayName": "Leo Shahar",
+    "externalId": 940858,
+    "firstName": "Leo",
+    "lastName": "Shahar",
+    "slug": "leo-shahar-940858",
+    "sortName": "Shahar, Leo",
+    "teamSlug": "newcastle-united"
+  },
+  {
+    "assetPath": "/player-faces/newcastle_united_steur_sean.png",
+    "displayName": "Sean Steur",
+    "externalId": 1111063,
+    "firstName": "Sean",
+    "lastName": "Steur",
+    "slug": "sean-steur-1111063",
+    "sortName": "Steur, Sean",
+    "teamSlug": "newcastle-united"
+  },
+  {
+    "assetPath": "/player-faces/newcastle_united_thiaw_malick.png",
+    "displayName": "Malick Thiaw",
+    "externalId": 521964,
+    "firstName": "Malick",
+    "lastName": "Thiaw",
+    "slug": "malick-thiaw-521964",
+    "sortName": "Thiaw, Malick",
+    "teamSlug": "newcastle-united"
+  },
+  {
+    "assetPath": "/player-faces/newcastle_united_toure_bazoumana.png",
+    "displayName": "Bazoumana Touré",
+    "externalId": 1067904,
+    "firstName": "Bazoumana",
+    "lastName": "Touré",
+    "slug": "bazoumana-toure-1067904",
+    "sortName": "Touré, Bazoumana",
+    "teamSlug": "newcastle-united"
+  },
+  {
+    "assetPath": "/player-faces/newcastle_united_willock_joe.png",
+    "displayName": "Joe Willock",
+    "externalId": 340329,
+    "firstName": "Joe",
+    "lastName": "Willock",
+    "slug": "joe-willock-340329",
+    "sortName": "Willock, Joe",
+    "teamSlug": "newcastle-united"
+  },
+  {
+    "assetPath": "/player-faces/newcastle_united_wissa_yoane.png",
+    "displayName": "Yoane Wissa",
+    "externalId": 388165,
+    "firstName": "Yoane",
+    "lastName": "Wissa",
+    "slug": "yoane-wissa-388165",
+    "sortName": "Wissa, Yoane",
+    "teamSlug": "newcastle-united"
+  },
+  {
+    "assetPath": "/player-faces/newcastle_united_woltemade_nick.png",
+    "displayName": "Nick Woltemade",
+    "externalId": 455661,
+    "firstName": "Nick",
+    "lastName": "Woltemade",
+    "slug": "nick-woltemade-455661",
+    "sortName": "Woltemade, Nick",
+    "teamSlug": "newcastle-united"
+  },
+  {
+    "assetPath": "/player-faces/nottingham_forest_abbott_zach.png",
+    "displayName": "Zach Abbott",
+    "externalId": 933017,
+    "firstName": "Zach",
+    "lastName": "Abbott",
+    "slug": "zach-abbott-933017",
+    "sortName": "Abbott, Zach",
+    "teamSlug": "nottingham-forest"
+  },
+  {
+    "assetPath": "/player-faces/nottingham_forest_aina_ola.png",
+    "displayName": "Ola Aina",
+    "externalId": 236490,
+    "firstName": "Ola",
+    "lastName": "Aina",
+    "slug": "ola-aina-236490",
+    "sortName": "Aina, Ola",
+    "teamSlug": "nottingham-forest"
+  },
+  {
+    "assetPath": "/player-faces/nottingham_forest_awoniyi_taiwo.png",
+    "displayName": "Taiwo Awoniyi",
+    "externalId": 295313,
+    "firstName": "Taiwo",
+    "lastName": "Awoniyi",
+    "slug": "taiwo-awoniyi-295313",
+    "sortName": "Awoniyi, Taiwo",
+    "teamSlug": "nottingham-forest"
+  },
+  {
+    "assetPath": "/player-faces/nottingham_forest_bakwa_dilane.png",
+    "displayName": "Dilane Bakwa",
+    "externalId": 540664,
+    "firstName": "Dilane",
+    "lastName": "Bakwa",
+    "slug": "dilane-bakwa-540664",
+    "sortName": "Bakwa, Dilane",
+    "teamSlug": "nottingham-forest"
+  },
+  {
+    "assetPath": "/player-faces/nottingham_forest_bindon_tyler.png",
+    "displayName": "Tyler Bindon",
+    "externalId": 1007720,
+    "firstName": "Tyler",
+    "lastName": "Bindon",
+    "slug": "tyler-bindon-1007720",
+    "sortName": "Bindon, Tyler",
+    "teamSlug": "nottingham-forest"
+  },
+  {
+    "assetPath": "/player-faces/nottingham_forest_cunha_jair.png",
+    "displayName": "Jair Cunha",
+    "externalId": 984096,
+    "firstName": "Jair",
+    "lastName": "Cunha",
+    "slug": "jair-cunha-984096",
+    "sortName": "Cunha, Jair",
+    "teamSlug": "nottingham-forest"
+  },
+  {
+    "assetPath": "/player-faces/nottingham_forest_da_silva_moreira_eric.png",
+    "displayName": "Eric da Silva Moreira",
+    "externalId": 897481,
+    "firstName": "Eric",
+    "lastName": "da Silva Moreira",
+    "slug": "eric-da-silva-moreira-897481",
+    "sortName": "da Silva Moreira, Eric",
+    "teamSlug": "nottingham-forest"
+  },
+  {
+    "assetPath": "/player-faces/nottingham_forest_dominguez_nicolas.png",
+    "displayName": "Nicolás Domínguez",
+    "externalId": 497291,
+    "firstName": "Nicolás",
+    "lastName": "Domínguez",
+    "slug": "nicolas-dominguez-497291",
+    "sortName": "Domínguez, Nicolás",
+    "teamSlug": "nottingham-forest"
+  },
+  {
+    "assetPath": "/player-faces/nottingham_forest_gibbs_white_morgan.png",
+    "displayName": "Morgan Gibbs-White",
+    "externalId": 429014,
+    "firstName": "Morgan",
+    "lastName": "Gibbs-White",
+    "slug": "morgan-gibbs-white-429014",
+    "sortName": "Gibbs-White, Morgan",
+    "teamSlug": "nottingham-forest"
+  },
+  {
+    "assetPath": "/player-faces/nottingham_forest_hudson_odoi_callum.png",
+    "displayName": "Callum Hudson-Odoi",
+    "externalId": 392768,
+    "firstName": "Callum",
+    "lastName": "Hudson-Odoi",
+    "slug": "callum-hudson-odoi-392768",
+    "sortName": "Hudson-Odoi, Callum",
+    "teamSlug": "nottingham-forest"
+  },
+  {
+    "assetPath": "/player-faces/nottingham_forest_hutchinson_omari.png",
+    "displayName": "Omari Hutchinson",
+    "externalId": 741238,
+    "firstName": "Omari",
+    "lastName": "Hutchinson",
+    "slug": "omari-hutchinson-741238",
+    "sortName": "Hutchinson, Omari",
+    "teamSlug": "nottingham-forest"
+  },
+  {
+    "assetPath": "/player-faces/nottingham_forest_jesus_igor.png",
+    "displayName": "Igor Jesus",
+    "externalId": 432164,
+    "firstName": "Igor",
+    "lastName": "Jesus",
+    "slug": "igor-jesus-432164",
+    "sortName": "Jesus, Igor",
+    "teamSlug": "nottingham-forest"
+  },
+  {
+    "assetPath": "/player-faces/nottingham_forest_kalimuendo_arnaud.png",
+    "displayName": "Arnaud Kalimuendo",
+    "externalId": 585959,
+    "firstName": "Arnaud",
+    "lastName": "Kalimuendo",
+    "slug": "arnaud-kalimuendo-585959",
+    "sortName": "Kalimuendo, Arnaud",
+    "teamSlug": "nottingham-forest"
+  },
+  {
+    "assetPath": "/player-faces/nottingham_forest_mcatee_james.png",
+    "displayName": "James McAtee",
+    "externalId": 583199,
+    "firstName": "James",
+    "lastName": "McAtee",
+    "slug": "james-mcatee-583199",
+    "sortName": "McAtee, James",
+    "teamSlug": "nottingham-forest"
+  },
+  {
+    "assetPath": "/player-faces/nottingham_forest_milenkovic_nikola.png",
+    "displayName": "Nikola Milenković",
+    "externalId": 413507,
+    "firstName": "Nikola",
+    "lastName": "Milenković",
+    "slug": "nikola-milenkovic-413507",
+    "sortName": "Milenković, Nikola",
+    "teamSlug": "nottingham-forest"
+  },
+  {
+    "assetPath": "/player-faces/nottingham_forest_x_morato.png",
+    "displayName": "Morato",
+    "externalId": 673492,
+    "firstName": "Morato",
+    "lastName": null,
+    "slug": "morato-673492",
+    "sortName": "Morato",
+    "teamSlug": "nottingham-forest"
+  },
+  {
+    "assetPath": "/player-faces/nottingham_forest_x_murillo.png",
+    "displayName": "Murillo",
+    "externalId": 1005649,
+    "firstName": "Murillo",
+    "lastName": null,
+    "slug": "murillo-1005649",
+    "sortName": "Murillo",
+    "teamSlug": "nottingham-forest"
+  },
+  {
+    "assetPath": "/player-faces/nottingham_forest_ndoye_dan.png",
+    "displayName": "Dan Ndoye",
+    "externalId": 365108,
+    "firstName": "Dan",
+    "lastName": "Ndoye",
+    "slug": "dan-ndoye-365108",
+    "sortName": "Ndoye, Dan",
+    "teamSlug": "nottingham-forest"
+  },
+  {
+    "assetPath": "/player-faces/nottingham_forest_netz_luca.png",
+    "displayName": "Luca Netz",
+    "externalId": 524285,
+    "firstName": "Luca",
+    "lastName": "Netz",
+    "slug": "luca-netz-524285",
+    "sortName": "Netz, Luca",
+    "teamSlug": "nottingham-forest"
+  },
+  {
+    "assetPath": "/player-faces/nottingham_forest_richards_omar.png",
+    "displayName": "Omar Richards",
+    "externalId": 424881,
+    "firstName": "Omar",
+    "lastName": "Richards",
+    "slug": "omar-richards-424881",
+    "sortName": "Richards, Omar",
+    "teamSlug": "nottingham-forest"
+  },
+  {
+    "assetPath": "/player-faces/nottingham_forest_sangare_ibrahim.png",
+    "displayName": "Ibrahim Sangaré",
+    "externalId": 375885,
+    "firstName": "Ibrahim",
+    "lastName": "Sangaré",
+    "slug": "ibrahim-sangare-375885",
+    "sortName": "Sangaré, Ibrahim",
+    "teamSlug": "nottingham-forest"
+  },
+  {
+    "assetPath": "/player-faces/nottingham_forest_savona_nicolo.png",
+    "displayName": "Nicolò Savona",
+    "externalId": 708072,
+    "firstName": "Nicolò",
+    "lastName": "Savona",
+    "slug": "nicolo-savona-708072",
+    "sortName": "Savona, Nicolò",
+    "teamSlug": "nottingham-forest"
+  },
+  {
+    "assetPath": "/player-faces/nottingham_forest_schlager_xaver.png",
+    "displayName": "Xaver Schlager",
+    "externalId": 223979,
+    "firstName": "Xaver",
+    "lastName": "Schlager",
+    "slug": "xaver-schlager-223979",
+    "sortName": "Schlager, Xaver",
+    "teamSlug": "nottingham-forest"
+  },
+  {
+    "assetPath": "/player-faces/nottingham_forest_sels_matz.png",
+    "displayName": "Matz Sels",
+    "externalId": 127202,
+    "firstName": "Matz",
+    "lastName": "Sels",
+    "slug": "matz-sels-127202",
+    "sortName": "Sels, Matz",
+    "teamSlug": "nottingham-forest"
+  },
+  {
+    "assetPath": "/player-faces/nottingham_forest_victor_john.png",
+    "displayName": "John Victor",
+    "externalId": 432914,
+    "firstName": "John",
+    "lastName": "Victor",
+    "slug": "john-victor-432914",
+    "sortName": "Victor, John",
+    "teamSlug": "nottingham-forest"
+  },
+  {
+    "assetPath": "/player-faces/nottingham_forest_williams_neco.png",
+    "displayName": "Neco Williams",
+    "externalId": 503680,
+    "firstName": "Neco",
+    "lastName": "Williams",
+    "slug": "neco-williams-503680",
+    "sortName": "Williams, Neco",
+    "teamSlug": "nottingham-forest"
+  },
+  {
+    "assetPath": "/player-faces/nottingham_forest_wood_chris.png",
+    "displayName": "Chris Wood",
+    "externalId": 108725,
+    "firstName": "Chris",
+    "lastName": "Wood",
+    "slug": "chris-wood-108725",
+    "sortName": "Wood, Chris",
+    "teamSlug": "nottingham-forest"
+  },
+  {
+    "assetPath": "/player-faces/nottingham_forest_yates_ryan.png",
+    "displayName": "Ryan Yates",
+    "externalId": 425902,
+    "firstName": "Ryan",
+    "lastName": "Yates",
+    "slug": "ryan-yates-425902",
+    "sortName": "Yates, Ryan",
+    "teamSlug": "nottingham-forest"
+  },
+  {
+    "assetPath": "/player-faces/afc_sunderland_adingra_simon.png",
+    "displayName": "Simon Adingra",
+    "externalId": 658536,
+    "firstName": "Simon",
+    "lastName": "Adingra",
+    "slug": "simon-adingra-658536",
+    "sortName": "Adingra, Simon",
+    "teamSlug": "sunderland"
+  },
+  {
+    "assetPath": "/player-faces/afc_sunderland_alderete_omar.png",
+    "displayName": "Omar Alderete",
+    "externalId": 353032,
+    "firstName": "Omar",
+    "lastName": "Alderete",
+    "slug": "omar-alderete-353032",
+    "sortName": "Alderete, Omar",
+    "teamSlug": "sunderland"
+  },
+  {
+    "assetPath": "/player-faces/afc_sunderland_alese_aji.png",
+    "displayName": "Aji Alese",
+    "externalId": 502065,
+    "firstName": "Aji",
+    "lastName": "Alese",
+    "slug": "aji-alese-502065",
+    "sortName": "Alese, Aji",
+    "teamSlug": "sunderland"
+  },
+  {
+    "assetPath": "/player-faces/afc_sunderland_angulo_nilson.png",
+    "displayName": "Nilson Angulo",
+    "externalId": 903611,
+    "firstName": "Nilson",
+    "lastName": "Angulo",
+    "slug": "nilson-angulo-903611",
+    "sortName": "Angulo, Nilson",
+    "teamSlug": "sunderland"
+  },
+  {
+    "assetPath": "/player-faces/afc_sunderland_ba_abdoullah.png",
+    "displayName": "Abdoullah Ba",
+    "externalId": 654412,
+    "firstName": "Abdoullah",
+    "lastName": "Ba",
+    "slug": "abdoullah-ba-654412",
+    "sortName": "Ba, Abdoullah",
+    "teamSlug": "sunderland"
+  },
+  {
+    "assetPath": "/player-faces/afc_sunderland_ballard_dan.png",
+    "displayName": "Dan Ballard",
+    "externalId": 503686,
+    "firstName": "Dan",
+    "lastName": "Ballard",
+    "slug": "dan-ballard-503686",
+    "sortName": "Ballard, Dan",
+    "teamSlug": "sunderland"
+  },
+  {
+    "assetPath": "/player-faces/afc_sunderland_brobbey_brian.png",
+    "displayName": "Brian Brobbey",
+    "externalId": 473169,
+    "firstName": "Brian",
+    "lastName": "Brobbey",
+    "slug": "brian-brobbey-473169",
+    "sortName": "Brobbey, Brian",
+    "teamSlug": "sunderland"
+  },
+  {
+    "assetPath": "/player-faces/afc_sunderland_browne_alan.png",
+    "displayName": "Alan Browne",
+    "externalId": 277697,
+    "firstName": "Alan",
+    "lastName": "Browne",
+    "slug": "alan-browne-277697",
+    "sortName": "Browne, Alan",
+    "teamSlug": "sunderland"
+  },
+  {
+    "assetPath": "/player-faces/afc_sunderland_diarra_habib.png",
+    "displayName": "Habib Diarra",
+    "externalId": 876631,
+    "firstName": "Habib",
+    "lastName": "Diarra",
+    "slug": "habib-diarra-876631",
+    "sortName": "Diarra, Habib",
+    "teamSlug": "sunderland"
+  },
+  {
+    "assetPath": "/player-faces/afc_sunderland_ellborg_melker.png",
+    "displayName": "Melker Ellborg",
+    "externalId": 605426,
+    "firstName": "Melker",
+    "lastName": "Ellborg",
+    "slug": "melker-ellborg-605426",
+    "sortName": "Ellborg, Melker",
+    "teamSlug": "sunderland"
+  },
+  {
+    "assetPath": "/player-faces/afc_sunderland_hjelde_leo.png",
+    "displayName": "Leo Hjelde",
+    "externalId": 661208,
+    "firstName": "Leo",
+    "lastName": "Hjelde",
+    "slug": "leo-hjelde-661208",
+    "sortName": "Hjelde, Leo",
+    "teamSlug": "sunderland"
+  },
+  {
+    "assetPath": "/player-faces/afc_sunderland_hume_trai.png",
+    "displayName": "Trai Hume",
+    "externalId": 515544,
+    "firstName": "Trai",
+    "lastName": "Hume",
+    "slug": "trai-hume-515544",
+    "sortName": "Hume, Trai",
+    "teamSlug": "sunderland"
+  },
+  {
+    "assetPath": "/player-faces/afc_sunderland_isidor_wilson.png",
+    "displayName": "Wilson Isidor",
+    "externalId": 494237,
+    "firstName": "Wilson",
+    "lastName": "Isidor",
+    "slug": "wilson-isidor-494237",
+    "sortName": "Isidor, Wilson",
+    "teamSlug": "sunderland"
+  },
+  {
+    "assetPath": "/player-faces/afc_sunderland_le_fee_enzo.png",
+    "displayName": "Enzo Le Fée",
+    "externalId": 633992,
+    "firstName": "Enzo",
+    "lastName": "Le Fée",
+    "slug": "enzo-le-fee-633992",
+    "sortName": "Le Fée, Enzo",
+    "teamSlug": "sunderland"
+  },
+  {
+    "assetPath": "/player-faces/afc_sunderland_mandava_reinildo.png",
+    "displayName": "Reinildo Mandava",
+    "externalId": 240692,
+    "firstName": "Reinildo",
+    "lastName": "Mandava",
+    "slug": "reinildo-mandava-240692",
+    "sortName": "Mandava, Reinildo",
+    "teamSlug": "sunderland"
+  },
+  {
+    "assetPath": "/player-faces/afc_sunderland_masuaku_arthur.png",
+    "displayName": "Arthur Masuaku",
+    "externalId": 181380,
+    "firstName": "Arthur",
+    "lastName": "Masuaku",
+    "slug": "arthur-masuaku-181380",
+    "sortName": "Masuaku, Arthur",
+    "teamSlug": "sunderland"
+  },
+  {
+    "assetPath": "/player-faces/afc_sunderland_meunier_thomas.png",
+    "displayName": "Thomas Meunier",
+    "externalId": 100986,
+    "firstName": "Thomas",
+    "lastName": "Meunier",
+    "slug": "thomas-meunier-100986",
+    "sortName": "Meunier, Thomas",
+    "teamSlug": "sunderland"
+  },
+  {
+    "assetPath": "/player-faces/afc_sunderland_moore_simon.png",
+    "displayName": "Simon Moore",
+    "externalId": 123536,
+    "firstName": "Simon",
+    "lastName": "Moore",
+    "slug": "simon-moore-123536",
+    "sortName": "Moore, Simon",
+    "teamSlug": "sunderland"
+  },
+  {
+    "assetPath": "/player-faces/afc_sunderland_mukiele_nordi.png",
+    "displayName": "Nordi Mukiele",
+    "externalId": 348026,
+    "firstName": "Nordi",
+    "lastName": "Mukiele",
+    "slug": "nordi-mukiele-348026",
+    "sortName": "Mukiele, Nordi",
+    "teamSlug": "sunderland"
+  },
+  {
+    "assetPath": "/player-faces/afc_sunderland_mundle_romaine.png",
+    "displayName": "Romaine Mundle",
+    "externalId": 696181,
+    "firstName": "Romaine",
+    "lastName": "Mundle",
+    "slug": "romaine-mundle-696181",
+    "sortName": "Mundle, Romaine",
+    "teamSlug": "sunderland"
+  },
+  {
+    "assetPath": "/player-faces/afc_sunderland_o_nien_luke.png",
+    "displayName": "Luke O'Nien",
+    "externalId": 282939,
+    "firstName": "Luke",
+    "lastName": "O'Nien",
+    "slug": "luke-onien-282939",
+    "sortName": "O'Nien, Luke",
+    "teamSlug": "sunderland"
+  },
+  {
+    "assetPath": "/player-faces/afc_sunderland_patterson_anthony.png",
+    "displayName": "Anthony Patterson",
+    "externalId": 475946,
+    "firstName": "Anthony",
+    "lastName": "Patterson",
+    "slug": "anthony-patterson-475946",
+    "sortName": "Patterson, Anthony",
+    "teamSlug": "sunderland"
+  },
+  {
+    "assetPath": "/player-faces/afc_sunderland_rigg_chris.png",
+    "displayName": "Chris Rigg",
+    "externalId": 947411,
+    "firstName": "Chris",
+    "lastName": "Rigg",
+    "slug": "chris-rigg-947411",
+    "sortName": "Rigg, Chris",
+    "teamSlug": "sunderland"
+  },
+  {
+    "assetPath": "/player-faces/afc_sunderland_roefs_robin.png",
+    "displayName": "Robin Roefs",
+    "externalId": 646991,
+    "firstName": "Robin",
+    "lastName": "Roefs",
+    "slug": "robin-roefs-646991",
+    "sortName": "Roefs, Robin",
+    "teamSlug": "sunderland"
+  },
+  {
+    "assetPath": "/player-faces/afc_sunderland_sadiki_noah.png",
+    "displayName": "Noah Sadiki",
+    "externalId": 727089,
+    "firstName": "Noah",
+    "lastName": "Sadiki",
+    "slug": "noah-sadiki-727089",
+    "sortName": "Sadiki, Noah",
+    "teamSlug": "sunderland"
+  },
+  {
+    "assetPath": "/player-faces/afc_sunderland_seelt_jenson.png",
+    "displayName": "Jenson Seelt",
+    "externalId": 617755,
+    "firstName": "Jenson",
+    "lastName": "Seelt",
+    "slug": "jenson-seelt-617755",
+    "sortName": "Seelt, Jenson",
+    "teamSlug": "sunderland"
+  },
+  {
+    "assetPath": "/player-faces/afc_sunderland_semedo_luis.png",
+    "displayName": "Luís Semedo",
+    "externalId": 840687,
+    "firstName": "Luís",
+    "lastName": "Semedo",
+    "slug": "luis-semedo-840687",
+    "sortName": "Semedo, Luís",
+    "teamSlug": "sunderland"
+  },
+  {
+    "assetPath": "/player-faces/afc_sunderland_ta_bi_jocelin.png",
+    "displayName": "Jocelin Ta Bi",
+    "externalId": 1322090,
+    "firstName": "Jocelin",
+    "lastName": "Ta Bi",
+    "slug": "jocelin-ta-bi-1322090",
+    "sortName": "Ta Bi, Jocelin",
+    "teamSlug": "sunderland"
+  },
+  {
+    "assetPath": "/player-faces/afc_sunderland_talbi_chemsdine.png",
+    "displayName": "Chemsdine Talbi",
+    "externalId": 743384,
+    "firstName": "Chemsdine",
+    "lastName": "Talbi",
+    "slug": "chemsdine-talbi-743384",
+    "sortName": "Talbi, Chemsdine",
+    "teamSlug": "sunderland"
+  },
+  {
+    "assetPath": "/player-faces/afc_sunderland_xhaka_granit.png",
+    "displayName": "Granit Xhaka",
+    "externalId": 111455,
+    "firstName": "Granit",
+    "lastName": "Xhaka",
+    "slug": "granit-xhaka-111455",
+    "sortName": "Xhaka, Granit",
+    "teamSlug": "sunderland"
+  },
+  {
+    "assetPath": "/player-faces/tottenham_hotspur_austin_brandon.png",
+    "displayName": "Brandon Austin",
+    "externalId": 428016,
+    "firstName": "Brandon",
+    "lastName": "Austin",
+    "slug": "brandon-austin-428016",
+    "sortName": "Austin, Brandon",
+    "teamSlug": "tottenham-hotspur"
+  },
+  {
+    "assetPath": "/player-faces/tottenham_hotspur_bentancur_rodrigo.png",
+    "displayName": "Rodrigo Bentancur",
+    "externalId": 354362,
+    "firstName": "Rodrigo",
+    "lastName": "Bentancur",
+    "slug": "rodrigo-bentancur-354362",
+    "sortName": "Bentancur, Rodrigo",
+    "teamSlug": "tottenham-hotspur"
+  },
+  {
+    "assetPath": "/player-faces/tottenham_hotspur_bergvall_lucas.png",
+    "displayName": "Lucas Bergvall",
+    "externalId": 866246,
+    "firstName": "Lucas",
+    "lastName": "Bergvall",
+    "slug": "lucas-bergvall-866246",
+    "sortName": "Bergvall, Lucas",
+    "teamSlug": "tottenham-hotspur"
+  },
+  {
+    "assetPath": "/player-faces/tottenham_hotspur_danso_kevin.png",
+    "displayName": "Kevin Danso",
+    "externalId": 263236,
+    "firstName": "Kevin",
+    "lastName": "Danso",
+    "slug": "kevin-danso-263236",
+    "sortName": "Danso, Kevin",
+    "teamSlug": "tottenham-hotspur"
+  },
+  {
+    "assetPath": "/player-faces/tottenham_hotspur_davies_ben.png",
+    "displayName": "Ben Davies",
+    "externalId": 192765,
+    "firstName": "Ben",
+    "lastName": "Davies",
+    "slug": "ben-davies-192765",
+    "sortName": "Davies, Ben",
+    "teamSlug": "tottenham-hotspur"
+  },
+  {
+    "assetPath": "/player-faces/tottenham_hotspur_dubravka_martin.png",
+    "displayName": "Martin Dúbravka",
+    "externalId": 74960,
+    "firstName": "Martin",
+    "lastName": "Dúbravka",
+    "slug": "martin-dubravka-74960",
+    "sortName": "Dúbravka, Martin",
+    "teamSlug": "tottenham-hotspur"
+  },
+  {
+    "assetPath": "/player-faces/tottenham_hotspur_fernandes_mateus.png",
+    "displayName": "Mateus Fernandes",
+    "externalId": 880245,
+    "firstName": "Mateus",
+    "lastName": "Fernandes",
+    "slug": "mateus-fernandes-880245",
+    "sortName": "Fernandes, Mateus",
+    "teamSlug": "tottenham-hotspur"
+  },
+  {
+    "assetPath": "/player-faces/tottenham_hotspur_gallagher_conor.png",
+    "displayName": "Conor Gallagher",
+    "externalId": 488362,
+    "firstName": "Conor",
+    "lastName": "Gallagher",
+    "slug": "conor-gallagher-488362",
+    "sortName": "Gallagher, Conor",
+    "teamSlug": "tottenham-hotspur"
+  },
+  {
+    "assetPath": "/player-faces/tottenham_hotspur_gray_archie.png",
+    "displayName": "Archie Gray",
+    "externalId": 922693,
+    "firstName": "Archie",
+    "lastName": "Gray",
+    "slug": "archie-gray-922693",
+    "sortName": "Gray, Archie",
+    "teamSlug": "tottenham-hotspur"
+  },
+  {
+    "assetPath": "/player-faces/tottenham_hotspur_kinsky_antonin.png",
+    "displayName": "Antonín Kinský",
+    "externalId": 725912,
+    "firstName": "Antonín",
+    "lastName": "Kinský",
+    "slug": "antonin-kinsky-725912",
+    "sortName": "Kinský, Antonín",
+    "teamSlug": "tottenham-hotspur"
+  },
+  {
+    "assetPath": "/player-faces/tottenham_hotspur_kudus_mohammed.png",
+    "displayName": "Mohammed Kudus",
+    "externalId": 543499,
+    "firstName": "Mohammed",
+    "lastName": "Kudus",
+    "slug": "mohammed-kudus-543499",
+    "sortName": "Kudus, Mohammed",
+    "teamSlug": "tottenham-hotspur"
+  },
+  {
+    "assetPath": "/player-faces/tottenham_hotspur_kulusevski_dejan.png",
+    "displayName": "Dejan Kulusevski",
+    "externalId": 431755,
+    "firstName": "Dejan",
+    "lastName": "Kulusevski",
+    "slug": "dejan-kulusevski-431755",
+    "sortName": "Kulusevski, Dejan",
+    "teamSlug": "tottenham-hotspur"
+  },
+  {
+    "assetPath": "/player-faces/tottenham_hotspur_maddison_james.png",
+    "displayName": "James Maddison",
+    "externalId": 294057,
+    "firstName": "James",
+    "lastName": "Maddison",
+    "slug": "james-maddison-294057",
+    "sortName": "Maddison, James",
+    "teamSlug": "tottenham-hotspur"
+  },
+  {
+    "assetPath": "/player-faces/tottenham_hotspur_matar_sarr_pape.png",
+    "displayName": "Pape Matar Sarr",
+    "externalId": 568693,
+    "firstName": "Pape",
+    "lastName": "Matar Sarr",
+    "slug": "pape-matar-sarr-568693",
+    "sortName": "Matar Sarr, Pape",
+    "teamSlug": "tottenham-hotspur"
+  },
+  {
+    "assetPath": "/player-faces/tottenham_hotspur_moore_mikey.png",
+    "displayName": "Mikey Moore",
+    "externalId": 1011147,
+    "firstName": "Mikey",
+    "lastName": "Moore",
+    "slug": "mikey-moore-1011147",
+    "sortName": "Moore, Mikey",
+    "teamSlug": "tottenham-hotspur"
+  },
+  {
+    "assetPath": "/player-faces/tottenham_hotspur_odobert_wilson.png",
+    "displayName": "Wilson Odobert",
+    "externalId": 743498,
+    "firstName": "Wilson",
+    "lastName": "Odobert",
+    "slug": "wilson-odobert-743498",
+    "sortName": "Odobert, Wilson",
+    "teamSlug": "tottenham-hotspur"
+  },
+  {
+    "assetPath": "/player-faces/tottenham_hotspur_paul_van_hecke_jan.png",
+    "displayName": "Jan Paul van Hecke",
+    "externalId": 576314,
+    "firstName": "Jan",
+    "lastName": "Paul van Hecke",
+    "slug": "jan-paul-van-hecke-576314",
+    "sortName": "Paul van Hecke, Jan",
+    "teamSlug": "tottenham-hotspur"
+  },
+  {
+    "assetPath": "/player-faces/tottenham_hotspur_phillips_ashley.png",
+    "displayName": "Ashley Phillips",
+    "externalId": 859951,
+    "firstName": "Ashley",
+    "lastName": "Phillips",
+    "slug": "ashley-phillips-859951",
+    "sortName": "Phillips, Ashley",
+    "teamSlug": "tottenham-hotspur"
+  },
+  {
+    "assetPath": "/player-faces/tottenham_hotspur_porro_pedro.png",
+    "displayName": "Pedro Porro",
+    "externalId": 553875,
+    "firstName": "Pedro",
+    "lastName": "Porro",
+    "slug": "pedro-porro-553875",
+    "sortName": "Porro, Pedro",
+    "teamSlug": "tottenham-hotspur"
+  },
+  {
+    "assetPath": "/player-faces/tottenham_hotspur_x_richarlison.png",
+    "displayName": "Richarlison",
+    "externalId": 378710,
+    "firstName": "Richarlison",
+    "lastName": null,
+    "slug": "richarlison-378710",
+    "sortName": "Richarlison",
+    "teamSlug": "tottenham-hotspur"
+  },
+  {
+    "assetPath": "/player-faces/tottenham_hotspur_robertson_andrew.png",
+    "displayName": "Andrew Robertson",
+    "externalId": 234803,
+    "firstName": "Andrew",
+    "lastName": "Robertson",
+    "slug": "andrew-robertson-234803",
+    "sortName": "Robertson, Andrew",
+    "teamSlug": "tottenham-hotspur"
+  },
+  {
+    "assetPath": "/player-faces/tottenham_hotspur_romero_cristian.png",
+    "displayName": "Cristian Romero",
+    "externalId": 355915,
+    "firstName": "Cristian",
+    "lastName": "Romero",
+    "slug": "cristian-romero-355915",
+    "sortName": "Romero, Cristian",
+    "teamSlug": "tottenham-hotspur"
+  },
+  {
+    "assetPath": "/player-faces/tottenham_hotspur_scarlett_dane.png",
+    "displayName": "Dane Scarlett",
+    "externalId": 670883,
+    "firstName": "Dane",
+    "lastName": "Scarlett",
+    "slug": "dane-scarlett-670883",
+    "sortName": "Scarlett, Dane",
+    "teamSlug": "tottenham-hotspur"
+  },
+  {
+    "assetPath": "/player-faces/tottenham_hotspur_senesi_marcos.png",
+    "displayName": "Marcos Senesi",
+    "externalId": 469781,
+    "firstName": "Marcos",
+    "lastName": "Senesi",
+    "slug": "marcos-senesi-469781",
+    "sortName": "Senesi, Marcos",
+    "teamSlug": "tottenham-hotspur"
+  },
+  {
+    "assetPath": "/player-faces/tottenham_hotspur_simons_xavi.png",
+    "displayName": "Xavi Simons",
+    "externalId": 566931,
+    "firstName": "Xavi",
+    "lastName": "Simons",
+    "slug": "xavi-simons-566931",
+    "sortName": "Simons, Xavi",
+    "teamSlug": "tottenham-hotspur"
+  },
+  {
+    "assetPath": "/player-faces/tottenham_hotspur_solanke_dominic.png",
+    "displayName": "Dominic Solanke",
+    "externalId": 258889,
+    "firstName": "Dominic",
+    "lastName": "Solanke",
+    "slug": "dominic-solanke-258889",
+    "sortName": "Solanke, Dominic",
+    "teamSlug": "tottenham-hotspur"
+  },
+  {
+    "assetPath": "/player-faces/tottenham_hotspur_solomon_manor.png",
+    "displayName": "Manor Solomon",
+    "externalId": 396638,
+    "firstName": "Manor",
+    "lastName": "Solomon",
+    "slug": "manor-solomon-396638",
+    "sortName": "Solomon, Manor",
+    "teamSlug": "tottenham-hotspur"
+  },
+  {
+    "assetPath": "/player-faces/tottenham_hotspur_x_souza.png",
+    "displayName": "Souza",
+    "externalId": 1086258,
+    "firstName": "Souza",
+    "lastName": null,
+    "slug": "souza-1086258",
+    "sortName": "Souza",
+    "teamSlug": "tottenham-hotspur"
+  },
+  {
+    "assetPath": "/player-faces/tottenham_hotspur_spence_djed.png",
+    "displayName": "Djed Spence",
+    "externalId": 483348,
+    "firstName": "Djed",
+    "lastName": "Spence",
+    "slug": "djed-spence-483348",
+    "sortName": "Spence, Djed",
+    "teamSlug": "tottenham-hotspur"
+  },
+  {
+    "assetPath": null,
+    "displayName": "Kota Takai",
+    "externalId": 671108,
+    "firstName": "Kota",
+    "lastName": "Takai",
+    "slug": "kota-takai-671108",
+    "sortName": "Takai, Kota",
+    "teamSlug": "tottenham-hotspur"
+  },
+  {
+    "assetPath": "/player-faces/tottenham_hotspur_tel_mathys.png",
+    "displayName": "Mathys Tel",
+    "externalId": 801734,
+    "firstName": "Mathys",
+    "lastName": "Tel",
+    "slug": "mathys-tel-801734",
+    "sortName": "Tel, Mathys",
+    "teamSlug": "tottenham-hotspur"
+  },
+  {
+    "assetPath": "/player-faces/tottenham_hotspur_tonali_sandro.png",
+    "displayName": "Sandro Tonali",
+    "externalId": 397033,
+    "firstName": "Sandro",
+    "lastName": "Tonali",
+    "slug": "sandro-tonali-397033",
+    "sortName": "Tonali, Sandro",
+    "teamSlug": "tottenham-hotspur"
+  },
+  {
+    "assetPath": "/player-faces/tottenham_hotspur_udogie_destiny.png",
+    "displayName": "Destiny Udogie",
+    "externalId": 556385,
+    "firstName": "Destiny",
+    "lastName": "Udogie",
+    "slug": "destiny-udogie-556385",
+    "sortName": "Udogie, Destiny",
+    "teamSlug": "tottenham-hotspur"
+  },
+  {
+    "assetPath": "/player-faces/tottenham_hotspur_van_de_ven_micky.png",
+    "displayName": "Micky van de Ven",
+    "externalId": 557459,
+    "firstName": "Micky",
+    "lastName": "van de Ven",
+    "slug": "micky-van-de-ven-557459",
+    "sortName": "van de Ven, Micky",
+    "teamSlug": "tottenham-hotspur"
+  },
+  {
+    "assetPath": "/player-faces/tottenham_hotspur_vicario_guglielmo.png",
+    "displayName": "Guglielmo Vicario",
+    "externalId": 286047,
+    "firstName": "Guglielmo",
+    "lastName": "Vicario",
+    "slug": "guglielmo-vicario-286047",
+    "sortName": "Vicario, Guglielmo",
+    "teamSlug": "tottenham-hotspur"
+  },
+  {
+    "assetPath": "/player-faces/tottenham_hotspur_hyeok_yang_min.png",
+    "displayName": "Min-hyeok Yang",
+    "externalId": 1004327,
+    "firstName": "Min-hyeok",
+    "lastName": "Yang",
+    "slug": "min-hyeok-yang-1004327",
+    "sortName": "Yang, Min-hyeok",
+    "teamSlug": "tottenham-hotspur"
+  }
+]

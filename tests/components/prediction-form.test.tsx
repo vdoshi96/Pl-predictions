@@ -7,8 +7,9 @@ import {
   within,
 } from "@testing-library/react";
 import { useState } from "react";
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
+import { PlayerMark } from "@/components/player-mark";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import { TeamMark } from "@/components/team-mark";
@@ -22,6 +23,11 @@ import {
   PredictionSorter,
   type PredictionTeam,
 } from "@/features/predictions/prediction-sorter";
+import {
+  type PredictionPlayer,
+  SpotlightPredictionsForm,
+  type SpotlightPicksDraft,
+} from "@/features/predictions/spotlight-predictions-form";
 
 vi.hoisted(() => {
   class MockResizeObserver {
@@ -39,6 +45,15 @@ vi.hoisted(() => {
 afterEach(() => {
   cleanup();
   vi.restoreAllMocks();
+  vi.unstubAllGlobals();
+});
+
+beforeEach(() => {
+  vi.stubGlobal("requestAnimationFrame", (callback: FrameRequestCallback) => {
+    callback(0);
+    return 1;
+  });
+  vi.stubGlobal("scrollTo", vi.fn());
 });
 
 const teams: PredictionTeam[] = PREMIER_LEAGUE_2026_27_TEAMS.map((team) => ({
@@ -49,6 +64,58 @@ const teams: PredictionTeam[] = PREMIER_LEAGUE_2026_27_TEAMS.map((team) => ({
   assetPath: team.assetPath,
 }));
 
+const playerFixtures: PredictionPlayer[] = [
+  {
+    displayName: "Mohamed Salah",
+    firstName: "Mohamed",
+    id: "mohamed-salah",
+    lastName: "Salah",
+  },
+  {
+    displayName: "Bukayo Saka",
+    firstName: "Bukayo",
+    id: "bukayo-saka",
+    lastName: "Saka",
+  },
+];
+
+function getSpotlightCategory(category: string) {
+  const card = document.querySelector<HTMLElement>(
+    `[data-category="${category}"]`,
+  );
+  if (!card) throw new Error(`Missing spotlight category ${category}`);
+  return card;
+}
+
+function chooseOtherPlayer(
+  category: string,
+  label: string,
+  playerName: string,
+) {
+  const card = getSpotlightCategory(category);
+  fireEvent.focus(within(card).getByRole("combobox", { name: label }));
+  fireEvent.click(within(card).getByRole("option", { name: "Other player" }));
+  fireEvent.change(within(card).getByLabelText("Player’s full name"), {
+    target: { value: playerName },
+  });
+}
+
+function chooseClub(category: string, label: string, clubName: string) {
+  const card = getSpotlightCategory(category);
+  fireEvent.focus(within(card).getByRole("combobox", { name: label }));
+  fireEvent.click(within(card).getByRole("option", { name: clubName }));
+}
+
+function completeSpotlightPicks() {
+  chooseOtherPlayer("top_scorer", "Top scorer", "  Mohamed   Salah  ");
+  chooseOtherPlayer("top_assister", "Top assister", "Bukayo Saka");
+  chooseClub("most_clean_sheets", "Most clean sheets", "Arsenal");
+  chooseClub("underdog_team", "Underdog team", "Brentford");
+  chooseClub("overrated_team", "Overrated team", "Manchester United");
+  chooseOtherPlayer("underdog_player", "Underdog player", "  Elliot Anderson");
+  chooseOtherPlayer("overrated_player", "Overrated player", "Antony Matheus  ");
+}
+
 function SorterHarness({
   initialTeams = teams,
 }: {
@@ -57,6 +124,19 @@ function SorterHarness({
   const [orderedTeams, setOrderedTeams] = useState(initialTeams);
 
   return <PredictionSorter teams={orderedTeams} onChange={setOrderedTeams} />;
+}
+
+function SpotlightHarness() {
+  const [picks, setPicks] = useState<SpotlightPicksDraft>({});
+
+  return (
+    <SpotlightPredictionsForm
+      onChange={setPicks}
+      picks={picks}
+      players={playerFixtures}
+      teams={teams}
+    />
+  );
 }
 
 describe("TeamMark", () => {
@@ -84,6 +164,19 @@ describe("TeamMark", () => {
     expect(
       screen.getByRole("img", { name: "Arsenal initials" }),
     ).toHaveTextContent("ARS");
+  });
+});
+
+describe("PlayerMark", () => {
+  it("renders an accessible placeholder while player portraits are pending", () => {
+    render(<PlayerMark name="Future roster player" />);
+
+    const placeholder = screen.getByRole("img", {
+      name: "Future roster player player portrait",
+    });
+    expect(placeholder).toBeVisible();
+    expect(placeholder.querySelector("svg")).toBeInTheDocument();
+    expect(placeholder.querySelector("img")).not.toBeInTheDocument();
   });
 });
 
@@ -199,7 +292,7 @@ describe("PredictionSorter", () => {
 });
 
 describe("PredictionForm", () => {
-  it("normalizes the name, reviews all 20 rows, and emits a complete submission", async () => {
+  it("moves from table to spotlight to final review and emits all predictions", async () => {
     const result: PredictionSubmissionResult = {
       ok: true,
       entryId: "entry-123",
@@ -223,15 +316,30 @@ describe("PredictionForm", () => {
     fireEvent.change(screen.getByLabelText(/your display name/i), {
       target: { value: "  Vishal    Doshi  " },
     });
-    fireEvent.click(screen.getByRole("button", { name: /review your 1–20/i }));
+    fireEvent.click(
+      screen.getByRole("button", { name: /continue to spotlight picks/i }),
+    );
+
+    expect(
+      screen.getByRole("heading", { name: /make your spotlight picks/i }),
+    ).toBeVisible();
+    completeSpotlightPicks();
+    fireEvent.click(
+      screen.getByRole("button", { name: /review all predictions/i }),
+    );
 
     const dialog = await screen.findByRole("dialog");
     expect(within(dialog).getByText(/submitting as/i)).toHaveTextContent(
       "Vishal Doshi",
     );
     expect(within(dialog).getAllByRole("listitem")).toHaveLength(20);
-    expect(within(dialog).getByText("Arsenal")).toBeVisible();
+    expect(within(dialog).getAllByText("Arsenal")).toHaveLength(2);
     expect(within(dialog).getByText("Tottenham Hotspur")).toBeVisible();
+    expect(within(dialog).getByText("7 spotlight picks")).toBeVisible();
+    expect(within(dialog).getByText("Mohamed Salah")).toBeVisible();
+    expect(within(dialog).getByText("Bukayo Saka")).toBeVisible();
+    expect(within(dialog).getByText("Elliot Anderson")).toBeVisible();
+    expect(within(dialog).getByText("Antony Matheus")).toBeVisible();
     expect(dialog).toHaveClass("bottom-2", "sm:bottom-auto", "sm:top-1/2");
     expect(dialog.className).toContain("safe-area-inset-top");
 
@@ -263,6 +371,15 @@ describe("PredictionForm", () => {
       teamId: "tottenham-hotspur",
       predictedPosition: 20,
     });
+    expect(submitted.categoryPicks).toEqual([
+      { category: "top_scorer", customPlayerName: "Mohamed Salah" },
+      { category: "top_assister", customPlayerName: "Bukayo Saka" },
+      { category: "most_clean_sheets", teamId: "arsenal" },
+      { category: "underdog_team", teamId: "brentford" },
+      { category: "overrated_team", teamId: "manchester-united" },
+      { category: "underdog_player", customPlayerName: "Elliot Anderson" },
+      { category: "overrated_player", customPlayerName: "Antony Matheus" },
+    ]);
     expect(onPendingChange).toHaveBeenNthCalledWith(1, true);
     expect(onPendingChange).toHaveBeenLastCalledWith(false);
     expect(onSuccess).toHaveBeenCalledWith(result, submitted);
@@ -290,7 +407,13 @@ describe("PredictionForm", () => {
     fireEvent.change(screen.getByLabelText(/your display name/i), {
       target: { value: "Alex" },
     });
-    fireEvent.click(screen.getByRole("button", { name: /review your 1–20/i }));
+    fireEvent.click(
+      screen.getByRole("button", { name: /continue to spotlight picks/i }),
+    );
+    completeSpotlightPicks();
+    fireEvent.click(
+      screen.getByRole("button", { name: /review all predictions/i }),
+    );
 
     const dialog = await screen.findByRole("dialog");
     fireEvent.click(
@@ -309,17 +432,214 @@ describe("PredictionForm", () => {
     ).toBeEnabled();
   });
 
+  it("requires all seven categories and a complete Other player name", () => {
+    render(<PredictionForm teams={teams} onSubmit={vi.fn()} />);
+
+    fireEvent.change(screen.getByLabelText(/your display name/i), {
+      target: { value: "Alex" },
+    });
+    fireEvent.click(
+      screen.getByRole("button", { name: /continue to spotlight picks/i }),
+    );
+    fireEvent.click(
+      screen.getByRole("button", { name: /review all predictions/i }),
+    );
+
+    expect(screen.getByRole("alert")).toHaveTextContent(
+      "Choose all seven spotlight predictions and complete every Other player name.",
+    );
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+    for (const combobox of screen.getAllByRole("combobox")) {
+      expect(combobox).toHaveAttribute("aria-invalid", "true");
+    }
+
+    chooseOtherPlayer("top_scorer", "Top scorer", "A");
+    const topScorerCard = getSpotlightCategory("top_scorer");
+    const otherPlayerInput =
+      within(topScorerCard).getByLabelText("Player’s full name");
+    expect(otherPlayerInput).toHaveClass("border-red-400");
+    expect(otherPlayerInput).toHaveAttribute("aria-invalid", "true");
+    expect(otherPlayerInput).toHaveAccessibleDescription(
+      /enter a valid player name/i,
+    );
+  });
+
+  it("preserves the table, display name, and spotlight picks when going back", () => {
+    const { container } = render(
+      <PredictionForm teams={teams} onSubmit={vi.fn()} />,
+    );
+
+    const arsenalHandle = screen.getByRole("button", {
+      name: /move arsenal.*arrow up or arrow down.*drag this handle/i,
+    });
+    fireEvent.keyDown(arsenalHandle, { code: "Space", key: " " });
+    fireEvent.keyDown(arsenalHandle, {
+      code: "ArrowDown",
+      key: "ArrowDown",
+    });
+    fireEvent.change(screen.getByLabelText(/your display name/i), {
+      target: { value: "  Alex   Smith  " },
+    });
+    fireEvent.click(
+      screen.getByRole("button", { name: /continue to spotlight picks/i }),
+    );
+    chooseOtherPlayer("top_scorer", "Top scorer", "Alexander Isak");
+    chooseClub("most_clean_sheets", "Most clean sheets", "Liverpool");
+
+    fireEvent.click(screen.getByRole("button", { name: /back to table/i }));
+
+    expect(screen.getByLabelText(/your display name/i)).toHaveValue(
+      "Alex Smith",
+    );
+    expect(container.querySelector("[data-position='2']")).toHaveAttribute(
+      "data-team-id",
+      "arsenal",
+    );
+
+    fireEvent.click(
+      screen.getByRole("button", { name: /continue to spotlight picks/i }),
+    );
+    const topScorerCard = getSpotlightCategory("top_scorer");
+    expect(within(topScorerCard).getByRole("combobox")).toHaveValue(
+      "Other player",
+    );
+    expect(
+      within(topScorerCard).getByLabelText("Player’s full name"),
+    ).toHaveValue("Alexander Isak");
+    expect(
+      within(getSpotlightCategory("most_clean_sheets")).getByRole("combobox"),
+    ).toHaveValue("Liverpool");
+  });
+
+  it("clears a catalog pick when that player leaves the available roster", async () => {
+    const { rerender } = render(
+      <PredictionForm
+        players={playerFixtures}
+        teams={teams}
+        onSubmit={vi.fn()}
+      />,
+    );
+    fireEvent.change(screen.getByLabelText(/your display name/i), {
+      target: { value: "Alex" },
+    });
+    fireEvent.click(
+      screen.getByRole("button", { name: /continue to spotlight picks/i }),
+    );
+    const topScorerCard = getSpotlightCategory("top_scorer");
+    fireEvent.focus(
+      within(topScorerCard).getByRole("combobox", { name: "Top scorer" }),
+    );
+    fireEvent.click(
+      within(topScorerCard).getByRole("option", { name: "Mohamed Salah" }),
+    );
+    expect(within(topScorerCard).getByRole("combobox")).toHaveValue(
+      "Mohamed Salah",
+    );
+
+    rerender(
+      <PredictionForm
+        players={playerFixtures.slice(1)}
+        teams={teams}
+        onSubmit={vi.fn()}
+      />,
+    );
+
+    await waitFor(() =>
+      expect(
+        within(getSpotlightCategory("top_scorer")).getByRole("combobox"),
+      ).toHaveValue(""),
+    );
+  });
+
   it("uses a safe-area-aware sticky action at mobile widths", () => {
     render(<PredictionForm teams={teams} onSubmit={vi.fn()} />);
 
     const reviewButton = screen.getByRole("button", {
-      name: /review your 1–20/i,
+      name: /continue to spotlight picks/i,
     });
-    const stickyAction = reviewButton.parentElement;
+    const stickyAction = reviewButton.closest(".sticky");
 
     expect(stickyAction).toHaveClass("sticky", "bottom-0");
     expect(stickyAction?.className).toContain("safe-area-inset-bottom");
     expect(reviewButton).toHaveClass("w-full", "min-h-12");
+  });
+});
+
+describe("SpotlightPredictionsForm", () => {
+  it("filters the player fixture by first or last name", () => {
+    render(<SpotlightHarness />);
+
+    const topScorerCard = getSpotlightCategory("top_scorer");
+    const combobox = within(topScorerCard).getByRole("combobox", {
+      name: "Top scorer",
+    });
+    combobox.focus();
+    fireEvent.change(combobox, { target: { value: "mohamed" } });
+
+    expect(
+      within(topScorerCard).getByRole("option", { name: "Mohamed Salah" }),
+    ).toBeVisible();
+    expect(
+      within(topScorerCard).queryByRole("option", { name: "Bukayo Saka" }),
+    ).not.toBeInTheDocument();
+
+    fireEvent.change(combobox, { target: { value: "Saka" } });
+
+    expect(
+      within(topScorerCard).getByRole("option", { name: "Bukayo Saka" }),
+    ).toBeVisible();
+    expect(
+      within(topScorerCard).queryByRole("option", { name: "Mohamed Salah" }),
+    ).not.toBeInTheDocument();
+  });
+
+  it("supports input-focused keyboard navigation and selection", () => {
+    render(<SpotlightHarness />);
+
+    const topScorerCard = getSpotlightCategory("top_scorer");
+    const combobox = within(topScorerCard).getByRole("combobox", {
+      name: "Top scorer",
+    });
+    combobox.focus();
+    fireEvent.focus(combobox);
+
+    const options = within(topScorerCard).getAllByRole("option");
+    expect(options).toHaveLength(3);
+    for (const option of options)
+      expect(option).toHaveAttribute("tabindex", "-1");
+
+    fireEvent.keyDown(combobox, { key: "ArrowDown" });
+    expect(combobox).toHaveAttribute(
+      "aria-activedescendant",
+      expect.stringContaining("bukayo-saka"),
+    );
+    fireEvent.keyDown(combobox, { key: "Enter" });
+
+    expect(combobox).toHaveValue("Bukayo Saka");
+    expect(combobox).toHaveFocus();
+    expect(
+      within(topScorerCard).queryByRole("listbox"),
+    ).not.toBeInTheDocument();
+  });
+
+  it("preserves the prior selection when a replacement search is cancelled", () => {
+    render(<SpotlightHarness />);
+
+    const topScorerCard = getSpotlightCategory("top_scorer");
+    const combobox = within(topScorerCard).getByRole("combobox", {
+      name: "Top scorer",
+    });
+    fireEvent.focus(combobox);
+    fireEvent.click(
+      within(topScorerCard).getByRole("option", { name: "Bukayo Saka" }),
+    );
+    expect(combobox).toHaveValue("Bukayo Saka");
+
+    fireEvent.focus(combobox);
+    fireEvent.change(combobox, { target: { value: "Mohamed" } });
+    fireEvent.keyDown(combobox, { key: "Escape" });
+
+    expect(combobox).toHaveValue("Bukayo Saka");
   });
 });
 
@@ -334,7 +654,7 @@ describe("shared site chrome", () => {
     expect(navigation).toHaveClass("basis-full", "sm:basis-auto");
     expect(within(navigation).getByRole("list")).toHaveClass(
       "grid",
-      "grid-cols-3",
+      "grid-cols-4",
       "sm:flex",
     );
     expect(predictLink).toHaveAttribute("href", "/");
@@ -347,6 +667,10 @@ describe("shared site chrome", () => {
     expect(screen.getByRole("link", { name: /leaderboard/i })).toHaveAttribute(
       "href",
       "/leaderboard",
+    );
+    expect(screen.getByRole("link", { name: /^rules$/i })).toHaveAttribute(
+      "href",
+      "/rules",
     );
     expect(screen.getByText("2026/27 Premier League")).toBeVisible();
     expect(screen.getByText("Dranx Prediction League")).toBeVisible();

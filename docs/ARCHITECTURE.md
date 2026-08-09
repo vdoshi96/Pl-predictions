@@ -2,7 +2,7 @@
 
 ## System boundary
 
-Dranx Prediction League is one Next.js 16 App Router application deployed to Vercel and backed by Vercel Marketplace Neon. Public pages, administrator pages, server actions, and the standings intake route share one codebase. There is no separate backend, client-side source of truth, runtime football API client, production scraper, or Vercel Cron. Existing repository, Vercel, database, URL, and environment identifiers retain their operational `pl-predictions` names.
+Dranx Prediction League is one Next.js 16 App Router application deployed to Vercel and backed by Vercel Marketplace Neon. Public pages, administrator pages, server actions, and the standings intake route share one codebase. Each submission is one immutable parent with a 20-club ordering and seven spotlight picks. There is no separate backend, client-side source of truth, runtime football API client, production scraper, or Vercel Cron. Existing repository, Vercel, database, URL, and environment identifiers retain their operational `pl-predictions` names.
 
 ```text
 participant browser                         owner operations
@@ -26,7 +26,7 @@ Next.js server components/actions                           |
                dynamic reads and derived scoring
 ```
 
-The public application never contacts FotMob or another football-data source. A separate owner-run Codex automation may write a snapshot only when its acquisition method is permitted or licensed. FotMob's current terms prohibit automatic crawling and systematic or regular extraction, and a consumer subscription is not sufficient authorization. The manual standings editor remains fully independent of any external source.
+The public application never contacts FotMob or another football-data source. The owner-provided `premier-league-players-2026-08-08/` handoff is a dated, local roster import: it supplies selector identities and portrait files but is never executed as runtime acquisition and does not supply competition outcomes. A separate owner-run Codex automation may write a standings snapshot or future spotlight outcome ranking only when its acquisition method is permitted or licensed. FotMob's current terms prohibit automatic crawling and systematic or regular extraction, and a consumer subscription is not sufficient authorization. The current authenticated importer and manual editor handle standings only. Top-scorer, assister, clean-sheet, and player-rating result ingestion is not implemented yet, so those five categories remain pending instead of triggering runtime access or silently receiving zero.
 
 ## Runtime and deployment
 
@@ -35,14 +35,15 @@ The public application never contacts FotMob or another football-data source. A 
 - Deployment protection: Vercel Authentication is `preview`; production is public and retained previews require Vercel sign-in.
 - Database: Neon resource `neon-coffee-queen`, provisioned through Vercel Marketplace before migrations and seed.
 - Runtime: Node.js 24.x, Next.js 16.3.0, React 19.2.8, Neon serverless HTTP, and Drizzle ORM.
-- Rendering: database-backed pages are dynamic; static local club badge assets may be cached and optimized by Next.js.
+- Rendering: database-backed pages are dynamic; static local club badges and imported player-face assets may be cached and optimized by Next.js.
 - Configuration: server-only Vercel variables; no credential has a `NEXT_PUBLIC` prefix.
 
 ## Routes
 
-- `/` — prediction form or server-derived closed state.
-- `/leaderboard` — 0-point champion-pick cards before kickoff and shared-rank scores with champion status afterward.
+- `/` — three-stage table, spotlight, and review flow or the server-derived closed state.
+- `/leaderboard` — 0-point champion-pick cards before reveal; shared-rank table plus available spotlight scores afterward; and a labelled, non-persisted layout test run while outcome feeds are pending.
 - `/entries/[id]` — receipt/admin-authorized private confirmation before reveal; public comparison afterward.
+- `/rules` — table tiers, spotlight rank rules, team formulas, privacy, and pending-data explanation.
 - `/admin/login` — owner credential handoff.
 - `/admin` — season and latest-import overview.
 - `/admin/submissions` — view and delete erroneous entries.
@@ -53,26 +54,26 @@ The public application never contacts FotMob or another football-data source. A 
 
 ## Mobile-first presentation
 
-The prediction and manual standings experiences share the same accessible sorter. A 56 by 56 pixel handle is the only element with `touch-action: none`, preserving page scrolling on touch devices. Pointer drag and direct Arrow Up/Arrow Down movement both update position immediately and announce the result through an assertive live region. Rows remain single-column without horizontal overflow, display the top/bottom-half boundary, wrap long names on narrow screens, and use explicit focus rings. The submission action is reachable above safe-area insets, and reduced-motion preferences disable nonessential transitions.
+The prediction and manual standings experiences share the same accessible sorter. A 56 by 56 pixel handle is the only element with `touch-action: none`, preserving page scrolling on touch devices. Pointer drag and direct Arrow Up/Arrow Down movement both update position immediately and announce the result through an assertive live region. Rows remain single-column without horizontal overflow, display the top/bottom-half boundary, wrap long names on narrow screens, and use explicit focus rings. The spotlight stage uses keyboard-operable combobox/listbox controls with name filtering, visible selection state, and a focused free-text input after Other player is chosen. The submission action is reachable above safe-area insets, and reduced-motion preferences disable nonessential transitions.
 
 Leaderboard and comparison data use mobile cards before expanding into denser desktop layouts. The administrator navigation becomes a full-width two-column grid at narrow widths without forcing the primary page or prediction list to overflow.
 
 ## Prediction write path
 
-1. The browser sends a display name, honeypot, and ordered team UUIDs.
-2. Zod requires a normalized 2–40 character name and exactly one occurrence of every active team and position. The server resolves names and assets from its own team rows; it never trusts browser-supplied club metadata.
+1. Stage 1 collects a normalized display name and the ordered 20-club table; stage 2 collects all seven spotlight categories; stage 3 presents the final table and spotlight review before confirmation.
+2. The browser sends the display name, honeypot, ordered team UUIDs, and seven typed category choices. Zod requires a 2–40 character normalized name, exactly one occurrence of every active team and position, exactly one row for each category, a current-season club for team categories, and either a current active player or normalized 2–120 character custom name for player categories. The server resolves display metadata from its own rows and never trusts browser-supplied names or assets.
 3. One guarded PostgreSQL common-table-expression statement first locks the active season row, then samples PostgreSQL `clock_timestamp()` and claims the row only while manual lock and reveal are both false and that post-lock wall clock is strictly before both the configured deadline and the season's persisted opening-kickoff ceiling.
-4. The same statement inserts the prediction and all 20 dependent items or inserts nothing. This closes request-start/deadline, lock-wait/deadline, and administrator-lock races without relying on an application clock.
+4. The same statement inserts the prediction parent, all 20 ordered team items, and all seven category picks or inserts nothing. Returned counts must be 20 and 7. This closes request-start/deadline, lock-wait/deadline, administrator-lock, and partial-child-write races without relying on an application clock.
 5. A unique `(season_id, normalized_participant_name)` index resolves simultaneous duplicate names safely.
 6. A random receipt token is returned once and stored only as a SHA-256 hash. Its HttpOnly cookie permits that browser to view its own table before reveal.
 
-Predictions are immutable. Administrator deletion cascades through all 20 items, allowing a corrected resubmission.
+Predictions are immutable. Administrator deletion removes the parent row inside the active-season scope; PostgreSQL cascades through all 20 table items and seven category picks. The receipt lookup disappears, the normalized display name can submit again, the deletion remains in the bounded audit log, and team consensus scores derive again from the remaining entries.
 
 ## Reveal and privacy policy
 
 The shared server policy reveals full entries after the effective deadline, after a manual lock, or when early reveal is explicitly enabled. The effective deadline is the earlier of an optional owner deadline and the owning season row's persisted Gameweek 1 opening kickoff. Pages read PostgreSQL's wall clock with the season, and the atomic insert independently checks the same persisted instant after acquiring its row lock, so app-clock skew or lock contention cannot admit a competing entry after reveal.
 
-Before full reveal, the leaderboard deliberately publishes one narrow projection: participant name, submission time, 0-point total, and the position-1 predicted champion's name and permitted local mark. Prediction UUIDs and positions 2–20 remain absent from public HTML and RSC. An entry lookup still returns no result unless the request has the matching receipt cookie or an administrator session.
+Before full reveal, the leaderboard deliberately publishes one narrow projection: participant name, submission time, 0-point total, and the position-1 predicted champion's name and permitted local mark. Prediction UUIDs, positions 2–20, and all seven spotlight picks remain absent from public HTML and RSC. An entry lookup still returns no result unless the request has the matching receipt cookie or an administrator session. After reveal, full entries and spotlight choices become public, but unavailable category results remain visibly pending.
 
 ## Standings intake and last-good preservation
 
@@ -100,26 +101,39 @@ All four effects succeed together or the action reports that the active standing
 
 ## Scoring and leaderboard
 
-Scores are computed on read from prediction items plus the one active standings snapshot. They are never accumulated or stored as independently editable totals. Each club receives exactly one tier: 5 exact, otherwise 3 within three, otherwise 1 in the same half, otherwise 0. The system derives total, exact count, within-three count, and correct-half-only count.
+Scores are computed on read from immutable prediction rows, the one active standings snapshot, and any reviewed category-result rankings. They are never accumulated or stored as independently editable totals. Each table club receives exactly one tier: 5 exact, otherwise 3 within three, otherwise 1 in the same half, otherwise 0. The system derives table total, exact count, within-three count, and correct-half-only count. The position-1 champion is highlighted but receives no separate bonus, so the table maximum remains 100.
 
-Scoring cannot activate before the owning season's verified opening kickoff. The active table must also have been accepted or re-observed at or after kickoff; a stale preseason ordering cannot turn into points merely because the clock crossed the boundary. All-zero played-games tables remain unscored after kickoff. Before activation, every leaderboard card shows 0 and only its predicted champion. When scoring is active, cards add the champion's actual ordinal position and label 1st as on track or every other position as off track. Entries sort by total descending; equal totals receive the same competition rank and are alphabetized only for deterministic display. The maximum is 100.
+Each spotlight category uses the chosen subject's occupied competition rank. Rank 1 earns 20 points, rank 2 earns 19, through rank 20 earning 1; lower ranks earn 0. Equal metric values share rank and points. All seven categories therefore add at most 140 points and the overall competition maximum is 240.
+
+- Top scorer and top assister use the player's rank in reviewed goals and assists lists.
+- Most clean sheets uses the selected club's rank in the reviewed club clean-sheets list.
+- For every club, underdog index is `average predicted position - actual position`; overrated index is its inverse, `actual position - average predicted position`. Each category ranks the largest index first using full precision. For an average prediction of 2.4 and actual position 10, the indexes are -7.6 underdog and +7.6 overrated.
+- Underdog player ranks reviewed FotMob average season ratings descending; overrated player ranks them ascending. This defines the intended metric, not permission for runtime or automated FotMob access.
+
+Scoring cannot activate before the owning season's verified opening kickoff. The active table must also have been accepted or re-observed at or after kickoff; a stale preseason ordering cannot turn into points merely because the clock crossed the boundary. All-zero played-games tables remain unscored after kickoff. Underdog-team and overrated-team ranks can derive from the active table and all remaining submissions. The five other categories carry no points and display pending until a reviewed source-neutral result ranking and custom-name reconciliation path exists. They are not treated as incorrect zero-point answers.
+
+Before activation, every leaderboard card shows 0 and only its predicted champion. When scoring is active, cards separate table and available spotlight totals, add the champion's actual ordinal position, and label 1st as on track or every other position as off track. Entries sort by combined total descending; equal totals receive the same competition rank and are alphabetized only for deterministic display. The embedded spotlight test run is an in-memory illustration and is never read from or written to prediction storage.
 
 ## Database model and invariants
 
 - `seasons` stores the code-selected season, persisted opening kickoff, optional earlier owner deadline, fairness settings, active/final pointers, and the monotonic accepted-capture watermark.
 - `teams` stores season-scoped names, sort names, factual external mapping, and permitted local asset path.
+- `players` is the season-scoped catalogue of 587 imported 2026-08-08 players, with first/last/display names, club association, active status, and an optional local `/player-faces/` asset path.
 - `predictions` and `prediction_items` store immutable participant tables and receipt hashes.
+- `prediction_category_picks` stores exactly one typed choice per spotlight category. Team categories reference a club. Player categories reference either an active catalogue player or a normalized custom player name, never both.
 - `standings_snapshots` and `standings_items` store complete actual tables.
 - `standings_import_runs` preserves bounded outcome metadata for every attempt; `standings_import_run_items` retains row facts for activation attempts without storing arbitrary malformed input.
 - `admin_audit_logs` records administrator mutations with a request identifier when supplied by the platform.
 
-PostgreSQL duplicates application invariants with foreign keys, position checks, name-length checks, season/team uniqueness, team/position uniqueness per prediction or snapshot, and useful lookup indexes. Timestamps use PostgreSQL `timestamp with time zone` and application `Date` values.
+PostgreSQL duplicates application invariants with foreign keys, position checks, name-length checks, season/team/player uniqueness, team/position uniqueness per prediction or snapshot, category and subject-shape checks, and useful lookup indexes. Both prediction child tables use `ON DELETE CASCADE` from the prediction parent. Timestamps use PostgreSQL `timestamp with time zone` and application `Date` values.
 
 ## Administrator trust boundary
 
-`ADMIN_SECRET` is compared through fixed-length SHA-256 digests and constant-time equality. Successful login issues a signed, random-nonce, eight-hour cookie that is HttpOnly, SameSite Strict, Secure in production, and contains no credential. Every administrator mutation revalidates the session and same-origin request metadata. Logout expires the cookie with matching attributes.
+Administrator login requires a username and password. `ADMIN_USERNAME` defaults to `admin`. The preferred `ADMIN_PASSWORD_HASH` format is a randomly salted `pbkdf2_sha256` digest with 600,000 iterations; parsing is bounded and malformed or weak configuration fails closed. The password comparison still runs when the username is wrong, while the production path runs the expensive derivation asynchronously. `ADMIN_SECRET` remains a fixed-length SHA-256/constant-time migration fallback only when no password hash is configured. Successful login issues a signed, random-nonce, eight-hour cookie that is HttpOnly, SameSite Strict, Secure in production, and contains no credential. Every administrator mutation revalidates the session and same-origin request metadata. Logout expires the cookie with matching attributes.
 
 The standings route independently requires a minimum-length `STANDINGS_INGEST_SECRET`, compares fixed-length digests in constant time, rejects bodies above 64 KiB, and returns bounded errors without source or database details. Public submission has a honeypot and stores no account, email, IP address, or other personal data beyond the chosen display name.
+
+The invited-group boundary is social rather than account-based: the public form has no invitation token or participant login. The honeypot and per-season normalized-name uniqueness reduce mistakes and simple bots but are not access control, so fabricated public entries could influence the two consensus team indexes until an administrator deletes them. This is an explicit honor-system tradeoff; add invitation enforcement before the competition if the public URL is expected to attract abuse.
 
 Security headers set a self-restricted content security policy, deny framing, disable MIME sniffing, restrict referrers, and disable camera, microphone, geolocation, payment, and USB browser permissions.
 
@@ -129,11 +143,16 @@ The user-facing visual system is Dranx Prediction League: a Premier-League-inspi
 
 The 20 canonical club assets are owner-provided transparent PNG badges with accessible club-name alternatives. They are served from `public/team-marks/`; the application does not fetch or hotlink FotMob images. `teams.asset_path` remains the stable database-backed local-asset seam, and the idempotent seed updates existing rows after the PNGs are deployed. The shared `TeamMark` uses contain sizing, a neutral backing, and a labelled initials fallback. Original SVG monograms remain rollback-only for the first PNG release. The separate Premier League logo/lion/ball files are excluded.
 
+The owner-provided `premier-league-players-2026-08-08/` snapshot covers 587 players across the same 20 clubs and includes 580 portrait PNGs. The import maps reviewed roster rows into the season catalogue and copies portraits to local `/player-faces/` paths. `PlayerMark` shows a generic silhouette for the seven players without a supplied image, for a null asset path, or after an image failure. Other player remains available for unavailable or newly added players. The raw folder remains the owner-provided provenance handoff; the deployed app neither runs its acquisition scripts nor hotlinks portrait sources.
+
+Roster identity and portrait ingestion are separate from result ingestion. The snapshot does not provide reviewed final goals, assists, club clean sheets, or average season rating rankings, so those five spotlight outcomes remain pending a source-neutral input and custom-name reconciliation path.
+
 ## Failure behavior
 
 - Missing or invalid database configuration fails server-side without revealing credentials.
 - Missing seed data produces a clear operational error rather than a partial 20-team UI.
 - Malformed, stale, duplicate, unauthorized, concurrent, or post-final imports preserve the active snapshot.
 - With no meaningful snapshot, the leaderboard retains the participant count and says scoring has not started.
+- An unavailable or newly added player can still be entered through Other player; a missing portrait uses the silhouette, while a missing or unmatched category outcome remains pending and does not silently score zero.
 - A source acquisition failure can be recorded without changing public standings.
 - Manual standings remain available when external acquisition is unavailable.

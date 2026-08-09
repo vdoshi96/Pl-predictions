@@ -6,7 +6,9 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { ChampionPick } from "@/features/leaderboard/champion-pick";
 import { LeaderboardEntryLink } from "@/features/leaderboard/entry-link";
+import { LeaderboardDemo } from "@/features/leaderboard/leaderboard-demo";
 import { getLeaderboardView } from "@/features/leaderboard/queries";
+import { SpotlightPickGrid } from "@/features/leaderboard/spotlight-pick-grid";
 import { getActiveSeasonView } from "@/features/seasons/queries";
 import { formatUtcDateTime } from "@/shared/format";
 
@@ -44,8 +46,9 @@ export default async function LeaderboardPage() {
                 Dranx Prediction League
               </h1>
               <p className="mt-2 max-w-2xl text-sm leading-6 text-white/75 sm:text-base">
-                Every score is recalculated from the latest valid table. Equal
-                totals share the same rank; tied names are alphabetical.
+                Table scores are recalculated from the latest valid standings.
+                Seven spotlight picks join the total as their reviewed result
+                rankings become available.
               </p>
             </div>
           </div>
@@ -84,9 +87,9 @@ export default async function LeaderboardPage() {
                 </h2>
                 <p className="mt-1 text-sm leading-6 text-slate-600">
                   Everyone is on 0 points, and only each predicted champion is
-                  public now. The other 19 positions stay private until the
-                  opening kickoff, a manual lock, or an early reveal by the
-                  owner.
+                  public now. The other 19 positions and all seven spotlight
+                  picks stay private until the opening kickoff, a manual lock,
+                  or an early reveal by the owner.
                 </p>
               </div>
             </CardContent>
@@ -112,6 +115,8 @@ export default async function LeaderboardPage() {
             </CardContent>
           </Card>
         ) : null}
+
+        <LeaderboardDemo />
 
         {view.entries.length === 0 ? (
           <Card>
@@ -153,6 +158,10 @@ export default async function LeaderboardPage() {
                     <span className="mt-1 block text-xs text-slate-500">
                       {formatUtcDateTime(entry.createdAt)}
                     </span>
+                    <span className="mt-1 block text-xs font-semibold text-slate-600">
+                      {entry.tableScore} table · {entry.spotlightScore}{" "}
+                      spotlight
+                    </span>
                   </div>
                   <div className="text-right">
                     <strong className="block text-2xl font-black text-[#c80047] tabular-nums">
@@ -191,6 +200,24 @@ export default async function LeaderboardPage() {
                       </div>
                     </dl>
                   </div>
+                  {entry.spotlightPicks.length > 0 ? (
+                    <details className="border-border col-span-3 rounded-xl border bg-white sm:col-span-2 sm:col-start-2">
+                      <summary className="text-brand focus-visible:ring-accent-blue flex min-h-12 cursor-pointer list-none items-center px-3 text-sm font-black outline-none focus-visible:ring-2">
+                        View 7 spotlight picks ·{" "}
+                        {
+                          entry.spotlightPicks.filter(
+                            (pick) =>
+                              pick.points !== null && pick.points !== undefined,
+                          ).length
+                        }{" "}
+                        scored
+                      </summary>
+                      <SpotlightPickGrid
+                        className="border-border border-t p-3"
+                        picks={entry.spotlightPicks}
+                      />
+                    </details>
+                  ) : null}
                 </CardContent>
               </Card>
             ))}
@@ -228,9 +255,20 @@ export default async function LeaderboardPage() {
                       {entry.totalScore}
                     </strong>
                     <span className="text-[0.68rem] font-bold tracking-wide text-slate-500 uppercase">
-                      points
+                      table points
                     </span>
                   </div>
+                  {entry.spotlightPicks && entry.spotlightPicks.length > 0 ? (
+                    <details className="border-border col-span-2 rounded-xl border bg-white sm:col-span-3">
+                      <summary className="text-brand focus-visible:ring-accent-blue flex min-h-12 cursor-pointer list-none items-center px-3 text-sm font-black outline-none focus-visible:ring-2">
+                        View 7 spotlight picks · results pending
+                      </summary>
+                      <SpotlightPickGrid
+                        className="border-border border-t p-3"
+                        picks={entry.spotlightPicks}
+                      />
+                    </details>
+                  ) : null}
                 </CardContent>
               </Card>
             ))}

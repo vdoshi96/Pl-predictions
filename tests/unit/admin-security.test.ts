@@ -14,6 +14,7 @@ import {
   AdminAuthenticationRequiredError,
   AdminInvalidOriginError,
   AdminSecurityConfigurationError,
+  createAdminPasswordHash,
   getAdminAuditMetadata,
   getAdminSession,
   isSameOriginAdminRequest,
@@ -23,11 +24,17 @@ import {
   requireAdmin,
   requireAdminMutation,
   requireSameOrigin,
-  verifyAdminCredential,
+  verifyAdminCredentials,
   verifyAdminSessionToken,
 } from "../../src/features/admin/security";
 
-const ADMIN_SECRET = "owner-credential-with-enough-entropy";
+const ADMIN_USERNAME = "admin";
+const ADMIN_PASSWORD = "synthetic-test-only-admin-password";
+const LEGACY_ADMIN_SECRET = "owner-credential-with-enough-entropy";
+const ADMIN_PASSWORD_HASH = createAdminPasswordHash(
+  ADMIN_PASSWORD,
+  Buffer.from("00112233445566778899aabbccddeeff", "hex"),
+);
 const SESSION_SECRET = "session-signing-secret-with-at-least-thirty-two-bytes";
 const NOW = Date.UTC(2026, 7, 8, 12, 0, 0);
 
@@ -49,7 +56,9 @@ function sameOriginHeaders(overrides: HeadersInit = {}): Headers {
 }
 
 beforeEach(() => {
-  vi.stubEnv("ADMIN_SECRET", ADMIN_SECRET);
+  vi.stubEnv("ADMIN_USERNAME", ADMIN_USERNAME);
+  vi.stubEnv("ADMIN_PASSWORD_HASH", ADMIN_PASSWORD_HASH);
+  vi.stubEnv("ADMIN_SECRET", LEGACY_ADMIN_SECRET);
   vi.stubEnv("ADMIN_SESSION_SECRET", SESSION_SECRET);
   vi.stubEnv("NODE_ENV", "test");
 
@@ -67,27 +76,84 @@ afterEach(() => {
 });
 
 describe("administrator credential verification", () => {
-  it("accepts only the exact configured credential", () => {
-    expect(verifyAdminCredential(ADMIN_SECRET)).toBe(true);
-    expect(verifyAdminCredential(`${ADMIN_SECRET}-wrong`)).toBe(false);
-    expect(verifyAdminCredential(ADMIN_SECRET.slice(0, -1))).toBe(false);
-    expect(verifyAdminCredential(null)).toBe(false);
-    expect(verifyAdminCredential("x".repeat(4_097))).toBe(false);
+  it("accepts only the exact username and PBKDF2-backed password", () => {
+    expect(verifyAdminCredentials(ADMIN_USERNAME, ADMIN_PASSWORD)).toBe(true);
+    expect(verifyAdminCredentials("Admin", ADMIN_PASSWORD)).toBe(false);
+    expect(verifyAdminCredentials(ADMIN_USERNAME, `${ADMIN_PASSWORD}!`)).toBe(
+      false,
+    );
+    expect(verifyAdminCredentials(null, ADMIN_PASSWORD)).toBe(false);
+    expect(verifyAdminCredentials(ADMIN_USERNAME, null)).toBe(false);
+    expect(verifyAdminCredentials(ADMIN_USERNAME, "x".repeat(4_097))).toBe(
+      false,
+    );
   });
 
-  it("fails closed with a fixed, secret-free configuration error", () => {
-    vi.stubEnv("ADMIN_SECRET", "short");
+  it("creates a salted PBKDF2 hash without embedding the password", () => {
+    expect(ADMIN_PASSWORD_HASH).toMatch(
+      /^pbkdf2_sha256\$600000\$[A-Za-z0-9_-]+\$[A-Za-z0-9_-]+$/,
+    );
+    expect(ADMIN_PASSWORD_HASH).not.toContain(ADMIN_PASSWORD);
+  });
 
-    expect(() => verifyAdminCredential(ADMIN_SECRET)).toThrow(
-      AdminSecurityConfigurationError,
+  it("never authenticates invalid inputs that collide with sentinel values", () => {
+    vi.stubEnv("ADMIN_USERNAME", "invalid-admin-username");
+    vi.stubEnv(
+      "ADMIN_PASSWORD_HASH",
+      createAdminPasswordHash(
+        "invalid-admin-password",
+        Buffer.from("ffeeddccbbaa99887766554433221100", "hex"),
+      ),
     );
 
+    expect(verifyAdminCredentials(null, null)).toBe(false);
+    expect(verifyAdminCredentials({}, [])).toBe(false);
+    expect(verifyAdminCredentials("x".repeat(4_097), "x".repeat(4_097))).toBe(
+      false,
+    );
+  });
+
+  it("supports the legacy ADMIN_SECRET credential during migration", () => {
+    vi.stubEnv("ADMIN_PASSWORD_HASH", "");
+
+    expect(verifyAdminCredentials(ADMIN_USERNAME, LEGACY_ADMIN_SECRET)).toBe(
+      true,
+    );
+    expect(
+      verifyAdminCredentials(ADMIN_USERNAME, `${LEGACY_ADMIN_SECRET}-wrong`),
+    ).toBe(false);
+  });
+
+  it("defaults the legacy username to admin when none is configured", () => {
+    vi.stubEnv("ADMIN_USERNAME", "");
+    vi.stubEnv("ADMIN_PASSWORD_HASH", "");
+
+    expect(verifyAdminCredentials("admin", LEGACY_ADMIN_SECRET)).toBe(true);
+  });
+
+  it("fails closed on a malformed password hash without leaking secrets", () => {
+    vi.stubEnv("ADMIN_PASSWORD_HASH", "pbkdf2_sha256$1$bad$bad");
+
+    expect(() =>
+      verifyAdminCredentials(ADMIN_USERNAME, ADMIN_PASSWORD),
+    ).toThrow(AdminSecurityConfigurationError);
+
     try {
-      verifyAdminCredential(ADMIN_SECRET);
+      verifyAdminCredentials(ADMIN_USERNAME, ADMIN_PASSWORD);
     } catch (error) {
-      expect(String(error)).not.toContain(ADMIN_SECRET);
+      expect(String(error)).not.toContain(ADMIN_PASSWORD);
+      expect(String(error)).not.toContain(LEGACY_ADMIN_SECRET);
       expect(String(error)).not.toContain(SESSION_SECRET);
     }
+  });
+
+  it("fails closed when the legacy secret is too weak", () => {
+    vi.stubEnv("ADMIN_PASSWORD_HASH", "");
+    vi.stubEnv("ADMIN_SECRET", "short");
+
+    expect(() =>
+      verifyAdminCredentials(ADMIN_USERNAME, LEGACY_ADMIN_SECRET),
+    ).toThrow(AdminSecurityConfigurationError);
   });
 });
 
@@ -101,7 +167,7 @@ describe("signed administrator session tokens", () => {
       issuedAt: Math.floor(NOW / 1_000),
       expiresAt: Math.floor(NOW / 1_000) + ADMIN_SESSION_TTL_SECONDS,
     });
-    expect(token).not.toContain(ADMIN_SECRET);
+    expect(token).not.toContain(LEGACY_ADMIN_SECRET);
     expect(token).not.toContain(SESSION_SECRET);
     expect(token.split(".")).toHaveLength(2);
   });
@@ -152,7 +218,9 @@ describe("signed administrator session tokens", () => {
 
 describe("administrator cookie lifecycle", () => {
   it("sets a strict HttpOnly session cookie after a valid same-origin login", async () => {
-    await expect(loginAdmin(ADMIN_SECRET)).resolves.toBe(true);
+    await expect(loginAdmin(ADMIN_USERNAME, ADMIN_PASSWORD)).resolves.toBe(
+      true,
+    );
 
     expect(cookieStore.set).toHaveBeenCalledOnce();
     const [name, token, options] = cookieStore.set.mock.calls[0] as [
@@ -162,7 +230,8 @@ describe("administrator cookie lifecycle", () => {
     ];
     expect(name).toBe(ADMIN_SESSION_COOKIE);
     expect(verifyAdminSessionToken(token)).not.toBeNull();
-    expect(token).not.toContain(ADMIN_SECRET);
+    expect(token).not.toContain(ADMIN_PASSWORD);
+    expect(token).not.toContain(LEGACY_ADMIN_SECRET);
     expect(options).toMatchObject({
       httpOnly: true,
       maxAge: ADMIN_SESSION_TTL_SECONDS,
@@ -177,13 +246,16 @@ describe("administrator cookie lifecycle", () => {
   it("marks the cookie Secure in production", async () => {
     vi.stubEnv("NODE_ENV", "production");
 
-    await loginAdmin(ADMIN_SECRET);
+    await loginAdmin(ADMIN_USERNAME, ADMIN_PASSWORD);
 
     expect(cookieStore.set.mock.calls[0]?.[2]).toMatchObject({ secure: true });
   });
 
   it("does not create a cookie for an invalid credential", async () => {
-    await expect(loginAdmin("wrong-credential")).resolves.toBe(false);
+    await expect(loginAdmin(ADMIN_USERNAME, "wrong-credential")).resolves.toBe(
+      false,
+    );
+    await expect(loginAdmin("not-admin", ADMIN_PASSWORD)).resolves.toBe(false);
     expect(cookieStore.set).not.toHaveBeenCalled();
   });
 
@@ -192,9 +264,9 @@ describe("administrator cookie lifecycle", () => {
       sameOriginHeaders({ origin: "https://attacker.example" }),
     );
 
-    await expect(loginAdmin(ADMIN_SECRET)).rejects.toBeInstanceOf(
-      AdminInvalidOriginError,
-    );
+    await expect(
+      loginAdmin(ADMIN_USERNAME, ADMIN_PASSWORD),
+    ).rejects.toBeInstanceOf(AdminInvalidOriginError);
     expect(cookieStore.set).not.toHaveBeenCalled();
   });
 
@@ -311,7 +383,7 @@ describe("audit metadata", () => {
       get(name: string) {
         if (name === "x-vercel-id") return requestId;
         if (name === "x-forwarded-for") return "203.0.113.1";
-        if (name === "cookie") return `credential=${ADMIN_SECRET}`;
+        if (name === "cookie") return `credential=${LEGACY_ADMIN_SECRET}`;
         return null;
       },
     });
@@ -322,7 +394,7 @@ describe("audit metadata", () => {
     expect(metadata.requestId).toHaveLength(128);
     expect(metadata.requestId).not.toContain("\u0000");
     expect(metadata.requestId).not.toContain("\u007f");
-    expect(JSON.stringify(metadata)).not.toContain(ADMIN_SECRET);
+    expect(JSON.stringify(metadata)).not.toContain(LEGACY_ADMIN_SECRET);
     expect(JSON.stringify(metadata)).not.toContain("203.0.113.1");
   });
 });

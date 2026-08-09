@@ -17,7 +17,7 @@ const scoringRules = [
 ] as const;
 
 export default async function PredictionPage() {
-  const { databaseNow, season, teams } = await getActiveSeasonView();
+  const { databaseNow, players, season, teams } = await getActiveSeasonView();
   const access = getSeasonAccess(
     {
       openingKickoff: season.openingKickoff,
@@ -50,8 +50,9 @@ export default async function PredictionPage() {
             Build your 2026/27 Premier League table.
           </h1>
           <p className="mt-3 max-w-2xl text-sm leading-6 text-white/75 sm:mt-4 sm:text-base sm:leading-7">
-            Put all 20 clubs in your predicted finishing order, review every
-            place, and lock in your Dranx Prediction League entry.
+            Put all 20 clubs in your predicted finishing order, choose seven
+            spotlight predictions, and lock in your Dranx Prediction League
+            entry.
           </p>
 
           <div className="mt-4 flex items-start gap-3 rounded-2xl border border-white/15 bg-white/8 p-3 backdrop-blur-sm sm:mt-6 sm:p-4">
@@ -88,8 +89,9 @@ export default async function PredictionPage() {
                 <h2 className="font-black tracking-tight">How scoring works</h2>
               </div>
               <p className="mt-1 text-sm leading-6 text-slate-600">
-                Only the highest matching tier counts for each club. Scores are
-                recalculated from scratch against the latest valid table.
+                Table points keep the existing 5–3–1 tiers. Spotlight picks use
+                a 20-to-1 rank scale and stay pending until their reviewed
+                result rankings are available.
               </p>
             </div>
             <div className="grid grid-cols-3 gap-2" aria-label="Scoring tiers">
@@ -109,13 +111,20 @@ export default async function PredictionPage() {
             </div>
             <p className="flex items-center gap-2 text-xs font-semibold text-slate-500 sm:col-span-2">
               <Check aria-hidden="true" className="size-4 text-[#08734f]" />
-              Exact full table: 100 points maximum.
+              Exact full table: 100 points · seven spotlight picks: up to 140.
             </p>
           </CardContent>
         </Card>
 
         <div className="order-2 min-w-0 sm:order-3">
           <PredictionForm
+            players={players.map((player) => ({
+              assetPath: player.assetPath,
+              displayName: player.displayName,
+              firstName: player.firstName,
+              id: player.id,
+              lastName: player.lastName,
+            }))}
             teams={teams.map((team) => ({
               id: team.id,
               displayName: team.displayName,

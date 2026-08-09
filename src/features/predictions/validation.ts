@@ -3,7 +3,14 @@ import { z } from "zod";
 import { PREMIER_LEAGUE_TEAM_COUNT } from "@/data";
 
 import {
+  PREDICTION_CATEGORIES,
+  PLAYER_PREDICTION_CATEGORIES,
+  TEAM_PREDICTION_CATEGORIES,
+} from "./categories";
+import {
+  normalizeDisplayText,
   normalizeParticipantName,
+  normalizedDisplayTextKey,
   normalizedParticipantNameKey,
 } from "./normalization";
 
@@ -20,10 +27,36 @@ export const participantNameSchema = z
       .string()
       .min(2, "Enter a display name with at least 2 characters.")
       .max(40, "Display names must be 40 characters or fewer."),
-  );
+  )
+  .superRefine((value, context) => {
+    if (normalizedParticipantNameKey(value).length > 40) {
+      context.addIssue({
+        code: "custom",
+        message: "That display name cannot be normalized safely.",
+      });
+    }
+  });
 
 export const normalizedParticipantNameKeySchema =
   participantNameSchema.transform(normalizedParticipantNameKey);
+
+export const customPlayerNameSchema = z
+  .string()
+  .transform(normalizeDisplayText)
+  .pipe(
+    z
+      .string()
+      .min(2, "Enter a player name with at least 2 characters.")
+      .max(120, "Player names must be 120 characters or fewer."),
+  )
+  .superRefine((value, context) => {
+    if (normalizedDisplayTextKey(value).length > 120) {
+      context.addIssue({
+        code: "custom",
+        message: "That player name cannot be normalized safely.",
+      });
+    }
+  });
 
 export const predictionItemSchema = z
   .object({
@@ -74,6 +107,64 @@ export const predictionItemsSchema = z
     }
   });
 
+const teamCategoryPickSchema = z
+  .object({
+    category: z.enum(TEAM_PREDICTION_CATEGORIES),
+    teamId: z.string().uuid(),
+  })
+  .strict();
+
+const catalogPlayerCategoryPickSchema = z
+  .object({
+    category: z.enum(PLAYER_PREDICTION_CATEGORIES),
+    playerId: z.string().uuid(),
+  })
+  .strict();
+
+const customPlayerCategoryPickSchema = z
+  .object({
+    category: z.enum(PLAYER_PREDICTION_CATEGORIES),
+    customPlayerName: customPlayerNameSchema,
+  })
+  .strict();
+
+export const predictionCategoryPickSchema = z.union([
+  teamCategoryPickSchema,
+  catalogPlayerCategoryPickSchema,
+  customPlayerCategoryPickSchema,
+]);
+
+export const predictionCategoryPicksSchema = z
+  .array(predictionCategoryPickSchema)
+  .length(
+    PREDICTION_CATEGORIES.length,
+    `A prediction must contain exactly ${PREDICTION_CATEGORIES.length} spotlight picks.`,
+  )
+  .superRefine((picks, context) => {
+    const categories = new Set<string>();
+
+    picks.forEach((pick, index) => {
+      if (categories.has(pick.category)) {
+        context.addIssue({
+          code: "custom",
+          message: "Each spotlight category may appear only once.",
+          path: [index, "category"],
+        });
+      }
+      categories.add(pick.category);
+    });
+
+    const missing = PREDICTION_CATEGORIES.filter(
+      (category) => !categories.has(category),
+    );
+    if (missing.length > 0) {
+      context.addIssue({
+        code: "custom",
+        message: `Missing spotlight categor${missing.length === 1 ? "y" : "ies"}: ${missing.join(", ")}.`,
+      });
+    }
+  });
+
 export function createPredictionItemsSchema(activeTeamIds: readonly string[]) {
   if (
     activeTeamIds.length !== PREMIER_LEAGUE_TEAM_COUNT ||
@@ -111,11 +202,44 @@ export function createPredictionItemsSchema(activeTeamIds: readonly string[]) {
   });
 }
 
+export function createPredictionCategoryPicksSchema(
+  activeTeamIds: readonly string[],
+  activePlayerIds: readonly string[],
+) {
+  const activeTeamIdSet = new Set(activeTeamIds);
+  const activePlayerIdSet = new Set(activePlayerIds);
+
+  return predictionCategoryPicksSchema.superRefine((picks, context) => {
+    picks.forEach((pick, index) => {
+      if ("teamId" in pick && !activeTeamIdSet.has(pick.teamId)) {
+        context.addIssue({
+          code: "custom",
+          message: "Choose a club from the active season.",
+          path: [index, "teamId"],
+        });
+      }
+
+      if ("playerId" in pick && !activePlayerIdSet.has(pick.playerId)) {
+        context.addIssue({
+          code: "custom",
+          message: "Choose an available player or use Other player.",
+          path: [index, "playerId"],
+        });
+      }
+    });
+  });
+}
+
 export function createPredictionSubmissionSchema(
   activeTeamIds: readonly string[],
+  activePlayerIds: readonly string[] = [],
 ) {
   return z
     .object({
+      categoryPicks: createPredictionCategoryPicksSchema(
+        activeTeamIds,
+        activePlayerIds,
+      ),
       items: createPredictionItemsSchema(activeTeamIds),
       participantName: participantNameSchema,
     })
@@ -124,3 +248,9 @@ export function createPredictionSubmissionSchema(
 
 export type ValidatedPredictionItem = z.infer<typeof predictionItemSchema>;
 export type ValidatedPredictionItems = z.infer<typeof predictionItemsSchema>;
+export type ValidatedPredictionCategoryPick = z.infer<
+  typeof predictionCategoryPickSchema
+>;
+export type ValidatedPredictionCategoryPicks = z.infer<
+  typeof predictionCategoryPicksSchema
+>;

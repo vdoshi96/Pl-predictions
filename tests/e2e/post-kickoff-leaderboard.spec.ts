@@ -6,6 +6,7 @@ import { and, asc, count, eq, inArray, isNull } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/neon-http";
 
 import {
+  predictionCategoryPicks,
   predictionItems,
   predictions,
   seasons,
@@ -32,6 +33,59 @@ type QaFixture = {
   snapshotId: string;
   swappedName: string;
 };
+
+function spotlightRowsFor(
+  predictionId: string,
+  seasonTeams: readonly (typeof teams.$inferSelect)[],
+  label: string,
+): (typeof predictionCategoryPicks.$inferInsert)[] {
+  const [underdogTeam, overratedTeam, cleanSheetsTeam] = seasonTeams;
+  if (!underdogTeam || !overratedTeam || !cleanSheetsTeam) {
+    throw new Error("Three seeded teams are required for spotlight picks.");
+  }
+
+  return [
+    {
+      category: "top_scorer",
+      customPlayerName: `${label} scorer`,
+      normalizedCustomPlayerName: `${label} scorer`.toLowerCase(),
+      predictionId,
+    },
+    {
+      category: "top_assister",
+      customPlayerName: `${label} assister`,
+      normalizedCustomPlayerName: `${label} assister`.toLowerCase(),
+      predictionId,
+    },
+    {
+      category: "most_clean_sheets",
+      predictionId,
+      teamId: cleanSheetsTeam.id,
+    },
+    {
+      category: "underdog_team",
+      predictionId,
+      teamId: underdogTeam.id,
+    },
+    {
+      category: "overrated_team",
+      predictionId,
+      teamId: overratedTeam.id,
+    },
+    {
+      category: "underdog_player",
+      customPlayerName: `${label} underdog`,
+      normalizedCustomPlayerName: `${label} underdog`.toLowerCase(),
+      predictionId,
+    },
+    {
+      category: "overrated_player",
+      customPlayerName: `${label} overrated`,
+      normalizedCustomPlayerName: `${label} overrated`.toLowerCase(),
+      predictionId,
+    },
+  ];
+}
 
 let qaFixture: QaFixture | null = null;
 
@@ -113,6 +167,7 @@ test.afterEach(async () => {
   const [
     remainingPredictions,
     remainingPredictionItems,
+    remainingPredictionCategoryPicks,
     remainingSnapshots,
     remainingStandingsItems,
     restoredSeasons,
@@ -125,6 +180,12 @@ test.afterEach(async () => {
       .select({ value: count() })
       .from(predictionItems)
       .where(inArray(predictionItems.predictionId, fixture.predictionIds)),
+    db
+      .select({ value: count() })
+      .from(predictionCategoryPicks)
+      .where(
+        inArray(predictionCategoryPicks.predictionId, fixture.predictionIds),
+      ),
     db
       .select({ value: count() })
       .from(standingsSnapshots)
@@ -142,6 +203,7 @@ test.afterEach(async () => {
 
   expect(remainingPredictions[0]?.value).toBe(0);
   expect(remainingPredictionItems[0]?.value).toBe(0);
+  expect(remainingPredictionCategoryPicks[0]?.value).toBe(0);
   expect(remainingSnapshots[0]?.value).toBe(0);
   expect(remainingStandingsItems[0]?.value).toBe(0);
 
@@ -245,6 +307,12 @@ test("post-kickoff leaderboard scores champion picks at desktop and mobile width
       teamId: team.id,
     })),
   ]);
+  await db
+    .insert(predictionCategoryPicks)
+    .values([
+      ...spotlightRowsFor(predictionIds[0], seasonTeams, `${suffix} exact`),
+      ...spotlightRowsFor(predictionIds[1], seasonTeams, `${suffix} swapped`),
+    ]);
   await db.insert(standingsSnapshots).values({
     capturedAt: preKickoffCapturedAt,
     contentHash: runId.replaceAll("-", "").repeat(2),
@@ -298,6 +366,12 @@ test("post-kickoff leaderboard scores champion picks at desktop and mobile width
   await expect(staleSwappedEntry.getByText("0", { exact: true })).toBeVisible();
   await expect(staleExactEntry.getByText(/track/u)).toHaveCount(0);
   await expect(staleSwappedEntry.getByText(/track/u)).toHaveCount(0);
+  await staleExactEntry
+    .getByText("View 7 spotlight picks · results pending", { exact: true })
+    .click();
+  await expect(
+    staleExactEntry.getByText(`${suffix} exact scorer`, { exact: true }),
+  ).toBeVisible();
 
   const reobserved = await db
     .update(seasons)
@@ -315,30 +389,50 @@ test("post-kickoff leaderboard scores champion picks at desktop and mobile width
   expect(reobserved).toHaveLength(1);
 
   await page.reload({ waitUntil: "networkidle" });
-  await expect(page.getByLabel("Scored leaderboard")).toBeVisible();
+  const scoredLeaderboard = page.getByLabel("Scored leaderboard");
+  await expect(scoredLeaderboard).toBeVisible();
   await expect(page.getByText("Matchweek 1", { exact: true })).toBeVisible();
   await expect(page.getByText("Provisional", { exact: true })).toBeVisible();
-  await expect(page.getByLabel(/ leaderboard entry$/u)).toHaveCount(2);
+  await expect(scoredLeaderboard.getByRole("article")).toHaveCount(2);
 
   const exactEntry = page.getByLabel(`${exactName} leaderboard entry`);
   await expect(exactEntry.getByLabel("Rank 1")).toHaveText("1");
-  await expect(exactEntry.getByText("100", { exact: true })).toBeVisible();
+  await expect(exactEntry.getByText("140", { exact: true })).toBeVisible();
+  await expect(
+    exactEntry.getByText("100 table · 40 spotlight", { exact: true }),
+  ).toBeVisible();
+  await exactEntry
+    .getByText("View 7 spotlight picks · 2 scored", { exact: true })
+    .click();
+  await expect(
+    exactEntry.getByText("Index +0.5 · Rank 1 · 20 pts", { exact: true }),
+  ).toHaveCount(2);
+  await expect(
+    exactEntry.getByText("View 7 spotlight picks · 2 scored", { exact: true }),
+  ).toBeVisible();
   await expect(
     exactEntry.getByLabel("Predicted champion: Arsenal"),
   ).toBeVisible();
   await expect(
-    exactEntry.getByRole("img", { name: "Arsenal club mark" }),
+    exactEntry
+      .getByLabel("Predicted champion: Arsenal")
+      .getByRole("img", { name: "Arsenal club mark" }),
   ).toBeVisible();
   await expect(exactEntry.getByText("On track · 1st")).toBeVisible();
 
   const swappedEntry = page.getByLabel(`${swappedName} leaderboard entry`);
   await expect(swappedEntry.getByLabel("Rank 2")).toHaveText("2");
-  await expect(swappedEntry.getByText("96", { exact: true })).toBeVisible();
+  await expect(swappedEntry.getByText("136", { exact: true })).toBeVisible();
+  await expect(
+    swappedEntry.getByText("96 table · 40 spotlight", { exact: true }),
+  ).toBeVisible();
   await expect(
     swappedEntry.getByLabel("Predicted champion: Aston Villa"),
   ).toBeVisible();
   await expect(
-    swappedEntry.getByRole("img", { name: "Aston Villa club mark" }),
+    swappedEntry
+      .getByLabel("Predicted champion: Aston Villa")
+      .getByRole("img", { name: "Aston Villa club mark" }),
   ).toBeVisible();
   await expect(swappedEntry.getByText("Off track · 2nd")).toBeVisible();
 

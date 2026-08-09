@@ -19,7 +19,7 @@ export async function submitPrediction(
       ok: true,
       entryId: created.id,
       message:
-        "Your final table is safely stored. Only you can view it before predictions are revealed.",
+        "Your final table and seven spotlight picks are safely stored. Only you can view the full entry before predictions are revealed.",
     };
   } catch (error) {
     return { ok: false, message: safeErrorMessage(error) };

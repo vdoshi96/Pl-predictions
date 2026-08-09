@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="canonical-source" content="PLAN.md" />
-    <meta name="canonical-source-sha256" content="c11aaf2f20387dc4c7d90712b4b93dde666573e4b262ee17e33f9e19f3462ac5" />
+    <meta name="canonical-source-sha256" content="50e7a5b9445f1a7af05db50270afc42016157b8210d1f8f423eae0fd809c53ac" />
     <title>Implementation plan</title>
     <style>
       :root { color-scheme: light dark; font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
@@ -50,7 +50,7 @@
 <li>Generate current documentation HTML and QA evidence, create the private GitHub repository, merge the feature branch to <code>main</code>, deploy production, and leave local/remote state synchronized.</li>
 </ol>
 <p>Core implementation work proceeds autonomously. The only accepted blockers are an external consent/login step or missing project-owner direction for additional third-party artwork; the existing owner-provided club set uses the documented initials fallback if a local image fails.</p>
-<h2>Current branding iteration</h2>
+<h2>Completed branding iteration</h2>
 <ol>
 <li>Replace user-facing “PL Predictions” and “Friends League” language with <strong>Dranx Prediction League</strong> while retaining operational <code>pl-predictions</code> identifiers.</li>
 <li>Apply a Premier-League-inspired palette using official purple <code>#37003c</code> with cyan <code>#05f0ff</code>, green <code>#00ff87</code>, and pink <code>#ff2882</code> accents, and use an original Dranx mark instead of the official Premier League logo.</li>
@@ -58,8 +58,20 @@
 <li>Update affected tests, then run formatting, lint, type, unit/component, isolated integration, production build, and desktop/mobile browser verification.</li>
 <li>Refresh only the newest QA evidence, regenerate and check all HTML peers, verify production, publish through GitHub <code>main</code>, synchronize local <code>main</code>, and remove completed worktree state.</li>
 </ol>
+<h2>Current spotlight-predictions iteration</h2>
+<ol>
+<li>Extend the mobile entry journey to three stages: the 20-club table and display name, seven required spotlight selectors, then one final review and confirmation.</li>
+<li>Import the owner-provided <code>premier-league-players-2026-08-08/</code> snapshot into the season-scoped player catalogue: 587 players across the 20 clubs and 580 copied local portrait PNGs. Search first, last, or full names, use the <code>PlayerMark</code> silhouette for the seven players without a supplied image, and retain Other player plus a required custom-name field for unavailable or newly added players. Continue using existing local club crests for the three club categories.</li>
+<li>Validate exactly one top scorer, top assister, most clean sheets, underdog team, overrated team, underdog player, and overrated player choice. Persist the prediction parent, 20 ordered table items, and seven category rows in the existing deadline-guarded atomic statement.</li>
+<li>Derive the 5–3–1 table score and 20-to-1 spotlight rank points on read. Cap the full table at 100, all spotlight picks at 140, and the combined leaderboard at 240. Treat the position-1 champion as part of table scoring, not a separate bonus.</li>
+<li>Calculate underdog-team index as average predicted position minus actual position and overrated-team index as the inverse, ranking the largest values first with full precision. Rank top scorer, top assister, and most clean sheets by their reviewed result-list positions; rank reviewed average season player ratings descending for underdog and ascending for overrated.</li>
+<li>Keep the five non-table-derived category outcomes explicitly pending until a permitted, reviewed source-neutral result path is designed. Treat the dated roster snapshot as selector identity and portrait input only, not as a goals, assists, clean-sheets, or season-rating feed. Do not add runtime FotMob access, a production scraper, or cron. Ensure custom player names are reconciled before scoring.</li>
+<li>Preserve pre-reveal privacy for prediction IDs, positions 2–20, and all seven spotlight picks. Add <code>/rules</code>, split real leaderboard table/spotlight totals, and show a clearly labelled in-memory test run that cannot affect stored submissions or rankings.</li>
+<li>Move owner login to username plus salted PBKDF2-SHA-256 configuration while retaining <code>ADMIN_SECRET</code> only as a migration fallback. Keep same-origin/session protections, and verify an administrator deletion cascades through all 20 table items and seven spotlight rows while retaining its bounded audit record.</li>
+<li>Run focused and full unit/component tests, isolated Neon integration, TypeScript, ESLint, formatting, production build, three-stage desktop/mobile browser checks, documentation parity, and bounded production smoke. Refresh only the newest QA evidence after the verification result is known, then complete the repository merge/deploy/cleanup rules.</li>
+</ol>
 
-      <p class="source">Generated deterministically from <a href="PLAN.md">docs/PLAN.md</a>. Canonical SHA-256: <code>c11aaf2f20387dc4c7d90712b4b93dde666573e4b262ee17e33f9e19f3462ac5</code>.</p>
+      <p class="source">Generated deterministically from <a href="PLAN.md">docs/PLAN.md</a>. Canonical SHA-256: <code>50e7a5b9445f1a7af05db50270afc42016157b8210d1f8f423eae0fd809c53ac</code>.</p>
     </main>
   </body>
 </html>

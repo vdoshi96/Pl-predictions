@@ -5,8 +5,11 @@ import {
   normalizedParticipantNameKey,
 } from "@/features/predictions/normalization";
 import {
+  createPredictionCategoryPicksSchema,
   createPredictionItemsSchema,
+  customPlayerNameSchema,
   participantNameSchema,
+  predictionCategoryPicksSchema,
   predictionItemsSchema,
 } from "@/features/predictions/validation";
 
@@ -19,6 +22,19 @@ const exactItems = teamIds.map((teamId, index) => ({
   predictedPosition: index + 1,
   teamId,
 }));
+const playerIds = [
+  "10000000-0000-4000-8000-000000000001",
+  "10000000-0000-4000-8000-000000000002",
+] as const;
+const exactCategoryPicks = [
+  { category: "top_scorer", playerId: playerIds[0] },
+  { category: "top_assister", customPlayerName: "  Bruno   Fernandes  " },
+  { category: "most_clean_sheets", teamId: teamIds[0] },
+  { category: "underdog_team", teamId: teamIds[1] },
+  { category: "overrated_team", teamId: teamIds[2] },
+  { category: "underdog_player", playerId: playerIds[1] },
+  { category: "overrated_player", customPlayerName: "  Ｏｔｈｅｒ Player  " },
+] as const;
 
 describe("participant name normalization", () => {
   it("applies NFKC, trimming, and whitespace collapse", () => {
@@ -34,6 +50,7 @@ describe("participant name normalization", () => {
     expect(participantNameSchema.parse("  Ada  ")).toBe("Ada");
     expect(participantNameSchema.safeParse(" \t ").success).toBe(false);
     expect(participantNameSchema.safeParse("a").success).toBe(false);
+    expect(participantNameSchema.safeParse("İ".repeat(40)).success).toBe(false);
   });
 });
 
@@ -68,5 +85,95 @@ describe("prediction permutation validation", () => {
     expect(
       predictionItemsSchema.safeParse(exactItems.slice(0, 19)).success,
     ).toBe(false);
+  });
+});
+
+describe("spotlight prediction validation", () => {
+  it("accepts exactly one pick for all seven categories", () => {
+    expect(
+      createPredictionCategoryPicksSchema(teamIds, playerIds).parse(
+        exactCategoryPicks,
+      ),
+    ).toEqual([
+      { category: "top_scorer", playerId: playerIds[0] },
+      { category: "top_assister", customPlayerName: "Bruno Fernandes" },
+      { category: "most_clean_sheets", teamId: teamIds[0] },
+      { category: "underdog_team", teamId: teamIds[1] },
+      { category: "overrated_team", teamId: teamIds[2] },
+      { category: "underdog_player", playerId: playerIds[1] },
+      { category: "overrated_player", customPlayerName: "Other Player" },
+    ]);
+  });
+
+  it("rejects a missing or duplicate category", () => {
+    expect(
+      predictionCategoryPicksSchema.safeParse(exactCategoryPicks.slice(0, 6))
+        .success,
+    ).toBe(false);
+
+    const duplicateCategory: unknown[] = exactCategoryPicks.map((pick) => ({
+      ...pick,
+    }));
+    duplicateCategory[6] = {
+      category: "top_scorer",
+      customPlayerName: "Replacement player",
+    };
+    expect(
+      predictionCategoryPicksSchema.safeParse(duplicateCategory).success,
+    ).toBe(false);
+  });
+
+  it("keeps club categories club-only and player categories player-only", () => {
+    expect(
+      predictionCategoryPicksSchema.safeParse([
+        ...exactCategoryPicks.slice(0, 2),
+        { category: "most_clean_sheets", customPlayerName: "A goalkeeper" },
+        ...exactCategoryPicks.slice(3),
+      ]).success,
+    ).toBe(false);
+    expect(
+      predictionCategoryPicksSchema.safeParse([
+        { category: "top_scorer", teamId: teamIds[0] },
+        ...exactCategoryPicks.slice(1),
+      ]).success,
+    ).toBe(false);
+  });
+
+  it("rejects clubs and catalog players outside the active season", () => {
+    const schema = createPredictionCategoryPicksSchema(teamIds, playerIds);
+    expect(
+      schema.safeParse([
+        ...exactCategoryPicks.slice(0, 2),
+        {
+          category: "most_clean_sheets",
+          teamId: "ffffffff-ffff-4fff-8fff-ffffffffffff",
+        },
+        ...exactCategoryPicks.slice(3),
+      ]).success,
+    ).toBe(false);
+    expect(
+      schema.safeParse([
+        {
+          category: "top_scorer",
+          playerId: "ffffffff-ffff-4fff-8fff-ffffffffffff",
+        },
+        ...exactCategoryPicks.slice(1),
+      ]).success,
+    ).toBe(false);
+  });
+
+  it("requires a usable name when Other player is selected", () => {
+    expect(
+      predictionCategoryPicksSchema.safeParse([
+        { category: "top_scorer", customPlayerName: " \t " },
+        ...exactCategoryPicks.slice(1),
+      ]).success,
+    ).toBe(false);
+  });
+
+  it("rejects names whose canonical lowercase key exceeds storage", () => {
+    expect(customPlayerNameSchema.safeParse("İ".repeat(120)).success).toBe(
+      false,
+    );
   });
 });

@@ -2,7 +2,11 @@ import { describe, expect, it } from "vitest";
 
 import {
   assignSharedRanks,
+  calculateTeamExpectationIndexes,
   isStandingsScoringActive,
+  rankMetricItems,
+  rankTeamExpectationIndexes,
+  scoreCategoryRank,
   scoreClub,
   scorePrediction,
   scorePredictionIfActive,
@@ -92,6 +96,111 @@ describe("shared leaderboard ranks", () => {
       { participantName: "Ben", rank: 1, totalScore: 90 },
       { participantName: "Zoe", rank: 3, totalScore: 80 },
       { participantName: "Cal", rank: 4, totalScore: 70 },
+    ]);
+  });
+});
+
+describe("spotlight category scoring", () => {
+  it("converts an occupied category rank into descending points", () => {
+    expect(scoreCategoryRank(1)).toBe(20);
+    expect(scoreCategoryRank(2)).toBe(19);
+    expect(scoreCategoryRank(20)).toBe(1);
+    expect(scoreCategoryRank(21)).toBe(0);
+    expect(() => scoreCategoryRank(0)).toThrow(RangeError);
+    expect(() => scoreCategoryRank(1.5)).toThrow(RangeError);
+  });
+
+  it("uses actual position minus the group's average prediction for overrated clubs", () => {
+    const indexes = calculateTeamExpectationIndexes(
+      [1, 2, 2, 3, 4].map((predictedPosition) => [
+        { predictedPosition, teamId: "manchester-united" },
+      ]),
+      [{ actualPosition: 10, teamId: "manchester-united" }],
+    );
+
+    expect(indexes).toHaveLength(1);
+    expect(indexes[0]).toMatchObject({
+      actualPosition: 10,
+      averagePredictedPosition: 2.4,
+      teamId: "manchester-united",
+    });
+    expect(indexes[0]?.underdogIndex).toBeCloseTo(-7.6);
+    expect(indexes[0]?.overratedIndex).toBeCloseTo(7.6);
+  });
+
+  it("ranks team overperformance and underperformance in opposite orders", () => {
+    const indexes = [
+      {
+        actualPosition: 2,
+        averagePredictedPosition: 10,
+        overratedIndex: -8,
+        teamId: "unexpected-high-finisher",
+        underdogIndex: 8,
+      },
+      {
+        actualPosition: 10,
+        averagePredictedPosition: 2,
+        overratedIndex: 8,
+        teamId: "unexpected-low-finisher",
+        underdogIndex: -8,
+      },
+    ];
+
+    expect(
+      rankTeamExpectationIndexes(indexes, "underdog").map(
+        (item) => item.teamId,
+      ),
+    ).toEqual(["unexpected-high-finisher", "unexpected-low-finisher"]);
+    expect(
+      rankTeamExpectationIndexes(indexes, "overrated").map(
+        (item) => item.teamId,
+      ),
+    ).toEqual(["unexpected-low-finisher", "unexpected-high-finisher"]);
+  });
+
+  it("ranks player ratings descending for underdogs and ascending for overrated players", () => {
+    const seasonRatings = [
+      { id: "highest-rating", metric: 8.3 },
+      { id: "middle-rating", metric: 7.1 },
+      { id: "lowest-rating", metric: 5.9 },
+    ];
+
+    expect(
+      rankMetricItems(seasonRatings, "descending").map(({ id, rank }) => ({
+        id,
+        rank,
+      })),
+    ).toEqual([
+      { id: "highest-rating", rank: 1 },
+      { id: "middle-rating", rank: 2 },
+      { id: "lowest-rating", rank: 3 },
+    ]);
+    expect(
+      rankMetricItems(seasonRatings, "ascending").map(({ id, rank }) => ({
+        id,
+        rank,
+      })),
+    ).toEqual([
+      { id: "lowest-rating", rank: 1 },
+      { id: "middle-rating", rank: 2 },
+      { id: "highest-rating", rank: 3 },
+    ]);
+  });
+
+  it("shares metric ranks when two subjects have the same value", () => {
+    expect(
+      rankMetricItems(
+        [
+          { id: "b", metric: 10 },
+          { id: "a", metric: 10 },
+          { id: "c", metric: 8 },
+        ],
+        "descending",
+      ).map(({ id, rank }) => ({ id, rank })),
+    ).toEqual([
+      { id: "a", rank: 1 },
+      { id: "b", rank: 1 },
+      { id: "c", rank: 3 },
     ]);
   });
 });

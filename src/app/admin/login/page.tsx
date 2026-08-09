@@ -1,12 +1,12 @@
-import { KeyRound, ShieldCheck } from "lucide-react";
+import { KeyRound, ShieldCheck, UserRound } from "lucide-react";
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 
-import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { getAdminSession } from "@/features/admin";
 
 import { loginAction } from "./actions";
+import { LoginSubmitButton } from "./login-submit-button";
 
 export const metadata: Metadata = { title: "Admin sign in" };
 export const dynamic = "force-dynamic";
@@ -38,17 +38,50 @@ export default async function AdminLoginPage({
             className="mt-3 text-sm leading-6 text-slate-600"
             id="admin-login-help"
           >
-            Use the owner secret stored in Vercel. It is verified only on the
-            server and is never returned or stored by the app.
+            Use the owner username and password. The password is verified
+            against a server-only digest and is never returned or stored by the
+            app.
           </p>
 
           <form action={loginAction} className="mt-7 grid gap-4">
             <div>
               <label
                 className="text-sm font-bold text-slate-800"
-                htmlFor="secret"
+                htmlFor="username"
               >
-                Admin secret
+                Username
+              </label>
+              <div className="relative mt-2">
+                <UserRound
+                  aria-hidden="true"
+                  className="pointer-events-none absolute top-3.5 left-3.5 size-5 text-slate-400"
+                />
+                <input
+                  aria-describedby={
+                    invalid
+                      ? "admin-login-help admin-login-error"
+                      : "admin-login-help"
+                  }
+                  aria-invalid={invalid}
+                  autoCapitalize="none"
+                  autoComplete="username"
+                  className="min-h-12 w-full rounded-xl border border-slate-300 bg-white pr-3.5 pl-11 text-base text-slate-950 outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100"
+                  id="username"
+                  maxLength={64}
+                  name="username"
+                  required
+                  spellCheck={false}
+                  type="text"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label
+                className="text-sm font-bold text-slate-800"
+                htmlFor="password"
+              >
+                Password
               </label>
               <div className="relative mt-2">
                 <KeyRound
@@ -66,9 +99,9 @@ export default async function AdminLoginPage({
                   autoComplete="current-password"
                   className="min-h-12 w-full rounded-xl border border-slate-300 bg-white pr-3.5 pl-11 text-base text-slate-950 outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100"
                   enterKeyHint="go"
-                  id="secret"
+                  id="password"
                   maxLength={4096}
-                  name="secret"
+                  name="password"
                   required
                   spellCheck={false}
                   type="password"
@@ -82,13 +115,11 @@ export default async function AdminLoginPage({
                 id="admin-login-error"
                 role="alert"
               >
-                That credential was not accepted.
+                That username or password was not accepted.
               </p>
             ) : null}
 
-            <Button size="lg" type="submit">
-              Sign in securely
-            </Button>
+            <LoginSubmitButton />
           </form>
         </CardContent>
       </Card>

@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { TeamMark } from "@/components/team-mark";
 import { getEntryComparison } from "@/features/entries/queries";
+import { SpotlightPickGrid } from "@/features/leaderboard/spotlight-pick-grid";
 import { formatUtcDateTime, ordinal } from "@/shared/format";
 
 export const dynamic = "force-dynamic";
@@ -34,6 +35,9 @@ export default async function EntryPage({
 }: PageProps<"/entries/[id]">) {
   const entry = await getEntryComparison((await params).id);
   if (!entry) notFound();
+  const scoredSpotlightCount = entry.spotlightPicks.filter(
+    (pick) => pick.points !== null && pick.points !== undefined,
+  ).length;
 
   return (
     <main className="page-shell w-full flex-1 py-6 sm:py-10">
@@ -55,7 +59,7 @@ export default async function EntryPage({
             ) : null}
           </div>
           <h1 className="mt-5 text-3xl font-black tracking-tight [overflow-wrap:anywhere] sm:text-5xl">
-            {entry.participantName}&apos;s table
+            {entry.participantName}&apos;s prediction
           </h1>
           <p className="mt-3 text-sm leading-6 text-white/75">
             Submitted {formatUtcDateTime(entry.createdAt)}
@@ -67,10 +71,11 @@ export default async function EntryPage({
               </span>
               <div>
                 <strong className="block text-3xl font-black tabular-nums">
-                  {entry.totalScore} points
+                  {entry.totalScore} total points
                 </strong>
                 <span className="text-xs font-semibold text-white/65">
-                  Recalculated from the active table
+                  {entry.tableScore ?? 0} table · {entry.spotlightScore ?? 0}{" "}
+                  spotlight
                 </span>
               </div>
             </div>
@@ -96,6 +101,35 @@ export default async function EntryPage({
             </CardContent>
           </Card>
         ) : null}
+
+        <Card>
+          <CardContent>
+            <div className="flex flex-wrap items-start justify-between gap-2">
+              <div>
+                <h2 className="text-brand-strong text-xl font-black">
+                  Spotlight picks
+                </h2>
+                <p className="mt-1 text-sm leading-6 text-slate-600">
+                  These seven picks are stored with the table. Points appear as
+                  each reviewed result ranking becomes available.
+                </p>
+              </div>
+              <Badge variant={scoredSpotlightCount > 0 ? "success" : "warning"}>
+                {scoredSpotlightCount} of 7 scored
+              </Badge>
+            </div>
+            {entry.spotlightPicks.length > 0 ? (
+              <SpotlightPickGrid
+                className="mt-4"
+                picks={entry.spotlightPicks}
+              />
+            ) : (
+              <p className="mt-4 rounded-xl bg-slate-50 p-3 text-sm text-slate-500">
+                This legacy entry does not contain spotlight picks.
+              </p>
+            )}
+          </CardContent>
+        </Card>
 
         {entry.snapshot ? (
           <p className="flex min-w-0 items-center gap-2 text-xs font-semibold text-slate-500">

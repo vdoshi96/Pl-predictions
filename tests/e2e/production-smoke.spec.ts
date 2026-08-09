@@ -8,6 +8,7 @@ import {
   dragWithMouse,
   dragWithWebKitTouch,
 } from "./production-drag-helpers";
+import { completeSpotlightPicks } from "./spotlight-helpers";
 
 async function expectNoHorizontalOverflow(
   page: import("@playwright/test").Page,
@@ -136,13 +137,15 @@ test("production public routes are mobile-safe and healthy", async ({
   const participantName = page.getByRole("textbox", {
     name: "Your display name",
   });
-  const reviewButton = page.getByRole("button", { name: "Review your 1–20" });
+  const continueButton = page.getByRole("button", {
+    name: "Continue to spotlight picks",
+  });
   await expectNoHorizontalOverflow(page);
 
   if (await participantName.isEnabled()) {
     await participantName.fill("Production review preview");
     await expect(participantName).toHaveValue("Production review preview");
-    await expect(reviewButton).toBeEnabled();
+    await expect(continueButton).toBeEnabled();
 
     let firstHandle = page.getByRole("button", { name: /^Move Arsenal,/ });
     const secondHandle = page.getByRole("button", {
@@ -189,13 +192,20 @@ test("production public routes are mobile-safe and healthy", async ({
       });
     }
 
-    await reviewButton.click();
+    await continueButton.click();
+    await completeSpotlightPicks(page, "Production Preview");
+    await page.getByRole("button", { name: "Review all predictions" }).click();
     const reviewDialog = page.getByRole("dialog", {
-      name: "Check your 1–20",
+      name: "Review every prediction",
     });
     await expect(reviewDialog).toBeVisible();
+    await expect(reviewDialog.locator("[data-category]")).toHaveCount(7);
     await expectClubMarksLoaded(
-      reviewDialog.getByRole("img", { name: / club mark$/u }),
+      reviewDialog
+        .getByRole("list", {
+          name: "Prediction review, positions 1 through 20",
+        })
+        .getByRole("img", { name: / club mark$/u }),
     );
     const reviewScroller = reviewDialog.locator(".overflow-y-auto");
     await reviewScroller.evaluate((element) => {
@@ -210,13 +220,14 @@ test("production public routes are mobile-safe and healthy", async ({
       });
     }
     await page.keyboard.press("Escape");
+    await page.getByRole("button", { name: "Back to table" }).click();
   } else {
     await expect(page.getByText("Closed", { exact: true })).toBeVisible();
     await expect(
       page.getByText("Submissions closed", { exact: true }),
     ).toBeVisible();
     await expect(participantName).toBeDisabled();
-    await expect(reviewButton).toBeDisabled();
+    await expect(continueButton).toBeDisabled();
     if (captureMobileEvidence) {
       await page.screenshot({
         path: path.join(screenshotDirectory!, "prediction-mobile.png"),
@@ -233,6 +244,13 @@ test("production public routes are mobile-safe and healthy", async ({
   await expect(
     page.getByRole("heading", { level: 1, name: "Dranx Prediction League" }),
   ).toBeVisible();
+  const leaderboardDemo = page.getByRole("region", {
+    name: "Spotlight scoring test run",
+  });
+  await expect(leaderboardDemo).toBeVisible();
+  await expect(
+    leaderboardDemo.getByText("Demo only", { exact: true }),
+  ).toBeVisible();
   await resetScrollPosition(page);
   await expectNoHorizontalOverflow(page);
   if (captureMobileEvidence) {
@@ -240,6 +258,12 @@ test("production public routes are mobile-safe and healthy", async ({
       path: path.join(screenshotDirectory!, "leaderboard-mobile.png"),
     });
   }
+
+  await page.goto("/rules");
+  await expect(
+    page.getByRole("heading", { level: 1, name: "Rules and scoring" }),
+  ).toBeVisible();
+  await expectNoHorizontalOverflow(page);
 
   await page.goto("/admin/login");
   await expect(

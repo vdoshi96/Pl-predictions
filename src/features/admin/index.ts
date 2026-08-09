@@ -18,7 +18,8 @@ export {
   requireAdmin,
   requireAdminMutation,
   requireSameOrigin,
-  verifyAdminCredential,
+  createAdminPasswordHash,
+  verifyAdminCredentials,
   verifyAdminSessionToken,
 } from "./security";
 

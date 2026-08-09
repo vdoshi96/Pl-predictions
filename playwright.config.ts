@@ -1,5 +1,7 @@
 import { defineConfig, devices } from "@playwright/test";
 
+const isProductionWriteSmoke = process.env.ALLOW_PRODUCTION_WRITE_SMOKE === "1";
+
 export default defineConfig({
   testDir: "./tests/e2e",
   fullyParallel: false,
@@ -15,8 +17,9 @@ export default defineConfig({
     baseURL:
       process.env.PLAYWRIGHT_BASE_URL?.replace(/\/$/u, "") ??
       "http://127.0.0.1:3100",
-    screenshot: "only-on-failure",
-    trace: "retain-on-failure",
+    screenshot: isProductionWriteSmoke ? "off" : "only-on-failure",
+    trace: isProductionWriteSmoke ? "off" : "retain-on-failure",
+    video: "off",
   },
   projects: [
     {

@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="canonical-source" content="QA.md" />
-    <meta name="canonical-source-sha256" content="4875172d74847e5aa137d705401dc4061389f0b86b2e490cf2b8ac9f5fa3f945" />
+    <meta name="canonical-source-sha256" content="bf6ab2d9332d290fc971f86b823be496047bf16c448be0db86dd2f382ee95f36" />
     <title>Quality assurance</title>
     <style>
       :root { color-scheme: light dark; font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
@@ -75,9 +75,19 @@
 <td>Captured stage 1, stage 2, and final review from the public live flow without submitting the walkthrough draft. All three PNGs were visually inspected.</td>
 </tr>
 <tr>
+<td>Production deployment</td>
+<td>Vercel production deployment <code>dpl_2L4cprnsWShhesujY7sTLKffywhg</code></td>
+<td>Ready at the immutable URL recorded below after GitHub PR #13 merged to <code>main</code>. Read-back proved the stable public alias resolves to this deployment.</td>
+</tr>
+<tr>
 <td>Production release smoke</td>
-<td><code>npm run test:production-smoke</code></td>
-<td>Pending publication of the release candidate to <code>main</code>. The final read-only five-project result and newest-only screenshot set will replace this row during release closeout.</td>
+<td><code>npm run test:production-smoke</code> against the immutable URL</td>
+<td>Passed 5 of 5 projects: desktop Chromium, 390-pixel mobile Chromium, exact 320/430-pixel Chromium reflow, and mobile WebKit. A second read-only mobile Chromium pass captured the dedicated countdown artifact.</td>
+</tr>
+<tr>
+<td>Production runtime logs</td>
+<td>exact-deployment error and HTTP 500 queries, preceding 30 minutes</td>
+<td>Both queries returned no records after the smoke run.</td>
 </tr>
 </tbody></table>
 <p>The first aggregate-check attempt stopped at Prettier before lint, tests, integration, or build ran. After formatting the one flagged mobile test, the clean uninterrupted run above passed. The local environment uses the repository&#39;s verified Webpack build because the restricted sandbox does not permit a default Turbopack helper to bind its internal port.</p>
@@ -113,7 +123,7 @@
 <li>underdog player Chris Rigg; and</li>
 <li>overrated player Alysson.</li>
 </ul>
-<p>The database verification exposed only safe aggregate facts: one parent, 20 child positions, seven category picks, and the display name. It did not print prediction IDs, receipt material, database URLs, or private credentials. Before reveal, the public spotlight page reports one active bracket but does not serialize or display those seven choices.</p>
+<p>The final post-release database verification exposed only safe aggregate facts: one parent, 20 child positions, seven category picks, and the sole display name <code>Dranx Test Entry</code>. It found no display name containing Alex or Jordan. It did not print prediction IDs, receipt material, database URLs, private pick subjects, or credentials. Before reveal, the public spotlight page reports one active bracket but does not serialize or display those seven choices.</p>
 <h2>Annotated live-mobile walkthrough</h2>
 <p>The participant-facing <code>/rules</code> section uses three first-party captures from the live 390 by 844 public flow:</p>
 <ol>
@@ -122,6 +132,24 @@
 <li><code>public/how-to-play/step-3-review-mobile.png</code> — the complete 20-position and seven-pick review with the final submit action.</li>
 </ol>
 <p>Each image receives two numbered overlay pins at render time. The same numbers and instructions appear as adjacent HTML text, so the annotations remain accessible, selectable, responsive, and understandable without colour. The walkthrough draft used the unsaved display name “How to play preview”; it never created a second production entry.</p>
+<h2>Production deployment and mobile evidence</h2>
+<p>GitHub <a href="https://github.com/vdoshi96/Pl-predictions/pull/13">PR #13</a> merged the tested feature into <code>main</code> at <code>a7785b9b16b64be825e06ef8f181ab5f98031524</code>. Vercel production deployment <code>dpl_2L4cprnsWShhesujY7sTLKffywhg</code> is Ready at <a href="https://pl-predictions-9h7r762li-vdoshi96s-projects.vercel.app">https://pl-predictions-9h7r762li-vdoshi96s-projects.vercel.app</a>. The standard release alias command moved <a href="https://pl-predictions-2026.vercel.app">https://pl-predictions-2026.vercel.app</a> to that exact deployment, and deployment-ID read-back verified the mapping.</p>
+<p>The final read-only smoke passed all five browser projects against the immutable URL. It exercised the timer, all three entry stages without submitting, the table leaderboard, private pre-reveal spotlight state, absence of Alex/Jordan fixtures, the annotated how-to, administrator login, 320–430-pixel reflow, WebKit, local imagery, no horizontal overflow, and browser/network/HTTP guards. The exact-deployment error-level and HTTP 500 log queries returned no records in the preceding 30 minutes.</p>
+<p>Only the newest completed production run is retained under <code>docs/assets/qa/</code>. All seven artifacts were visually inspected for readable type, clear hierarchy, painted local imagery, reachable actions, correct annotations, and absence of clipping.</p>
+<p><strong>Submission countdown — mobile Chromium at 390 by 844:</strong> the compact calendar-flip timer is prominent inside the open-submissions card without overwhelming the hero or first-stage action.</p>
+<p><img src="assets/qa/countdown-mobile.png" alt="Production submission countdown on mobile Chromium"></p>
+<p><strong>Prediction sorter — mobile Chromium at 390 by 844:</strong> the reordered table, 56-pixel handle, painted crests, and sticky continue action fit without horizontal overflow.</p>
+<p><img src="assets/qa/prediction-mobile.png" alt="Production prediction sorter on mobile Chromium"></p>
+<p><strong>Spotlight stage — mobile Chromium at 390 by 844:</strong> all seven selector values are prepared and the review action remains reachable above the safe area.</p>
+<p><img src="assets/qa/spotlight-picks-mobile.png" alt="Production spotlight-pick stage on mobile Chromium"></p>
+<p><strong>Final review — mobile Chromium at 390 by 844:</strong> the preview shows the 20-club and seven-pick counts, real portraits, club crests, the custom-player silhouette, and the submit action. The smoke closes this preview without submitting.</p>
+<p><img src="assets/qa/review-mobile.png" alt="Production final review on mobile Chromium"></p>
+<p><strong>Private spotlight state — mobile Chromium at 390 by 844:</strong> the page exposes category navigation and its complete-bracket privacy explanation, with no Alex/Jordan fixture or real pick subjects.</p>
+<p><img src="assets/qa/spotlight-mobile.png" alt="Production private spotlight page on mobile Chromium"></p>
+<p><strong>Rendered how-to annotations — 358 by 1200 element capture from mobile Chromium:</strong> the first live-mobile card shows numbered overlay pins and matching textual instructions; the next card remains discoverable at the horizontal edge.</p>
+<p><img src="assets/qa/how-to-mobile.png" alt="Production annotated how-to section on mobile Chromium"></p>
+<p><strong>Administrator sign-in — mobile Chromium at 390 by 844:</strong> the owner-only credential form and navigation reflow cleanly.</p>
+<p><img src="assets/qa/admin-login-mobile.png" alt="Production administrator sign-in on mobile Chromium"></p>
 <h2>Security and cleanup boundaries</h2>
 <ul>
 <li>No environment value, receipt token, database URL, administrator credential, or subscription cookie is committed or printed.</li>
@@ -136,12 +164,12 @@
 <li><input checked="" disabled="" type="checkbox"> Implement and locally verify the countdown, annotated walkthrough, navigation copy, and fixture removal.</li>
 <li><input checked="" disabled="" type="checkbox"> Create and verify one complete retained production test bracket.</li>
 <li><input checked="" disabled="" type="checkbox"> Pass the uninterrupted full local verification chain.</li>
-<li><input disabled="" type="checkbox"> Merge the release through GitHub <code>main</code> and verify the Ready production deployment.</li>
-<li><input disabled="" type="checkbox"> Pass the final five-project read-only production smoke and visually inspect its newest screenshots.</li>
-<li><input disabled="" type="checkbox"> Regenerate final HTML peers, synchronize local and remote <code>main</code>, and remove completed branch state.</li>
+<li><input checked="" disabled="" type="checkbox"> Merge GitHub PR #13 into <code>main</code> and verify the Ready production deployment plus stable alias mapping.</li>
+<li><input checked="" disabled="" type="checkbox"> Pass the final five-project read-only production smoke, visually inspect all seven newest screenshots, and find no error-level or HTTP 500 records in the tested window.</li>
+<li><input checked="" disabled="" type="checkbox"> Regenerate final HTML peers, publish this closeout through <code>main</code>, synchronize local and remote <code>main</code>, and remove completed branch state.</li>
 </ul>
 
-      <p class="source">Generated deterministically from <a href="QA.md">docs/QA.md</a>. Canonical SHA-256: <code>4875172d74847e5aa137d705401dc4061389f0b86b2e490cf2b8ac9f5fa3f945</code>.</p>
+      <p class="source">Generated deterministically from <a href="QA.md">docs/QA.md</a>. Canonical SHA-256: <code>bf6ab2d9332d290fc971f86b823be496047bf16c448be0db86dd2f382ee95f36</code>.</p>
     </main>
   </body>
 </html>

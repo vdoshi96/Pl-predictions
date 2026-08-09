@@ -2,7 +2,7 @@
 
 ## 2026-08-08
 
-### How-to, countdown, and complete test-entry iteration (release in progress)
+### How-to, countdown, and complete test-entry iteration (complete)
 
 - Traced the live Demo Alex and Demo Jordan spotlight cards to the hard-coded `LeaderboardDemo` component. A read-only production aggregate found zero prediction parents, table items, and category picks before the requested test entry, proving there were no malformed spotlight-only rows to delete.
 - Removed the fixture component, its unconditional `/spotlight` render path, and demo-specific component/browser assertions. The real spotlight view now counts or ranks only complete persisted brackets.
@@ -10,7 +10,11 @@
 - Captured three 390-by-844 screens from the live public mobile flow and added them to `/rules` as a responsive three-step walkthrough. Numbered overlay pins have matching accessible callout text; the unsaved walkthrough draft created no production entry.
 - Submitted the retained `Dranx Test Entry` through the supported public three-stage flow. Safe follow-up verification found one parent, 20 ordered table rows, and seven spotlight rows; `/leaderboard` shows the entry while `/spotlight` keeps its subjects private before reveal.
 - Passed uninterrupted `CI=1 npm run check`: documentation/player parity, formatting, ESLint, strict TypeScript, 150 default tests with 10 guarded skips, all 10 isolated Neon integration cases, the Webpack production build, five pre-kickoff browser projects with 20 intentional skips, and three post-kickoff browser projects with two intentional skips. An earlier attempt stopped at Prettier before any lint or test phase and was corrected before the clean run.
-- Production publication, final read-only smoke, newest-only QA evidence, and GitHub/local cleanup remain pending release-closeout work.
+- Merged GitHub [PR #13](https://github.com/vdoshi96/Pl-predictions/pull/13) into `main` at `a7785b9b16b64be825e06ef8f181ab5f98031524`. Verified Ready production deployment `dpl_2L4cprnsWShhesujY7sTLKffywhg` at [https://pl-predictions-9h7r762li-vdoshi96s-projects.vercel.app](https://pl-predictions-9h7r762li-vdoshi96s-projects.vercel.app), moved the stable alias to it, and read back the same deployment ID through the alias.
+- Passed the final five-project read-only production smoke against the immutable deployment across desktop Chromium, 390-pixel mobile Chromium, exact 320/430-pixel reflow, and mobile WebKit. A dedicated second mobile pass captured the top-of-page countdown.
+- Refreshed and visually inspected the newest seven production artifacts: countdown, prediction sorter, spotlight stage, final review, private spotlight state, rendered annotated how-to, and administrator login. Removed the stale Alex/Jordan demo screenshot from the retained QA set.
+- A final read-only aggregate found one prediction parent named exactly `Dranx Test Entry`, 20 table items, seven spotlight picks, and no Alex/Jordan display-name rows. Exact-deployment error-level and HTTP 500 queries returned no records in the preceding 30 minutes.
+- Regenerated every HTML peer, published the closeout through `main`, synchronized local and remote `main`, removed completed branch state, and retained only the primary worktree. The two owner handoff directories remain untouched and untracked.
 
 ### Research and provisioning
 

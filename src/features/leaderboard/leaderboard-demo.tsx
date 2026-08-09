@@ -13,7 +13,12 @@ import {
   type SpotlightPickDisplay,
 } from "./spotlight-pick-grid";
 
-type DemoPick = SpotlightPickDisplay & { points: number; rank: number };
+type DemoPick = SpotlightPickDisplay & {
+  accuracyPoints: number;
+  resultRank: number;
+};
+
+const DEMO_BRACKET_COUNT = 2;
 
 const labelByCategory = new Map(
   PREDICTION_CATEGORY_DEFINITIONS.map((definition) => [
@@ -26,15 +31,15 @@ function playerPick(
   category: PredictionCategory,
   displayName: string,
   assetPath: string | null,
-  rank: number,
+  resultRank: number,
 ): DemoPick {
   return {
+    accuracyPoints: scoreCategoryRank(resultRank, DEMO_BRACKET_COUNT),
     assetPath,
     category,
     displayName,
     label: labelByCategory.get(category) ?? category,
-    points: scoreCategoryRank(rank),
-    rank,
+    resultRank,
     subject: "player",
   };
 }
@@ -44,17 +49,17 @@ function teamPick(
   displayName: string,
   shortName: string,
   assetPath: string,
-  rank: number,
+  resultRank: number,
   metricLabel?: string,
 ): DemoPick {
   return {
+    accuracyPoints: scoreCategoryRank(resultRank, DEMO_BRACKET_COUNT),
     assetPath,
     category,
     displayName,
     label: labelByCategory.get(category) ?? category,
     metricLabel,
-    points: scoreCategoryRank(rank),
-    rank,
+    resultRank,
     shortName,
     subject: "team",
   };
@@ -63,7 +68,7 @@ function teamPick(
 const demoEntries = [
   {
     participantName: "Demo Alex",
-    picks: [
+    spotlightPicks: [
       playerPick(
         "top_scorer",
         "Erling Haaland",
@@ -112,11 +117,10 @@ const demoEntries = [
         7,
       ),
     ],
-    tableScore: 78,
   },
   {
     participantName: "Demo Jordan",
-    picks: [
+    spotlightPicks: [
       playerPick(
         "top_scorer",
         "Alexander Isak",
@@ -160,21 +164,22 @@ const demoEntries = [
         3,
       ),
     ],
-    tableScore: 82,
   },
-].map((entry) => {
-  const spotlightScore = entry.picks.reduce(
-    (total, pick) => total + pick.points,
+].map((entry) => ({
+  ...entry,
+  accuracyScore: entry.spotlightPicks.reduce(
+    (total, pick) => total + pick.accuracyPoints,
     0,
-  );
-  return {
-    ...entry,
-    spotlightScore,
-    totalScore: entry.tableScore + spotlightScore,
-  };
-});
+  ),
+  availableCategoryCount: entry.spotlightPicks.length,
+}));
 
-const rankedDemoEntries = assignSharedRanks(demoEntries);
+const rankedDemoEntries = assignSharedRanks(
+  demoEntries.map((entry) => ({
+    ...entry,
+    totalScore: entry.accuracyScore,
+  })),
+);
 
 export function LeaderboardDemo() {
   return (
@@ -190,30 +195,34 @@ export function LeaderboardDemo() {
                 id="leaderboard-demo-heading"
                 className="text-brand-strong text-xl font-black"
               >
-                Spotlight scoring test run
+                Spotlight accuracy test run
               </h2>
               <p className="mt-1 max-w-2xl text-sm leading-6 text-slate-600">
-                This preview is not stored or counted. It shows how table
-                points, seven ranked picks, player portraits, the silhouette
-                fallback, and club crests fit together before the real result
-                feeds are wired.
+                This preview is not stored or counted. With two active brackets,
+                each pick earns 2 points for result rank 1, 1 point for rank 2,
+                and 0 after that. Seven perfect picks would score 14. Player
+                portraits, the silhouette fallback, and club crests show the
+                finished layout while real results are entered later.
               </p>
             </div>
           </div>
-          <Badge variant="warning">Demo only</Badge>
+          <div className="flex flex-wrap gap-2">
+            <Badge variant="warning">Demo only</Badge>
+            <Badge>{DEMO_BRACKET_COUNT} active brackets</Badge>
+          </div>
         </CardContent>
       </Card>
 
       {rankedDemoEntries.map((entry) => (
         <Card
-          aria-label={`${entry.participantName} demo leaderboard entry`}
+          aria-label={`${entry.participantName} demo accuracy entry`}
           key={entry.participantName}
         >
           <CardContent>
             <div className="grid grid-cols-[auto_1fr_auto] items-center gap-3">
               <span
                 className="bg-brand grid size-11 place-items-center rounded-xl text-lg font-black text-white"
-                aria-label={`Demo rank ${entry.rank}`}
+                aria-label={`Demo accuracy rank ${entry.rank}`}
               >
                 {entry.rank}
               </span>
@@ -221,17 +230,16 @@ export function LeaderboardDemo() {
                 <strong className="text-brand-strong block font-black">
                   {entry.participantName}
                 </strong>
-                <span className="mt-1 flex flex-wrap gap-x-3 gap-y-1 text-xs font-semibold text-slate-500">
-                  <span>{entry.tableScore} table</span>
-                  <span>{entry.spotlightScore} spotlight</span>
+                <span className="mt-1 block text-xs font-semibold text-slate-500">
+                  {entry.availableCategoryCount} of 7 results available
                 </span>
               </div>
               <div className="text-right">
                 <strong className="block text-2xl font-black text-[#c80047] tabular-nums">
-                  {entry.totalScore}
+                  {entry.accuracyScore}
                 </strong>
                 <span className="text-[0.65rem] font-bold tracking-wide text-slate-500 uppercase">
-                  demo total
+                  accuracy points
                 </span>
               </div>
             </div>
@@ -241,11 +249,11 @@ export function LeaderboardDemo() {
             >
               <summary className="text-brand focus-visible:ring-accent-blue flex min-h-12 cursor-pointer list-none items-center gap-2 rounded-xl px-3 text-sm font-black outline-none focus-visible:ring-2">
                 <Trophy aria-hidden="true" className="size-4" />
-                View seven scored picks
+                View seven ranked picks
               </summary>
               <SpotlightPickGrid
                 className="border-border border-t p-3"
-                picks={entry.picks}
+                picks={entry.spotlightPicks}
               />
             </details>
           </CardContent>

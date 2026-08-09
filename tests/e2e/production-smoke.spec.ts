@@ -302,16 +302,31 @@ test("production public routes are mobile-safe and healthy", async ({
   await expect(
     page.getByRole("heading", { level: 1, name: "Dranx Prediction League" }),
   ).toBeVisible();
-  const leaderboardDemo = page.getByRole("region", {
-    name: "Spotlight scoring test run",
-  });
-  await expect(leaderboardDemo).toBeVisible();
   await expect(
-    leaderboardDemo.getByText("Demo only", { exact: true }),
+    page.getByRole("link", { name: "View spotlight accuracy" }),
   ).toBeVisible();
-  const demoAlex = leaderboardDemo.getByLabel(
-    "Demo Alex demo leaderboard entry",
-  );
+  await expect(
+    page.getByRole("region", { name: "Spotlight accuracy test run" }),
+  ).toHaveCount(0);
+  await expectNoHorizontalOverflow(page);
+
+  await page.goto("/spotlight?sort=overall");
+  await expect(
+    page.getByRole("heading", { level: 1, name: "Spotlight accuracy" }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("heading", {
+      name: "Spotlight picks are still private",
+    }),
+  ).toBeVisible();
+  const spotlightDemo = page.getByRole("region", {
+    name: "Spotlight accuracy test run",
+  });
+  await expect(spotlightDemo).toBeVisible();
+  await expect(
+    spotlightDemo.getByText("Demo only", { exact: true }),
+  ).toBeVisible();
+  const demoAlex = spotlightDemo.getByLabel("Demo Alex demo accuracy entry");
   const demoAlexDetails = demoAlex.locator("details");
   if (
     !(await demoAlexDetails.evaluate(
@@ -319,7 +334,7 @@ test("production public routes are mobile-safe and healthy", async ({
     ))
   ) {
     await demoAlex
-      .getByText("View seven scored picks", { exact: true })
+      .getByText("View seven ranked picks", { exact: true })
       .click();
   }
   await expect(demoAlexDetails).toHaveJSProperty("open", true);
@@ -328,8 +343,8 @@ test("production public routes are mobile-safe and healthy", async ({
       name: "Erling Haaland player portrait",
     }),
   );
-  const demoJordan = leaderboardDemo.getByLabel(
-    "Demo Jordan demo leaderboard entry",
+  const demoJordan = spotlightDemo.getByLabel(
+    "Demo Jordan demo accuracy entry",
   );
   const demoJordanDetails = demoJordan.locator("details");
   if (
@@ -338,7 +353,7 @@ test("production public routes are mobile-safe and healthy", async ({
     ))
   ) {
     await demoJordan
-      .getByText("View seven scored picks", { exact: true })
+      .getByText("View seven ranked picks", { exact: true })
       .click();
   }
   await expect(demoJordanDetails).toHaveJSProperty("open", true);
@@ -349,7 +364,7 @@ test("production public routes are mobile-safe and healthy", async ({
   await expect(demoSilhouette.locator("svg")).toBeVisible();
   await expectNoHorizontalOverflow(page);
   if (captureMobileEvidence) {
-    await leaderboardDemo.scrollIntoViewIfNeeded();
+    await spotlightDemo.scrollIntoViewIfNeeded();
     await page.screenshot({
       path: path.join(screenshotDirectory!, "leaderboard-mobile.png"),
     });

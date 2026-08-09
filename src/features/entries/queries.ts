@@ -51,7 +51,6 @@ export type EntryComparisonView = {
     matchweek: number | null;
   } | null;
   spotlightPicks: SpotlightPickDisplay[];
-  spotlightScore: number | null;
   tableScore: number | null;
   totalScore: number | null;
 };
@@ -147,9 +146,9 @@ export async function getEntryComparison(
       ? scoring.summary.items.map((item) => [item.teamId, item] as const)
       : [],
   );
-  const rankedLeaderboardEntry =
+  const spotlightAccuracyEntry =
     scoring.status === "scored"
-      ? (await getLeaderboardView()).scoredEntries?.find(
+      ? (await getLeaderboardView()).spotlightAccuracyEntries?.find(
           (leaderboardEntry) => leaderboardEntry.id === entry.id,
         )
       : null;
@@ -177,11 +176,8 @@ export async function getEntryComparison(
           matchweek: snapshot.matchweek,
         }
       : null,
-    spotlightPicks: rankedLeaderboardEntry?.spotlightPicks ?? spotlightPicks,
-    spotlightScore: rankedLeaderboardEntry?.spotlightScore ?? null,
+    spotlightPicks: spotlightAccuracyEntry?.spotlightPicks ?? spotlightPicks,
     tableScore: scoring.status === "scored" ? scoring.summary.total : null,
-    totalScore:
-      rankedLeaderboardEntry?.totalScore ??
-      (scoring.status === "scored" ? scoring.summary.total : null),
+    totalScore: scoring.status === "scored" ? scoring.summary.total : null,
   };
 }

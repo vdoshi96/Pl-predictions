@@ -218,7 +218,7 @@ test.afterEach(async () => {
   }
 });
 
-test("post-kickoff leaderboard scores champion picks at desktop and mobile widths", async ({
+test("post-kickoff table and spotlight rankings stay split at desktop and mobile widths", async ({
   page,
 }, testInfo) => {
   test.skip(
@@ -366,11 +366,44 @@ test("post-kickoff leaderboard scores champion picks at desktop and mobile width
   await expect(staleSwappedEntry.getByText("0", { exact: true })).toBeVisible();
   await expect(staleExactEntry.getByText(/track/u)).toHaveCount(0);
   await expect(staleSwappedEntry.getByText(/track/u)).toHaveCount(0);
-  await staleExactEntry
-    .getByText("View 7 spotlight picks · results pending", { exact: true })
-    .click();
   await expect(
     staleExactEntry.getByText(`${suffix} exact scorer`, { exact: true }),
+  ).toHaveCount(0);
+  await expect(staleExactEntry.locator("details")).toHaveCount(0);
+  await expect(
+    page.getByRole("link", { name: "View spotlight accuracy" }),
+  ).toBeVisible();
+
+  await page.goto("/spotlight?sort=overall", { waitUntil: "networkidle" });
+  await expect(
+    page.getByRole("heading", { level: 1, name: "Spotlight accuracy" }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("heading", {
+      name: "Accuracy rankings are not available yet",
+    }),
+  ).toBeVisible();
+  const pendingAccuracyList = page.getByLabel("Spotlight accuracy leaderboard");
+  await expect(pendingAccuracyList.getByRole("article")).toHaveCount(2);
+  const pendingExactEntry = page.getByLabel(
+    `${exactName} spotlight accuracy entry`,
+  );
+  await expect(
+    pendingExactEntry.getByLabel("Accuracy rank pending"),
+  ).toHaveText("—");
+  await expect(
+    pendingExactEntry.getByText("result pending", { exact: true }),
+  ).toBeVisible();
+  const pendingExactDetails = pendingExactEntry.locator("details");
+  if (
+    !(await pendingExactDetails.evaluate(
+      (element) => element instanceof HTMLDetailsElement && element.open,
+    ))
+  ) {
+    await pendingExactDetails.locator("summary").click();
+  }
+  await expect(
+    pendingExactEntry.getByText(`${suffix} exact scorer`, { exact: true }),
   ).toBeVisible();
 
   const reobserved = await db
@@ -388,7 +421,7 @@ test("post-kickoff leaderboard scores champion picks at desktop and mobile width
     .returning({ id: seasons.id });
   expect(reobserved).toHaveLength(1);
 
-  await page.reload({ waitUntil: "networkidle" });
+  await page.goto("/leaderboard", { waitUntil: "networkidle" });
   const scoredLeaderboard = page.getByLabel("Scored leaderboard");
   await expect(scoredLeaderboard).toBeVisible();
   await expect(page.getByText("Matchweek 1", { exact: true })).toBeVisible();
@@ -397,19 +430,14 @@ test("post-kickoff leaderboard scores champion picks at desktop and mobile width
 
   const exactEntry = page.getByLabel(`${exactName} leaderboard entry`);
   await expect(exactEntry.getByLabel("Rank 1")).toHaveText("1");
-  await expect(exactEntry.getByText("140", { exact: true })).toBeVisible();
-  await expect(
-    exactEntry.getByText("100 table · 40 spotlight", { exact: true }),
-  ).toBeVisible();
-  await exactEntry
-    .getByText("View 7 spotlight picks · 2 scored", { exact: true })
-    .click();
+  await expect(exactEntry.getByText("100", { exact: true })).toBeVisible();
   await expect(
     exactEntry.getByText("Index +0.5 · Rank 1 · 20 pts", { exact: true }),
-  ).toHaveCount(2);
+  ).toHaveCount(0);
   await expect(
-    exactEntry.getByText("View 7 spotlight picks · 2 scored", { exact: true }),
-  ).toBeVisible();
+    exactEntry.getByText(`${suffix} exact scorer`, { exact: true }),
+  ).toHaveCount(0);
+  await expect(exactEntry.locator("details")).toHaveCount(0);
   await expect(
     exactEntry.getByLabel("Predicted champion: Arsenal"),
   ).toBeVisible();
@@ -422,10 +450,7 @@ test("post-kickoff leaderboard scores champion picks at desktop and mobile width
 
   const swappedEntry = page.getByLabel(`${swappedName} leaderboard entry`);
   await expect(swappedEntry.getByLabel("Rank 2")).toHaveText("2");
-  await expect(swappedEntry.getByText("136", { exact: true })).toBeVisible();
-  await expect(
-    swappedEntry.getByText("96 table · 40 spotlight", { exact: true }),
-  ).toBeVisible();
+  await expect(swappedEntry.getByText("96", { exact: true })).toBeVisible();
   await expect(
     swappedEntry.getByLabel("Predicted champion: Aston Villa"),
   ).toBeVisible();
@@ -435,6 +460,69 @@ test("post-kickoff leaderboard scores champion picks at desktop and mobile width
       .getByRole("img", { name: "Aston Villa club mark" }),
   ).toBeVisible();
   await expect(swappedEntry.getByText("Off track · 2nd")).toBeVisible();
+  await expect(swappedEntry.locator("details")).toHaveCount(0);
 
+  await expectNoHorizontalOverflow(page);
+
+  await page.goto("/spotlight?sort=overall", { waitUntil: "networkidle" });
+  const accuracyLeaderboard = page.getByLabel("Spotlight accuracy leaderboard");
+  await expect(accuracyLeaderboard.getByRole("article")).toHaveCount(2);
+  const exactAccuracyEntry = page.getByLabel(
+    `${exactName} spotlight accuracy entry`,
+  );
+  const swappedAccuracyEntry = page.getByLabel(
+    `${swappedName} spotlight accuracy entry`,
+  );
+  await expect(
+    exactAccuracyEntry.getByText("4", { exact: true }),
+  ).toBeVisible();
+  await expect(
+    swappedAccuracyEntry.getByText("4", { exact: true }),
+  ).toBeVisible();
+  const exactAccuracyDetails = exactAccuracyEntry.locator("details");
+  if (
+    !(await exactAccuracyDetails.evaluate(
+      (element) => element instanceof HTMLDetailsElement && element.open,
+    ))
+  ) {
+    await exactAccuracyDetails.locator("summary").click();
+  }
+  await expect(
+    exactAccuracyEntry.getByText(
+      "Index +0.5 · Result rank 1 · 2 accuracy pts",
+      { exact: true },
+    ),
+  ).toHaveCount(2);
+  await expect(
+    exactAccuracyEntry.getByText(`${suffix} exact scorer`, { exact: true }),
+  ).toBeVisible();
+
+  await page.goto("/spotlight?sort=underdog_team", {
+    waitUntil: "networkidle",
+  });
+  const underdogAccuracyEntries = page
+    .getByLabel("Spotlight accuracy leaderboard")
+    .getByRole("article");
+  await expect(underdogAccuracyEntries).toHaveCount(2);
+  await expect(underdogAccuracyEntries.nth(0)).toHaveAccessibleName(
+    `${exactName} spotlight accuracy entry`,
+  );
+  await expect(underdogAccuracyEntries.nth(1)).toHaveAccessibleName(
+    `${swappedName} spotlight accuracy entry`,
+  );
+  for (const underdogAccuracyEntry of [
+    page.getByLabel(`${exactName} spotlight accuracy entry`),
+    page.getByLabel(`${swappedName} spotlight accuracy entry`),
+  ]) {
+    await expect(
+      underdogAccuracyEntry.getByLabel("Underdog team result rank 1"),
+    ).toHaveText("1");
+    await expect(
+      underdogAccuracyEntry.getByText("2", { exact: true }),
+    ).toBeVisible();
+    await expect(
+      underdogAccuracyEntry.getByText("4", { exact: true }),
+    ).toHaveCount(0);
+  }
   await expectNoHorizontalOverflow(page);
 });

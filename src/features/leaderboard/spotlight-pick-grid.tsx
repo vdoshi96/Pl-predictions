@@ -8,9 +8,9 @@ export type SpotlightPickDisplay = Readonly<{
   category: PredictionCategory;
   displayName: string;
   label: string;
+  accuracyPoints?: number | null;
   metricLabel?: string | null;
-  points?: number | null;
-  rank?: number | null;
+  resultRank?: number | null;
   shortName?: string | null;
   subject: "player" | "team";
 }>;
@@ -53,14 +53,18 @@ export function SpotlightPickGrid({
             <strong className="text-brand-strong block text-xs leading-4 break-words">
               {pick.displayName}
             </strong>
-            {pick.rank && pick.points !== null && pick.points !== undefined ? (
+            {pick.resultRank !== null &&
+            pick.resultRank !== undefined &&
+            pick.accuracyPoints !== null &&
+            pick.accuracyPoints !== undefined ? (
               <span className="mt-0.5 block text-[0.65rem] leading-4 font-semibold text-slate-500">
-                {pick.metricLabel ? `${pick.metricLabel} · ` : ""}Rank{" "}
-                {pick.rank} · {pick.points} pts
+                {pick.metricLabel ? `${pick.metricLabel} · ` : ""}Result rank{" "}
+                {pick.resultRank} · {pick.accuracyPoints} accuracy{" "}
+                {pick.accuracyPoints === 1 ? "pt" : "pts"}
               </span>
             ) : (
               <span className="mt-0.5 block text-[0.65rem] leading-4 font-semibold text-slate-500">
-                Awaiting result ranking
+                Result rank pending
               </span>
             )}
           </div>

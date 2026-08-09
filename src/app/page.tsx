@@ -86,12 +86,16 @@ export default async function PredictionPage() {
                   aria-hidden="true"
                   className="text-accent-pink size-5"
                 />
-                <h2 className="font-black tracking-tight">How scoring works</h2>
+                <h2 className="font-black tracking-tight">
+                  Two separate tables
+                </h2>
               </div>
               <p className="mt-1 text-sm leading-6 text-slate-600">
-                Table points keep the existing 5–3–1 tiers. Spotlight picks use
-                a 20-to-1 rank scale and stay pending until their reviewed
-                result rankings are available.
+                The main leaderboard uses only the existing 5–3–1 table tiers
+                and stays capped at 100. Spotlight picks have a separate
+                just-for-fun accuracy score based on the active bracket count.
+                An owner-run Codex automation will manually enter the five
+                result lists that are not derived from the league table.
               </p>
             </div>
             <div className="grid grid-cols-3 gap-2" aria-label="Scoring tiers">
@@ -111,7 +115,7 @@ export default async function PredictionPage() {
             </div>
             <p className="flex items-center gap-2 text-xs font-semibold text-slate-500 sm:col-span-2">
               <Check aria-hidden="true" className="size-4 text-[#08734f]" />
-              Exact full table: 100 points · seven spotlight picks: up to 140.
+              Exact full table: 100 points · spotlight accuracy stays separate.
             </p>
           </CardContent>
         </Card>

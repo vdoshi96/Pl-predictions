@@ -1,4 +1,4 @@
-import { Clock3, EyeOff, Medal, Trophy, Users } from "lucide-react";
+import { Clock3, EyeOff, Medal, Sparkles, Trophy, Users } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
 
@@ -6,13 +6,11 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { ChampionPick } from "@/features/leaderboard/champion-pick";
 import { LeaderboardEntryLink } from "@/features/leaderboard/entry-link";
-import { LeaderboardDemo } from "@/features/leaderboard/leaderboard-demo";
 import { getLeaderboardView } from "@/features/leaderboard/queries";
-import { SpotlightPickGrid } from "@/features/leaderboard/spotlight-pick-grid";
 import { getActiveSeasonView } from "@/features/seasons/queries";
 import { formatUtcDateTime } from "@/shared/format";
 
-export const metadata: Metadata = { title: "Leaderboard" };
+export const metadata: Metadata = { title: "Table leaderboard" };
 export const dynamic = "force-dynamic";
 
 export default async function LeaderboardPage() {
@@ -30,6 +28,9 @@ export default async function LeaderboardPage() {
             <Badge className="bg-accent text-brand ring-accent">
               {season.name}
             </Badge>
+            <Badge className="bg-white/15 text-white ring-white/20">
+              100-point table
+            </Badge>
             {view.snapshot ? (
               <Badge variant={view.snapshot.isFinal ? "accent" : "warning"}>
                 {view.snapshot.isFinal ? "Final" : "Provisional"}
@@ -46,13 +47,13 @@ export default async function LeaderboardPage() {
                 Dranx Prediction League
               </h1>
               <p className="mt-2 max-w-2xl text-sm leading-6 text-white/75 sm:text-base">
-                Table scores are recalculated from the latest valid standings.
-                Seven spotlight picks join the total as their reviewed result
-                rankings become available.
+                The table leaderboard is recalculated from the latest valid
+                standings and always stays within 100 points. Spotlight picks
+                have a separate just-for-fun accuracy table.
               </p>
             </div>
           </div>
-          <div className="mt-6 flex flex-wrap gap-3 text-xs font-semibold text-white/75">
+          <div className="mt-6 flex flex-wrap items-center gap-3 text-xs font-semibold text-white/75">
             <span className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-2">
               <Users aria-hidden="true" className="text-accent size-4" />
               {view.entries.length}{" "}
@@ -72,6 +73,13 @@ export default async function LeaderboardPage() {
                 Matchweek {view.snapshot.matchweek}
               </span>
             ) : null}
+            <Link
+              className="bg-accent text-brand hover:bg-accent-yellow inline-flex min-h-10 items-center gap-2 rounded-xl px-3 font-black transition-colors"
+              href="/spotlight"
+            >
+              <Sparkles aria-hidden="true" className="size-4" />
+              View spotlight accuracy
+            </Link>
           </div>
         </section>
 
@@ -86,10 +94,10 @@ export default async function LeaderboardPage() {
                   Full tables are still private
                 </h2>
                 <p className="mt-1 text-sm leading-6 text-slate-600">
-                  Everyone is on 0 points, and only each predicted champion is
-                  public now. The other 19 positions and all seven spotlight
-                  picks stay private until the opening kickoff, a manual lock,
-                  or an early reveal by the owner.
+                  Everyone is on 0 table points, and only each predicted
+                  champion is public now. The other 19 positions and all seven
+                  spotlight picks stay private until the opening kickoff, a
+                  manual lock, or an early reveal by the owner.
                 </p>
               </div>
             </CardContent>
@@ -108,15 +116,13 @@ export default async function LeaderboardPage() {
                 </h2>
                 <p className="mt-1 text-sm leading-6 text-slate-600">
                   {view.seasonStarted
-                    ? "Scores will recalculate as soon as a meaningful standings snapshot is active."
+                    ? "Table scores will recalculate as soon as a meaningful standings snapshot is active."
                     : "Only predicted champions are shown until Arsenal v Coventry kicks off."}
                 </p>
               </div>
             </CardContent>
           </Card>
         ) : null}
-
-        <LeaderboardDemo />
 
         {view.entries.length === 0 ? (
           <Card>
@@ -159,8 +165,7 @@ export default async function LeaderboardPage() {
                       {formatUtcDateTime(entry.createdAt)}
                     </span>
                     <span className="mt-1 block text-xs font-semibold text-slate-600">
-                      {entry.tableScore} table · {entry.spotlightScore}{" "}
-                      spotlight
+                      Table score · maximum 100
                     </span>
                   </div>
                   <div className="text-right">
@@ -168,7 +173,7 @@ export default async function LeaderboardPage() {
                       {entry.totalScore}
                     </strong>
                     <span className="text-[0.68rem] font-bold tracking-wide text-slate-500 uppercase">
-                      points
+                      table points
                     </span>
                   </div>
                   <div className="col-span-3 grid min-w-0 gap-2 sm:col-span-2 sm:col-start-2 sm:grid-cols-[minmax(0,1fr)_18rem]">
@@ -200,24 +205,6 @@ export default async function LeaderboardPage() {
                       </div>
                     </dl>
                   </div>
-                  {entry.spotlightPicks.length > 0 ? (
-                    <details className="border-border col-span-3 rounded-xl border bg-white sm:col-span-2 sm:col-start-2">
-                      <summary className="text-brand focus-visible:ring-accent-blue flex min-h-12 cursor-pointer list-none items-center px-3 text-sm font-black outline-none focus-visible:ring-2">
-                        View 7 spotlight picks ·{" "}
-                        {
-                          entry.spotlightPicks.filter(
-                            (pick) =>
-                              pick.points !== null && pick.points !== undefined,
-                          ).length
-                        }{" "}
-                        scored
-                      </summary>
-                      <SpotlightPickGrid
-                        className="border-border border-t p-3"
-                        picks={entry.spotlightPicks}
-                      />
-                    </details>
-                  ) : null}
                 </CardContent>
               </Card>
             ))}
@@ -258,17 +245,6 @@ export default async function LeaderboardPage() {
                       table points
                     </span>
                   </div>
-                  {entry.spotlightPicks && entry.spotlightPicks.length > 0 ? (
-                    <details className="border-border col-span-2 rounded-xl border bg-white sm:col-span-3">
-                      <summary className="text-brand focus-visible:ring-accent-blue flex min-h-12 cursor-pointer list-none items-center px-3 text-sm font-black outline-none focus-visible:ring-2">
-                        View 7 spotlight picks · results pending
-                      </summary>
-                      <SpotlightPickGrid
-                        className="border-border border-t p-3"
-                        picks={entry.spotlightPicks}
-                      />
-                    </details>
-                  ) : null}
                 </CardContent>
               </Card>
             ))}

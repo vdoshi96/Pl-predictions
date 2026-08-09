@@ -101,13 +101,18 @@ describe("shared leaderboard ranks", () => {
 });
 
 describe("spotlight category scoring", () => {
-  it("converts an occupied category rank into descending points", () => {
-    expect(scoreCategoryRank(1)).toBe(20);
-    expect(scoreCategoryRank(2)).toBe(19);
-    expect(scoreCategoryRank(20)).toBe(1);
-    expect(scoreCategoryRank(21)).toBe(0);
-    expect(() => scoreCategoryRank(0)).toThrow(RangeError);
-    expect(() => scoreCategoryRank(1.5)).toThrow(RangeError);
+  it("uses the active bracket count to score an occupied outcome rank", () => {
+    expect(scoreCategoryRank(1, 12)).toBe(12);
+    expect(scoreCategoryRank(2, 12)).toBe(11);
+    expect(scoreCategoryRank(12, 12)).toBe(1);
+    expect(scoreCategoryRank(13, 12)).toBe(0);
+  });
+
+  it("requires positive integer outcome ranks and bracket counts", () => {
+    expect(() => scoreCategoryRank(0, 12)).toThrow(RangeError);
+    expect(() => scoreCategoryRank(1.5, 12)).toThrow(RangeError);
+    expect(() => scoreCategoryRank(1, 0)).toThrow(RangeError);
+    expect(() => scoreCategoryRank(1, 12.5)).toThrow(RangeError);
   });
 
   it("uses actual position minus the group's average prediction for overrated clubs", () => {

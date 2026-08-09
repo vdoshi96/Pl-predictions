@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="canonical-source" content="LOG.md" />
-    <meta name="canonical-source-sha256" content="8d91d40f34088454c2147b41ce1db8760ef5db2c0cae152285fcecc244d6d585" />
+    <meta name="canonical-source-sha256" content="86d1f497f4fde942803e789b3b3817ecdf7539a411137787e6ed26a333019a76" />
     <title>Session log</title>
     <style>
       :root { color-scheme: light dark; font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
@@ -178,8 +178,16 @@
 <li>Kept this presentation-only release read-only in production. No prediction, standings, administrator, schema, seed, or other production-data write ran.</li>
 <li>Audited the GitHub default-branch blocker. The repository account has administrator access, but the active fine-grained token lacks repository Administration permission. Changing the default branch to <code>main</code> requires Administration read and write for this repository; branch deletion also requires Contents read and write.</li>
 </ul>
+<h3>2026-08-08: GitHub default-branch closeout (complete)</h3>
+<ul>
+<li>Task: finish the repository-default and legacy-branch cleanup after the owner updated the fine-grained token permissions.</li>
+<li>Outcome: changed the GitHub default branch from <code>agent/build-pl-predictions</code> to <code>main</code>, then deleted the fully merged legacy remote branch.</li>
+<li>Files changed: current status and this durable log, plus their generated HTML peers.</li>
+<li>Verification: GitHub read-back reports default branch <code>main</code> and account role <code>ADMIN</code>; the legacy branch has no remote ref; local <code>origin/HEAD</code> resolves to <code>origin/main</code>; local <code>HEAD</code> and <code>origin/main</code> match at <code>8c7f65b8dc911b2ea3b4110699009dbf9fb3c948</code> before this documentation-only closeout.</li>
+<li>Next handoff: use <code>main</code> as the base for future pull requests. No GitHub access blocker remains for the current repository workflow.</li>
+</ul>
 
-      <p class="source">Generated deterministically from <a href="LOG.md">docs/context/LOG.md</a>. Canonical SHA-256: <code>8d91d40f34088454c2147b41ce1db8760ef5db2c0cae152285fcecc244d6d585</code>.</p>
+      <p class="source">Generated deterministically from <a href="LOG.md">docs/context/LOG.md</a>. Canonical SHA-256: <code>86d1f497f4fde942803e789b3b3817ecdf7539a411137787e6ed26a333019a76</code>.</p>
     </main>
   </body>
 </html>

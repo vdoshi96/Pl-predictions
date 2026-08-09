@@ -139,3 +139,11 @@
 - Refreshed and visually inspected the newest 390-by-844 prediction, review, spotlight-accuracy, and administrator-login screenshots. Exact-deployment queries found no error logs or HTTP 500 records in the preceding 30 minutes.
 - Kept this presentation-only release read-only in production. No prediction, standings, administrator, schema, seed, or other production-data write ran.
 - Audited the GitHub default-branch blocker. The repository account has administrator access, but the active fine-grained token lacks repository Administration permission. Changing the default branch to `main` requires Administration read and write for this repository; branch deletion also requires Contents read and write.
+
+### 2026-08-08: GitHub default-branch closeout (complete)
+
+- Task: finish the repository-default and legacy-branch cleanup after the owner updated the fine-grained token permissions.
+- Outcome: changed the GitHub default branch from `agent/build-pl-predictions` to `main`, then deleted the fully merged legacy remote branch.
+- Files changed: current status and this durable log, plus their generated HTML peers.
+- Verification: GitHub read-back reports default branch `main` and account role `ADMIN`; the legacy branch has no remote ref; local `origin/HEAD` resolves to `origin/main`; local `HEAD` and `origin/main` match at `8c7f65b8dc911b2ea3b4110699009dbf9fb3c948` before this documentation-only closeout.
+- Next handoff: use `main` as the base for future pull requests. No GitHub access blocker remains for the current repository workflow.

@@ -309,17 +309,39 @@ test("production public routes are mobile-safe and healthy", async ({
   await expect(
     leaderboardDemo.getByText("Demo only", { exact: true }),
   ).toBeVisible();
+  const demoAlex = leaderboardDemo.getByLabel(
+    "Demo Alex demo leaderboard entry",
+  );
+  const demoAlexDetails = demoAlex.locator("details");
+  if (
+    !(await demoAlexDetails.evaluate(
+      (element) => element instanceof HTMLDetailsElement && element.open,
+    ))
+  ) {
+    await demoAlex
+      .getByText("View seven scored picks", { exact: true })
+      .click();
+  }
+  await expect(demoAlexDetails).toHaveJSProperty("open", true);
   await expectPlayerPortraitLoaded(
-    leaderboardDemo.getByRole("img", {
+    demoAlex.getByRole("img", {
       name: "Erling Haaland player portrait",
     }),
   );
   const demoJordan = leaderboardDemo.getByLabel(
     "Demo Jordan demo leaderboard entry",
   );
-  await demoJordan
-    .getByText("View seven scored picks", { exact: true })
-    .click();
+  const demoJordanDetails = demoJordan.locator("details");
+  if (
+    !(await demoJordanDetails.evaluate(
+      (element) => element instanceof HTMLDetailsElement && element.open,
+    ))
+  ) {
+    await demoJordan
+      .getByText("View seven scored picks", { exact: true })
+      .click();
+  }
+  await expect(demoJordanDetails).toHaveJSProperty("open", true);
   const demoSilhouette = demoJordan.getByRole("img", {
     name: "Alysson player portrait",
   });

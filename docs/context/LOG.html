@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="canonical-source" content="LOG.md" />
-    <meta name="canonical-source-sha256" content="12fae27ec90eac349a07b020fff6a2485e26d7d0b186a8f34cc45aa42a3122c0" />
+    <meta name="canonical-source-sha256" content="704b39ebd5a021203880dcc55b91dca02be3e3ca916a56234d89a25c9b161ce5" />
     <title>Session log</title>
     <style>
       :root { color-scheme: light dark; font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
@@ -140,7 +140,7 @@
 <li>Diagnosed the first final aggregate rerun&#39;s WebKit timeout as a five-second UI wait expiring while the standings save still completed. Removed the exact isolated snapshot, two import runs, and two audit rows left by that attempt/retry, restored the season pointer/watermark, expanded only that server-action wait to 20 seconds, and passed both a 13.3-second targeted WebKit rerun and the clean complete aggregate chain. Final test-database verification found zero snapshots, runs, audits, or <code>Mobile QA</code> predictions.</li>
 <li>Regenerated and checked every HTML peer, published the evidence-only closeout through canonical <code>main</code>, synchronized local and remote <code>main</code>, removed completed badge branch/worktree state, and retained only the primary worktree. The final closeout merge SHA is intentionally not pinned in this durable end-state note.</li>
 </ul>
-<h3>Spotlight predictions and reviewed player-catalogue iteration (release verification in progress)</h3>
+<h3>Spotlight predictions and reviewed player-catalogue iteration (complete; owner controls pending)</h3>
 <ul>
 <li>Expanded the participant journey from one table screen into an immutable three-stage flow: order all 20 clubs and enter a display name, choose seven spotlight predictions, then review the complete entry before one atomic submission.</li>
 <li>Added top scorer, top assister, most clean sheets, underdog team, overrated team, underdog player, and overrated player. The four player categories use keyboard-accessible searchable selectors plus Other-player text input; most clean sheets and both team-opinion categories select clubs through the existing crest catalogue.</li>
@@ -158,12 +158,15 @@
 <li>Corrected the two production-smoke harness boundaries, then passed all 5 read-only projects across desktop Chromium, 390-pixel mobile Chromium, exact 320/430-pixel Chromium reflow, and mobile WebKit. The run covered the three-stage preview, seven completed picks, explicit portrait/silhouette assertions, visible leaderboard demo, rules, administrator login, no overflow, and browser/network error guards.</li>
 <li>Hardened and passed the explicitly gated one-case production write smoke: production mode accepts only <code>PLAYWRIGHT_ADMIN_PASSWORD</code>, disables screenshot/trace/video artifacts, uses the list reporter, and retained only <code>.last-run.json</code>. The run submitted one unique complete entry, proved its receipt-only privacy, authenticated through the owner login, exact-deleted it, verified the deletion audit, and removed the QA audit during teardown. Final queries again found zero prediction parents, table items, spotlight picks, or deletion-audit residue.</li>
 <li>Refreshed and visually inspected the newest four 390-by-844 production screenshots: table entry, complete review with player imagery and Other fallback, the visible spotlight leaderboard demonstration, and username/password administrator sign-in.</li>
-<li>Confirmed the configured username and PBKDF2 hash through the production login. Removed the legacy <code>ADMIN_SECRET</code> name from Vercel production, preview, and development environment inventories, while recording that a subsequent deployment and bounded login verification are still required before the running revision is described as legacy-free.</li>
-<li>Left the administrator-login WAF in its live log-only state for verification; it observed exactly one intended <code>POST</code>. Prepared a per-IP rate limit of 10 requests per 60 seconds with HTTP 429 on excess requests, but did not publish it because owner publication remains required. The staged rule is not live.</li>
-<li>Began the evidence-only closeout on <code>release/spotlight-closeout</code>. HTML regeneration, publication, post-secret-removal deployment proof, WAF publication, local <code>main</code> synchronization, and completed-worktree cleanup remain open; this entry does not claim a final closeout merge.</li>
+<li>Confirmed the configured username and PBKDF2 hash through the production login, removed <code>ADMIN_SECRET</code> from production, preview, and development inventories, and merged hardened closeout <a href="https://github.com/vdoshi96/Pl-predictions/pull/8">PR #8</a> at <code>a9d1c12c804ff34db48450ff2e57bded64710022</code>.</li>
+<li>Verified Ready post-removal deployment <code>dpl_HT2uPdP5iJPaWuYtNFEknroRmTqG</code> at <a href="https://pl-predictions-dixkq8ma0-vdoshi96s-projects.vercel.app">https://pl-predictions-dixkq8ma0-vdoshi96s-projects.vercel.app</a>. Its metadata contains <code>ADMIN_USERNAME</code> and <code>ADMIN_PASSWORD_HASH</code>, excludes <code>ADMIN_SECRET</code>, identifies exact SHA <code>a9d1c12c804ff34db48450ff2e57bded64710022</code>, and the stable alias points to it.</li>
+<li>Diagnosed a final smoke-only accessibility boundary: rank-two Haaland content begins inside a closed details element, while rank-one Jordan begins open. The harness now keeps both details open before requiring the real Haaland portrait to decode and the Alysson fallback to render as a silhouette. The corrected final run passed all 5 browser projects.</li>
+<li>Passed the hardened bounded write smoke against the same hash-only deployment. It causally matched the app-created UUID to the configured production database, authenticated without the legacy fallback, deleted the exact 20-plus-7 entry, and left zero prediction, table-item, category-pick, or deletion-audit residue while retaining no credential-bearing browser artifacts.</li>
+<li>Left the administrator-login WAF in its live log-only state for verification; the final metrics query recorded exactly four intended bounded-login <code>POST</code> requests. Prepared a per-IP rate limit of 10 requests per 60 seconds with HTTP 429 on excess requests, but did not publish it because owner publication remains required. The staged rule is not live.</li>
+<li>Regenerated and checked all HTML peers, published the final evidence through working <code>main</code>, synchronized local and remote <code>main</code>, removed completed branch state, and retained one primary worktree. The self-referential final evidence merge SHA is intentionally not pinned in this durable end-state note.</li>
 </ul>
 
-      <p class="source">Generated deterministically from <a href="LOG.md">docs/context/LOG.md</a>. Canonical SHA-256: <code>12fae27ec90eac349a07b020fff6a2485e26d7d0b186a8f34cc45aa42a3122c0</code>.</p>
+      <p class="source">Generated deterministically from <a href="LOG.md">docs/context/LOG.md</a>. Canonical SHA-256: <code>704b39ebd5a021203880dcc55b91dca02be3e3ca916a56234d89a25c9b161ce5</code>.</p>
     </main>
   </body>
 </html>

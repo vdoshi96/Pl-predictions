@@ -1,5 +1,15 @@
 # Decisions
 
+## 2026-08-08: Complete-entry test data, fixture retirement, and deadline countdown
+
+Remove the hard-coded Alex/Jordan spotlight presentation cards. Read-only live-page and production-database checks proved they were component fixtures, not prediction parents or partial stage-two writes, so no production deletion is warranted. The public spotlight page must derive its bracket count and, after reveal, every displayed pick and accuracy result from complete persisted submissions only.
+
+Create the retained `Dranx Test Entry` through the same public three-stage flow used by a participant. Treat it as product test data, not a seed or demo shortcut. Verification must find one parent, exactly 20 ordered table rows, and exactly seven category-pick rows. Before reveal, the main leaderboard may show its permitted participant/champion projection and `/spotlight` may count the bracket, but neither route may expose its spotlight subjects, private table positions, or prediction identifier.
+
+Show a compact days/hours/minutes/seconds calendar-flip countdown beside the server-derived open-submissions status. Calculate the initial remaining duration from PostgreSQL time and the effective deadline, then advance that duration with a monotonic client timer so a participant's device clock cannot move the display. Refresh the server page at zero. The countdown is informational; only the post-lock PostgreSQL `clock_timestamp()` check can authorize or reject a submission.
+
+Use three 390 × 844 captures from the live mobile flow for the public how-to section. Keep each screenshot's numbered overlay pins synchronized with adjacent text callouts so the instructions remain understandable to screen-reader users and without relying on colour alone.
+
 ## 2026-08-08: Owner-provided player snapshot import
 
 Use the owner's dated `premier-league-players-2026-08-08/` handoff as the local selector snapshot for the 2026/27 season. Import all 587 players across the application's 20 clubs, copy the 580 supplied portraits to `/player-faces/`, and deliberately show the `PlayerMark` silhouette for the seven players without a supplied image. Keep Other player available for unavailable or newly added players instead of inventing a catalogue row or portrait.
@@ -26,7 +36,7 @@ This earlier implementation rule used the mutually exclusive 5–3–1–0 table
 
 Define underdog-team index as `average predicted position - actual position` and overrated-team index as `actual position - average predicted position`; rank the largest value first using unrounded precision. An average prediction of 2.4 and actual position 10 therefore produces -7.6 underdog and +7.6 overrated. Top scorer, top assister, and most clean sheets use reviewed result-list positions. Underdog player ranks reviewed FotMob average season ratings descending, while overrated player ranks them ascending.
 
-The metric definition does not authorize data acquisition. The deployed application must not contact or scrape FotMob. Team expectation outcomes may derive from submitted tables and the active standings, but the other five categories remain pending until a permitted, reviewed source-neutral outcome and custom-name reconciliation path exists. Pending means unavailable, not an incorrect zero-point result. The visible leaderboard test run is hard-coded presentation evidence only and never enters stored standings, predictions, or real totals.
+The metric definition does not authorize data acquisition. The deployed application must not contact or scrape FotMob. Team expectation outcomes may derive from submitted tables and the active standings, but the other five categories remain pending until a permitted, reviewed source-neutral outcome and custom-name reconciliation path exists. Pending means unavailable, not an incorrect zero-point result. The then-visible leaderboard test run was hard-coded presentation evidence only and never entered stored standings, predictions, or real totals; the later complete-entry decision above retires that fixture.
 
 ## 2026-08-08: Spotlight privacy, PBKDF2 admin login, and cascade deletion
 

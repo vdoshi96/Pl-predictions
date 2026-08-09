@@ -13,8 +13,9 @@ import Link from "next/link";
 
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
+import { HowToPlay } from "@/components/how-to-play";
 
-export const metadata: Metadata = { title: "Rules" };
+export const metadata: Metadata = { title: "How to play & scoring" };
 
 const tableRules = [
   { label: "Exact finishing position", points: 5 },
@@ -66,17 +67,18 @@ export default function RulesPage() {
             />
             <div>
               <h1 className="text-3xl font-black tracking-tight sm:text-4xl">
-                Rules and scoring
+                How to play & scoring
               </h1>
               <p className="mt-2 max-w-2xl text-sm leading-6 text-white/75 sm:text-base">
-                One immutable entry contains a full 1–20 table and seven
-                spotlight picks. The main leaderboard is table-only with a
-                100-point maximum. Spotlight accuracy is a separate just-for-fun
-                table.
+                Follow the three mobile steps to submit one immutable entry:
+                your full 1–20 table, all seven spotlight picks, and a final
+                review. Table and spotlight scoring stay separate.
               </p>
             </div>
           </div>
         </section>
+
+        <HowToPlay />
 
         <Card>
           <CardContent>
@@ -224,9 +226,9 @@ export default function RulesPage() {
                 tables and active standings. The player roster and available
                 portraits are loaded. An owner-run Codex automation will
                 manually enter the other five outcome lists when they are ready;
-                there is no runtime football-data request, scraper, or cron. The
-                spotlight test run is illustrative only and never affects the
-                real table leaderboard.
+                there is no runtime football-data request, scraper, or cron.
+                Only complete submitted entries can appear in the active bracket
+                count.
               </p>
             </div>
           </CardContent>

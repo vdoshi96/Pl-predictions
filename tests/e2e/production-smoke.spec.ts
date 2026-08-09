@@ -176,6 +176,11 @@ test("production public routes are mobile-safe and healthy", async ({
   await expectNoHorizontalOverflow(page);
 
   if (await participantName.isEnabled()) {
+    const countdown = page.getByRole("timer", {
+      name: /until submissions lock$/u,
+    });
+    await expect(countdown).toBeVisible();
+    await expect(countdown.locator(".countdown-flip")).toHaveCount(4);
     await participantName.fill("Production review preview");
     await expect(participantName).toHaveValue("Production review preview");
     await expect(continueButton).toBeEnabled();
@@ -247,6 +252,15 @@ test("production public routes are mobile-safe and healthy", async ({
 
     await continueButton.click();
     await completeSpotlightPicks(page, "Production Preview");
+    if (captureMobileEvidence) {
+      await page
+        .getByRole("heading", { name: "Make your spotlight picks" })
+        .scrollIntoViewIfNeeded();
+      await page.screenshot({
+        animations: "disabled",
+        path: path.join(screenshotDirectory!, "spotlight-picks-mobile.png"),
+      });
+    }
     await page.getByRole("button", { name: "Review all predictions" }).click();
     const reviewDialog = page.getByRole("dialog", {
       name: "Review every prediction",
@@ -297,6 +311,7 @@ test("production public routes are mobile-safe and healthy", async ({
     ).toBeVisible();
     await expect(participantName).toBeDisabled();
     await expect(continueButton).toBeDisabled();
+    await expect(page.getByRole("timer")).toHaveCount(0);
     if (captureMobileEvidence) {
       await page.screenshot({
         path: path.join(screenshotDirectory!, "prediction-mobile.png"),
@@ -330,74 +345,57 @@ test("production public routes are mobile-safe and healthy", async ({
       name: "Spotlight picks are still private",
     }),
   ).toBeVisible();
-  const spotlightDemo = page.getByRole("region", {
-    name: "Spotlight accuracy test run",
-  });
-  await expect(spotlightDemo).toBeVisible();
   await expect(
-    spotlightDemo.getByText("Demo only", { exact: true }),
-  ).toBeVisible();
-  const demoAlex = spotlightDemo.getByLabel("Demo Alex demo accuracy entry");
-  const demoAlexDetails = demoAlex.locator("details");
-  if (
-    !(await demoAlexDetails.evaluate(
-      (element) => element instanceof HTMLDetailsElement && element.open,
-    ))
-  ) {
-    await demoAlex
-      .getByText("View seven ranked picks", { exact: true })
-      .click();
-  }
-  await expect(demoAlexDetails).toHaveJSProperty("open", true);
-  const demoJordan = spotlightDemo.getByLabel(
-    "Demo Jordan demo accuracy entry",
+    page.getByRole("region", { name: "Spotlight accuracy test run" }),
+  ).toHaveCount(0);
+  await expect(page.getByText("Demo Alex", { exact: true })).toHaveCount(0);
+  await expect(page.getByText("Demo Jordan", { exact: true })).toHaveCount(0);
+  await expect(page.getByLabel("Spotlight accuracy leaderboard")).toHaveCount(
+    0,
   );
-  const demoJordanDetails = demoJordan.locator("details");
-  if (
-    !(await demoJordanDetails.evaluate(
-      (element) => element instanceof HTMLDetailsElement && element.open,
-    ))
-  ) {
-    await demoJordan
-      .getByText("View seven ranked picks", { exact: true })
-      .click();
-  }
-  await expect(demoJordanDetails).toHaveJSProperty("open", true);
-  for (const playerName of [
-    "Erling Haaland",
-    "Bruno Fernandes",
-    "Chris Rigg",
-    "Mykhaylo Mudryk",
-    "Alexander Isak",
-    "Florian Wirtz",
-    "Bukayo Saka",
-  ]) {
-    await expectPlayerPortraitLoaded(
-      spotlightDemo.getByRole("img", {
-        name: `${playerName} player portrait`,
-      }),
-    );
-  }
-  const demoSilhouette = demoJordan.getByRole("img", {
-    name: "Alysson player portrait",
-  });
-  await expect(demoSilhouette.locator("img")).toHaveCount(0);
-  await expect(demoSilhouette.locator("svg")).toBeVisible();
+  await expect(page.getByText(/^\d+ active brackets?$/u)).toBeVisible();
   await expectNoHorizontalOverflow(page);
   if (captureMobileEvidence) {
     await page
-      .getByRole("heading", { name: "Spotlight accuracy test run" })
+      .getByRole("heading", { name: "Spotlight picks are still private" })
       .scrollIntoViewIfNeeded();
     await page.screenshot({
-      path: path.join(screenshotDirectory!, "leaderboard-mobile.png"),
+      animations: "disabled",
+      path: path.join(screenshotDirectory!, "spotlight-mobile.png"),
     });
   }
 
   await page.goto("/rules");
   await expect(
-    page.getByRole("heading", { level: 1, name: "Rules and scoring" }),
+    page.getByRole("heading", { level: 1, name: "How to play & scoring" }),
   ).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: "How to play in three steps" }),
+  ).toBeVisible();
+  const walkthroughScreenshots = page.getByRole("img", {
+    name: /Mobile .* screen/u,
+  });
+  await expect(walkthroughScreenshots).toHaveCount(3);
+  for (const screenshot of await walkthroughScreenshots.all()) {
+    await screenshot.scrollIntoViewIfNeeded();
+    await expect
+      .poll(() =>
+        screenshot.evaluate(
+          (image) =>
+            image instanceof HTMLImageElement &&
+            image.complete &&
+            image.naturalWidth > 0,
+        ),
+      )
+      .toBe(true);
+  }
   await expectNoHorizontalOverflow(page);
+  if (captureMobileEvidence) {
+    await page.locator("#how-to-play").screenshot({
+      animations: "disabled",
+      path: path.join(screenshotDirectory!, "how-to-mobile.png"),
+    });
+  }
 
   await page.goto("/admin/login");
   await expect(

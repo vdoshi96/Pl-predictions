@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="canonical-source" content="ARCHITECTURE.md" />
-    <meta name="canonical-source-sha256" content="e304be12391d106314ddd17a7f56fb90b986db8edd3f3baba78c3538c2995fc0" />
+    <meta name="canonical-source-sha256" content="61e1ec1a6f60928cfa930faced3502ef6c552acde45348a57353e88fe58f9ae3" />
     <title>Architecture</title>
     <style>
       :root { color-scheme: light dark; font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
@@ -76,9 +76,9 @@ Next.js server components/actions                           |
 <ul>
 <li><code>/</code> — three-stage table, spotlight, and review flow or the server-derived closed state.</li>
 <li><code>/leaderboard</code> — 0-point champion-pick cards before reveal and a shared-rank table-only leaderboard afterward. The maximum is 100 points.</li>
-<li><code>/spotlight</code> — a separate fun-accuracy leaderboard with overall and category sorts. It also contains the labelled, non-persisted test run.</li>
+<li><code>/spotlight</code> — a separate fun-accuracy leaderboard with overall and category sorts. Before reveal it exposes only the number of complete brackets, not their picks or hidden ordering.</li>
 <li><code>/entries/[id]</code> — receipt/admin-authorized private confirmation before reveal; public comparison afterward.</li>
-<li><code>/rules</code> — table tiers, spotlight rank rules, team formulas, privacy, and pending-data explanation.</li>
+<li><code>/rules</code> — an annotated three-screen live-mobile walkthrough followed by table tiers, spotlight rank rules, team formulas, privacy, and pending-data explanation.</li>
 <li><code>/admin/login</code> — owner credential handoff.</li>
 <li><code>/admin</code> — season and latest-import overview.</li>
 <li><code>/admin/submissions</code> — view and delete erroneous entries.</li>
@@ -88,7 +88,8 @@ Next.js server components/actions                           |
 <li><code>/api/health</code> — shallow non-secret health response.</li>
 </ul>
 <h2>Mobile-first presentation</h2>
-<p>The prediction and manual standings experiences share the same accessible sorter. A 56 by 56 pixel handle is the only element with <code>touch-action: none</code>, preserving page scrolling on touch devices. Pointer drag and direct Arrow Up/Arrow Down movement both update position immediately and announce the result through an assertive live region. Rows remain single-column without horizontal overflow, display the top/bottom-half boundary, wrap long names on narrow screens, and use explicit focus rings. The spotlight stage uses keyboard-operable combobox/listbox controls with name filtering, visible selection state, and a focused free-text input after Other player is chosen. The submission action is reachable above safe-area insets, and reduced-motion preferences disable nonessential transitions.</p>
+<p>The prediction and manual standings experiences share the same accessible sorter. A 56 by 56 pixel handle is the only element with <code>touch-action: none</code>, preserving page scrolling on touch devices. Pointer drag and direct Arrow Up/Arrow Down movement both update position immediately and announce the result through an assertive live region. Rows remain single-column without horizontal overflow, display the top/bottom-half boundary, wrap long names on narrow screens, and use explicit focus rings. The spotlight stage uses keyboard-operable combobox/listbox controls with name filtering, visible selection state, and a focused free-text input after Other player is chosen. The submission action is reachable above safe-area insets, and reduced-motion preferences disable nonessential transitions. The rules walkthrough renders three live-site 390 × 844 captures as snap-scrolling cards on phones and a three-column grid on wide screens. CSS overlay pins and adjacent numbered text carry the same annotation semantics.</p>
+<p>The open-submissions panel includes a compact days/hours/minutes/seconds calendar-flip countdown. Its initial duration is calculated on the server from the database wall clock and effective deadline. The client advances that duration from monotonic <code>performance.now()</code> rather than trusting the participant device clock, then refreshes the server page once at zero. This display never authorizes a write; the database-locking cutoff in the prediction write path remains authoritative.</p>
 <p>Leaderboard and comparison data use mobile cards before expanding into denser desktop layouts. The administrator navigation becomes a full-width two-column grid at narrow widths without forcing the primary page or prediction list to overflow.</p>
 <h2>Prediction write path</h2>
 <ol>
@@ -131,7 +132,7 @@ Next.js server components/actions                           |
 <li>Underdog player ranks reviewed FotMob average season ratings descending; overrated player ranks them ascending. This defines the intended metric, not permission for runtime or automated FotMob access.</li>
 </ul>
 <p>Scoring cannot activate before the verified opening kickoff. The active table must also have an observation at or after kickoff. A preseason table cannot receive points only because the clock crossed kickoff. All-zero played-games tables remain inactive. Underdog-team and overrated-team ranks use the active table and all remaining submissions. A future owner-run Codex automation will enter the five other reviewed outcomes manually. Missing outcomes display as pending. They are not incorrect zero-point answers.</p>
-<p>Before activation, each table-leaderboard card shows 0 and its predicted champion. When scoring is active, cards show table points and the champion&#39;s actual position. Entries sort by table points only. Equal totals share a competition rank. The separate spotlight page sorts by overall available accuracy or one category. Category sorts use outcome rank from low to high, put pending entries last, and use participant name for deterministic ties. Its test run is an in-memory illustration and never uses prediction storage.</p>
+<p>Before activation, each table-leaderboard card shows 0 and its predicted champion. When scoring is active, cards show table points and the champion&#39;s actual position. Entries sort by table points only. Equal totals share a competition rank. The separate spotlight page sorts by overall available accuracy or one category. Category sorts use outcome rank from low to high, put pending entries last, and use participant name for deterministic ties. Only atomic 20-position-plus-seven-pick submissions contribute to its bracket count or accuracy view; the retired Alex/Jordan cards were code fixtures and never prediction rows.</p>
 <h2>Database model and invariants</h2>
 <ul>
 <li><code>seasons</code> stores the code-selected season, persisted opening kickoff, optional earlier owner deadline, fairness settings, active/final pointers, and the monotonic accepted-capture watermark.</li>
@@ -165,7 +166,7 @@ Next.js server components/actions                           |
 <li>Manual standings remain available when external acquisition is unavailable.</li>
 </ul>
 
-      <p class="source">Generated deterministically from <a href="ARCHITECTURE.md">docs/ARCHITECTURE.md</a>. Canonical SHA-256: <code>e304be12391d106314ddd17a7f56fb90b986db8edd3f3baba78c3538c2995fc0</code>.</p>
+      <p class="source">Generated deterministically from <a href="ARCHITECTURE.md">docs/ARCHITECTURE.md</a>. Canonical SHA-256: <code>61e1ec1a6f60928cfa930faced3502ef6c552acde45348a57353e88fe58f9ae3</code>.</p>
     </main>
   </body>
 </html>

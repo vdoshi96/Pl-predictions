@@ -672,10 +672,9 @@ describe("shared site chrome", () => {
       "href",
       "/spotlight",
     );
-    expect(screen.getByRole("link", { name: /^rules$/i })).toHaveAttribute(
-      "href",
-      "/rules",
-    );
+    expect(
+      screen.getByRole("link", { name: /^how to play$/i }),
+    ).toHaveAttribute("href", "/rules");
     expect(screen.getByText("2026/27 Premier League")).toBeVisible();
     expect(screen.getByText("Dranx Prediction League")).toBeVisible();
 

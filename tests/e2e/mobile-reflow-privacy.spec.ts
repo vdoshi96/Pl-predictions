@@ -69,7 +69,25 @@ test("320–430px reflow keeps private identifiers out of HTML and RSC", async (
   expect(participantName).toHaveLength(40);
 
   await page.goto("/", { waitUntil: "networkidle" });
+  await expect(
+    page.getByRole("timer", { name: /until submissions lock$/u }),
+  ).toBeVisible();
+  await expect(page.locator(".countdown-flip")).toHaveCount(4);
+  await expect(
+    page.getByRole("link", { name: "How to play", exact: true }),
+  ).toBeVisible();
   await expectNoHorizontalOverflow(page);
+
+  await page.goto("/rules", { waitUntil: "networkidle" });
+  await expect(
+    page.getByRole("heading", { name: "How to play in three steps" }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("img", { name: /Mobile .* screen/u }),
+  ).toHaveCount(3);
+  await expectNoHorizontalOverflow(page);
+
+  await page.goto("/", { waitUntil: "networkidle" });
   await page
     .getByRole("textbox", { name: "Your display name" })
     .fill(participantName);

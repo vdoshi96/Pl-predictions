@@ -12,6 +12,7 @@ Checked on 2026-08-08.
 - Current identity direction: user-facing name **Dranx Prediction League**; Premier-League-inspired palette using official purple `#37003c` with cyan `#05f0ff`, green `#00ff87`, and pink `#ff2882` accents; original Dranx mark; operational `pl-predictions` identifiers unchanged.
 - Current club-asset direction: the project owner supplied a folder containing one transparent PNG badge for each of the 20 verified clubs and explicitly directed their use. The same folder's Premier League logo/lion/ball/composite files are outside that team-mark replacement and are not used.
 - Current player-asset direction: the project owner added `premier-league-players-2026-08-08/` and explicitly directed use of its roster and available portraits in the selectors, with a silhouette when no portrait was supplied. Other player remains available for unavailable or newly added players.
+- Current how-to direction: use screenshots captured from the public live mobile flow at 390 × 844 pixels, without submitting the walkthrough draft. The three source captures live under `public/how-to-play/`; their numbered overlays and matching callout text are first-party application documentation rather than a third-party data source.
 
 ## Owner-provided player snapshot source card
 

@@ -42,9 +42,9 @@ The public application never contacts FotMob or another football-data source. Th
 
 - `/` — three-stage table, spotlight, and review flow or the server-derived closed state.
 - `/leaderboard` — 0-point champion-pick cards before reveal and a shared-rank table-only leaderboard afterward. The maximum is 100 points.
-- `/spotlight` — a separate fun-accuracy leaderboard with overall and category sorts. It also contains the labelled, non-persisted test run.
+- `/spotlight` — a separate fun-accuracy leaderboard with overall and category sorts. Before reveal it exposes only the number of complete brackets, not their picks or hidden ordering.
 - `/entries/[id]` — receipt/admin-authorized private confirmation before reveal; public comparison afterward.
-- `/rules` — table tiers, spotlight rank rules, team formulas, privacy, and pending-data explanation.
+- `/rules` — an annotated three-screen live-mobile walkthrough followed by table tiers, spotlight rank rules, team formulas, privacy, and pending-data explanation.
 - `/admin/login` — owner credential handoff.
 - `/admin` — season and latest-import overview.
 - `/admin/submissions` — view and delete erroneous entries.
@@ -55,7 +55,9 @@ The public application never contacts FotMob or another football-data source. Th
 
 ## Mobile-first presentation
 
-The prediction and manual standings experiences share the same accessible sorter. A 56 by 56 pixel handle is the only element with `touch-action: none`, preserving page scrolling on touch devices. Pointer drag and direct Arrow Up/Arrow Down movement both update position immediately and announce the result through an assertive live region. Rows remain single-column without horizontal overflow, display the top/bottom-half boundary, wrap long names on narrow screens, and use explicit focus rings. The spotlight stage uses keyboard-operable combobox/listbox controls with name filtering, visible selection state, and a focused free-text input after Other player is chosen. The submission action is reachable above safe-area insets, and reduced-motion preferences disable nonessential transitions.
+The prediction and manual standings experiences share the same accessible sorter. A 56 by 56 pixel handle is the only element with `touch-action: none`, preserving page scrolling on touch devices. Pointer drag and direct Arrow Up/Arrow Down movement both update position immediately and announce the result through an assertive live region. Rows remain single-column without horizontal overflow, display the top/bottom-half boundary, wrap long names on narrow screens, and use explicit focus rings. The spotlight stage uses keyboard-operable combobox/listbox controls with name filtering, visible selection state, and a focused free-text input after Other player is chosen. The submission action is reachable above safe-area insets, and reduced-motion preferences disable nonessential transitions. The rules walkthrough renders three live-site 390 × 844 captures as snap-scrolling cards on phones and a three-column grid on wide screens. CSS overlay pins and adjacent numbered text carry the same annotation semantics.
+
+The open-submissions panel includes a compact days/hours/minutes/seconds calendar-flip countdown. Its initial duration is calculated on the server from the database wall clock and effective deadline. The client advances that duration from monotonic `performance.now()` rather than trusting the participant device clock, then refreshes the server page once at zero. This display never authorizes a write; the database-locking cutoff in the prediction write path remains authoritative.
 
 Leaderboard and comparison data use mobile cards before expanding into denser desktop layouts. The administrator navigation becomes a full-width two-column grid at narrow widths without forcing the primary page or prediction list to overflow.
 
@@ -113,7 +115,7 @@ Spotlight accuracy is separate from the table score. Each category uses the sele
 
 Scoring cannot activate before the verified opening kickoff. The active table must also have an observation at or after kickoff. A preseason table cannot receive points only because the clock crossed kickoff. All-zero played-games tables remain inactive. Underdog-team and overrated-team ranks use the active table and all remaining submissions. A future owner-run Codex automation will enter the five other reviewed outcomes manually. Missing outcomes display as pending. They are not incorrect zero-point answers.
 
-Before activation, each table-leaderboard card shows 0 and its predicted champion. When scoring is active, cards show table points and the champion's actual position. Entries sort by table points only. Equal totals share a competition rank. The separate spotlight page sorts by overall available accuracy or one category. Category sorts use outcome rank from low to high, put pending entries last, and use participant name for deterministic ties. Its test run is an in-memory illustration and never uses prediction storage.
+Before activation, each table-leaderboard card shows 0 and its predicted champion. When scoring is active, cards show table points and the champion's actual position. Entries sort by table points only. Equal totals share a competition rank. The separate spotlight page sorts by overall available accuracy or one category. Category sorts use outcome rank from low to high, put pending entries last, and use participant name for deterministic ties. Only atomic 20-position-plus-seven-pick submissions contribute to its bracket count or accuracy view; the retired Alex/Jordan cards were code fixtures and never prediction rows.
 
 ## Database model and invariants
 

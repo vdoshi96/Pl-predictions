@@ -19,7 +19,7 @@ Core implementation work proceeds autonomously. The only accepted blockers are a
 4. Update affected tests, then run formatting, lint, type, unit/component, isolated integration, production build, and desktop/mobile browser verification.
 5. Refresh only the newest QA evidence, regenerate and check all HTML peers, verify production, publish through GitHub `main`, synchronize local `main`, and remove completed worktree state.
 
-## Current spotlight-predictions iteration
+## Completed spotlight-predictions iteration
 
 1. Extend the mobile entry journey to three stages: the 20-club table and display name, seven required spotlight selectors, then one final review and confirmation.
 2. Import the owner-provided `premier-league-players-2026-08-08/` snapshot into the season-scoped player catalogue: 587 players across the 20 clubs and 580 copied local portrait PNGs. Search first, last, or full names, use the `PlayerMark` silhouette for the seven players without a supplied image, and retain Other player plus a required custom-name field for unavailable or newly added players. Continue using existing local club crests for the three club categories.
@@ -27,6 +27,14 @@ Core implementation work proceeds autonomously. The only accepted blockers are a
 4. Derive the 5–3–1 table score on read and cap the main leaderboard at 100. Treat the position-1 champion as part of table scoring, not a separate bonus. Keep spotlight accuracy separate from table points.
 5. Calculate underdog-team index as average predicted position minus actual position and overrated-team index as the inverse, ranking the largest values first with full precision. Rank top scorer, top assister, and most clean sheets by their reviewed result-list positions; rank reviewed average season player ratings descending for underdog and ascending for overrated.
 6. Keep the five non-table-derived outcomes pending until a future owner-run Codex automation enters the reviewed results manually. Treat the roster snapshot as selector and portrait input only. Do not add runtime FotMob access, a production scraper, or cron. Reconcile custom player names before ranking them.
-7. Preserve pre-reveal privacy for prediction IDs, positions 2–20, and all seven spotlight picks. Add `/rules` and a separate `/spotlight` accuracy page. Let `N` be the current number of active, nondeleted season brackets. Use `max(0, N + 1 - outcome rank)` for resolved categories. Exclude pending categories from overall accuracy. Show a labelled in-memory test run that cannot affect stored submissions or rankings.
+7. Preserve pre-reveal privacy for prediction IDs, positions 2–20, and all seven spotlight picks. Add `/rules` and a separate `/spotlight` accuracy page. Let `N` be the current number of active, nondeleted season brackets. Use `max(0, N + 1 - outcome rank)` for resolved categories. Exclude pending categories from overall accuracy. The initial labelled in-memory test run was later retired in favour of complete real-entry counts only.
 8. Move owner login to username plus salted PBKDF2-SHA-256 configuration while retaining `ADMIN_SECRET` only as a migration fallback. Keep same-origin/session protections, and verify an administrator deletion cascades through all 20 table items and seven spotlight rows while retaining its bounded audit record.
 9. Run focused and full unit/component tests, isolated Neon integration, TypeScript, ESLint, formatting, production build, three-stage desktop/mobile browser checks, documentation parity, and bounded production smoke. Refresh only the newest QA evidence after the verification result is known, then complete the repository merge/deploy/cleanup rules.
+
+## How-to, countdown, and complete-test-entry iteration
+
+1. Add a participant-facing three-step walkthrough to `/rules` using 390 × 844 screenshots captured from the live mobile flow. Overlay numbered visual pins and repeat every annotation as accessible text.
+2. Add a compact days/hours/minutes/seconds calendar-flip countdown beside “Submissions open”. Seed it from database time, advance it from a monotonic browser timer, refresh at zero, and leave the guarded database write as the only submission authority.
+3. Remove the hard-coded Alex/Jordan spotlight presentation fixture and its dedicated tests. Do not delete production data because verification proves those names were never prediction rows.
+4. Create one clearly named retained test bracket through the supported public three-stage flow. Verify it atomically stores one parent, 20 table positions, and seven spotlight picks; keep the private picks out of public pre-reveal responses.
+5. Extend component and browser coverage for the timer, walkthrough, renamed navigation, complete-bracket privacy, 320/390/430-pixel reflow, and absence of horizontal overflow. Refresh only the newest completed mobile QA evidence, synchronize Markdown/HTML documentation, and publish through `main`.

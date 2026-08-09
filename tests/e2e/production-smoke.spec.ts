@@ -181,6 +181,12 @@ test("production public routes are mobile-safe and healthy", async ({
     });
     await expect(countdown).toBeVisible();
     await expect(countdown.locator(".countdown-flip")).toHaveCount(4);
+    if (captureMobileEvidence) {
+      await page.screenshot({
+        animations: "disabled",
+        path: path.join(screenshotDirectory!, "countdown-mobile.png"),
+      });
+    }
     await participantName.fill("Production review preview");
     await expect(participantName).toHaveValue("Production review preview");
     await expect(continueButton).toBeEnabled();

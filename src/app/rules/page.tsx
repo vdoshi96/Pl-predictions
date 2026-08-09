@@ -9,10 +9,10 @@ import {
   Trophy,
 } from "lucide-react";
 import type { Metadata } from "next";
+import Link from "next/link";
 
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
-import { CATEGORY_RANK_POINT_CAP } from "@/features/scoring";
 
 export const metadata: Metadata = { title: "Rules" };
 
@@ -57,7 +57,7 @@ export default function RulesPage() {
             <Badge className="bg-accent text-brand ring-accent">
               2026/27 competition
             </Badge>
-            <Badge variant="warning">Result rankings pending</Badge>
+            <Badge variant="warning">Five manual results pending</Badge>
           </div>
           <div className="mt-5 flex items-start gap-3">
             <ListChecks
@@ -70,8 +70,9 @@ export default function RulesPage() {
               </h1>
               <p className="mt-2 max-w-2xl text-sm leading-6 text-white/75 sm:text-base">
                 One immutable entry contains a full 1–20 table and seven
-                spotlight picks. The maximum is 240 points: 100 from the table
-                and 140 from spotlight rankings.
+                spotlight picks. The main leaderboard is table-only with a
+                100-point maximum. Spotlight accuracy is a separate just-for-fun
+                table.
               </p>
             </div>
           </div>
@@ -121,14 +122,14 @@ export default function RulesPage() {
               </span>
               <div>
                 <h2 className="text-brand-strong text-xl font-black">
-                  Spotlight rank points
+                  Spotlight accuracy
                 </h2>
                 <p className="mt-1 text-sm leading-6 text-slate-600">
-                  In each category, rank 1 earns {CATEGORY_RANK_POINT_CAP}{" "}
-                  points, rank 2 earns {CATEGORY_RANK_POINT_CAP - 1}, down to 1
-                  point at rank {CATEGORY_RANK_POINT_CAP}. Lower ranks earn 0.
-                  Equal results share competition rank and therefore the same
-                  points.
+                  This score never joins the table leaderboard. With N active
+                  brackets, an occupied result rank earns max(0, N + 1 − rank)
+                  accuracy points. Rank 1 earns N, rank 2 earns N − 1, and ranks
+                  after N earn 0. Equal outcomes share the same result rank and
+                  accuracy points.
                 </p>
               </div>
             </div>
@@ -147,6 +148,12 @@ export default function RulesPage() {
                 </div>
               ))}
             </div>
+            <Link
+              className="bg-brand text-accent focus-visible:ring-accent-blue mt-4 inline-flex min-h-11 items-center rounded-xl px-4 text-sm font-black outline-none hover:bg-[#4b0b50] focus-visible:ring-2"
+              href="/spotlight"
+            >
+              Open spotlight accuracy
+            </Link>
           </CardContent>
         </Card>
 
@@ -181,8 +188,8 @@ export default function RulesPage() {
                 Player selectors search first, last, or full name; 580 supplied
                 portraits appear locally and the other seven players use a
                 silhouette. Choose Other player for anyone unavailable or new.
-                Custom names must be matched to a reviewed result list before
-                scoring.
+                Custom names must be matched to a manually entered result list
+                before they receive an accuracy result.
               </p>
             </CardContent>
           </Card>
@@ -213,12 +220,13 @@ export default function RulesPage() {
               <h2 className="font-black text-amber-950">Current data status</h2>
               <p className="mt-1 text-sm leading-6 text-amber-900">
                 The app now stores and displays all seven picks. Underdog-team
-                and overrated-team points can recalculate from the group tables
-                and active standings. The player roster and available portraits
-                are loaded, but the other five outcomes remain pending until
-                reviewed source-neutral goals, assists, clean-sheet, and player
-                rating rankings are connected. The leaderboard test run is
-                illustrative only and never affects the real standings.
+                and overrated-team accuracy can recalculate from the group
+                tables and active standings. The player roster and available
+                portraits are loaded. An owner-run Codex automation will
+                manually enter the other five outcome lists when they are ready;
+                there is no runtime football-data request, scraper, or cron. The
+                spotlight test run is illustrative only and never affects the
+                real table leaderboard.
               </p>
             </div>
           </CardContent>
@@ -226,9 +234,11 @@ export default function RulesPage() {
 
         <p className="flex items-start gap-2 text-xs leading-5 text-slate-500">
           <ShieldCheck aria-hidden="true" className="mt-0.5 size-4 shrink-0" />
-          Scores are derived on read rather than manually stored. Deleting an
-          entry removes its table and spotlight picks and recalculates any group
-          averages from the remaining submissions.
+          Table scores are derived on read and remain capped at 100. Spotlight
+          accuracy is separate; manually entered outcome lists supply results,
+          not editable participant totals. Deleting an entry removes its table
+          and spotlight picks and recalculates the active bracket count and any
+          group averages from the remaining submissions.
         </p>
       </div>
     </main>

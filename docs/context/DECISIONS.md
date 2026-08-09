@@ -12,9 +12,17 @@ Treat the table and seven spotlight choices as one immutable submission. Stage 1
 
 Use season-scoped `players` and `prediction_category_picks` tables as the durable catalogue and selection seams. Player selectors search first, last, and full names and allow a normalized Other-player value; club categories reference existing season teams. The catalogue began empty while the roster handoff was pending, rather than fabricating entries. The later owner-provided player snapshot decision above supersedes that temporary empty state while retaining local-only `/player-faces/` paths and the generic `PlayerMark` fallback. Most clean sheets always chooses a club.
 
-## 2026-08-08: Unified 240-point derived scoring and pending outcomes
+## 2026-08-08: Separate table leaderboard and spotlight accuracy
 
-Retain the mutually exclusive 5–3–1–0 table tiers and 100-point exact-table maximum. The champion remains the team predicted first and receives no separate bonus. The owner specified occupied-rank judging but not an additive point conversion, so adopt a clearly published working scale: 20 points for rank 1, 19 for rank 2, through 1 for rank 20 and 0 below rank 20. Equal metric values share rank and points. Seven perfect spotlight picks add 140, so the combined maximum is 240; totals remain derived on read rather than editable stored values. This conversion is an implementation decision and can be revised before competition scoring if the owner chooses a different scale.
+Keep the main leaderboard limited to the 5–3–1–0 table score. Its maximum remains 100. The predicted champion remains table position 1 and receives no separate bonus. Spotlight predictions are a separate fun-accuracy view and never change table points. Users can sort that view by overall available accuracy or one category.
+
+Use the selected subject's occupied outcome rank. Let `N` be the current number of active, nondeleted brackets for the season. Rank 1 earns `N` accuracy points, rank 2 earns `N - 1`, and later ranks decrease to zero. Equal outcomes share rank and accuracy points. Overall available accuracy sums only categories with a reviewed result. Pending outcomes remain unavailable and are not incorrect zero-point answers. Because scores are derived, an administrator deletion changes `N` and recalculates the accuracy view.
+
+A future owner-run Codex automation will enter the five non-table-derived reviewed outcomes manually. The automation must obey the existing source and rights boundary. This decision supersedes the combined 240-point working rule below.
+
+## 2026-08-08: Superseded unified 240-point working rule
+
+This earlier implementation rule used the mutually exclusive 5–3–1–0 table tiers and a combined 240-point total. It gave 20 points for spotlight rank 1 through 1 point for rank 20. The separate table-leaderboard decision above supersedes this working rule before competition scoring.
 
 Define underdog-team index as `average predicted position - actual position` and overrated-team index as `actual position - average predicted position`; rank the largest value first using unrounded precision. An average prediction of 2.4 and actual position 10 therefore produces -7.6 underdog and +7.6 overrated. Top scorer, top assister, and most clean sheets use reviewed result-list positions. Underdog player ranks reviewed FotMob average season ratings descending, while overrated player ranks them ascending.
 

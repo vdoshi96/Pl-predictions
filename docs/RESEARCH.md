@@ -25,7 +25,7 @@ FotMob league ID `47` and the canonical team pages expose the factual external I
 
 FotMob's current terms, checked 2026-08-08, prohibit robots/crawlers and systematic or regular extraction. A consumer subscription is not evidence of a data redistribution or automation licence. The Premier League also says club names and badges remain member-club marks.
 
-Decision: do not implement recurring FotMob scraping in the product. A future owner-run Codex workflow may submit a permitted/licensed export through the source-neutral importer. The app also supports manual standings. It stores no source HTML, browser cookies, or subscription credentials.
+Decision: do not implement recurring FotMob scraping in the product. A future owner-run Codex automation will enter reviewed spotlight outcomes manually. The existing source-neutral importer remains limited to standings. The app also supports manual standings. It stores no source HTML, browser cookies, or subscription credentials.
 
 Crest decision: FotMob's image URLs identify the genuine marks but do not grant redistribution or hotlinking rights, so the application does not fetch or hotlink them. The project owner's later 20-file PNG handoff supersedes the presentation portion of the original monogram decision for this exact local set. `TeamMark` uses contain sizing and a safe initials fallback; original SVG monograms remain rollback-only during the first PNG release.
 

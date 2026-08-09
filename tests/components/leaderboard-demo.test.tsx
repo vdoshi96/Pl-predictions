@@ -26,21 +26,33 @@ describe("LeaderboardDemo", () => {
     expect(alyssonFallback.querySelector("img")).not.toBeInTheDocument();
   });
 
-  it("preserves the seven-pick score calculation and shared ranking", () => {
+  it("uses the active bracket count for a separate accuracy ranking", () => {
     render(<LeaderboardDemo />);
 
-    const jordan = screen.getByLabelText("Demo Jordan demo leaderboard entry");
-    expect(within(jordan).getByLabelText("Demo rank 1")).toHaveTextContent("1");
-    expect(within(jordan).getByText("82 table")).toBeVisible();
-    expect(within(jordan).getByText("125 spotlight")).toBeVisible();
-    expect(within(jordan).getByText("207")).toBeVisible();
+    expect(
+      screen.getByText("2 active brackets", { exact: true }),
+    ).toBeVisible();
+    expect(
+      screen.getByText(/seven perfect picks would score 14/i),
+    ).toBeVisible();
+
+    const alex = screen.getByLabelText("Demo Alex demo accuracy entry");
+    expect(
+      within(alex).getByLabelText("Demo accuracy rank 1"),
+    ).toHaveTextContent("1");
+    expect(within(alex).getByText("6", { exact: true })).toBeVisible();
+    expect(
+      within(alex).getByText("7 of 7 results available", { exact: true }),
+    ).toBeVisible();
+    expect(alex.querySelectorAll("[data-category]")).toHaveLength(7);
+
+    const jordan = screen.getByLabelText("Demo Jordan demo accuracy entry");
+    expect(
+      within(jordan).getByLabelText("Demo accuracy rank 2"),
+    ).toHaveTextContent("2");
+    expect(within(jordan).getByText("5", { exact: true })).toBeVisible();
     expect(jordan.querySelectorAll("[data-category]")).toHaveLength(7);
 
-    const alex = screen.getByLabelText("Demo Alex demo leaderboard entry");
-    expect(within(alex).getByLabelText("Demo rank 2")).toHaveTextContent("2");
-    expect(within(alex).getByText("78 table")).toBeVisible();
-    expect(within(alex).getByText("127 spotlight")).toBeVisible();
-    expect(within(alex).getByText("205")).toBeVisible();
-    expect(alex.querySelectorAll("[data-category]")).toHaveLength(7);
+    expect(screen.queryByText(/table ·/i)).not.toBeInTheDocument();
   });
 });

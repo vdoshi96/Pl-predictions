@@ -14,6 +14,16 @@ import { completeSpotlightPicks } from "./spotlight-helpers";
 const qaName = `Production QA ${Date.now().toString(36)}`;
 let qaEntryId: string | null = null;
 let submissionAttempted = false;
+const spotlightSorts = [
+  "overall",
+  "top_scorer",
+  "top_assister",
+  "most_clean_sheets",
+  "underdog_team",
+  "overrated_team",
+  "underdog_player",
+  "overrated_player",
+] as const;
 
 test.describe.configure({ retries: 0 });
 
@@ -246,6 +256,34 @@ test("production enforces its current submission state and cleans any QA entry",
     expect(rawRsc).not.toContain(privatePlayerName);
   }
 
+  for (const spotlightSort of spotlightSorts) {
+    const spotlightHtmlResponse = await page.request.get(
+      `/spotlight?sort=${spotlightSort}`,
+      { headers: { accept: "text/html" } },
+    );
+    expect(spotlightHtmlResponse.ok()).toBe(true);
+    const spotlightHtml = await spotlightHtmlResponse.text();
+    expect(spotlightHtml).not.toContain("Spotlight accuracy leaderboard");
+    expect(spotlightHtml).not.toContain(qaName);
+    expect(spotlightHtml).not.toContain(qaEntryId);
+    for (const privatePlayerName of privatePlayerNames) {
+      expect(spotlightHtml).not.toContain(privatePlayerName);
+    }
+
+    const spotlightRscResponse = await page.request.get(
+      `/spotlight?sort=${spotlightSort}&_rsc=privacy-${spotlightSort}`,
+      { headers: { accept: "text/x-component", rsc: "1" } },
+    );
+    expect(spotlightRscResponse.ok()).toBe(true);
+    const spotlightRsc = await spotlightRscResponse.text();
+    expect(spotlightRsc).not.toContain("Spotlight accuracy leaderboard");
+    expect(spotlightRsc).not.toContain(qaName);
+    expect(spotlightRsc).not.toContain(qaEntryId);
+    for (const privatePlayerName of privatePlayerNames) {
+      expect(spotlightRsc).not.toContain(privatePlayerName);
+    }
+  }
+
   await confirmationLink.click();
   await expect(
     page.getByRole("heading", { level: 1, name: `${qaName}'s prediction` }),
@@ -265,6 +303,19 @@ test("production enforces its current submission state and cleans any QA entry",
   await expect(
     freshPage.getByRole("heading", { level: 1, name: "That page is offside." }),
   ).toBeVisible();
+  await freshPage.goto("/spotlight?sort=top_scorer");
+  await expect(
+    freshPage.getByRole("heading", { level: 1, name: "Spotlight accuracy" }),
+  ).toBeVisible();
+  await expect(
+    freshPage.getByRole("heading", {
+      name: "Spotlight picks are still private",
+    }),
+  ).toBeVisible();
+  await expect(
+    freshPage.getByLabel("Spotlight accuracy leaderboard"),
+  ).toHaveCount(0);
+  await expect(freshPage.getByText(qaName, { exact: true })).toHaveCount(0);
   await freshContext.close();
 
   await page.goto("/leaderboard");

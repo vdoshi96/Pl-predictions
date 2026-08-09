@@ -6,7 +6,9 @@ Checked on 2026-08-08.
 
 - Original owner brief: `/Users/vishal/.codex/attachments/52a70e1f-75be-4dba-a2ab-739d8a99b417/pasted-text.txt` (local conversation attachment; intentionally not copied into the repository).
 - Latest owner overrides: mobile-first for the majority-mobile audience; recurring updates will be owner-run Codex automation; no runtime live-data API and no Vercel Cron.
-- Current spotlight-predictions brief: one three-stage immutable entry containing the 20-club table and seven required categories; searchable first/last-name player selectors with Other-player fallback; clubs for most clean sheets; local player portraits and club crests with visual fallbacks; expanded leaderboard; public rules page; and administrator deletion. The owner-supplied raw login password is operational secret input and is intentionally not copied into repository documentation.
+- Current scoring override: the main leaderboard uses table points only and has a 100-point maximum. Spotlight predictions use a separate fun-accuracy page with overall and category sorts. Let `N` be the current number of active, nondeleted season brackets. Accuracy points are `max(0, N + 1 - outcome rank)`. Overall accuracy excludes pending categories.
+- Current outcome-input direction: a future owner-run Codex automation will enter the five non-table-derived outcomes manually. The automation is not part of this iteration.
+- Current spotlight-predictions brief: one three-stage immutable entry containing the 20-club table and seven required categories; searchable first/last-name player selectors with Other-player fallback; clubs for most clean sheets; local player portraits and club crests with visual fallbacks; public rules and spotlight pages; and administrator deletion. The owner-supplied raw login password is operational secret input and is intentionally not copied into repository documentation.
 - Current identity direction: user-facing name **Dranx Prediction League**; Premier-League-inspired palette using official purple `#37003c` with cyan `#05f0ff`, green `#00ff87`, and pink `#ff2882` accents; original Dranx mark; operational `pl-predictions` identifiers unchanged.
 - Current club-asset direction: the project owner supplied a folder containing one transparent PNG badge for each of the 20 verified clubs and explicitly directed their use. The same folder's Premier League logo/lion/ball/composite files are outside that team-mark replacement and are not used.
 - Current player-asset direction: the project owner added `premier-league-players-2026-08-08/` and explicitly directed use of its roster and available portraits in the selectors, with a silhouette when no portrait was supplied. Other player remains available for unavailable or newly added players.
@@ -17,7 +19,7 @@ Checked on 2026-08-08.
 - Handoff provenance: the local README identifies Transfermarkt 2026 first-team squad pages as the roster source, 570 FotMob-sourced images, and 10 Creative Commons Wikipedia images. For this repository, the operative provenance is the project owner's local handoff and direction to use it; this record does not claim broader ownership or redistribution permission.
 - Application use: roster rows are imported into the season catalogue and reviewed portraits are copied to local `/player-faces/` paths. The seven players without a supplied portrait use `PlayerMark`'s generic silhouette.
 - Runtime boundary: the deployed application does not execute the handoff's acquisition scripts, call those upstream sources, scrape player pages, or hotlink portraits. Other player covers unavailable or newly added players.
-- Outcome boundary: this is a selector identity and portrait snapshot, not a goals, assists, clean-sheets, or player-rating result feed. The five non-table-derived outcomes remain pending a reviewed source-neutral input.
+- Outcome boundary: this is a selector identity and portrait snapshot, not a goals, assists, clean-sheets, or player-rating result feed. A future owner-run Codex automation will enter the five reviewed outcomes manually.
 
 ## Season and rights
 
@@ -35,11 +37,11 @@ FotMob's official terms, the Premier League logo portal, and the Premier League 
 
 ## Spotlight outcome authority and pending inputs
 
-- The owner defined occupied-rank judging for all seven categories and supplied the team expectation formulas. The brief did not define how those ranks convert into the existing additive points total; this implementation adopts a visible 20-to-1 scale, with rank 1 earning 20 and rank 20 earning 1, as the documented working rule pending any later owner adjustment.
+- The owner clarified that spotlight accuracy never changes the table leaderboard. The table maximum remains 100. Let `N` be the current number of active, nondeleted season brackets. Accuracy points are `max(0, N + 1 - outcome rank)`. Overall accuracy excludes pending categories. A resolved zero-point result still counts as available. Equal overall scores share a competition rank. Category sorts use outcome rank from low to high and put pending entries last.
 - Team expectation data is internal: average each club's predicted position across the remaining valid submissions, then compare it with the active validated standings. Underdog is average prediction minus actual position; overrated is the inverse.
 - The requested player-opinion metric is FotMob average season rating, descending for underdog and ascending for overrated. This product rule does not supersede FotMob's terms or authorize automated extraction. There is no runtime FotMob client, scraper, scheduled job, or stored provider credential.
-- The owner has supplied the dated 587-player selector catalogue and 580 portrait PNGs, with seven intentional silhouette fallbacks. The handoff does not include reviewed top-scorer, assists, clean-sheets, or player-rating outcome rankings. Those five category results and custom-player reconciliation therefore remain pending. Do not infer, fabricate, or silently score missing result data from the roster snapshot.
-- Any future spotlight outcome integration must be source-neutral at the application boundary and backed by permitted or licensed acquisition. The precise canonical payload, administrative review path, provenance fields, and final/provisional semantics remain an explicit design task rather than an implemented claim.
+- The owner has supplied the dated 587-player selector catalogue and 580 portrait PNGs, with seven intentional silhouette fallbacks. The handoff does not include reviewed top-scorer, assists, clean-sheets, or player-rating rankings. Do not infer or fabricate these results.
+- A future owner-run Codex automation will enter the five reviewed outcomes manually. Its source material must be permitted or licensed. The payload, review path, provenance fields, and final-state rules remain a later design task.
 
 ## Technical authority
 

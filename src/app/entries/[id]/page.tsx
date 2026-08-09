@@ -1,5 +1,6 @@
-import { Eye, LockKeyhole, Medal } from "lucide-react";
+import { Eye, LockKeyhole, Medal, Sparkles } from "lucide-react";
 import type { Metadata } from "next";
+import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { Badge } from "@/components/ui/badge";
@@ -35,8 +36,8 @@ export default async function EntryPage({
 }: PageProps<"/entries/[id]">) {
   const entry = await getEntryComparison((await params).id);
   if (!entry) notFound();
-  const scoredSpotlightCount = entry.spotlightPicks.filter(
-    (pick) => pick.points !== null && pick.points !== undefined,
+  const availableSpotlightCount = entry.spotlightPicks.filter(
+    (pick) => pick.accuracyPoints !== null && pick.accuracyPoints !== undefined,
   ).length;
 
   return (
@@ -71,11 +72,10 @@ export default async function EntryPage({
               </span>
               <div>
                 <strong className="block text-3xl font-black tabular-nums">
-                  {entry.totalScore} total points
+                  {entry.totalScore} table points
                 </strong>
                 <span className="text-xs font-semibold text-white/65">
-                  {entry.tableScore ?? 0} table · {entry.spotlightScore ?? 0}{" "}
-                  spotlight
+                  Main leaderboard score · maximum 100
                 </span>
               </div>
             </div>
@@ -110,13 +110,25 @@ export default async function EntryPage({
                   Spotlight picks
                 </h2>
                 <p className="mt-1 text-sm leading-6 text-slate-600">
-                  These seven picks are stored with the table. Points appear as
-                  each reviewed result ranking becomes available.
+                  These seven picks are stored with the table. Their separate
+                  just-for-fun accuracy appears as result lists become available
+                  and never changes the 100-point table score.
                 </p>
               </div>
-              <Badge variant={scoredSpotlightCount > 0 ? "success" : "warning"}>
-                {scoredSpotlightCount} of 7 scored
-              </Badge>
+              <div className="flex flex-wrap items-center gap-2">
+                <Badge
+                  variant={availableSpotlightCount > 0 ? "success" : "warning"}
+                >
+                  {availableSpotlightCount} of 7 results available
+                </Badge>
+                <Link
+                  className="text-brand focus-visible:ring-accent-blue inline-flex min-h-10 items-center gap-2 rounded-xl border border-purple-200 px-3 text-xs font-black outline-none hover:bg-purple-50 focus-visible:ring-2"
+                  href="/spotlight"
+                >
+                  <Sparkles aria-hidden="true" className="size-4" />
+                  View accuracy table
+                </Link>
+              </div>
             </div>
             {entry.spotlightPicks.length > 0 ? (
               <SpotlightPickGrid
@@ -143,8 +155,8 @@ export default async function EntryPage({
           </p>
         ) : (
           <p className="text-sm font-semibold text-slate-600">
-            Actual positions and scoring appear once a meaningful season table
-            is active.
+            Actual positions and table scoring appear once a meaningful season
+            table is active.
           </p>
         )}
 

@@ -1,13 +1,18 @@
-export const CATEGORY_RANK_POINT_CAP = 20;
-
 export type RankedMetricItem<T> = T & { rank: number };
 
-export function scoreCategoryRank(rank: number): number {
-  if (!Number.isInteger(rank) || rank < 1) {
-    throw new RangeError("A category rank must be a positive integer.");
+export function scoreCategoryRank(
+  outcomeRank: number,
+  activeBracketCount: number,
+): number {
+  if (!Number.isInteger(outcomeRank) || outcomeRank < 1) {
+    throw new RangeError("An outcome rank must be a positive integer.");
   }
 
-  return Math.max(0, CATEGORY_RANK_POINT_CAP + 1 - rank);
+  if (!Number.isInteger(activeBracketCount) || activeBracketCount < 1) {
+    throw new RangeError("An active bracket count must be a positive integer.");
+  }
+
+  return Math.max(0, activeBracketCount + 1 - outcomeRank);
 }
 
 export function rankMetricItems<T extends { id: string; metric: number }>(

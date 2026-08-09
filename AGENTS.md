@@ -14,7 +14,7 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 
 Dranx Prediction League is a mobile-first friends game for the 2026/27 Premier League. A participant completes one immutable three-stage entry: order all 20 clubs and enter a display name, choose seven spotlight predictions, then review and submit. It is one Next.js 16 App Router application deployed on Vercel, with Vercel Marketplace Neon PostgreSQL accessed through Drizzle and the Neon HTTP driver. Public pages, authenticated administrator pages, server actions, and the source-neutral standings import endpoint live in the same application.
 
-The seven spotlight categories are top scorer, top assister, most clean sheets, underdog team, overrated team, underdog player, and overrated player. Player categories use a searchable season catalogue plus an Other-player text fallback; most clean sheets and both team-opinion categories select clubs. There is no runtime football API client, production scraper, or Vercel Cron. Standings enter through the authenticated canonical importer or manual administrator form. The five non-table-derived spotlight outcome rankings remain pending a reviewed source-neutral input. Do not add automated FotMob extraction without written data-licence permission covering the intended use.
+The seven spotlight categories are top scorer, top assister, most clean sheets, underdog team, overrated team, underdog player, and overrated player. Player categories use a searchable season catalogue plus an Other-player text fallback; most clean sheets and both team-opinion categories select clubs. There is no runtime football API client, production scraper, or Vercel Cron. Standings enter through the authenticated canonical importer or manual administrator form. A future owner-run Codex automation will enter the five non-table-derived spotlight outcome rankings manually. Do not add automated FotMob extraction without written data-licence permission covering the intended use.
 
 The 20 owner-provided club badge PNGs are the canonical local team marks; the original monograms remain rollback-only fallbacks for the first badge release. The owner-provided `premier-league-players-2026-08-08/` snapshot is the reviewed selector source: 587 players across the 20 clubs, with 580 supplied portrait PNGs and seven intentional `PlayerMark` silhouette fallbacks. Keep Other player available for unavailable or newly added players. This roster import is not an outcome feed; do not infer the five pending result rankings from it or add runtime acquisition.
 
@@ -24,7 +24,7 @@ The 20 owner-provided club badge PNGs are the canonical local team marks; the or
 - `src/features/` — prediction, standings, scoring, season, and admin domain logic.
 - `src/db/` and `drizzle/` — schema, database client, and committed migrations.
 - `src/data/` — reviewed season and 20-club fixtures.
-- `src/features/predictions/categories.ts` and `src/features/scoring/categories.ts` — canonical spotlight taxonomy, rank curve, and team expectation formulas.
+- `src/features/predictions/categories.ts` and `src/features/scoring/categories.ts` — canonical spotlight taxonomy, accuracy curve, and team expectation formulas.
 - `scripts/` — seed, standings import, test-database safety wrapper, and documentation generator.
 - `tests/` — unit/component, isolated Neon integration, and Playwright browser suites.
 - `docs/` — canonical architecture, research, QA, decisions, status, and generated HTML peers.
@@ -66,13 +66,13 @@ Integration and full browser journeys must use an isolated database. Set `TEST_D
 - Once predictions are revealed by deadline, lock, or early reveal, submissions remain closed permanently for fairness.
 - Import only complete known-team standings permutations; failures must preserve the last accepted table.
 - Finalization and undo operations must compare-and-swap the exact active/final snapshot.
-- Derive totals rather than persisting editable scores. Table scoring is capped at 100; each spotlight category uses the 20-to-1 occupied-rank scale, for a 240-point overall maximum. Keep unavailable outcomes visibly pending rather than assigning zero.
+- Derive totals rather than persisting editable scores. The main leaderboard uses table points only and is capped at 100. Spotlight accuracy is separate and never changes table points. Let `N` be the current number of active, nondeleted season brackets. Accuracy points are `max(0, N + 1 - occupied outcome rank)`. Overall accuracy sums only resolved categories. A resolved zero-point result still counts as available. Pending outcomes remain unavailable. Equal overall scores share a competition rank.
 - Team expectation indexes are `average predicted position - actual position` for underdog and the exact inverse for overrated; rank each list largest first using full precision.
 - Deleting a prediction must cascade through all 20 table items and seven spotlight picks, then allow the normalized display name to submit again. Preserve the deletion audit record.
 - Collect only the participant's chosen display name. Receipt cookies are hashed at rest; admin cookies are HttpOnly, SameSite Strict, and Secure in production.
 
 ## Definition of done
 
-A change is complete only when relevant unit/component tests, isolated Neon integration tests, TypeScript, ESLint, formatting, documentation parity, production build, and desktop/mobile browser checks pass. Mobile QA must cover the three-stage flow, 320–430px reflow, 56px touch handles, mouse/touch/keyboard reorder, searchable keyboard-accessible category selectors, the Other-player text path, safe-area actions, long-name wrapping, and no horizontal overflow. Preserve exact cleanup evidence for any QA data.
+A change is complete only when relevant unit/component tests, isolated Neon integration tests, TypeScript, ESLint, formatting, documentation parity, production build, and desktop/mobile browser checks pass. Mobile QA must cover the three-stage flow, the table leaderboard, the separate spotlight-accuracy page, 320–430px reflow, 56px touch handles, mouse/touch/keyboard reorder, searchable keyboard-accessible category selectors, the Other-player text path, safe-area actions, long-name wrapping, and no horizontal overflow. Preserve exact cleanup evidence for any QA data.
 
 Keep canonical Markdown and generated HTML peers synchronized. Before finishing an iteration, correct stale status/QA documentation, push the feature branch, merge it to GitHub `main`, update local `main` to the same commit, and remove completed worktrees.

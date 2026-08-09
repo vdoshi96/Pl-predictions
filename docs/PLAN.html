@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="canonical-source" content="PLAN.md" />
-    <meta name="canonical-source-sha256" content="50e7a5b9445f1a7af05db50270afc42016157b8210d1f8f423eae0fd809c53ac" />
+    <meta name="canonical-source-sha256" content="8b0828df1c4ccc01f3d1ec36ce3b8f1755c03a5e12f745edafbea20b74c4bf87" />
     <title>Implementation plan</title>
     <style>
       :root { color-scheme: light dark; font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
@@ -63,15 +63,15 @@
 <li>Extend the mobile entry journey to three stages: the 20-club table and display name, seven required spotlight selectors, then one final review and confirmation.</li>
 <li>Import the owner-provided <code>premier-league-players-2026-08-08/</code> snapshot into the season-scoped player catalogue: 587 players across the 20 clubs and 580 copied local portrait PNGs. Search first, last, or full names, use the <code>PlayerMark</code> silhouette for the seven players without a supplied image, and retain Other player plus a required custom-name field for unavailable or newly added players. Continue using existing local club crests for the three club categories.</li>
 <li>Validate exactly one top scorer, top assister, most clean sheets, underdog team, overrated team, underdog player, and overrated player choice. Persist the prediction parent, 20 ordered table items, and seven category rows in the existing deadline-guarded atomic statement.</li>
-<li>Derive the 5–3–1 table score and 20-to-1 spotlight rank points on read. Cap the full table at 100, all spotlight picks at 140, and the combined leaderboard at 240. Treat the position-1 champion as part of table scoring, not a separate bonus.</li>
+<li>Derive the 5–3–1 table score on read and cap the main leaderboard at 100. Treat the position-1 champion as part of table scoring, not a separate bonus. Keep spotlight accuracy separate from table points.</li>
 <li>Calculate underdog-team index as average predicted position minus actual position and overrated-team index as the inverse, ranking the largest values first with full precision. Rank top scorer, top assister, and most clean sheets by their reviewed result-list positions; rank reviewed average season player ratings descending for underdog and ascending for overrated.</li>
-<li>Keep the five non-table-derived category outcomes explicitly pending until a permitted, reviewed source-neutral result path is designed. Treat the dated roster snapshot as selector identity and portrait input only, not as a goals, assists, clean-sheets, or season-rating feed. Do not add runtime FotMob access, a production scraper, or cron. Ensure custom player names are reconciled before scoring.</li>
-<li>Preserve pre-reveal privacy for prediction IDs, positions 2–20, and all seven spotlight picks. Add <code>/rules</code>, split real leaderboard table/spotlight totals, and show a clearly labelled in-memory test run that cannot affect stored submissions or rankings.</li>
+<li>Keep the five non-table-derived outcomes pending until a future owner-run Codex automation enters the reviewed results manually. Treat the roster snapshot as selector and portrait input only. Do not add runtime FotMob access, a production scraper, or cron. Reconcile custom player names before ranking them.</li>
+<li>Preserve pre-reveal privacy for prediction IDs, positions 2–20, and all seven spotlight picks. Add <code>/rules</code> and a separate <code>/spotlight</code> accuracy page. Let <code>N</code> be the current number of active, nondeleted season brackets. Use <code>max(0, N + 1 - outcome rank)</code> for resolved categories. Exclude pending categories from overall accuracy. Show a labelled in-memory test run that cannot affect stored submissions or rankings.</li>
 <li>Move owner login to username plus salted PBKDF2-SHA-256 configuration while retaining <code>ADMIN_SECRET</code> only as a migration fallback. Keep same-origin/session protections, and verify an administrator deletion cascades through all 20 table items and seven spotlight rows while retaining its bounded audit record.</li>
 <li>Run focused and full unit/component tests, isolated Neon integration, TypeScript, ESLint, formatting, production build, three-stage desktop/mobile browser checks, documentation parity, and bounded production smoke. Refresh only the newest QA evidence after the verification result is known, then complete the repository merge/deploy/cleanup rules.</li>
 </ol>
 
-      <p class="source">Generated deterministically from <a href="PLAN.md">docs/PLAN.md</a>. Canonical SHA-256: <code>50e7a5b9445f1a7af05db50270afc42016157b8210d1f8f423eae0fd809c53ac</code>.</p>
+      <p class="source">Generated deterministically from <a href="PLAN.md">docs/PLAN.md</a>. Canonical SHA-256: <code>8b0828df1c4ccc01f3d1ec36ce3b8f1755c03a5e12f745edafbea20b74c4bf87</code>.</p>
     </main>
   </body>
 </html>

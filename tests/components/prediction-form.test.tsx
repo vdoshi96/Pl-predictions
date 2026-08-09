@@ -654,7 +654,7 @@ describe("shared site chrome", () => {
     expect(navigation).toHaveClass("basis-full", "sm:basis-auto");
     expect(within(navigation).getByRole("list")).toHaveClass(
       "grid",
-      "grid-cols-4",
+      "grid-cols-5",
       "sm:flex",
     );
     expect(predictLink).toHaveAttribute("href", "/");
@@ -664,9 +664,13 @@ describe("shared site chrome", () => {
       "min-w-0",
       "sm:w-auto",
     );
-    expect(screen.getByRole("link", { name: /leaderboard/i })).toHaveAttribute(
+    expect(screen.getByRole("link", { name: /^table$/i })).toHaveAttribute(
       "href",
       "/leaderboard",
+    );
+    expect(screen.getByRole("link", { name: /^spotlight$/i })).toHaveAttribute(
+      "href",
+      "/spotlight",
     );
     expect(screen.getByRole("link", { name: /^rules$/i })).toHaveAttribute(
       "href",

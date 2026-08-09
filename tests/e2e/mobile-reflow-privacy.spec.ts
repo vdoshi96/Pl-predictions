@@ -14,6 +14,16 @@ const privateTeamSentinels = PREMIER_LEAGUE_2026_27_TEAMS.filter((team) =>
     team.slug,
   ),
 );
+const spotlightSorts = [
+  "overall",
+  "top_scorer",
+  "top_assister",
+  "most_clean_sheets",
+  "underdog_team",
+  "overrated_team",
+  "underdog_player",
+  "overrated_player",
+] as const;
 
 function getQaDb() {
   const connectionString = process.env.DATABASE_URL;
@@ -125,6 +135,48 @@ test("320–430px reflow keeps private identifiers out of HTML and RSC", async (
     expect(rawRsc).not.toContain(privateTeam.assetPath);
   }
 
+  for (const spotlightSort of spotlightSorts) {
+    const spotlightHtmlResponse = await page.request.get(
+      `/spotlight?sort=${spotlightSort}`,
+      { headers: { accept: "text/html" } },
+    );
+    expect(spotlightHtmlResponse.ok()).toBe(true);
+    expect(spotlightHtmlResponse.headers()["content-type"]).toContain(
+      "text/html",
+    );
+    const spotlightHtml = await spotlightHtmlResponse.text();
+    expect(spotlightHtml).not.toContain("Spotlight accuracy leaderboard");
+    expect(spotlightHtml).not.toContain(participantName);
+    expect(spotlightHtml).not.toContain(predictionId);
+    for (const customPlayerName of customPlayerNames) {
+      expect(spotlightHtml).not.toContain(customPlayerName);
+    }
+    for (const privateTeam of privateTeamSentinels) {
+      expect(spotlightHtml).not.toContain(privateTeam.displayName);
+      expect(spotlightHtml).not.toContain(privateTeam.assetPath);
+    }
+
+    const spotlightRscResponse = await page.request.get(
+      `/spotlight?sort=${spotlightSort}&_rsc=privacy-${spotlightSort}`,
+      { headers: { accept: "text/x-component", rsc: "1" } },
+    );
+    expect(spotlightRscResponse.ok()).toBe(true);
+    expect(spotlightRscResponse.headers()["content-type"]).toContain(
+      "text/x-component",
+    );
+    const spotlightRsc = await spotlightRscResponse.text();
+    expect(spotlightRsc).not.toContain("Spotlight accuracy leaderboard");
+    expect(spotlightRsc).not.toContain(participantName);
+    expect(spotlightRsc).not.toContain(predictionId);
+    for (const customPlayerName of customPlayerNames) {
+      expect(spotlightRsc).not.toContain(customPlayerName);
+    }
+    for (const privateTeam of privateTeamSentinels) {
+      expect(spotlightRsc).not.toContain(privateTeam.displayName);
+      expect(spotlightRsc).not.toContain(privateTeam.assetPath);
+    }
+  }
+
   await confirmationLink.click();
   await expect(
     page.getByRole("heading", {
@@ -177,5 +229,20 @@ test("320–430px reflow keeps private identifiers out of HTML and RSC", async (
     textOverflow: "clip",
     whiteSpace: "normal",
   });
+  await expectNoHorizontalOverflow(page);
+
+  await page.goto("/spotlight?sort=overrated_player");
+  await expect(
+    page.getByRole("heading", { level: 1, name: "Spotlight accuracy" }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("heading", {
+      name: "Spotlight picks are still private",
+    }),
+  ).toBeVisible();
+  await expect(page.getByLabel("Spotlight accuracy leaderboard")).toHaveCount(
+    0,
+  );
+  await expect(page.getByText(participantName, { exact: true })).toHaveCount(0);
   await expectNoHorizontalOverflow(page);
 });

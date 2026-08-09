@@ -318,6 +318,15 @@ test("desktop public routes render the complete league without overflow", async 
   await expect(
     page.getByRole("heading", { level: 1, name: "Dranx Prediction League" }),
   ).toBeVisible();
+  await expect(
+    page.getByRole("link", { name: "View spotlight accuracy" }),
+  ).toBeVisible();
+  await expectNoHorizontalOverflow(page);
+
+  await page.goto("/spotlight");
+  await expect(
+    page.getByRole("heading", { level: 1, name: "Spotlight accuracy" }),
+  ).toBeVisible();
   await expectNoHorizontalOverflow(page);
 
   await page.goto("/rules");
@@ -516,6 +525,23 @@ test("mobile journey preserves privacy and gives the owner full control", async 
   }
   await expectNoHorizontalOverflow(page);
 
+  await page.goto("/spotlight?sort=top_scorer");
+  await expect(
+    page.getByRole("heading", {
+      name: "Spotlight picks are still private",
+    }),
+  ).toBeVisible();
+  await expect(page.getByLabel("Spotlight accuracy leaderboard")).toHaveCount(
+    0,
+  );
+  await expect(page.getByText(qaName, { exact: true })).toHaveCount(0);
+  for (const customPlayerName of customPlayerNames) {
+    await expect(page.getByText(customPlayerName, { exact: true })).toHaveCount(
+      0,
+    );
+  }
+  await expectNoHorizontalOverflow(page);
+
   await page.goto("/admin/login");
   await page.getByLabel("Username").fill("admin");
   await page.getByLabel("Password").fill(adminSecret!);
@@ -618,12 +644,10 @@ test("mobile journey preserves privacy and gives the owner full control", async 
   await page.goto("/leaderboard", { waitUntil: "networkidle" });
   await expect(page.getByRole("link", { name: qaName })).toBeVisible();
   const revealedPreseasonEntry = page.getByLabel(`${qaName} leaderboard entry`);
-  await revealedPreseasonEntry
-    .getByText("View 7 spotlight picks · results pending", { exact: true })
-    .click();
   await expect(
     revealedPreseasonEntry.getByText(customPlayerNames[0]!, { exact: true }),
-  ).toBeVisible();
+  ).toHaveCount(0);
+  await expect(revealedPreseasonEntry.locator("details")).toHaveCount(0);
   await expect(
     revealedPreseasonEntry.getByLabel("Predicted champion: Aston Villa"),
   ).toBeVisible();
@@ -633,6 +657,38 @@ test("mobile journey preserves privacy and gives the owner full control", async 
   await expect(page.getByText("Everyone starts on 0 points")).toBeVisible();
   await expect(page.getByText("Matchweek 1", { exact: true })).toBeVisible();
   await expect(page.getByText("Provisional", { exact: true })).toBeVisible();
+
+  await page.goto("/spotlight?sort=overall", { waitUntil: "networkidle" });
+  await expect(
+    page.getByRole("heading", { level: 1, name: "Spotlight accuracy" }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("heading", {
+      name: "Accuracy rankings are not available yet",
+    }),
+  ).toBeVisible();
+  const spotlightEntry = page.getByLabel(`${qaName} spotlight accuracy entry`);
+  await expect(spotlightEntry).toBeVisible();
+  await expect(spotlightEntry.getByLabel("Accuracy rank pending")).toHaveText(
+    "—",
+  );
+  await expect(
+    spotlightEntry.getByText("result pending", { exact: true }),
+  ).toBeVisible();
+  const spotlightDetails = spotlightEntry.locator("details");
+  if (
+    !(await spotlightDetails.evaluate(
+      (element) => element instanceof HTMLDetailsElement && element.open,
+    ))
+  ) {
+    await spotlightDetails.locator("summary").click();
+  }
+  await expect(
+    spotlightEntry.getByText(customPlayerNames[0]!, { exact: true }),
+  ).toBeVisible();
+  await expectNoHorizontalOverflow(page);
+
+  await page.goto("/leaderboard");
   await page.getByRole("link", { name: qaName }).click();
   await expect(
     page.getByRole("heading", { level: 1, name: `${qaName}'s prediction` }),
@@ -661,5 +717,7 @@ test("mobile journey preserves privacy and gives the owner full control", async 
   qaAuditIds.push(...deletionAudits.map((audit) => audit.id));
 
   await page.goto("/leaderboard");
+  await expect(page.getByText(qaName, { exact: true })).toHaveCount(0);
+  await page.goto("/spotlight");
   await expect(page.getByText(qaName, { exact: true })).toHaveCount(0);
 });

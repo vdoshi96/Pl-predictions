@@ -50,12 +50,20 @@ export type ScoredLeaderboardEntry = RankedLeaderboardEntry<{
   exactCount: number;
   id: string;
   participantName: string;
-  spotlightPicks: SpotlightPickDisplay[];
-  spotlightScore: number;
   tableScore: number;
   totalScore: number;
   withinThreeCount: number;
 }>;
+
+export type SpotlightAccuracyEntry = {
+  accuracyRank: number;
+  accuracyScore: number;
+  availableCategoryCount: number;
+  createdAt: Date;
+  id: string;
+  participantName: string;
+  spotlightPicks: SpotlightPickDisplay[];
+};
 
 export type LeaderboardView = {
   entries: LeaderboardRosterEntry[];
@@ -69,6 +77,7 @@ export type LeaderboardView = {
     matchweek: number | null;
     source: string;
   } | null;
+  spotlightAccuracyEntries: SpotlightAccuracyEntry[] | null;
 };
 
 const nameCollator = new Intl.Collator("en-GB", {
@@ -80,6 +89,64 @@ function formatExpectationIndex(value: number): string {
   const rounded = Math.round(value * 10) / 10;
   const normalized = Object.is(rounded, -0) ? 0 : rounded;
   return `Index ${normalized > 0 ? "+" : ""}${normalized.toFixed(1)}`;
+}
+
+type AvailableSpotlightResult = {
+  accuracyPoints: number;
+  metricLabel: string;
+  resultRank: number;
+};
+
+function buildSpotlightAccuracyEntries(
+  entryRows: readonly {
+    createdAt: Date;
+    id: string;
+    participantName: string;
+  }[],
+  spotlightPicksByPredictionId: ReadonlyMap<string, SpotlightPickDisplay[]>,
+  rankedTeamPicksByPredictionId: ReadonlyMap<
+    string,
+    ReadonlyMap<string, AvailableSpotlightResult>
+  > = new Map(),
+): SpotlightAccuracyEntry[] {
+  const unrankedEntries = entryRows.map((entry) => {
+    const rankedTeamPicks = rankedTeamPicksByPredictionId.get(entry.id);
+    const spotlightPicks = (
+      spotlightPicksByPredictionId.get(entry.id) ?? []
+    ).map((pick) => {
+      const result = rankedTeamPicks?.get(pick.category);
+      return result ? { ...pick, ...result } : pick;
+    });
+    const availableCategoryPoints = spotlightPicks.flatMap((pick) =>
+      pick.accuracyPoints === null || pick.accuracyPoints === undefined
+        ? []
+        : [pick.accuracyPoints],
+    );
+    const accuracyScore = availableCategoryPoints.reduce(
+      (total, points) => total + points,
+      0,
+    );
+
+    return {
+      accuracyScore,
+      availableCategoryCount: availableCategoryPoints.length,
+      createdAt: entry.createdAt,
+      id: entry.id,
+      participantName: entry.participantName,
+      spotlightPicks,
+      totalScore: accuracyScore,
+    };
+  });
+
+  return assignSharedRanks(unrankedEntries).map((entry) => ({
+    accuracyRank: entry.rank,
+    accuracyScore: entry.accuracyScore,
+    availableCategoryCount: entry.availableCategoryCount,
+    createdAt: entry.createdAt,
+    id: entry.id,
+    participantName: entry.participantName,
+    spotlightPicks: entry.spotlightPicks,
+  }));
 }
 
 export async function getLeaderboardView(): Promise<LeaderboardView> {
@@ -166,6 +233,7 @@ export async function getLeaderboardView(): Promise<LeaderboardView> {
       scoredEntries: null,
       seasonStarted: access.seasonStarted,
       snapshot: null,
+      spotlightAccuracyEntries: null,
     };
   }
 
@@ -177,6 +245,10 @@ export async function getLeaderboardView(): Promise<LeaderboardView> {
     spotlightPicks:
       spotlightPicksByPredictionId.get(entryRows[index]?.id ?? "") ?? [],
   }));
+  const pendingSpotlightAccuracyEntries = buildSpotlightAccuracyEntries(
+    entryRows,
+    spotlightPicksByPredictionId,
+  );
 
   if (!season.activeSnapshotId) {
     return {
@@ -185,6 +257,7 @@ export async function getLeaderboardView(): Promise<LeaderboardView> {
       scoredEntries: null,
       seasonStarted: access.seasonStarted,
       snapshot: null,
+      spotlightAccuracyEntries: pendingSpotlightAccuracyEntries,
     };
   }
 
@@ -201,6 +274,7 @@ export async function getLeaderboardView(): Promise<LeaderboardView> {
       scoredEntries: null,
       seasonStarted: access.seasonStarted,
       snapshot: null,
+      spotlightAccuracyEntries: pendingSpotlightAccuracyEntries,
     };
   }
 
@@ -233,6 +307,7 @@ export async function getLeaderboardView(): Promise<LeaderboardView> {
           : null,
       seasonStarted: access.seasonStarted,
       snapshot: observedSnapshot,
+      spotlightAccuracyEntries: [],
     };
   }
 
@@ -304,7 +379,7 @@ export async function getLeaderboardView(): Promise<LeaderboardView> {
   );
   const rankedTeamPicksByPredictionId = new Map<
     string,
-    Map<string, { metricLabel: string; points: number; rank: number }>
+    Map<string, AvailableSpotlightResult>
   >();
 
   for (const pick of teamSpotlightRows) {
@@ -319,12 +394,18 @@ export async function getLeaderboardView(): Promise<LeaderboardView> {
     const byCategory =
       rankedTeamPicksByPredictionId.get(pick.predictionId) ?? new Map();
     byCategory.set(pick.category, {
+      accuracyPoints: scoreCategoryRank(result.rank, entryRows.length),
       metricLabel: formatExpectationIndex(result.index),
-      points: scoreCategoryRank(result.rank),
-      rank: result.rank,
+      resultRank: result.rank,
     });
     rankedTeamPicksByPredictionId.set(pick.predictionId, byCategory);
   }
+
+  const spotlightAccuracyEntries = buildSpotlightAccuracyEntries(
+    entryRows,
+    spotlightPicksByPredictionId,
+    rankedTeamPicksByPredictionId,
+  );
 
   const actualPositionByTeamId = new Map(
     actualTable.map((item) => [item.teamId, item.actualPosition] as const),
@@ -347,18 +428,6 @@ export async function getLeaderboardView(): Promise<LeaderboardView> {
       throw new Error("The champion pick must exist in the active standings.");
     }
 
-    const rankedTeamPicks = rankedTeamPicksByPredictionId.get(entry.id);
-    const spotlightPicks = (
-      spotlightPicksByPredictionId.get(entry.id) ?? []
-    ).map((pick) => {
-      const result = rankedTeamPicks?.get(pick.category);
-      return result ? { ...pick, ...result } : pick;
-    });
-    const spotlightScore = spotlightPicks.reduce(
-      (total, pick) => total + (pick.points ?? 0),
-      0,
-    );
-
     return {
       champion: {
         actualPosition,
@@ -371,10 +440,8 @@ export async function getLeaderboardView(): Promise<LeaderboardView> {
       exactCount: state.summary.exactCount,
       id: entry.id,
       participantName: entry.participantName,
-      spotlightPicks,
-      spotlightScore,
       tableScore: state.summary.total,
-      totalScore: state.summary.total + spotlightScore,
+      totalScore: state.summary.total,
       withinThreeCount: state.summary.withinThreeCount,
     };
   });
@@ -391,5 +458,6 @@ export async function getLeaderboardView(): Promise<LeaderboardView> {
         ),
     seasonStarted: access.seasonStarted,
     snapshot: observedSnapshot,
+    spotlightAccuracyEntries,
   };
 }

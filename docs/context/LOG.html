@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="canonical-source" content="LOG.md" />
-    <meta name="canonical-source-sha256" content="704b39ebd5a021203880dcc55b91dca02be3e3ca916a56234d89a25c9b161ce5" />
+    <meta name="canonical-source-sha256" content="5dd8f96cda13cad08203b8f16bc3ca13117ba5af6f1095925950656fc9a92045" />
     <title>Session log</title>
     <style>
       :root { color-scheme: light dark; font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
@@ -165,8 +165,18 @@
 <li>Left the administrator-login WAF in its live log-only state for verification; the final metrics query recorded exactly four intended bounded-login <code>POST</code> requests. Prepared a per-IP rate limit of 10 requests per 60 seconds with HTTP 429 on excess requests, but did not publish it because owner publication remains required. The staged rule is not live.</li>
 <li>Regenerated and checked all HTML peers, published the final evidence through working <code>main</code>, synchronized local and remote <code>main</code>, removed completed branch state, and retained one primary worktree. The self-referential final evidence merge SHA is intentionally not pinned in this durable end-state note.</li>
 </ul>
+<h3>Table-only leaderboard and spotlight accuracy iteration (locally verified; release pending)</h3>
+<ul>
+<li>Applied the owner&#39;s scoring clarification: the main leaderboard now uses only table-prediction points and remains capped at 100. Spotlight picks never change that score.</li>
+<li>Added a separate <code>/spotlight</code> page with overall and seven category sorts. With <code>N</code> active nondeleted brackets, a selected subject at outcome rank <code>r</code> earns <code>max(0, N + 1 - r)</code> accuracy points. Pending outcomes are excluded, resolved zero-point outcomes remain available, and equal overall totals share a competition rank.</li>
+<li>Kept the five non-table-derived outcomes pending for a future owner-run Codex automation. The application still has no runtime football API, production scraper, or Vercel Cron.</li>
+<li>Published the approved Vercel WAF rule for <code>POST /admin/login</code>: 10 requests per 60 seconds for each IP, with HTTP 429 for excess requests. Read-back found active version 2 and no draft.</li>
+<li>Passed uninterrupted <code>CI=1 npm run check</code>: 148 default tests with 10 guarded skips, 10 isolated Neon integration cases, the Webpack production build, five pre-kickoff browser journeys with 20 intentional skips, and three post-kickoff journeys with two intentional skips.</li>
+<li>Kept the current production deployment and screenshots labelled as prior-release evidence until this branch is merged and receives a new read-only production smoke. No production write ran for this iteration.</li>
+<li>Audited the GitHub default-branch blocker. The repository account has administrator access, but the active fine-grained token lacks repository Administration permission. Changing the default branch to <code>main</code> requires Administration read and write for this repository; branch deletion also requires Contents read and write.</li>
+</ul>
 
-      <p class="source">Generated deterministically from <a href="LOG.md">docs/context/LOG.md</a>. Canonical SHA-256: <code>704b39ebd5a021203880dcc55b91dca02be3e3ca916a56234d89a25c9b161ce5</code>.</p>
+      <p class="source">Generated deterministically from <a href="LOG.md">docs/context/LOG.md</a>. Canonical SHA-256: <code>5dd8f96cda13cad08203b8f16bc3ca13117ba5af6f1095925950656fc9a92045</code>.</p>
     </main>
   </body>
 </html>

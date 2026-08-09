@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="canonical-source" content="QA.md" />
-    <meta name="canonical-source-sha256" content="4ebc2d97c6429ef191204cf1b09656fb77bea304e686572da9c908d2b65543a3" />
+    <meta name="canonical-source-sha256" content="bfef202ce5cac98368e18c754b51a199806e11334fdc3d56202f41ac1274b106" />
     <title>Quality assurance</title>
     <style>
       :root { color-scheme: light dark; font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
@@ -39,7 +39,7 @@
   <body>
     <main>
       <h1>Quality assurance</h1>
-<p>Evidence date: 2026-08-08. This document records the newest completed local and production verification for the seven-category spotlight prediction and reviewed player-catalogue release. GitHub PR #7 is merged and its exact application deployment is live at the stable alias. Two operational controls remain open and are stated as pending below: a deployment after removal of the legacy administrator secret, and owner publication of the staged Web Application Firewall rate limit. Earlier release history remains in <code>docs/context/LOG.md</code>.</p>
+<p>Evidence date: 2026-08-08. This document records the newest completed local and production verification for the seven-category spotlight prediction and reviewed player-catalogue release. GitHub PRs #7 and #8 are merged, the hash-only closeout deployment is live at the stable alias, and its final read/write browser proof is complete. Owner publication of the staged Web Application Firewall rate limit remains the only open release control; pending result feeds and the working category curve remain product follow-ups. Earlier release history remains in <code>docs/context/LOG.md</code>.</p>
 <h2>Current results</h2>
 <table>
 <thead>
@@ -86,8 +86,8 @@
 </tr>
 <tr>
 <td>Vercel production build</td>
-<td>deployment <code>dpl_5KBCAG4xhrZuapSqMg5LK4i6myGR</code></td>
-<td>Ready with target <code>production</code> for exact Git SHA <code>c976c1719c8c17f8169b9c8b86248765821b203a</code>. Its immutable URL and the stable alias both resolve to this application release.</td>
+<td>deployment <code>dpl_HT2uPdP5iJPaWuYtNFEknroRmTqG</code></td>
+<td>Ready with target <code>production</code> for exact Git SHA <code>a9d1c12c804ff34db48450ff2e57bded64710022</code>. Its immutable URL and the stable alias both resolve to the hash-only closeout release.</td>
 </tr>
 <tr>
 <td>Anonymous production smoke</td>
@@ -116,13 +116,13 @@
 </tr>
 <tr>
 <td>Legacy administrator fallback</td>
-<td>Vercel environment inventory</td>
-<td><code>ADMIN_SECRET</code> was removed from the Vercel environments. The currently inspected deployment predates that removal, so one subsequent deployment is still required before production runtime is described as legacy-free.</td>
+<td>deployment metadata plus bounded login</td>
+<td><code>ADMIN_SECRET</code> is absent from production, preview, and development inventories and from the running production deployment. <code>ADMIN_USERNAME</code> and <code>ADMIN_PASSWORD_HASH</code> are present, and the post-removal bounded login passed.</td>
 </tr>
 <tr>
 <td>Administrator login WAF</td>
 <td>Vercel firewall inspection</td>
-<td>The live log-only rule observed exactly one intended login <code>POST</code>. A 10-request-per-60-second, per-IP, HTTP-429 rate limit is staged but is not live; owner publication remains required.</td>
+<td>The live log-only rule observed exactly four intended bounded-login <code>POST</code> requests and no enforced action. A 10-request-per-60-second, per-IP, HTTP-429 rate limit is staged but is not live; owner publication remains required.</td>
 </tr>
 </tbody></table>
 <p>The local environment uses the repository&#39;s verified Webpack production-build command because its restricted sandbox does not allow a default Turbopack helper to bind an internal port. Vercel built the release successfully, so this remains an execution-environment limitation rather than an application compile failure.</p>
@@ -161,14 +161,14 @@
 <li>the rules page, administrator sign-in, exact submission deletion, deletion audit, and complete isolated cleanup; and</li>
 <li>the existing deterministic pre/post-kickoff table scores, champion status, standings import, finalization, and undo paths.</li>
 </ul>
-<p>The first production rerun exposed two harness-only browser boundaries, not product failures. A touch drag may finish without crossing the insertion boundary on its first attempt, so the smoke permits one bounded retry and still requires the club order to change. A browser may cancel a speculative optimized player-face candidate during navigation; the request guard excludes only that cancellation while the UI makes explicit assertions that selected catalogue portraits decode with nonzero natural dimensions and that the custom Other-player fallback renders the silhouette with no image. The corrected read-only production run then passed all five projects.</p>
+<p>The production reruns exposed three harness-only browser boundaries, not product failures. A touch drag may finish without crossing the insertion boundary on its first attempt, so the smoke permits one bounded retry and still requires the club order to change. A browser may cancel a speculative optimized player-face candidate during navigation; the request guard excludes only that cancellation while the UI makes explicit rendered-image assertions. Finally, the rank-two Haaland demo starts in a closed details element while rank-one Jordan starts open, so the harness now keeps both details open before it requires Haaland&#39;s portrait to decode and Alysson&#39;s silhouette to contain no image. The corrected read-only production run then passed all five projects.</p>
 <p>Automated WebKit emulation is strong regression evidence but is not a substitute for a final spot check on the owner&#39;s physical iPhone when one is available.</p>
 <h2>Production deployment evidence</h2>
-<p>GitHub <a href="https://github.com/vdoshi96/Pl-predictions/pull/7">PR #7</a> merged the tested feature into the working <code>main</code> branch at exact merge SHA <code>c976c1719c8c17f8169b9c8b86248765821b203a</code>. Deployment <code>dpl_5KBCAG4xhrZuapSqMg5LK4i6myGR</code> is Ready with target <code>production</code> at immutable URL <a href="https://pl-predictions-7lhcv198i-vdoshi96s-projects.vercel.app">https://pl-predictions-7lhcv198i-vdoshi96s-projects.vercel.app</a>. Its metadata identifies that exact SHA, and the stable public alias <a href="https://pl-predictions-2026.vercel.app">https://pl-predictions-2026.vercel.app</a> points to it. This record does not claim that GitHub <code>main</code> is the repository&#39;s configured default branch.</p>
+<p>GitHub <a href="https://github.com/vdoshi96/Pl-predictions/pull/7">PR #7</a> merged the product feature at <code>c976c1719c8c17f8169b9c8b86248765821b203a</code>; <a href="https://github.com/vdoshi96/Pl-predictions/pull/8">PR #8</a> merged the hardened release evidence at <code>a9d1c12c804ff34db48450ff2e57bded64710022</code>. Deployment <code>dpl_HT2uPdP5iJPaWuYtNFEknroRmTqG</code> is Ready with target <code>production</code> at immutable URL <a href="https://pl-predictions-dixkq8ma0-vdoshi96s-projects.vercel.app">https://pl-predictions-dixkq8ma0-vdoshi96s-projects.vercel.app</a>. Its metadata identifies the exact PR #8 SHA, and the stable public alias <a href="https://pl-predictions-2026.vercel.app">https://pl-predictions-2026.vercel.app</a> points to it. This record does not claim that GitHub <code>main</code> is the repository&#39;s configured default branch.</p>
 <p>The corrected read-only production smoke passed 5 of 5 browser projects. It verified application health, the three-stage preview, seven completed picks, explicit decoded portrait/silhouette behavior, the visible leaderboard demonstration, the rules page, administrator sign-in, 320–430-pixel reflow, no horizontal overflow, and no unexpected browser, same-origin request, or HTTP response errors.</p>
 <p>The separately gated production write smoke passed its one exact journey. Its production mode requires only the <code>PLAYWRIGHT_ADMIN_PASSWORD</code> environment value, disables screenshot, trace, and video artifacts, and uses the list reporter so the credential cannot leak into retained browser evidence. The hardened live run left only <code>.last-run.json</code> in its output/results locations. It submitted a unique complete entry, confirmed the receipt-only privacy boundary, authenticated with the username and PBKDF2-backed credential, exact-deleted the created prediction, verified the deletion audit, then removed that QA audit as part of teardown. Final queries again found zero parent, table-item, spotlight-pick, or deletion-audit residue from the run.</p>
-<p>The successful login proves the configured hash path because the application prioritizes <code>ADMIN_PASSWORD_HASH</code> when it is present. The legacy <code>ADMIN_SECRET</code> name has since been removed from production, preview, and development environment inventories, but the current application deployment was built before that removal. A subsequent deployment and bounded login verification remain required before describing the running deployment as hash-only.</p>
-<p>The live WAF rule remained in log mode for the verification and observed exactly the one intended administrator-login <code>POST</code>. The prepared change would enforce 10 requests per 60 seconds per IP with HTTP 429 on excess requests, but it remains staged under the owner-publication boundary and is not live.</p>
+<p>The successful post-removal login proves the configured hash path because deployment metadata contains <code>ADMIN_USERNAME</code> and <code>ADMIN_PASSWORD_HASH</code> but not <code>ADMIN_SECRET</code>. The legacy name is also absent from production, preview, and development environment inventories. The raw credential remained in macOS Keychain only and was never written to source, browser artifacts, logs, or documentation.</p>
+<p>The live WAF rule remained in log mode for the verification and observed exactly four intended bounded administrator-login <code>POST</code> requests. The prepared change would enforce 10 requests per 60 seconds per IP with HTTP 429 on excess requests, but it remains staged under the owner-publication boundary and is not live.</p>
 <h2>Production mobile screenshots</h2>
 <p>Only the newest completed production run is retained. All four screenshots were refreshed at 390 by 844 pixels and visually inspected for readable wrapping, reachable actions, painted local imagery, and absence of horizontal clipping.</p>
 <p><strong>Prediction entry — mobile Chromium at 390 pixels:</strong> stage one shows all 20 club crests in the mobile sorter after a verified keyboard move, with the display-name field and safe-area-aware spotlight action fitting the viewport.</p>
@@ -192,19 +192,18 @@
 <h2>Release closeout state</h2>
 <ul>
 <li><input checked="" disabled="" type="checkbox"> Merge GitHub PR #7 into working <code>main</code> at exact SHA <code>c976c1719c8c17f8169b9c8b86248765821b203a</code>.</li>
-<li><input checked="" disabled="" type="checkbox"> Verify Ready production deployment <code>dpl_5KBCAG4xhrZuapSqMg5LK4i6myGR</code>, its immutable URL, exact SHA, and the stable alias mapping.</li>
+<li><input checked="" disabled="" type="checkbox"> Merge PR #8 at <code>a9d1c12c804ff34db48450ff2e57bded64710022</code> and verify Ready production deployment <code>dpl_HT2uPdP5iJPaWuYtNFEknroRmTqG</code>, its immutable URL, exact SHA, and stable alias mapping.</li>
 <li><input checked="" disabled="" type="checkbox"> Apply migrations <code>0003</code> through <code>0005</code>, seed and verify 587 players with 580 portraits and seven silhouettes, and prove there were zero pre-existing predictions.</li>
 <li><input checked="" disabled="" type="checkbox"> Pass the corrected five-project read-only smoke and the one-case bounded write smoke with exact zero QA residue.</li>
 <li><input checked="" disabled="" type="checkbox"> Refresh and visually inspect the newest four mobile screenshots.</li>
-<li><input checked="" disabled="" type="checkbox"> Confirm username-plus-PBKDF2 authentication and remove the legacy <code>ADMIN_SECRET</code> name from Vercel environment inventories.</li>
-<li><input disabled="" type="checkbox"> Deploy after the legacy-secret removal and rerun a bounded owner-login check before claiming the production runtime is legacy-free.</li>
+<li><input checked="" disabled="" type="checkbox"> Confirm username-plus-PBKDF2 authentication, remove <code>ADMIN_SECRET</code> from Vercel inventories, deploy without it, and pass the bounded owner-login check against that exact runtime.</li>
 <li><input disabled="" type="checkbox"> Obtain owner publication of the staged 10-per-60-second per-IP WAF rate limit; until then, the live rule remains log-only.</li>
 <li><input disabled="" type="checkbox"> Confirm or revise the working 20-to-1 category curve and 240-point maximum.</li>
 <li><input disabled="" type="checkbox"> Provide reviewed source-neutral inputs for the five pending outcome rankings and reconcile custom Other-player names.</li>
-<li><input disabled="" type="checkbox"> Complete the evidence-only documentation generation, merge, local <code>main</code> synchronization, and worktree cleanup; this record does not claim those steps are already complete.</li>
+<li><input checked="" disabled="" type="checkbox"> Generate the HTML peers, publish the final evidence through working <code>main</code>, synchronize local and remote <code>main</code>, remove completed branch state, and retain one primary worktree. The self-referential final evidence merge SHA is intentionally not pinned here.</li>
 </ul>
 
-      <p class="source">Generated deterministically from <a href="QA.md">docs/QA.md</a>. Canonical SHA-256: <code>4ebc2d97c6429ef191204cf1b09656fb77bea304e686572da9c908d2b65543a3</code>.</p>
+      <p class="source">Generated deterministically from <a href="QA.md">docs/QA.md</a>. Canonical SHA-256: <code>bfef202ce5cac98368e18c754b51a199806e11334fdc3d56202f41ac1274b106</code>.</p>
     </main>
   </body>
 </html>

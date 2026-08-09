@@ -53,6 +53,23 @@ async function expectClubMarksLoaded(
   }
 }
 
+async function expectPlayerPortraitLoaded(
+  playerMark: import("@playwright/test").Locator,
+) {
+  const portrait = playerMark.locator("img");
+  await expect(portrait).toHaveCount(1);
+  await expect
+    .poll(() =>
+      portrait.evaluate(
+        (image) =>
+          image instanceof HTMLImageElement &&
+          image.complete &&
+          image.naturalWidth > 0,
+      ),
+    )
+    .toBe(true);
+}
+
 test("production public routes are mobile-safe and healthy", async ({
   page,
 }, testInfo) => {
@@ -92,10 +109,15 @@ test("production public routes are mobile-safe and healthy", async ({
       requestUrl.pathname === "/_next/image" &&
       optimizedImageSource?.startsWith("/team-marks/") &&
       /(?:ERR_ABORTED|cancelled|canceled)/iu.test(errorText);
+    const isCanceledPlayerFaceCandidate =
+      requestUrl.pathname === "/_next/image" &&
+      optimizedImageSource?.startsWith("/player-faces/") &&
+      /(?:ERR_ABORTED|cancelled|canceled)/iu.test(errorText);
     if (
       requestUrl.origin === productionOrigin &&
       !isCanceledRscPrefetch &&
-      !isCanceledTeamMarkCandidate
+      !isCanceledTeamMarkCandidate &&
+      !isCanceledPlayerFaceCandidate
     ) {
       networkErrors.push(`${request.method()} ${request.url()} ${errorText}`);
     }
@@ -148,28 +170,48 @@ test("production public routes are mobile-safe and healthy", async ({
     await expect(continueButton).toBeEnabled();
 
     let firstHandle = page.getByRole("button", { name: /^Move Arsenal,/ });
-    const secondHandle = page.getByRole("button", {
-      name: /^Move Aston Villa,/,
+    const table = page.getByRole("list", {
+      name: "Premier League predicted positions",
     });
-    if (testInfo.project.name === "chromium") {
-      await dragWithMouse(page, firstHandle, secondHandle);
-    } else if (testInfo.project.name === "mobile-chromium") {
-      await dragWithChromiumTouch(page, firstHandle, secondHandle);
-    } else if (testInfo.project.name === "mobile-webkit") {
-      await dragWithWebKitTouch(page, firstHandle, secondHandle);
+    if (
+      testInfo.project.name === "mobile-chromium" ||
+      testInfo.project.name === "mobile-webkit"
+    ) {
+      const touchTarget = page.getByRole("button", {
+        name: /^Move AFC Bournemouth,/,
+      });
+      const dragWithTouch =
+        testInfo.project.name === "mobile-chromium"
+          ? dragWithChromiumTouch
+          : dragWithWebKitTouch;
+      await dragWithTouch(page, firstHandle, touchTarget);
+      if (
+        (await table
+          .getByRole("listitem")
+          .first()
+          .getAttribute("aria-label")) === "Arsenal, predicted position 1 of 20"
+      ) {
+        await dragWithTouch(page, firstHandle, touchTarget);
+      }
+      await expect(table.getByRole("listitem").first()).not.toHaveAttribute(
+        "aria-label",
+        /^Arsenal, predicted position 1 of 20$/,
+      );
     } else {
-      await firstHandle.focus();
-      await page.keyboard.press("ArrowDown");
+      if (testInfo.project.name === "chromium") {
+        const secondHandle = page.getByRole("button", {
+          name: /^Move Aston Villa,/,
+        });
+        await dragWithMouse(page, firstHandle, secondHandle);
+      } else {
+        await firstHandle.focus();
+        await page.keyboard.press("ArrowDown");
+      }
+      await expect(table.getByRole("listitem").first()).toHaveAttribute(
+        "aria-label",
+        /^Aston Villa, predicted position 1 of 20$/,
+      );
     }
-    await expect(
-      page
-        .getByRole("list", { name: "Premier League predicted positions" })
-        .getByRole("listitem")
-        .first(),
-    ).toHaveAttribute(
-      "aria-label",
-      /^Aston Villa, predicted position 1 of 20$/,
-    );
     await expect(
       page.locator("[data-dnd-dragging], [data-dnd-dropping]"),
     ).toHaveCount(0);
@@ -200,6 +242,22 @@ test("production public routes are mobile-safe and healthy", async ({
     });
     await expect(reviewDialog).toBeVisible();
     await expect(reviewDialog.locator("[data-category]")).toHaveCount(7);
+    for (const playerName of [
+      "Cole Palmer",
+      "Declan Rice",
+      "Elliot Anderson",
+    ]) {
+      await expectPlayerPortraitLoaded(
+        reviewDialog.getByRole("img", {
+          name: `${playerName} player portrait`,
+        }),
+      );
+    }
+    const customPlayerFallback = reviewDialog.getByRole("img", {
+      name: "Production Preview Other player portrait",
+    });
+    await expect(customPlayerFallback.locator("img")).toHaveCount(0);
+    await expect(customPlayerFallback.locator("svg")).toBeVisible();
     await expectClubMarksLoaded(
       reviewDialog
         .getByRole("list", {
@@ -251,9 +309,25 @@ test("production public routes are mobile-safe and healthy", async ({
   await expect(
     leaderboardDemo.getByText("Demo only", { exact: true }),
   ).toBeVisible();
-  await resetScrollPosition(page);
+  await expectPlayerPortraitLoaded(
+    leaderboardDemo.getByRole("img", {
+      name: "Erling Haaland player portrait",
+    }),
+  );
+  const demoJordan = leaderboardDemo.getByLabel(
+    "Demo Jordan demo leaderboard entry",
+  );
+  await demoJordan
+    .getByText("View seven scored picks", { exact: true })
+    .click();
+  const demoSilhouette = demoJordan.getByRole("img", {
+    name: "Alysson player portrait",
+  });
+  await expect(demoSilhouette.locator("img")).toHaveCount(0);
+  await expect(demoSilhouette.locator("svg")).toBeVisible();
   await expectNoHorizontalOverflow(page);
   if (captureMobileEvidence) {
+    await leaderboardDemo.scrollIntoViewIfNeeded();
     await page.screenshot({
       path: path.join(screenshotDirectory!, "leaderboard-mobile.png"),
     });

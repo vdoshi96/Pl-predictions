@@ -1,5 +1,5 @@
 import { neon } from "@neondatabase/serverless";
-import { expect, test } from "@playwright/test";
+import { expect, test, type Page } from "@playwright/test";
 import { and, count, eq } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/neon-http";
 
@@ -15,6 +15,8 @@ const qaName = `Production QA ${Date.now().toString(36)}`;
 let qaEntryId: string | null = null;
 let submissionAttempted = false;
 
+test.describe.configure({ retries: 0 });
+
 function getProductionDb() {
   const connectionString = process.env.DATABASE_URL;
   if (!connectionString) {
@@ -23,28 +25,55 @@ function getProductionDb() {
   return drizzle(neon(connectionString));
 }
 
+async function deleteQaEntryThroughAdmin(page: Page, adminPassword: string) {
+  await page.goto("/admin/submissions", { waitUntil: "networkidle" });
+  if (new URL(page.url()).pathname === "/admin/login") {
+    await page.getByLabel("Username").fill("admin");
+    await page.getByLabel("Password").fill(adminPassword);
+    await page.getByRole("button", { name: "Sign in securely" }).click();
+    await expect(page).toHaveURL(/\/admin$/u);
+    await page.goto("/admin/submissions", { waitUntil: "networkidle" });
+  }
+
+  const qaRow = page
+    .getByRole("list", { name: "All submissions" })
+    .getByRole("listitem")
+    .filter({ has: page.getByRole("link", { name: qaName }) });
+  if ((await qaRow.count()) !== 1) return false;
+
+  page.once("dialog", (dialog) => dialog.accept());
+  await qaRow.getByRole("button", { name: "Delete entry" }).click();
+  await expect(page.getByRole("link", { name: qaName })).toHaveCount(0);
+  return true;
+}
+
 test.afterEach(async () => {
   if ((!submissionAttempted && !qaEntryId) || !process.env.DATABASE_URL) return;
 
+  const expectedEntryId = qaEntryId;
   const db = getProductionDb();
   const matchingEntries = await db
     .select({ id: predictions.id })
     .from(predictions)
     .where(eq(predictions.participantName, qaName))
-    .limit(2);
-  expect(
-    matchingEntries.length,
-    "The generated production QA name must identify at most one entry",
-  ).toBeLessThanOrEqual(1);
+    .limit(3);
 
   const recoveredEntryId = matchingEntries[0]?.id ?? null;
-  if (qaEntryId && recoveredEntryId) {
-    expect(recoveredEntryId).toBe(qaEntryId);
+  const cleanupEntryIds = new Set<string>();
+  if (expectedEntryId) cleanupEntryIds.add(expectedEntryId);
+  for (const matchingEntry of matchingEntries) {
+    cleanupEntryIds.add(matchingEntry.id);
   }
-  const cleanupEntryId = qaEntryId ?? recoveredEntryId;
 
-  if (cleanupEntryId) {
-    await db.delete(predictions).where(eq(predictions.id, cleanupEntryId));
+  for (const cleanupEntryId of cleanupEntryIds) {
+    await db
+      .delete(predictions)
+      .where(
+        and(
+          eq(predictions.id, cleanupEntryId),
+          eq(predictions.participantName, qaName),
+        ),
+      );
     await db
       .delete(adminAuditLogs)
       .where(
@@ -60,42 +89,59 @@ test.afterEach(async () => {
     .select({ value: count() })
     .from(predictions)
     .where(eq(predictions.participantName, qaName));
-  expect(parentResidue?.value ?? 0).toBe(0);
-
-  if (cleanupEntryId) {
-    const [[itemResidue], [pickResidue], [auditResidue]] = await Promise.all([
-      db
-        .select({ value: count() })
-        .from(predictionItems)
-        .where(eq(predictionItems.predictionId, cleanupEntryId)),
-      db
-        .select({ value: count() })
-        .from(predictionCategoryPicks)
-        .where(eq(predictionCategoryPicks.predictionId, cleanupEntryId)),
-      db
-        .select({ value: count() })
-        .from(adminAuditLogs)
-        .where(
-          and(
-            eq(adminAuditLogs.action, "prediction.deleted"),
-            eq(adminAuditLogs.targetType, "prediction"),
-            eq(adminAuditLogs.targetId, cleanupEntryId),
+  const cleanupResidue = await Promise.all(
+    [...cleanupEntryIds].map(async (cleanupEntryId) => {
+      const [[itemResidue], [pickResidue], [auditResidue]] = await Promise.all([
+        db
+          .select({ value: count() })
+          .from(predictionItems)
+          .where(eq(predictionItems.predictionId, cleanupEntryId)),
+        db
+          .select({ value: count() })
+          .from(predictionCategoryPicks)
+          .where(eq(predictionCategoryPicks.predictionId, cleanupEntryId)),
+        db
+          .select({ value: count() })
+          .from(adminAuditLogs)
+          .where(
+            and(
+              eq(adminAuditLogs.action, "prediction.deleted"),
+              eq(adminAuditLogs.targetType, "prediction"),
+              eq(adminAuditLogs.targetId, cleanupEntryId),
+            ),
           ),
-        ),
-    ]);
-    expect(itemResidue?.value ?? 0).toBe(0);
-    expect(pickResidue?.value ?? 0).toBe(0);
-    expect(auditResidue?.value ?? 0).toBe(0);
-  }
+      ]);
+      return {
+        audit: auditResidue?.value ?? 0,
+        items: itemResidue?.value ?? 0,
+        picks: pickResidue?.value ?? 0,
+      };
+    }),
+  );
 
   qaEntryId = null;
   submissionAttempted = false;
+
+  expect(
+    matchingEntries.length,
+    "The generated production QA name must identify at most one entry",
+  ).toBeLessThanOrEqual(1);
+  if (expectedEntryId && recoveredEntryId) {
+    expect(recoveredEntryId).toBe(expectedEntryId);
+  }
+  expect(parentResidue?.value ?? 0).toBe(0);
+  for (const residue of cleanupResidue) {
+    expect(residue.items).toBe(0);
+    expect(residue.picks).toBe(0);
+    expect(residue.audit).toBe(0);
+  }
 });
 
 test("production enforces its current submission state and cleans any QA entry", async ({
   browser,
   page,
-}) => {
+}, testInfo) => {
+  test.setTimeout(120_000);
   test.skip(
     process.env.ALLOW_PRODUCTION_WRITE_SMOKE !== "1" ||
       !process.env.PLAYWRIGHT_BASE_URL,
@@ -106,30 +152,38 @@ test("production enforces its current submission state and cleans any QA entry",
     process.env.DATABASE_URL,
     "DATABASE_URL is required before the bounded smoke can create a QA entry",
   ).toBeTruthy();
-  const adminSecret =
-    process.env.PLAYWRIGHT_ADMIN_PASSWORD ?? process.env.ADMIN_SECRET;
+  expect(new URL(process.env.PLAYWRIGHT_BASE_URL!).origin).toBe(
+    "https://pl-predictions-2026.vercel.app",
+  );
   expect(
-    adminSecret,
-    "PLAYWRIGHT_ADMIN_PASSWORD or ADMIN_SECRET must be available for the bounded smoke",
+    testInfo.project.name,
+    "The bounded production write smoke must use its mobile-chromium project",
+  ).toBe("mobile-chromium");
+  const adminPassword = process.env.PLAYWRIGHT_ADMIN_PASSWORD;
+  expect(
+    adminPassword,
+    "PLAYWRIGHT_ADMIN_PASSWORD must be available for the bounded smoke",
   ).toBeTruthy();
 
   await page.goto("/", { waitUntil: "networkidle" });
   const continueButton = page.getByRole("button", {
     name: "Continue to spotlight picks",
   });
-  if (!(await continueButton.isEnabled())) {
+  const participantName = page.getByRole("textbox", {
+    name: "Your display name",
+  });
+  if (!(await participantName.isEnabled())) {
     await expect(
       page.getByText("Submissions closed", { exact: true }),
     ).toBeVisible();
-    await expect(
-      page.getByRole("textbox", { name: "Your display name" }),
-    ).toBeDisabled();
+    await expect(participantName).toBeDisabled();
     return;
   }
 
-  await page.getByRole("textbox", { name: "Your display name" }).fill(qaName);
+  await participantName.fill(qaName);
+  await expect(continueButton).toBeEnabled();
   await continueButton.click();
-  await completeSpotlightPicks(page, qaName);
+  const privatePlayerNames = await completeSpotlightPicks(page, qaName);
   await page.getByRole("button", { name: "Review all predictions" }).click();
   submissionAttempted = true;
   await page
@@ -144,6 +198,53 @@ test("production enforces its current submission state and cleans any QA entry",
   const entryPath = await confirmationLink.getAttribute("href");
   expect(entryPath).toMatch(/^\/entries\/[0-9a-f-]{36}$/u);
   qaEntryId = entryPath!.split("/").at(-1)!;
+
+  const [boundEntry] = await getProductionDb()
+    .select({ id: predictions.id })
+    .from(predictions)
+    .where(
+      and(
+        eq(predictions.id, qaEntryId),
+        eq(predictions.participantName, qaName),
+      ),
+    )
+    .limit(1);
+  if (!boundEntry) {
+    const deletedThroughAdmin = await deleteQaEntryThroughAdmin(
+      page,
+      adminPassword!,
+    );
+    expect(
+      deletedThroughAdmin,
+      "A database/origin mismatch must still remove the exact live QA entry",
+    ).toBe(true);
+  }
+  expect(
+    boundEntry,
+    "DATABASE_URL must contain the exact entry created through the production origin",
+  ).toEqual({ id: qaEntryId });
+
+  const htmlResponse = await page.request.get("/leaderboard", {
+    headers: { accept: "text/html" },
+  });
+  expect(htmlResponse.ok()).toBe(true);
+  const rawHtml = await htmlResponse.text();
+  expect(rawHtml).toContain(qaName);
+  expect(rawHtml).not.toContain(qaEntryId);
+  for (const privatePlayerName of privatePlayerNames) {
+    expect(rawHtml).not.toContain(privatePlayerName);
+  }
+
+  const rscResponse = await page.request.get("/leaderboard?_rsc=privacy", {
+    headers: { accept: "text/x-component", rsc: "1" },
+  });
+  expect(rscResponse.ok()).toBe(true);
+  const rawRsc = await rscResponse.text();
+  expect(rawRsc).toContain(qaName);
+  expect(rawRsc).not.toContain(qaEntryId);
+  for (const privatePlayerName of privatePlayerNames) {
+    expect(rawRsc).not.toContain(privatePlayerName);
+  }
 
   await confirmationLink.click();
   await expect(
@@ -172,7 +273,7 @@ test("production enforces its current submission state and cleans any QA entry",
 
   await page.goto("/admin/login");
   await page.getByLabel("Username").fill("admin");
-  await page.getByLabel("Password").fill(adminSecret!);
+  await page.getByLabel("Password").fill(adminPassword!);
   await page.getByRole("button", { name: "Sign in securely" }).click();
   await expect(page).toHaveURL(/\/admin$/u);
   await page.goto("/admin/submissions", { waitUntil: "networkidle" });

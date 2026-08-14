@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="generated-by" content="scripts/generate-docs-html.mjs" />
     <meta name="canonical-source" content="SOURCES.md" />
-    <meta name="canonical-source-sha256" content="7e51378624c0fe31b3d500414807d65e1c50ff5d029b454877c67f0470c168a7" />
+    <meta name="canonical-source-sha256" content="9864e270d4ca329f5ff8c235746a651a1b9c42ca42e38b6305cce9e2ba4c7da2" />
     <title>Sources</title>
     <style>
       :root { color-scheme: light dark; font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
@@ -63,7 +63,7 @@
 <li>Application use: roster rows are imported into the season catalogue and reviewed portraits are copied to local <code>/player-faces/</code> paths. <code>PlayerMark</code> uses its generic silhouette when an asset path is absent or an image fails.</li>
 <li>Runtime boundary: the deployed application does not execute the handoff&#39;s acquisition scripts, call those upstream sources, scrape player pages, or hotlink portraits. Other player covers unavailable or newly added players.</li>
 <li>Outcome boundary: this is a selector identity and portrait snapshot, not a goals, assists, clean-sheets, or player-rating result feed. A future owner-run Codex automation may acquire those five outcomes offline, review them, and enter them through an approved path.</li>
-<li>Production boundary: the live database remains on the August 8 seed baseline of 587 total/active players and 580 portrait paths until the August 13 application is merged, deployed, and seeded through the approved production sequence.</li>
+<li>Production boundary: the August 13 application was merged through PR #15, deployed, and seeded once through the approved sequence after a six-hour Neon restore window and read-only just-before-seed time-travel result were proven. The live catalogue now has 599 total rows, 582 active players, 17 preserved inactive rows, and 582 distinct active portrait paths. This release state does not change the no-runtime-acquisition boundary.</li>
 </ul>
 <h2 id="season-sources-and-permission-disposition">Season sources and permission disposition</h2>
 <ul>
@@ -90,7 +90,7 @@
 <p>Current official Next.js, React, Node.js/Vercel runtime, Tailwind CSS, dnd-kit, Neon, Drizzle, Vercel Marketplace/Git integration, Vercel Authentication, and GitHub documentation informed the pinned stack and deployment flow. Exact links, decisions, caveats, rejected alternatives, and failure behavior are recorded in <code>docs/RESEARCH.md</code>.</p>
 <p>Implementation and current checked-out behavior remain authoritative when a historical note differs.</p>
 
-      <p class="source">Generated deterministically from <a href="SOURCES.md">docs/context/SOURCES.md</a>. Canonical SHA-256: <code>7e51378624c0fe31b3d500414807d65e1c50ff5d029b454877c67f0470c168a7</code>.</p>
+      <p class="source">Generated deterministically from <a href="SOURCES.md">docs/context/SOURCES.md</a>. Canonical SHA-256: <code>9864e270d4ca329f5ff8c235746a651a1b9c42ca42e38b6305cce9e2ba4c7da2</code>.</p>
     </main>
   </body>
 </html>

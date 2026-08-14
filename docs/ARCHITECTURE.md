@@ -32,8 +32,9 @@ The public application never contacts FotMob or another football-data source. Th
 
 - Vercel project: `vdoshi96s-projects/pl-predictions`.
 - Production alias: `https://pl-predictions-2026.vercel.app`.
+- Released catalogue deployment: `dpl_2CAJEZ3cXpm7NU6K972sN31bVBkz`, Ready at `https://pl-predictions-835vjpg3z-vdoshi96s-projects.vercel.app`; at roster release verification time, alias read-back resolved to the same deployment ID.
 - Deployment protection: Vercel Authentication is `preview`; production is public and retained previews require Vercel sign-in.
-- Database: Neon resource `neon-coffee-queen`, provisioned through Vercel Marketplace before migrations and seed.
+- Database: Neon resource `neon-coffee-queen`, project `young-leaf-03280061`, provisioned through Vercel Marketplace before migrations and seed. Its root `main` branch has a six-hour restore window.
 - Runtime: Node.js 24.x, Next.js 16.3.0, React 19.2.8, Neon serverless HTTP, and Drizzle ORM.
 - Rendering: database-backed pages are dynamic; static local club badges and imported player-face assets may be cached and optimized by Next.js.
 - Configuration: server-only Vercel variables; no credential has a `NEXT_PUBLIC` prefix.
@@ -148,7 +149,7 @@ The 20 canonical club assets are owner-provided transparent PNG badges with acce
 
 The owner-selected `premier-league-players-2026-08-13/` snapshot covers 582 players across the same 20 clubs and includes 582 portrait PNGs. Relative to August 8, it has 12 additions, 17 removals, and four intra-league moves. The import maps reviewed roster rows into the season catalogue and copies portraits to local `/player-faces/` paths. The exact asset transition deletes 17 obsolete paths and applies four club-move renames without retaining legacy copies. `PlayerMark` shows a generic silhouette for a null asset path or after an image failure. Other player remains available for unavailable or newly added players. The raw folder remains the owner-provided provenance handoff; the deployed app neither runs its acquisition scripts nor hotlinks portrait sources.
 
-Database rollout is deliberately deploy-first and seed-second. Production remains on 587 total/active players and 580 portrait paths until the 582-player code/assets are merged and the exact production deployment is Ready. The idempotent seed then deactivates absent fixture players rather than deleting rows that historical picks may reference, upserts the approved active fixture, and is followed by read-only database and browser verification.
+Database rollout is deliberately deploy-first and seed-second. For this release, the 582-player code/assets reached the exact Ready production deployment before any database change. Because no legacy portrait paths were retained, the owner accepted the brief interval in which an old database path could render `PlayerMark`'s silhouette; the supported seed closed that compatibility window. The recovery stop gate first proved the configured six-hour window and reproduced the 20-team, 587-player pre-seed baseline through a read-only just-before-seed time-travel query; no restore was performed. The seed then ran exactly once, deactivated absent fixture players rather than deleting rows historical picks may reference, and upserted the approved active fixture. Read-only verification found 599 total player rows, 582 active, 17 inactive, 582 distinct active portrait paths, exact fixture parity, and intact foreign-key and cross-season constraints.
 
 Roster identity and portrait ingestion are separate from result entry. The snapshot does not provide final goals, assists, clean sheets, or season ratings. A future owner-run Codex automation will enter these reviewed outcomes manually. Custom Other-player names still require reconciliation.
 

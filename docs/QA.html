@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="generated-by" content="scripts/generate-docs-html.mjs" />
     <meta name="canonical-source" content="QA.md" />
-    <meta name="canonical-source-sha256" content="8e04d7374e45a5e46c7b96637cd07fb6e86faedcb9890152abcf545bc35b9552" />
+    <meta name="canonical-source-sha256" content="6d6ff677d9ce16b60435227fdb70f6ef61c8f8f7846be3cf530d0c03e2caf023" />
     <title>Quality assurance</title>
     <style>
       :root { color-scheme: light dark; font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
@@ -40,8 +40,8 @@
   <body>
     <main>
       <h1 id="quality-assurance">Quality assurance</h1>
-<p>Evidence date: 2026-08-14. The current evidence covers the pre-merge August 13 roster/portrait refresh. The completed August 8 how-to, database-time countdown, retained test entry, and fixture-retirement evidence remains below as dated production history; it does not verify the new roster.</p>
-<h2 id="august-13-roster-refresh-current-pre-merge-results">August 13 roster refresh: current pre-merge results</h2>
+<p>Evidence date: 2026-08-14. The current evidence covers the completed August 13 roster/portrait release from local reconciliation through GitHub merge, production deployment, Neon recovery proof, one supported seed, and read-only production verification. The completed August 8 how-to, database-time countdown, retained test entry, and fixture-retirement evidence remains below as dated production history.</p>
+<h2 id="august-13-roster-refresh-completed-release-results">August 13 roster refresh: completed release results</h2>
 <table>
 <thead>
 <tr>
@@ -51,12 +51,12 @@
 </tr>
 </thead>
 <tbody><tr>
-<td>Repository/GitHub audit</td>
-<td>read-only Git plus GitHub API inspection</td>
-<td>Feature worktree began clean at <code>7d1996ca</code>, one direct commit ahead of live <code>main</code> <code>38aa37ad</code>. The branch incorrectly tracked <code>origin/main</code>; no remote feature branch, pull request, or feature checks existed.</td>
+<td>Repository/GitHub release</td>
+<td>Git, GitHub pull request, and available status checks</td>
+<td>Feature work began at <code>7d1996ca</code>, one direct commit ahead of the then-live <code>main</code> <code>38aa37ad</code>. GitHub <a href="https://github.com/vdoshi96/Pl-predictions/pull/15">PR #15</a> passed every available check and merged on 2026-08-14 at 07:08:09 UTC as merge commit <code>cc4129dbd1513675bb44424cb4c667694c74d120</code>.</td>
 </tr>
 <tr>
-<td>Candidate roster/portrait state</td>
+<td>Released roster/portrait state</td>
 <td>owner handoff plus application-fixture reconciliation</td>
 <td>Passed for 582 players and 582 portraits: 12 additions, 17 removals, four intra-league moves, seven restored portraits, and ten replaced portraits relative to August 8. The fixture, raw JSON, final JSON, workbook, source portraits, tracked fixture, and published portraits reconcile exactly.</td>
 </tr>
@@ -68,7 +68,7 @@
 <tr>
 <td>Compatibility</td>
 <td>owner decision recorded 2026-08-14</td>
-<td>Use the exact refreshed asset set: remove 17 obsolete paths and apply four club-move renames without legacy copies. Preserve inactive database rows for historical picks and retain the runtime silhouette fallback.</td>
+<td>Use the exact refreshed asset set: remove 17 obsolete paths and apply four club-move renames without legacy copies. Preserve inactive database rows for historical picks and retain the runtime silhouette fallback. The owner accepted the brief deploy-before-seed silhouette window; it ended when the seed completed.</td>
 </tr>
 <tr>
 <td>Documentation generator</td>
@@ -91,19 +91,49 @@
 <td>Passed 77 focused tests. The release validator proved exact 582-file coverage, full decode, dimensions, unique hashes/pixels, exact transition identities, provenance IDs, derived selector fields, traversal rejection, validation-before-mutation, rollback, and clean-clone release fingerprints.</td>
 </tr>
 <tr>
-<td>Production baseline</td>
-<td>approved read-only pre-release state</td>
-<td>Production remains unchanged at 587 total/active players and 580 portrait paths. The 582-player fixture is not merged, deployed, or seeded.</td>
-</tr>
-<tr>
 <td>Complete pre-merge chain</td>
 <td><code>CI=1 npm run check</code> against attested isolated Neon</td>
 <td>Passed uninterrupted on the final pre-PR revision: 14-document parity, catalogue validation, formatting, ESLint, strict TypeScript, 205 unit/component tests with 11 guarded integration skips, all 11 isolated Neon integration tests, Webpack production build, five pre-kickoff browser journeys, and three post-kickoff journeys.</td>
 </tr>
 <tr>
-<td>Release and production proof</td>
-<td>GitHub, Vercel, approved seed, read-only live verification</td>
-<td><code>TBD after release</code>: feature PR, merge SHA, exact Ready deployment, alias mapping, one production-seed result, database counts, selector/portrait/browser proof, and any required documentation-closeout PR.</td>
+<td>Exact production deployment</td>
+<td>Vercel deployment and alias read-back</td>
+<td>Deployment <code>dpl_2CAJEZ3cXpm7NU6K972sN31bVBkz</code> was Ready at <a href="https://pl-predictions-835vjpg3z-vdoshi96s-projects.vercel.app">its immutable URL</a>, and the stable production alias resolved to the same deployment ID at roster release verification time.</td>
+</tr>
+<tr>
+<td>Recovery stop gate</td>
+<td>authenticated Neon Console read-only checks</td>
+<td>Project <code>young-leaf-03280061</code> has a root <code>main</code> branch with parent <code>-</code> and a configured six-hour restore window. A pre-seed capture at 2026-08-14 13:35:11.760453 UTC recorded WAL <code>0/45548C8</code> and the exact 20/587/587/0/580 baseline. A read-only time-travel query at 13:33:00 UTC returned that same baseline. The Browse pane showed one transient signal-aborted error, but Query data succeeded; no restore was performed.</td>
+</tr>
+<tr>
+<td>Supported production seed</td>
+<td>synchronized <code>main</code>; <code>npm run db:seed</code> exactly once</td>
+<td>The one production seed invocation printed <code>Seeded 20 teams and 582 players for 2026/27 Premier League.</code> A post-seed capture at 2026-08-14 13:37:59.513827 UTC recorded WAL <code>0/4652E18</code>.</td>
+</tr>
+<tr>
+<td>Production database state</td>
+<td>read-only aggregate and exact fixture comparison</td>
+<td>Passed: 20 teams; 599 total rows and 599 distinct row IDs, external IDs, and slugs; 582 active; 17 inactive; 582 distinct active portrait paths; zero missing/null club references; foreign-key and cross-season checks true; zero inactive-player pick references. The fixture comparison was exact, all 17 inactive IDs and four moves were correct, and no active obsolete path remained.</td>
+</tr>
+<tr>
+<td>Production asset verification</td>
+<td>all current and obsolete public portrait URLs</td>
+<td>All 582 active portrait URLs returned HTTP 200 with PNG content types and PNG signatures. All 21 obsolete URLs returned HTTP 404.</td>
+</tr>
+<tr>
+<td>Production browser smoke</td>
+<td>read-only Playwright against the immutable deployment</td>
+<td>Passed 5 of 5 projects: desktop Chromium, 390-pixel mobile Chromium, exact 320/430-pixel Chromium reflow, and mobile WebKit. It verified added Ronald Araujo, moved Dwight McNeil, restored Alysson, the absence of removed Lucas Digne, Other player&#39;s silhouette, and zero console, network, or HTTP errors.</td>
+</tr>
+<tr>
+<td>Production visual evidence</td>
+<td>seven newest screenshots plus visual inspection</td>
+<td>Refreshed and visually inspected all seven retained screenshots. Their manifest SHA-256 is <code>6b5251c6fd96a70f5d32edc074101246303c76805deec1bf499ec382afee134d</code>.</td>
+</tr>
+<tr>
+<td>Production deployment logs</td>
+<td>exact deployment, bounded last-30-minute queries</td>
+<td>Error, fatal, and HTTP 5xx queries all returned no records.</td>
 </tr>
 </tbody></table>
 <h2 id="august-8-completed-production-release-historical">August 8 completed production release (historical)</h2>
@@ -171,7 +201,7 @@
 <li>the existing 56-pixel mouse/touch/keyboard reorder handles, searchable selectors, Other-player path, safe-area action, long-name wrapping, table scoring, standings, administrator deletion, and compare-and-swap protections.</li>
 </ul>
 <p>The countdown is an informational display. The server calculates its starting duration from PostgreSQL time, while the atomic submission statement still locks the season and rechecks PostgreSQL <code>clock_timestamp()</code> against the effective deadline. Device-clock changes or a stale open page therefore cannot authorize a late write.</p>
-<h2 id="production-data-verification">Production data verification</h2>
+<h2 id="historical-august-8-production-data-verification">Historical August 8 production data verification</h2>
 <p>Read-only live inspection established the baseline before any requested mutation:</p>
 <ul>
 <li><code>/leaderboard</code> showed no entries;</li>
@@ -200,9 +230,9 @@
 </ol>
 <p>Each image receives two numbered overlay pins at render time. The same numbers and instructions appear as adjacent HTML text, so the annotations remain accessible, selectable, responsive, and understandable without colour. The walkthrough draft used the unsaved display name “How to play preview”; it never created a second production entry.</p>
 <h2 id="production-deployment-and-mobile-evidence">Production deployment and mobile evidence</h2>
-<p>GitHub <a href="https://github.com/vdoshi96/Pl-predictions/pull/13">PR #13</a> merged the tested feature into <code>main</code> at <code>a7785b9b16b64be825e06ef8f181ab5f98031524</code>. Vercel production deployment <code>dpl_2L4cprnsWShhesujY7sTLKffywhg</code> is Ready at <a href="https://pl-predictions-9h7r762li-vdoshi96s-projects.vercel.app">https://pl-predictions-9h7r762li-vdoshi96s-projects.vercel.app</a>. The standard release alias command moved <a href="https://pl-predictions-2026.vercel.app">https://pl-predictions-2026.vercel.app</a> to that exact deployment, and deployment-ID read-back verified the mapping.</p>
-<p>The final read-only smoke passed all five browser projects against the immutable URL. It exercised the timer, all three entry stages without submitting, the table leaderboard, private pre-reveal spotlight state, absence of Alex/Jordan fixtures, the annotated how-to, administrator login, 320–430-pixel reflow, WebKit, local imagery, no horizontal overflow, and browser/network/HTTP guards. The exact-deployment error-level and HTTP 500 log queries returned no records in the preceding 30 minutes.</p>
-<p>Only the newest completed production run is retained under <code>docs/assets/qa/</code>. All seven artifacts were visually inspected for readable type, clear hierarchy, painted local imagery, reachable actions, correct annotations, and absence of clipping.</p>
+<p>GitHub <a href="https://github.com/vdoshi96/Pl-predictions/pull/15">PR #15</a> merged the tested August 13 catalogue into <code>main</code> at <code>cc4129dbd1513675bb44424cb4c667694c74d120</code>. Vercel production deployment <code>dpl_2CAJEZ3cXpm7NU6K972sN31bVBkz</code> was Ready at <a href="https://pl-predictions-835vjpg3z-vdoshi96s-projects.vercel.app">https://pl-predictions-835vjpg3z-vdoshi96s-projects.vercel.app</a>. Deployment-ID read-back proved <a href="https://pl-predictions-2026.vercel.app">https://pl-predictions-2026.vercel.app</a> resolved to that same deployment at roster release verification time.</p>
+<p>The final read-only smoke passed all five browser projects against the immutable URL. It exercised the timer, all three entry stages without submitting, added Ronald Araujo, moved Dwight McNeil, restored Alysson, the absence of removed Lucas Digne, Other player&#39;s silhouette, the table leaderboard, private pre-reveal spotlight state, the annotated how-to, administrator login, 320–430-pixel reflow, WebKit, local imagery, no horizontal overflow, and browser/network/HTTP guards. All 582 active portrait URLs returned HTTP 200 with PNG content types and PNG signatures, all 21 obsolete paths returned HTTP 404, and the exact deployment&#39;s bounded error, fatal, and HTTP 5xx log queries returned no records.</p>
+<p>Only the newest completed production run is retained under <code>docs/assets/qa/</code>. All seven artifacts were visually inspected for readable type, clear hierarchy, painted local imagery, reachable actions, correct annotations, and absence of clipping. Their manifest SHA-256 is <code>6b5251c6fd96a70f5d32edc074101246303c76805deec1bf499ec382afee134d</code>.</p>
 <p><strong>Submission countdown — mobile Chromium at 390 by 844:</strong> the compact calendar-flip timer is prominent inside the open-submissions card without overwhelming the hero or first-stage action.</p>
 <p><img src="assets/qa/countdown-mobile.png" alt="Production submission countdown on mobile Chromium"></p>
 <p><strong>Prediction sorter — mobile Chromium at 390 by 844:</strong> the reordered table, 56-pixel handle, painted crests, and sticky continue action fit without horizontal overflow.</p>
@@ -220,7 +250,7 @@
 <h2 id="security-and-cleanup-boundaries">Security and cleanup boundaries</h2>
 <ul>
 <li>No environment value, receipt token, database URL, administrator credential, or subscription cookie is committed or printed.</li>
-<li>Production creation was limited to the explicitly requested retained test entry. The destructive production-write smoke was not used because that harness intentionally deletes its QA entry.</li>
+<li>This release&#39;s only production database mutation was the supported catalogue seed, invoked exactly once after the recovery stop gate passed. It did not create or delete a participant prediction. The retained <code>Dranx Test Entry</code> remains the explicitly requested August 8 production history.</li>
 <li>The retained entry followed the same atomic write path as every participant: parent plus 20 table rows plus seven spotlight rows, or nothing.</li>
 <li>Alex/Jordan removal is a code cleanup, not a data deletion. No legitimate production submission was deleted.</li>
 <li>Public pre-reveal output continues to expose only the permitted table-leaderboard projection and complete-bracket count.</li>
@@ -232,11 +262,11 @@
 <li><input checked="" disabled="" type="checkbox"> Complete the read-only Git/worktree/GitHub audit and record the production pre-seed baseline.</li>
 <li><input checked="" disabled="" type="checkbox"> Record the owner-selected roster authority, internal-only verification boundary, and exact no-legacy compatibility decision.</li>
 <li><input checked="" disabled="" type="checkbox"> Pass the final complete local verification chain and visually inspect every added, restored, replaced, and renamed portrait.</li>
-<li><input disabled="" type="checkbox"> Push the feature branch under its own upstream, open the PR, and merge only after every available check is green.</li>
-<li><input disabled="" type="checkbox"> Verify the exact merged production deployment and stable alias, then run the approved idempotent production seed exactly once.</li>
-<li><input disabled="" type="checkbox"> Verify 582 active players, expected inactive historical rows, 582 portrait paths, representative additions/removals/moves, Other player, historical references, and every active portrait in the live UI.</li>
-<li><input disabled="" type="checkbox"> Record the exact PR, merge SHA, deployment, seed, browser/image verification, and any production-specific documentation closeout.</li>
-<li><input disabled="" type="checkbox"> Synchronize local <code>main</code>, verify retained handoff hashes, and remove the completed branch/worktree only after all release gates pass.</li>
+<li><input checked="" disabled="" type="checkbox"> Push the feature branch under its own upstream, merge PR #15 only after every available check is green, and synchronize the tested merge into local <code>main</code>.</li>
+<li><input checked="" disabled="" type="checkbox"> Verify the exact merged production deployment and stable alias, prove the Neon recovery path, then run the approved production seed exactly once.</li>
+<li><input checked="" disabled="" type="checkbox"> Verify 582 active players, 17 inactive historical rows, 582 portrait paths, representative additions/removals/moves, Other player, historical references, every active portrait URL, and all obsolete-path 404s.</li>
+<li><input checked="" disabled="" type="checkbox"> Record the exact feature PR, merge SHA, deployment, recovery, seed, database, browser, image, visual, and log evidence.</li>
+<li><input disabled="" type="checkbox"> Publish this evidence-only closeout through its own PR, synchronize final <code>main</code>, reverify retained handoff hashes, and remove completed branch/worktree state.</li>
 </ul>
 <h2 id="august-8-release-closeout-state-historical">August 8 release closeout state (historical)</h2>
 <ul>
@@ -248,7 +278,7 @@
 <li><input checked="" disabled="" type="checkbox"> Regenerate final HTML peers, publish this closeout through <code>main</code>, synchronize local and remote <code>main</code>, and remove completed branch state.</li>
 </ul>
 
-      <p class="source">Generated deterministically from <a href="QA.md">docs/QA.md</a>. Canonical SHA-256: <code>8e04d7374e45a5e46c7b96637cd07fb6e86faedcb9890152abcf545bc35b9552</code>.</p>
+      <p class="source">Generated deterministically from <a href="QA.md">docs/QA.md</a>. Canonical SHA-256: <code>6d6ff677d9ce16b60435227fdb70f6ef61c8f8f7846be3cf530d0c03e2caf023</code>.</p>
     </main>
   </body>
 </html>

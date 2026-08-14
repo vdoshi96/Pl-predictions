@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="generated-by" content="scripts/generate-docs-html.mjs" />
     <meta name="canonical-source" content="ARCHITECTURE.md" />
-    <meta name="canonical-source-sha256" content="536894a6b88b205f83d4c0e8ef42395094a6817e9108240a1d4d78553062228b" />
+    <meta name="canonical-source-sha256" content="dcb09b4e3961ae1533b72663d6caa68cade974ee487b3b5fdd306b421fb541be" />
     <title>Architecture</title>
     <style>
       :root { color-scheme: light dark; font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
@@ -67,8 +67,9 @@ Next.js server components/actions                           |
 <ul>
 <li>Vercel project: <code>vdoshi96s-projects/pl-predictions</code>.</li>
 <li>Production alias: <code>https://pl-predictions-2026.vercel.app</code>.</li>
+<li>Released catalogue deployment: <code>dpl_2CAJEZ3cXpm7NU6K972sN31bVBkz</code>, Ready at <code>https://pl-predictions-835vjpg3z-vdoshi96s-projects.vercel.app</code>; at roster release verification time, alias read-back resolved to the same deployment ID.</li>
 <li>Deployment protection: Vercel Authentication is <code>preview</code>; production is public and retained previews require Vercel sign-in.</li>
-<li>Database: Neon resource <code>neon-coffee-queen</code>, provisioned through Vercel Marketplace before migrations and seed.</li>
+<li>Database: Neon resource <code>neon-coffee-queen</code>, project <code>young-leaf-03280061</code>, provisioned through Vercel Marketplace before migrations and seed. Its root <code>main</code> branch has a six-hour restore window.</li>
 <li>Runtime: Node.js 24.x, Next.js 16.3.0, React 19.2.8, Neon serverless HTTP, and Drizzle ORM.</li>
 <li>Rendering: database-backed pages are dynamic; static local club badges and imported player-face assets may be cached and optimized by Next.js.</li>
 <li>Configuration: server-only Vercel variables; no credential has a <code>NEXT_PUBLIC</code> prefix.</li>
@@ -155,7 +156,7 @@ Next.js server components/actions                           |
 <p>The user-facing visual system is Dranx Prediction League: a Premier-League-inspired palette anchored on official purple <code>#37003c</code>, with cyan <code>#05f0ff</code>, green <code>#00ff87</code>, and pink <code>#ff2882</code> accents and an original Dranx mark. The official Premier League logo is not included.</p>
 <p>The 20 canonical club assets are owner-provided transparent PNG badges with accessible club-name alternatives. They are served from <code>public/team-marks/</code>; the application does not fetch or hotlink FotMob images. <code>teams.asset_path</code> remains the stable database-backed local-asset seam, and the idempotent seed updates existing rows after the PNGs are deployed. The shared <code>TeamMark</code> uses contain sizing, a neutral backing, and a labelled initials fallback. Original SVG monograms remain rollback-only for the first PNG release. The separate Premier League logo/lion/ball files are excluded.</p>
 <p>The owner-selected <code>premier-league-players-2026-08-13/</code> snapshot covers 582 players across the same 20 clubs and includes 582 portrait PNGs. Relative to August 8, it has 12 additions, 17 removals, and four intra-league moves. The import maps reviewed roster rows into the season catalogue and copies portraits to local <code>/player-faces/</code> paths. The exact asset transition deletes 17 obsolete paths and applies four club-move renames without retaining legacy copies. <code>PlayerMark</code> shows a generic silhouette for a null asset path or after an image failure. Other player remains available for unavailable or newly added players. The raw folder remains the owner-provided provenance handoff; the deployed app neither runs its acquisition scripts nor hotlinks portrait sources.</p>
-<p>Database rollout is deliberately deploy-first and seed-second. Production remains on 587 total/active players and 580 portrait paths until the 582-player code/assets are merged and the exact production deployment is Ready. The idempotent seed then deactivates absent fixture players rather than deleting rows that historical picks may reference, upserts the approved active fixture, and is followed by read-only database and browser verification.</p>
+<p>Database rollout is deliberately deploy-first and seed-second. For this release, the 582-player code/assets reached the exact Ready production deployment before any database change. Because no legacy portrait paths were retained, the owner accepted the brief interval in which an old database path could render <code>PlayerMark</code>&#39;s silhouette; the supported seed closed that compatibility window. The recovery stop gate first proved the configured six-hour window and reproduced the 20-team, 587-player pre-seed baseline through a read-only just-before-seed time-travel query; no restore was performed. The seed then ran exactly once, deactivated absent fixture players rather than deleting rows historical picks may reference, and upserted the approved active fixture. Read-only verification found 599 total player rows, 582 active, 17 inactive, 582 distinct active portrait paths, exact fixture parity, and intact foreign-key and cross-season constraints.</p>
 <p>Roster identity and portrait ingestion are separate from result entry. The snapshot does not provide final goals, assists, clean sheets, or season ratings. A future owner-run Codex automation will enter these reviewed outcomes manually. Custom Other-player names still require reconciliation.</p>
 <h2 id="failure-behavior">Failure behavior</h2>
 <ul>
@@ -168,7 +169,7 @@ Next.js server components/actions                           |
 <li>Manual standings remain available when external acquisition is unavailable.</li>
 </ul>
 
-      <p class="source">Generated deterministically from <a href="ARCHITECTURE.md">docs/ARCHITECTURE.md</a>. Canonical SHA-256: <code>536894a6b88b205f83d4c0e8ef42395094a6817e9108240a1d4d78553062228b</code>.</p>
+      <p class="source">Generated deterministically from <a href="ARCHITECTURE.md">docs/ARCHITECTURE.md</a>. Canonical SHA-256: <code>dcb09b4e3961ae1533b72663d6caa68cade974ee487b3b5fdd306b421fb541be</code>.</p>
     </main>
   </body>
 </html>

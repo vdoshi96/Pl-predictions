@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="generated-by" content="scripts/generate-docs-html.mjs" />
     <meta name="canonical-source" content="PLAN.md" />
-    <meta name="canonical-source-sha256" content="71dfe7c019755eace53f2976bae705f8d57079b6da3483bf67ec4469385b52f2" />
+    <meta name="canonical-source-sha256" content="708eca734a79d11bc6cdafb5dcbd9d6aac42432051166d27c95d8b2071d3192c" />
     <title>Implementation plan</title>
     <style>
       :root { color-scheme: light dark; font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
@@ -71,13 +71,14 @@
 <li>Move owner login to username plus salted PBKDF2-SHA-256 configuration while retaining <code>ADMIN_SECRET</code> only as a migration fallback. Keep same-origin/session protections, and verify an administrator deletion cascades through all 20 table items and seven spotlight rows while retaining its bounded audit record.</li>
 <li>Run focused and full unit/component tests, isolated Neon integration, TypeScript, ESLint, formatting, production build, three-stage desktop/mobile browser checks, documentation parity, and bounded production smoke. Refresh only the newest QA evidence after the verification result is known, then complete the repository merge/deploy/cleanup rules.</li>
 </ol>
-<h2 id="august-13-roster-and-portrait-refresh-pre-merge">August 13 roster and portrait refresh (pre-merge)</h2>
+<h2 id="august-13-roster-and-portrait-refresh-release-complete-repository-cleanup-pending">August 13 roster and portrait refresh (release complete; repository cleanup pending)</h2>
 <ol>
 <li>Treat <code>premier-league-players-2026-08-13/</code> as the owner-selected selector snapshot. Reconcile its workbook/JSON, normalized fixture, tracked application fixture, and local portrait inventory without rerunning the handoff acquisition scripts. Record that this release is internally reconciled and was not independently verified against official club or Premier League roster pages.</li>
 <li>Replace the active fixture with 582 players and 582 portrait paths: 12 additions, 17 removals, and four intra-league club moves relative to the August 8 snapshot. Keep Other player and the runtime silhouette for a missing path or failed image.</li>
-<li>Remove the 17 obsolete portrait paths and apply the four exact path renames with no legacy compatibility copies. Preserve inactive database player rows referenced by historical picks; the seed deactivates rather than deletes them.</li>
-<li>Complete isolated tests and browser QA before publication. After merge, deploy the application first, wait for the exact production deployment to become Ready, then run the approved idempotent production seed once and verify the database and public selector read-only.</li>
-<li>Record the feature PR, merge SHA, production deployment, seed result, and live roster/image verification only after each occurs. Until then those release identifiers remain <code>TBD after release</code>, production remains on the 587-player/580-path seed, and the roster worktree remains active.</li>
+<li>Remove the 17 obsolete portrait paths and apply the four exact path renames with no legacy compatibility copies. Preserve inactive database player rows referenced by historical picks; the seed deactivates rather than deletes them. Accept the owner-selected brief deploy-before-seed silhouette window and close it promptly with the supported seed.</li>
+<li>Complete isolated tests and browser QA before publication. After merge, deploy the application first, wait for the exact production deployment to become Ready, prove the configured Neon recovery window and a usable just-before-seed recovery point, then run the approved production seed once and verify the database and public selector read-only.</li>
+<li>Record the completed release evidence: GitHub PR #15 merged as <code>cc4129dbd1513675bb44424cb4c667694c74d120</code>; Vercel deployment <code>dpl_2CAJEZ3cXpm7NU6K972sN31bVBkz</code> was Ready and owned the stable alias at roster release verification time; the six-hour Neon recovery window and read-only pre-seed time-travel result were proven; one supported seed produced 582 active and 17 inactive rows; and the exact database, portrait-URL, browser, visual, and deployment-log checks passed.</li>
+<li>Merge evidence-only closeout <a href="https://github.com/vdoshi96/Pl-predictions/pull/16">PR #16</a>, synchronize final local and remote <code>main</code>, reverify the retained handoff digest, and remove the completed feature/closeout branch and worktree state. This cleanup remains pending until the closeout merge succeeds.</li>
 </ol>
 <h2 id="how-to-countdown-and-complete-test-entry-iteration">How-to, countdown, and complete-test-entry iteration</h2>
 <ol>
@@ -88,7 +89,7 @@
 <li>Extend component and browser coverage for the timer, walkthrough, renamed navigation, complete-bracket privacy, 320/390/430-pixel reflow, and absence of horizontal overflow. Refresh only the newest completed mobile QA evidence, synchronize Markdown/HTML documentation, and publish through <code>main</code>.</li>
 </ol>
 
-      <p class="source">Generated deterministically from <a href="PLAN.md">docs/PLAN.md</a>. Canonical SHA-256: <code>71dfe7c019755eace53f2976bae705f8d57079b6da3483bf67ec4469385b52f2</code>.</p>
+      <p class="source">Generated deterministically from <a href="PLAN.md">docs/PLAN.md</a>. Canonical SHA-256: <code>708eca734a79d11bc6cdafb5dcbd9d6aac42432051166d27c95d8b2071d3192c</code>.</p>
     </main>
   </body>
 </html>

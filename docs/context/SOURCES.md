@@ -24,7 +24,7 @@ External-source notes were checked on 2026-08-08. The August 13 handoff authorit
 - Application use: roster rows are imported into the season catalogue and reviewed portraits are copied to local `/player-faces/` paths. `PlayerMark` uses its generic silhouette when an asset path is absent or an image fails.
 - Runtime boundary: the deployed application does not execute the handoff's acquisition scripts, call those upstream sources, scrape player pages, or hotlink portraits. Other player covers unavailable or newly added players.
 - Outcome boundary: this is a selector identity and portrait snapshot, not a goals, assists, clean-sheets, or player-rating result feed. A future owner-run Codex automation may acquire those five outcomes offline, review them, and enter them through an approved path.
-- Production boundary: the live database remains on the August 8 seed baseline of 587 total/active players and 580 portrait paths until the August 13 application is merged, deployed, and seeded through the approved production sequence.
+- Production boundary: the August 13 application was merged through PR #15, deployed, and seeded once through the approved sequence after a six-hour Neon restore window and read-only just-before-seed time-travel result were proven. The live catalogue now has 599 total rows, 582 active players, 17 preserved inactive rows, and 582 distinct active portrait paths. This release state does not change the no-runtime-acquisition boundary.
 
 ## Season sources and permission disposition
 

@@ -6,7 +6,7 @@ Production: [https://pl-predictions-2026.vercel.app](https://pl-predictions-2026
 
 GitHub: [https://github.com/vdoshi96/Pl-predictions](https://github.com/vdoshi96/Pl-predictions)
 
-Deployment status: production is public and Ready at the stable alias above. Vercel Authentication is set to `preview`, so retained preview deployments still require owner sign-in while production remains anonymously accessible. Final production browser and cleanup evidence is recorded in [docs/QA.md](docs/QA.md).
+Deployment status: production is public and Ready at the stable alias above. The August 13 roster release was verified on Vercel deployment `dpl_2CAJEZ3cXpm7NU6K972sN31bVBkz`, whose immutable URL is [https://pl-predictions-835vjpg3z-vdoshi96s-projects.vercel.app](https://pl-predictions-835vjpg3z-vdoshi96s-projects.vercel.app); at release verification time, the stable alias resolved to that deployment ID. Vercel Authentication is set to `preview`, so retained preview deployments still require owner sign-in while production remains anonymously accessible. Production browser evidence and the current cleanup state are recorded in [docs/QA.md](docs/QA.md).
 
 ## Brand and local assets
 
@@ -18,7 +18,7 @@ The owner also supplied the dated `premier-league-players-2026-08-13/` roster sn
 
 On 2026-08-14 the owner confirmed that the required permissions for this player-catalogue workflow have been obtained, including acquisition, storage, redistribution, and production use. Owner-run FotMob or Transfermarkt acquisition may therefore run offline and produce a reviewed snapshot. This permission disposition removes the former source-specific licence gate; it does not change the deployed application's no-runtime-fetch, no-scrape, no-hotlink, no-football-API, and no-Cron boundary.
 
-This branch describes the candidate August 13 fixture. Until its release is merged, deployed, and seeded, production remains on the August 8 database baseline of 587 total/active players and 580 portrait paths.
+The August 13 fixture was released through GitHub [PR #15](https://github.com/vdoshi96/Pl-predictions/pull/15), merged at `cc4129dbd1513675bb44424cb4c667694c74d120`, deployed, and seeded through the supported production command exactly once. Production now has 599 player rows: 582 active catalogue players with 582 distinct local portrait paths and 17 preserved inactive rows. The owner accepted the brief deploy-before-seed window in which an old database path could use `PlayerMark`'s silhouette because the selected release retained no legacy portrait copies; that window ended when the seed completed. Exact database, image, browser, and deployment-log verification passed afterward.
 
 ### Player snapshot source card
 
@@ -31,7 +31,7 @@ This branch describes the candidate August 13 fixture. Until its release is merg
 | Roster authority     | Owner-selected snapshot; internally reconciled, not independently official-site verified                              |
 | Application boundary | Reviewed roster import and local portrait serving only; no runtime fetch, scrape, or hotlink                          |
 | Result-data boundary | This snapshot supplies selector identities and portraits, not goals, assists, clean sheets, or season-rating outcomes |
-| Production state     | Pre-release baseline remains 587 total/active players and 580 portrait paths until the approved deploy/seed sequence  |
+| Production state     | Released: 599 total rows, 582 active, 17 inactive, and 582 distinct active portrait paths                             |
 
 ## Product behavior
 

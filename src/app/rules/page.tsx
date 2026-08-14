@@ -186,12 +186,13 @@ export default function RulesPage() {
                 Player list and Other
               </h2>
               <p className="mt-1 text-sm leading-6 text-slate-600">
-                The 2026-08-08 snapshot covers 587 players across all 20 clubs.
-                Player selectors search first, last, or full name; 580 supplied
-                portraits appear locally and the other seven players use a
-                silhouette. Choose Other player for anyone unavailable or new.
-                Custom names must be matched to a manually entered result list
-                before they receive an accuracy result.
+                The 2026-08-13 snapshot covers 582 players across all 20 clubs.
+                Player selectors search first, last, or full name; 582 supplied
+                portraits appear locally. Choose Other player for anyone
+                unavailable or new. A silhouette appears only if a portrait is
+                missing or fails to load. Custom names must be matched to a
+                manually entered result list before they receive an accuracy
+                result.
               </p>
             </CardContent>
           </Card>

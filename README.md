@@ -14,16 +14,16 @@ The user-facing identity is Dranx Prediction League. Its Premier-League-inspired
 
 The project owner supplied one transparent PNG badge for each of the 20 clubs and explicitly directed their use in this application. Those local files are now the canonical team marks; the shared `TeamMark` uses contain sizing, a neutral backing, and a labelled initials fallback. The original SVG monograms remain only as rollback-safe files during the first PNG release. The owner-provided handoff does not imply affiliation, transfer ownership of the club marks, or authorize the separate Premier League logo/lion/ball files, none of which are used.
 
-The owner also supplied the dated `premier-league-players-2026-08-08/` roster snapshot and directed its use for the player selectors. It contains 587 players across the app's 20 clubs and 580 portrait PNGs. The seven players without a supplied image use the generic `PlayerMark` silhouette. The app imports the snapshot into its season catalogue and serves copied local portraits; it does not run the handoff's acquisition scripts or fetch player data or images at runtime.
+The owner also supplied the dated `premier-league-players-2026-08-13/` roster snapshot and directed its use for the player selectors. It contains 582 players across the app's 20 clubs and 582 portrait PNGs. `PlayerMark` still uses its generic silhouette when an asset path is absent or an image fails to load. The app imports the snapshot into its season catalogue and serves copied local portraits; it does not run the handoff's acquisition scripts or fetch player data or images at runtime.
 
 ### Player snapshot source card
 
 | Field                | Value                                                                                                                 |
 | -------------------- | --------------------------------------------------------------------------------------------------------------------- |
-| Local handoff        | `premier-league-players-2026-08-08/` (owner-provided raw snapshot)                                                    |
-| Snapshot date        | 2026-08-08                                                                                                            |
-| Coverage             | 587 players across all 20 application clubs                                                                           |
-| Portrait coverage    | 580 supplied PNGs; seven `PlayerMark` silhouette fallbacks                                                            |
+| Local handoff        | `premier-league-players-2026-08-13/` (owner-provided raw snapshot)                                                    |
+| Snapshot date        | 2026-08-13                                                                                                            |
+| Coverage             | 582 players across all 20 application clubs                                                                           |
+| Portrait coverage    | 582 supplied PNGs; `PlayerMark` silhouette remains only for missing paths or image failures                           |
 | Application boundary | Reviewed roster import and local portrait serving only; no runtime fetch, scrape, or hotlink                          |
 | Result-data boundary | This snapshot supplies selector identities and portraits, not goals, assists, clean sheets, or season-rating outcomes |
 
@@ -48,7 +48,7 @@ Every category uses its own searchable selector:
 - **Underdog player** ranks reviewed average season ratings from highest to lowest.
 - **Overrated player** ranks reviewed average season ratings from lowest to highest.
 
-Player options are searchable by first, last, or full name across the 587-player 2026-08-08 snapshot. Every player category also offers **Other player**. This option shows a required name field for an unavailable or new player. `PlayerMark` shows 580 local portraits. The other seven players use its neutral silhouette. Club categories use the existing local crests. Custom names must match a reviewed result list before they receive an accuracy rank.
+Player options are searchable by first, last, or full name across the 582-player 2026-08-13 snapshot. Every player category also offers **Other player**. This option shows a required name field for an unavailable or new player. `PlayerMark` shows 582 local portraits. Club categories use the existing local crests. Custom names must match a reviewed result list before they receive an accuracy rank.
 
 Table scoring is mutually exclusive for each club: 5 points exact, 3 within three places, 1 in the same half, or 0. An exact table scores 100. The predicted champion is position 1 and has no separate bonus. Spotlight accuracy never changes this score. Let `N` be the current number of active, nondeleted season brackets. Accuracy points are `max(0, N + 1 - outcome rank)`. Overall accuracy sums only resolved categories. A resolved zero-point result still counts as available. Pending categories remain unavailable. Equal overall scores share a competition rank. Category sorts use outcome rank from low to high, put pending entries last, and use participant name for deterministic ties.
 
@@ -247,7 +247,7 @@ The application intentionally has one code-selected active season.
 
 - Club marks use the 20 owner-provided local PNG badges. Names and marks remain their respective owners' property; the repository records the project owner's direction to use this exact set, not a broader licence for other league or club artwork. The original monograms remain rollback-only during the first PNG release.
 - Standings are manual or accepted through the authenticated canonical importer. There is no built-in provider fetch, sync-now source client, scheduled job, or live-data guarantee.
-- The owner-provided 2026-08-08 snapshot supplies 587 player options and 580 local portraits. Seven catalogued players use the generic silhouette, and Other player remains available for unavailable or newly added players.
+- The owner-provided 2026-08-13 snapshot supplies 582 player options and 582 local portraits. Other player remains available for unavailable or newly added players.
 - Only underdog-team and overrated-team outcomes are currently derivable. A future owner-run Codex automation will enter the other five reviewed result lists manually. The former Alex/Jordan spotlight cards were hard-coded presentation fixtures, not stored submissions; they were retired so `/spotlight` now represents only complete real entries.
 - Participants have no accounts and cannot edit an entry. The administrator can delete an erroneous parent entry, cascading through all 20 table rows and seven spotlight picks so it can be resubmitted.
 - The opening fixture is reviewed static season data, not a live schedule feed. Because Premier League fixtures can change, the owner must update both the canonical UTC fixture metadata and the persisted season row through a reviewed forward migration before the existing cutoff if the opener moves. A constant-only deploy does not change the database-enforced instant.

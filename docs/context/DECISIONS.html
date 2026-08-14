@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="canonical-source" content="DECISIONS.md" />
-    <meta name="canonical-source-sha256" content="c3d7123fd4041b32ad02dba5777d1aa31a0456182f421844d9feb2f38350ab81" />
+    <meta name="canonical-source-sha256" content="43e72723b4a0e389b8ba69a79bfab53cccd3b89a8659d66ff2956955971eb471" />
     <title>Decisions</title>
     <style>
       :root { color-scheme: light dark; font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
@@ -39,6 +39,9 @@
   <body>
     <main>
       <h1>Decisions</h1>
+<h2>2026-08-13: Transfermarkt roster refresh and complete local portraits</h2>
+<p>Replace the 2026-08-08 selector snapshot with the owner-run <code>premier-league-players-2026-08-13/</code> handoff. Import the Transfermarkt first-team kader for saison_id=2026 as of 2026-08-13: 582 players across the application&#39;s 20 clubs and 582 local <code>/player-faces/</code> portraits. Keep Other player available for unavailable or newly added players. <code>PlayerMark</code> still uses its generic silhouette when an asset path is absent or an image fails.</p>
+<p>This decision supersedes the 2026-08-08 player-count and seven-fallback split. It does not authorize a runtime football API, production scraper, Vercel Cron, or inferred spotlight outcomes. The deployed app still must not execute the handoff&#39;s acquisition scripts.</p>
 <h2>2026-08-08: Complete-entry test data, fixture retirement, and deadline countdown</h2>
 <p>Remove the hard-coded Alex/Jordan spotlight presentation cards. Read-only live-page and production-database checks proved they were component fixtures, not prediction parents or partial stage-two writes, so no production deletion is warranted. The public spotlight page must derive its bracket count and, after reveal, every displayed pick and accuracy result from complete persisted submissions only.</p>
 <p>Create the retained <code>Dranx Test Entry</code> through the same public three-stage flow used by a participant. Treat it as product test data, not a seed or demo shortcut. Verification must find one parent, exactly 20 ordered table rows, and exactly seven category-pick rows. Before reveal, the main leaderboard may show its permitted participant/champion projection and <code>/spotlight</code> may count the bracket, but neither route may expose its spotlight subjects, private table positions, or prediction identifier.</p>
@@ -46,7 +49,7 @@
 <p>Use three 390 × 844 captures from the live mobile flow for the public how-to section. Keep each screenshot&#39;s numbered overlay pins synchronized with adjacent text callouts so the instructions remain understandable to screen-reader users and without relying on colour alone.</p>
 <h2>2026-08-08: Owner-provided player snapshot import</h2>
 <p>Use the owner&#39;s dated <code>premier-league-players-2026-08-08/</code> handoff as the local selector snapshot for the 2026/27 season. Import all 587 players across the application&#39;s 20 clubs, copy the 580 supplied portraits to <code>/player-faces/</code>, and deliberately show the <code>PlayerMark</code> silhouette for the seven players without a supplied image. Keep Other player available for unavailable or newly added players instead of inventing a catalogue row or portrait.</p>
-<p>Preserve the raw handoff as owner-provided provenance, but do not run its acquisition scripts, fetch its upstream sources, or hotlink its images in production. This decision imports roster identity and portrait data only. It does not provide the reviewed goals, assists, club clean-sheets, or average season rating rankings needed for the five pending spotlight outcomes, and it does not change the source-neutral result-ingestion boundary.</p>
+<p>Preserve the raw handoff as owner-provided provenance, but do not run its acquisition scripts, fetch its upstream sources, or hotlink its images in production. This decision imports roster identity and portrait data only. It does not provide the reviewed goals, assists, club clean-sheets, or average season rating rankings needed for the five pending spotlight outcomes, and it does not change the source-neutral result-ingestion boundary. The 2026-08-13 roster refresh above supersedes the player-count and fallback split while retaining this runtime boundary.</p>
 <h2>2026-08-08: Three-stage immutable entry and spotlight placeholders</h2>
 <p>Treat the table and seven spotlight choices as one immutable submission. Stage 1 orders all 20 active clubs and captures the display name, stage 2 requires exactly one top scorer, top assister, most clean sheets, underdog team, overrated team, underdog player, and overrated player choice, and stage 3 reviews both sets before confirmation. The deadline-guarded PostgreSQL statement writes the parent, all 20 table rows, and all seven category rows together and verifies both child counts; a closed or partial attempt writes none of them.</p>
 <p>Use season-scoped <code>players</code> and <code>prediction_category_picks</code> tables as the durable catalogue and selection seams. Player selectors search first, last, and full names and allow a normalized Other-player value; club categories reference existing season teams. The catalogue began empty while the roster handoff was pending, rather than fabricating entries. The later owner-provided player snapshot decision above supersedes that temporary empty state while retaining local-only <code>/player-faces/</code> paths and the generic <code>PlayerMark</code> fallback. Most clean sheets always chooses a club.</p>
@@ -96,7 +99,7 @@
 <h2>2026-08-08: Production public, previews protected</h2>
 <p>Use the Vercel Authentication boundary <code>preview</code>: the finished production site is public while preview deployments require owner sign-in. This is narrower than disabling deployment protection. The owner explicitly approved the persistent change from all-deployments protection; anonymous production access now returns 200, and the retained preview URL still redirects to Vercel SSO with 302.</p>
 
-      <p class="source">Generated deterministically from <a href="DECISIONS.md">docs/context/DECISIONS.md</a>. Canonical SHA-256: <code>c3d7123fd4041b32ad02dba5777d1aa31a0456182f421844d9feb2f38350ab81</code>.</p>
+      <p class="source">Generated deterministically from <a href="DECISIONS.md">docs/context/DECISIONS.md</a>. Canonical SHA-256: <code>43e72723b4a0e389b8ba69a79bfab53cccd3b89a8659d66ff2956955971eb471</code>.</p>
     </main>
   </body>
 </html>

@@ -26,7 +26,7 @@ Next.js server components/actions                           |
                dynamic reads and derived scoring
 ```
 
-The public application never contacts FotMob or another football-data source. The owner-provided `premier-league-players-2026-08-08/` handoff supplies selector identities and portrait files. The deployed app never executes its acquisition code. The handoff does not supply competition outcomes. A future owner-run Codex automation will enter the five non-table-derived outcomes manually. It must use permitted or licensed source material. The current importer and manual editor handle standings only. Missing spotlight outcomes remain pending and do not receive zero.
+The public application never contacts FotMob or another football-data source. The owner-provided `premier-league-players-2026-08-13/` handoff supplies selector identities and portrait files. The deployed app never executes its acquisition code. The handoff does not supply competition outcomes. A future owner-run Codex automation will enter the five non-table-derived outcomes manually. It must use permitted or licensed source material. The current importer and manual editor handle standings only. Missing spotlight outcomes remain pending and do not receive zero.
 
 ## Runtime and deployment
 
@@ -121,7 +121,7 @@ Before activation, each table-leaderboard card shows 0 and its predicted champio
 
 - `seasons` stores the code-selected season, persisted opening kickoff, optional earlier owner deadline, fairness settings, active/final pointers, and the monotonic accepted-capture watermark.
 - `teams` stores season-scoped names, sort names, factual external mapping, and permitted local asset path.
-- `players` is the season-scoped catalogue of 587 imported 2026-08-08 players, with first/last/display names, club association, active status, and an optional local `/player-faces/` asset path.
+- `players` is the season-scoped catalogue of 582 imported 2026-08-13 players, with first/last/display names, club association, active status, and an optional local `/player-faces/` asset path.
 - `predictions` and `prediction_items` store immutable participant tables and receipt hashes.
 - `prediction_category_picks` stores exactly one typed choice per spotlight category. Team categories reference a club. Player categories reference either an active catalogue player or a normalized custom player name, never both.
 - `standings_snapshots` and `standings_items` store complete actual tables.
@@ -146,7 +146,7 @@ The user-facing visual system is Dranx Prediction League: a Premier-League-inspi
 
 The 20 canonical club assets are owner-provided transparent PNG badges with accessible club-name alternatives. They are served from `public/team-marks/`; the application does not fetch or hotlink FotMob images. `teams.asset_path` remains the stable database-backed local-asset seam, and the idempotent seed updates existing rows after the PNGs are deployed. The shared `TeamMark` uses contain sizing, a neutral backing, and a labelled initials fallback. Original SVG monograms remain rollback-only for the first PNG release. The separate Premier League logo/lion/ball files are excluded.
 
-The owner-provided `premier-league-players-2026-08-08/` snapshot covers 587 players across the same 20 clubs and includes 580 portrait PNGs. The import maps reviewed roster rows into the season catalogue and copies portraits to local `/player-faces/` paths. `PlayerMark` shows a generic silhouette for the seven players without a supplied image, for a null asset path, or after an image failure. Other player remains available for unavailable or newly added players. The raw folder remains the owner-provided provenance handoff; the deployed app neither runs its acquisition scripts nor hotlinks portrait sources.
+The owner-provided `premier-league-players-2026-08-13/` snapshot covers 582 players across the same 20 clubs and includes 582 portrait PNGs. The import maps reviewed roster rows into the season catalogue and copies portraits to local `/player-faces/` paths. `PlayerMark` shows a generic silhouette for a null asset path or after an image failure. Other player remains available for unavailable or newly added players. The raw folder remains the owner-provided provenance handoff; the deployed app neither runs its acquisition scripts nor hotlinks portrait sources.
 
 Roster identity and portrait ingestion are separate from result entry. The snapshot does not provide final goals, assists, clean sheets, or season ratings. A future owner-run Codex automation will enter these reviewed outcomes manually. Custom Other-player names still require reconciliation.
 

@@ -15,6 +15,7 @@ const eslintConfig = defineConfig([
     // Owner-provided raw player-source handoff. Only normalized fixtures and
     // reviewed portraits are application inputs; do not lint its bundled venv.
     "premier-league-players-2026-08-08/**",
+    "premier-league-players-2026-08-13/**",
   ]),
 ]);
 

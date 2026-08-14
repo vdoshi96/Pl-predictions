@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="canonical-source" content="LOG.md" />
-    <meta name="canonical-source-sha256" content="d786bd0803531e8204e1b406785192902b549f5165bf4deed1b4efb8a356c346" />
+    <meta name="canonical-source-sha256" content="274c204c6a75b836c8cd2601516ab35d248d2d0c517ed7d7da4be9ba22bf4af2" />
     <title>Session log</title>
     <style>
       :root { color-scheme: light dark; font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
@@ -39,6 +39,14 @@
   <body>
     <main>
       <h1>Session log</h1>
+<h2>2026-08-13</h2>
+<h3>Transfermarkt roster and portrait refresh (local feature branch)</h3>
+<ul>
+<li>Scraped Transfermarkt 2026/27 first-team kader pages for the application&#39;s 20 clubs and compared them with the 2026-08-08 snapshot: 12 additions, 17 removals, and 4 intra-PL club changes, leaving 582 players.</li>
+<li>Fetched FotMob portraits for every new player, all seven previously missing images, and the ten Wikimedia fallbacks. Catalogue coverage is now 582 portraits and 0 silhouette fallbacks.</li>
+<li>Verified identity with unique Transfermarkt IDs, unique FotMob IDs and name checks, unique PNG hashes, and a pixel compare of reused FotMob files against the current CDN.</li>
+<li>Pointed <code>players:generate</code> at <code>premier-league-players-2026-08-13/</code> and updated the tracked fixture plus <code>public/player-faces/</code>. Other player remains available. Not merged to <code>main</code>.</li>
+</ul>
 <h2>2026-08-08</h2>
 <h3>How-to, countdown, and complete test-entry iteration (complete)</h3>
 <ul>
@@ -201,7 +209,7 @@
 <li>Next handoff: use <code>main</code> as the base for future pull requests. No GitHub access blocker remains for the current repository workflow.</li>
 </ul>
 
-      <p class="source">Generated deterministically from <a href="LOG.md">docs/context/LOG.md</a>. Canonical SHA-256: <code>d786bd0803531e8204e1b406785192902b549f5165bf4deed1b4efb8a356c346</code>.</p>
+      <p class="source">Generated deterministically from <a href="LOG.md">docs/context/LOG.md</a>. Canonical SHA-256: <code>274c204c6a75b836c8cd2601516ab35d248d2d0c517ed7d7da4be9ba22bf4af2</code>.</p>
     </main>
   </body>
 </html>

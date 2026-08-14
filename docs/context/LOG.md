@@ -1,5 +1,14 @@
 # Session log
 
+## 2026-08-13
+
+### Transfermarkt roster and portrait refresh (local feature branch)
+
+- Scraped Transfermarkt 2026/27 first-team kader pages for the application's 20 clubs and compared them with the 2026-08-08 snapshot: 12 additions, 17 removals, and 4 intra-PL club changes, leaving 582 players.
+- Fetched FotMob portraits for every new player, all seven previously missing images, and the ten Wikimedia fallbacks. Catalogue coverage is now 582 portraits and 0 silhouette fallbacks.
+- Verified identity with unique Transfermarkt IDs, unique FotMob IDs and name checks, unique PNG hashes, and a pixel compare of reused FotMob files against the current CDN.
+- Pointed `players:generate` at `premier-league-players-2026-08-13/` and updated the tracked fixture plus `public/player-faces/`. Other player remains available. Not merged to `main`.
+
 ## 2026-08-08
 
 ### How-to, countdown, and complete test-entry iteration (complete)

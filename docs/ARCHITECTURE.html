@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="canonical-source" content="ARCHITECTURE.md" />
-    <meta name="canonical-source-sha256" content="61e1ec1a6f60928cfa930faced3502ef6c552acde45348a57353e88fe58f9ae3" />
+    <meta name="canonical-source-sha256" content="7bd99ffbf608e8eb383193ad61dbfa9761a4577d6cbc42badbc061cacfbfb3c0" />
     <title>Architecture</title>
     <style>
       :root { color-scheme: light dark; font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
@@ -61,7 +61,7 @@ Next.js server components/actions                           |
                               v
                dynamic reads and derived scoring
 </code></pre>
-<p>The public application never contacts FotMob or another football-data source. The owner-provided <code>premier-league-players-2026-08-08/</code> handoff supplies selector identities and portrait files. The deployed app never executes its acquisition code. The handoff does not supply competition outcomes. A future owner-run Codex automation will enter the five non-table-derived outcomes manually. It must use permitted or licensed source material. The current importer and manual editor handle standings only. Missing spotlight outcomes remain pending and do not receive zero.</p>
+<p>The public application never contacts FotMob or another football-data source. The owner-provided <code>premier-league-players-2026-08-13/</code> handoff supplies selector identities and portrait files. The deployed app never executes its acquisition code. The handoff does not supply competition outcomes. A future owner-run Codex automation will enter the five non-table-derived outcomes manually. It must use permitted or licensed source material. The current importer and manual editor handle standings only. Missing spotlight outcomes remain pending and do not receive zero.</p>
 <h2>Runtime and deployment</h2>
 <ul>
 <li>Vercel project: <code>vdoshi96s-projects/pl-predictions</code>.</li>
@@ -137,7 +137,7 @@ Next.js server components/actions                           |
 <ul>
 <li><code>seasons</code> stores the code-selected season, persisted opening kickoff, optional earlier owner deadline, fairness settings, active/final pointers, and the monotonic accepted-capture watermark.</li>
 <li><code>teams</code> stores season-scoped names, sort names, factual external mapping, and permitted local asset path.</li>
-<li><code>players</code> is the season-scoped catalogue of 587 imported 2026-08-08 players, with first/last/display names, club association, active status, and an optional local <code>/player-faces/</code> asset path.</li>
+<li><code>players</code> is the season-scoped catalogue of 582 imported 2026-08-13 players, with first/last/display names, club association, active status, and an optional local <code>/player-faces/</code> asset path.</li>
 <li><code>predictions</code> and <code>prediction_items</code> store immutable participant tables and receipt hashes.</li>
 <li><code>prediction_category_picks</code> stores exactly one typed choice per spotlight category. Team categories reference a club. Player categories reference either an active catalogue player or a normalized custom player name, never both.</li>
 <li><code>standings_snapshots</code> and <code>standings_items</code> store complete actual tables.</li>
@@ -153,7 +153,7 @@ Next.js server components/actions                           |
 <h2>Assets and rights</h2>
 <p>The user-facing visual system is Dranx Prediction League: a Premier-League-inspired palette anchored on official purple <code>#37003c</code>, with cyan <code>#05f0ff</code>, green <code>#00ff87</code>, and pink <code>#ff2882</code> accents and an original Dranx mark. The official Premier League logo is not included.</p>
 <p>The 20 canonical club assets are owner-provided transparent PNG badges with accessible club-name alternatives. They are served from <code>public/team-marks/</code>; the application does not fetch or hotlink FotMob images. <code>teams.asset_path</code> remains the stable database-backed local-asset seam, and the idempotent seed updates existing rows after the PNGs are deployed. The shared <code>TeamMark</code> uses contain sizing, a neutral backing, and a labelled initials fallback. Original SVG monograms remain rollback-only for the first PNG release. The separate Premier League logo/lion/ball files are excluded.</p>
-<p>The owner-provided <code>premier-league-players-2026-08-08/</code> snapshot covers 587 players across the same 20 clubs and includes 580 portrait PNGs. The import maps reviewed roster rows into the season catalogue and copies portraits to local <code>/player-faces/</code> paths. <code>PlayerMark</code> shows a generic silhouette for the seven players without a supplied image, for a null asset path, or after an image failure. Other player remains available for unavailable or newly added players. The raw folder remains the owner-provided provenance handoff; the deployed app neither runs its acquisition scripts nor hotlinks portrait sources.</p>
+<p>The owner-provided <code>premier-league-players-2026-08-13/</code> snapshot covers 582 players across the same 20 clubs and includes 582 portrait PNGs. The import maps reviewed roster rows into the season catalogue and copies portraits to local <code>/player-faces/</code> paths. <code>PlayerMark</code> shows a generic silhouette for a null asset path or after an image failure. Other player remains available for unavailable or newly added players. The raw folder remains the owner-provided provenance handoff; the deployed app neither runs its acquisition scripts nor hotlinks portrait sources.</p>
 <p>Roster identity and portrait ingestion are separate from result entry. The snapshot does not provide final goals, assists, clean sheets, or season ratings. A future owner-run Codex automation will enter these reviewed outcomes manually. Custom Other-player names still require reconciliation.</p>
 <h2>Failure behavior</h2>
 <ul>
@@ -166,7 +166,7 @@ Next.js server components/actions                           |
 <li>Manual standings remain available when external acquisition is unavailable.</li>
 </ul>
 
-      <p class="source">Generated deterministically from <a href="ARCHITECTURE.md">docs/ARCHITECTURE.md</a>. Canonical SHA-256: <code>61e1ec1a6f60928cfa930faced3502ef6c552acde45348a57353e88fe58f9ae3</code>.</p>
+      <p class="source">Generated deterministically from <a href="ARCHITECTURE.md">docs/ARCHITECTURE.md</a>. Canonical SHA-256: <code>7bd99ffbf608e8eb383193ad61dbfa9761a4577d6cbc42badbc061cacfbfb3c0</code>.</p>
     </main>
   </body>
 </html>

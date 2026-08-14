@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="canonical-source" content="PLAN.md" />
-    <meta name="canonical-source-sha256" content="e3ff8f93681589bef964f29eca4d7634c9574aaba6076a87e8e6eedceb1523c3" />
+    <meta name="canonical-source-sha256" content="22f37401777654aebfa4491971e2c0aeb676e9a2caeeb6525e621ef6a5ede151" />
     <title>Implementation plan</title>
     <style>
       :root { color-scheme: light dark; font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
@@ -61,7 +61,7 @@
 <h2>Completed spotlight-predictions iteration</h2>
 <ol>
 <li>Extend the mobile entry journey to three stages: the 20-club table and display name, seven required spotlight selectors, then one final review and confirmation.</li>
-<li>Import the owner-provided <code>premier-league-players-2026-08-08/</code> snapshot into the season-scoped player catalogue: 587 players across the 20 clubs and 580 copied local portrait PNGs. Search first, last, or full names, use the <code>PlayerMark</code> silhouette for the seven players without a supplied image, and retain Other player plus a required custom-name field for unavailable or newly added players. Continue using existing local club crests for the three club categories.</li>
+<li>Import the owner-provided <code>premier-league-players-2026-08-13/</code> snapshot into the season-scoped player catalogue: 582 players across the 20 clubs and 582 copied local portrait PNGs. Search first, last, or full names, use the <code>PlayerMark</code> silhouette only when an asset path is absent or an image fails, and retain Other player plus a required custom-name field for unavailable or newly added players. Continue using existing local club crests for the three club categories.</li>
 <li>Validate exactly one top scorer, top assister, most clean sheets, underdog team, overrated team, underdog player, and overrated player choice. Persist the prediction parent, 20 ordered table items, and seven category rows in the existing deadline-guarded atomic statement.</li>
 <li>Derive the 5–3–1 table score on read and cap the main leaderboard at 100. Treat the position-1 champion as part of table scoring, not a separate bonus. Keep spotlight accuracy separate from table points.</li>
 <li>Calculate underdog-team index as average predicted position minus actual position and overrated-team index as the inverse, ranking the largest values first with full precision. Rank top scorer, top assister, and most clean sheets by their reviewed result-list positions; rank reviewed average season player ratings descending for underdog and ascending for overrated.</li>
@@ -79,7 +79,7 @@
 <li>Extend component and browser coverage for the timer, walkthrough, renamed navigation, complete-bracket privacy, 320/390/430-pixel reflow, and absence of horizontal overflow. Refresh only the newest completed mobile QA evidence, synchronize Markdown/HTML documentation, and publish through <code>main</code>.</li>
 </ol>
 
-      <p class="source">Generated deterministically from <a href="PLAN.md">docs/PLAN.md</a>. Canonical SHA-256: <code>e3ff8f93681589bef964f29eca4d7634c9574aaba6076a87e8e6eedceb1523c3</code>.</p>
+      <p class="source">Generated deterministically from <a href="PLAN.md">docs/PLAN.md</a>. Canonical SHA-256: <code>22f37401777654aebfa4491971e2c0aeb676e9a2caeeb6525e621ef6a5ede151</code>.</p>
     </main>
   </body>
 </html>

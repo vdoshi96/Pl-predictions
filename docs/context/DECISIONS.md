@@ -1,5 +1,11 @@
 # Decisions
 
+## 2026-08-13: Transfermarkt roster refresh and complete local portraits
+
+Replace the 2026-08-08 selector snapshot with the owner-run `premier-league-players-2026-08-13/` handoff. Import the Transfermarkt first-team kader for saison_id=2026 as of 2026-08-13: 582 players across the application's 20 clubs and 582 local `/player-faces/` portraits. Keep Other player available for unavailable or newly added players. `PlayerMark` still uses its generic silhouette when an asset path is absent or an image fails.
+
+This decision supersedes the 2026-08-08 player-count and seven-fallback split. It does not authorize a runtime football API, production scraper, Vercel Cron, or inferred spotlight outcomes. The deployed app still must not execute the handoff's acquisition scripts.
+
 ## 2026-08-08: Complete-entry test data, fixture retirement, and deadline countdown
 
 Remove the hard-coded Alex/Jordan spotlight presentation cards. Read-only live-page and production-database checks proved they were component fixtures, not prediction parents or partial stage-two writes, so no production deletion is warranted. The public spotlight page must derive its bracket count and, after reveal, every displayed pick and accuracy result from complete persisted submissions only.
@@ -14,7 +20,7 @@ Use three 390 × 844 captures from the live mobile flow for the public how-to se
 
 Use the owner's dated `premier-league-players-2026-08-08/` handoff as the local selector snapshot for the 2026/27 season. Import all 587 players across the application's 20 clubs, copy the 580 supplied portraits to `/player-faces/`, and deliberately show the `PlayerMark` silhouette for the seven players without a supplied image. Keep Other player available for unavailable or newly added players instead of inventing a catalogue row or portrait.
 
-Preserve the raw handoff as owner-provided provenance, but do not run its acquisition scripts, fetch its upstream sources, or hotlink its images in production. This decision imports roster identity and portrait data only. It does not provide the reviewed goals, assists, club clean-sheets, or average season rating rankings needed for the five pending spotlight outcomes, and it does not change the source-neutral result-ingestion boundary.
+Preserve the raw handoff as owner-provided provenance, but do not run its acquisition scripts, fetch its upstream sources, or hotlink its images in production. This decision imports roster identity and portrait data only. It does not provide the reviewed goals, assists, club clean-sheets, or average season rating rankings needed for the five pending spotlight outcomes, and it does not change the source-neutral result-ingestion boundary. The 2026-08-13 roster refresh above supersedes the player-count and fallback split while retaining this runtime boundary.
 
 ## 2026-08-08: Three-stage immutable entry and spotlight placeholders
 

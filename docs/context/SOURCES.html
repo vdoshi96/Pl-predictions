@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="canonical-source" content="SOURCES.md" />
-    <meta name="canonical-source-sha256" content="62d961fe7d307035cbd4e389a3d5100c874bc58125554b80e4d5559efb0c392a" />
+    <meta name="canonical-source-sha256" content="191781cc89adb5932d23f8ff5e5213a4f9b1c5c6a72ec1d420c0a3e7b45dde30" />
     <title>Sources</title>
     <style>
       :root { color-scheme: light dark; font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
@@ -49,14 +49,14 @@
 <li>Current spotlight-predictions brief: one three-stage immutable entry containing the 20-club table and seven required categories; searchable first/last-name player selectors with Other-player fallback; clubs for most clean sheets; local player portraits and club crests with visual fallbacks; public rules and spotlight pages; and administrator deletion. The owner-supplied raw login password is operational secret input and is intentionally not copied into repository documentation.</li>
 <li>Current identity direction: user-facing name <strong>Dranx Prediction League</strong>; Premier-League-inspired palette using official purple <code>#37003c</code> with cyan <code>#05f0ff</code>, green <code>#00ff87</code>, and pink <code>#ff2882</code> accents; original Dranx mark; operational <code>pl-predictions</code> identifiers unchanged.</li>
 <li>Current club-asset direction: the project owner supplied a folder containing one transparent PNG badge for each of the 20 verified clubs and explicitly directed their use. The same folder&#39;s Premier League logo/lion/ball/composite files are outside that team-mark replacement and are not used.</li>
-<li>Current player-asset direction: the project owner added <code>premier-league-players-2026-08-08/</code> and explicitly directed use of its roster and available portraits in the selectors, with a silhouette when no portrait was supplied. Other player remains available for unavailable or newly added players.</li>
+<li>Current player-asset direction: the reviewed selector snapshot is <code>premier-league-players-2026-08-13/</code>. Other player remains available for unavailable or newly added players. The 2026-08-08 folder remains provenance only.</li>
 <li>Current how-to direction: use screenshots captured from the public live mobile flow at 390 × 844 pixels, without submitting the walkthrough draft. The three source captures live under <code>public/how-to-play/</code>; their numbered overlays and matching callout text are first-party application documentation rather than a third-party data source.</li>
 </ul>
 <h2>Owner-provided player snapshot source card</h2>
 <ul>
-<li>Local handoff: <code>premier-league-players-2026-08-08/</code>; its <code>README.txt</code> records snapshot date 2026-08-08, 587 players across the application&#39;s 20 clubs, 580 supplied PNGs, and seven deliberately missing images.</li>
-<li>Handoff provenance: the local README identifies Transfermarkt 2026 first-team squad pages as the roster source, 570 FotMob-sourced images, and 10 Creative Commons Wikipedia images. For this repository, the operative provenance is the project owner&#39;s local handoff and direction to use it; this record does not claim broader ownership or redistribution permission.</li>
-<li>Application use: roster rows are imported into the season catalogue and reviewed portraits are copied to local <code>/player-faces/</code> paths. The seven players without a supplied portrait use <code>PlayerMark</code>&#39;s generic silhouette.</li>
+<li>Local handoff: <code>premier-league-players-2026-08-13/</code>; its <code>README.txt</code> records snapshot date 2026-08-13, 582 players across the application&#39;s 20 clubs, and 582 supplied PNGs.</li>
+<li>Handoff provenance: the local README identifies Transfermarkt 2026 first-team squad pages as the roster source and FotMob CDN portraits for every catalogued player. For this repository, the operative provenance is the project owner&#39;s local handoff and direction to use it; this record does not claim broader ownership or redistribution permission.</li>
+<li>Application use: roster rows are imported into the season catalogue and reviewed portraits are copied to local <code>/player-faces/</code> paths. <code>PlayerMark</code> uses its generic silhouette when an asset path is absent or an image fails.</li>
 <li>Runtime boundary: the deployed application does not execute the handoff&#39;s acquisition scripts, call those upstream sources, scrape player pages, or hotlink portraits. Other player covers unavailable or newly added players.</li>
 <li>Outcome boundary: this is a selector identity and portrait snapshot, not a goals, assists, clean-sheets, or player-rating result feed. A future owner-run Codex automation will enter the five reviewed outcomes manually.</li>
 </ul>
@@ -78,14 +78,14 @@
 <li>The owner clarified that spotlight accuracy never changes the table leaderboard. The table maximum remains 100. Let <code>N</code> be the current number of active, nondeleted season brackets. Accuracy points are <code>max(0, N + 1 - outcome rank)</code>. Overall accuracy excludes pending categories. A resolved zero-point result still counts as available. Equal overall scores share a competition rank. Category sorts use outcome rank from low to high and put pending entries last.</li>
 <li>Team expectation data is internal: average each club&#39;s predicted position across the remaining valid submissions, then compare it with the active validated standings. Underdog is average prediction minus actual position; overrated is the inverse.</li>
 <li>The requested player-opinion metric is FotMob average season rating, descending for underdog and ascending for overrated. This product rule does not supersede FotMob&#39;s terms or authorize automated extraction. There is no runtime FotMob client, scraper, scheduled job, or stored provider credential.</li>
-<li>The owner has supplied the dated 587-player selector catalogue and 580 portrait PNGs, with seven intentional silhouette fallbacks. The handoff does not include reviewed top-scorer, assists, clean-sheets, or player-rating rankings. Do not infer or fabricate these results.</li>
+<li>The owner has supplied the dated 582-player selector catalogue and 582 portrait PNGs. The handoff does not include reviewed top-scorer, assists, clean-sheets, or player-rating rankings. Do not infer or fabricate these results.</li>
 <li>A future owner-run Codex automation will enter the five reviewed outcomes manually. Its source material must be permitted or licensed. The payload, review path, provenance fields, and final-state rules remain a later design task.</li>
 </ul>
 <h2>Technical authority</h2>
 <p>Current official Next.js, React, Node.js/Vercel runtime, Tailwind CSS, dnd-kit, Neon, Drizzle, Vercel Marketplace/Git integration, Vercel Authentication, and GitHub documentation informed the pinned stack and deployment flow. Exact links, decisions, caveats, rejected alternatives, and failure behavior are recorded in <code>docs/RESEARCH.md</code>.</p>
 <p>Implementation and current checked-out behavior remain authoritative when a historical note differs.</p>
 
-      <p class="source">Generated deterministically from <a href="SOURCES.md">docs/context/SOURCES.md</a>. Canonical SHA-256: <code>62d961fe7d307035cbd4e389a3d5100c874bc58125554b80e4d5559efb0c392a</code>.</p>
+      <p class="source">Generated deterministically from <a href="SOURCES.md">docs/context/SOURCES.md</a>. Canonical SHA-256: <code>191781cc89adb5932d23f8ff5e5213a4f9b1c5c6a72ec1d420c0a3e7b45dde30</code>.</p>
     </main>
   </body>
 </html>

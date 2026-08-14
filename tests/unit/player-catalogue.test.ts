@@ -58,15 +58,9 @@ describe("normalized 2026/27 player catalogue", () => {
           existsSync(join(process.cwd(), "public", player.assetPath.slice(1))),
       ),
     ).toBe(true);
-    expect(fallbacks.map((player) => player.displayName).toSorted()).toEqual([
-      "Aidan Harris",
-      "Alysson",
-      "David Akintola",
-      "Denner",
-      "Jack Fletcher",
-      "Kota Takai",
-      "Tom McGill",
-    ]);
+    expect(fallbacks.map((player) => player.displayName).toSorted()).toEqual(
+      [],
+    );
   });
 
   it("maps all source clubs to the canonical 20-team fixture", () => {
@@ -90,7 +84,7 @@ describe("normalized 2026/27 player catalogue", () => {
 
     expect(rows).toHaveLength(PREMIER_LEAGUE_2026_27_PLAYER_COUNT);
     expect(rows.every((row) => row.isActive)).toBe(true);
-    expect(rows.filter((row) => row.assetPath === null)).toHaveLength(7);
+    expect(rows.filter((row) => row.assetPath === null)).toHaveLength(0);
     expect(rows.every((row) => row.teamId.startsWith("team:"))).toBe(true);
     expect(rows.find((row) => row.displayName === "Bukayo Saka")).toMatchObject(
       {
@@ -99,8 +93,14 @@ describe("normalized 2026/27 player catalogue", () => {
       },
     );
     expect(rows.find((row) => row.displayName === "Alysson")).toMatchObject({
-      assetPath: null,
+      assetPath: "/player-faces/aston_villa_alysson_alysson.png",
       teamId: "team:aston-villa",
+    });
+    expect(
+      rows.find((row) => row.displayName === "Ronald Araujo"),
+    ).toMatchObject({
+      assetPath: "/player-faces/fc_liverpool_araujo_ronald.png",
+      teamId: "team:liverpool",
     });
   });
 

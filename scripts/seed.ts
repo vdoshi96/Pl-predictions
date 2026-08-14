@@ -5,6 +5,7 @@ import type { BatchItem } from "drizzle-orm/batch";
 
 import {
   ACTIVE_SEASON,
+  PREMIER_LEAGUE_2026_27_PLAYER_COUNT,
   PREMIER_LEAGUE_2026_27_PLAYERS,
   PREMIER_LEAGUE_2026_27_TEAMS,
 } from "@/data";
@@ -198,7 +199,7 @@ export async function seedDatabase(db: Database = getDb()): Promise<{
     })
   ) {
     throw new Error(
-      "The active season does not contain exactly the verified 587-player fixture.",
+      `The active season does not contain exactly the verified ${PREMIER_LEAGUE_2026_27_PLAYER_COUNT}-player fixture.`,
     );
   }
 

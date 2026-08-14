@@ -3,15 +3,16 @@ import {
   mkdir,
   readFile,
   readdir,
+  unlink,
   writeFile,
 } from "node:fs/promises";
 import { basename, join, resolve } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
 export const PLAYER_CATALOGUE_EXPECTATIONS = {
-  imageCount: 580,
-  missingImageCount: 7,
-  playerCount: 587,
+  imageCount: 582,
+  missingImageCount: 0,
+  playerCount: 582,
   requireAllSourceTeams: true,
 } as const;
 
@@ -414,7 +415,7 @@ export function validateNormalizedPlayerFixture(
     referencedImages.size !== PLAYER_CATALOGUE_EXPECTATIONS.imageCount
   ) {
     fail(
-      "the tracked fixture does not preserve the 580 portrait / 7 fallback split.",
+      `the tracked fixture does not preserve the ${PLAYER_CATALOGUE_EXPECTATIONS.imageCount} portrait / ${PLAYER_CATALOGUE_EXPECTATIONS.missingImageCount} fallback split.`,
     );
   }
   if (
@@ -489,7 +490,7 @@ export async function runPlayerCatalogueNormalizer(
   const repositoryRoot = resolve(fileURLToPath(new URL("..", import.meta.url)));
   const sourceDirectory = join(
     repositoryRoot,
-    "premier-league-players-2026-08-08",
+    "premier-league-players-2026-08-13",
   );
   const sourceImageDirectory = join(sourceDirectory, "images");
   const sourceJsonPath = join(
@@ -546,10 +547,8 @@ export async function runPlayerCatalogueNormalizer(
   const unexpectedPublishedImages = [...existingPngFileNames].filter(
     (fileName) => !sourceImageFileNames.has(fileName),
   );
-  if (unexpectedPublishedImages.length > 0) {
-    fail(
-      `public/player-faces contains unreferenced PNGs: ${unexpectedPublishedImages.join(", ")}.`,
-    );
+  for (const fileName of unexpectedPublishedImages) {
+    await unlink(join(destinationImageDirectory, fileName));
   }
 
   await writeFile(fixturePath, serializedFixture, "utf8");

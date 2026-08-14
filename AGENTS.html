@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="canonical-source" content="AGENTS.md" />
-    <meta name="canonical-source-sha256" content="172c9c1a022bff6cdbb4ea4008b3503acdfec3071fc30bcc60b8aaacb8534e0d" />
+    <meta name="canonical-source-sha256" content="70440c6c2e5d08eb476c607a775e4bb497d6a9cd5860118e9593d25e271dc117" />
     <title>This is NOT the Next.js you know</title>
     <style>
       :root { color-scheme: light dark; font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
@@ -45,7 +45,7 @@
 <h2>Product and architecture</h2>
 <p>Dranx Prediction League is a mobile-first friends game for the 2026/27 Premier League. A participant completes one immutable three-stage entry: order all 20 clubs and enter a display name, choose seven spotlight predictions, then review and submit. It is one Next.js 16 App Router application deployed on Vercel, with Vercel Marketplace Neon PostgreSQL accessed through Drizzle and the Neon HTTP driver. Public pages, authenticated administrator pages, server actions, and the source-neutral standings import endpoint live in the same application.</p>
 <p>The seven spotlight categories are top scorer, top assister, most clean sheets, underdog team, overrated team, underdog player, and overrated player. Player categories use a searchable season catalogue plus an Other-player text fallback; most clean sheets and both team-opinion categories select clubs. There is no runtime football API client, production scraper, or Vercel Cron. Standings enter through the authenticated canonical importer or manual administrator form. A future owner-run Codex automation will enter the five non-table-derived spotlight outcome rankings manually. Do not add automated FotMob extraction without written data-licence permission covering the intended use.</p>
-<p>The 20 owner-provided club badge PNGs are the canonical local team marks; the original monograms remain rollback-only fallbacks for the first badge release. The owner-provided <code>premier-league-players-2026-08-08/</code> snapshot is the reviewed selector source: 587 players across the 20 clubs, with 580 supplied portrait PNGs and seven intentional <code>PlayerMark</code> silhouette fallbacks. Keep Other player available for unavailable or newly added players. This roster import is not an outcome feed; do not infer the five pending result rankings from it or add runtime acquisition.</p>
+<p>The 20 owner-provided club badge PNGs are the canonical local team marks; the original monograms remain rollback-only fallbacks for the first badge release. The owner-provided <code>premier-league-players-2026-08-13/</code> snapshot is the reviewed selector source: 582 players across the 20 clubs, with 582 supplied portrait PNGs and no remaining silhouette fallbacks in the catalogue. Keep Other player available for unavailable or newly added players. This roster import is not an outcome feed; do not infer the five pending result rankings from it or add runtime acquisition.</p>
 <h2>Important paths</h2>
 <ul>
 <li><code>src/app/</code> — public, administrator, and API routes.</li>
@@ -57,7 +57,7 @@
 <li><code>tests/</code> — unit/component, isolated Neon integration, and Playwright browser suites.</li>
 <li><code>docs/</code> — canonical architecture, research, QA, decisions, status, and generated HTML peers.</li>
 <li><code>public/team-marks/</code> — owner-provided club badge PNGs plus rollback-only monograms; do not add the separate Premier League logo/lion/ball assets or unapproved replacements.</li>
-<li><code>premier-league-players-2026-08-08/</code> — owner-provided raw roster and portrait handoff; never execute its acquisition scripts in the deployed app.</li>
+<li><code>premier-league-players-2026-08-13/</code> — owner-provided raw roster and portrait handoff; never execute its acquisition scripts in the deployed app. The earlier <code>premier-league-players-2026-08-08/</code> folder remains provenance only.</li>
 <li><code>public/player-faces/</code> — imported local portraits; <code>PlayerMark</code> must fall back to the generic silhouette when an asset path is absent or an image fails.</li>
 </ul>
 <h2>Commands</h2>
@@ -99,7 +99,7 @@ npm run docs:check
 <p>A change is complete only when relevant unit/component tests, isolated Neon integration tests, TypeScript, ESLint, formatting, documentation parity, production build, and desktop/mobile browser checks pass. Mobile QA must cover the three-stage flow, the table leaderboard, the separate spotlight-accuracy page, 320–430px reflow, 56px touch handles, mouse/touch/keyboard reorder, searchable keyboard-accessible category selectors, the Other-player text path, safe-area actions, long-name wrapping, and no horizontal overflow. Preserve exact cleanup evidence for any QA data.</p>
 <p>Keep canonical Markdown and generated HTML peers synchronized. Before finishing an iteration, correct stale status/QA documentation, push the feature branch, merge it to GitHub <code>main</code>, update local <code>main</code> to the same commit, and remove completed worktrees.</p>
 
-      <p class="source">Generated deterministically from <a href="AGENTS.md">AGENTS.md</a>. Canonical SHA-256: <code>172c9c1a022bff6cdbb4ea4008b3503acdfec3071fc30bcc60b8aaacb8534e0d</code>.</p>
+      <p class="source">Generated deterministically from <a href="AGENTS.md">AGENTS.md</a>. Canonical SHA-256: <code>70440c6c2e5d08eb476c607a775e4bb497d6a9cd5860118e9593d25e271dc117</code>.</p>
     </main>
   </body>
 </html>

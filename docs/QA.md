@@ -144,7 +144,7 @@ Only the newest completed production run is retained under `docs/assets/qa/`. Al
 - [x] Verify the exact merged production deployment and stable alias, prove the Neon recovery path, then run the approved production seed exactly once.
 - [x] Verify 582 active players, 17 inactive historical rows, 582 portrait paths, representative additions/removals/moves, Other player, historical references, every active portrait URL, and all obsolete-path 404s.
 - [x] Record the exact feature PR, merge SHA, deployment, recovery, seed, database, browser, image, visual, and log evidence.
-- [ ] Publish this evidence-only closeout through its own PR, synchronize final `main`, reverify retained handoff hashes, and remove completed branch/worktree state.
+- [ ] Merge evidence-only closeout [PR #16](https://github.com/vdoshi96/Pl-predictions/pull/16), synchronize final `main`, reverify retained handoff hashes, and remove completed branch/worktree state.
 
 ## August 8 release closeout state (historical)
 

@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="generated-by" content="scripts/generate-docs-html.mjs" />
     <meta name="canonical-source" content="LOG.md" />
-    <meta name="canonical-source-sha256" content="5ddc5274f4e480c31aa2ae6ede65a6bcde8ab15528ef409fca30178463a74be5" />
+    <meta name="canonical-source-sha256" content="5ab5cb57ee9929990328ff74b0ee07fa7c7df7650087df9af70c3cdf30a7c471" />
     <title>Session log</title>
     <style>
       :root { color-scheme: light dark; font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
@@ -60,7 +60,7 @@
 <li>Proved the recovery stop gate in Neon project <code>young-leaf-03280061</code>: <code>main</code> is a root branch with parent <code>-</code>, the configured restore window is six hours, and the pre-seed capture at 2026-08-14 13:35:11.760453 UTC recorded WAL <code>0/45548C8</code> and the exact 20/587/587/0/580 baseline. A read-only time-travel query at 13:33:00 UTC returned that baseline. The Browse pane produced one transient signal-aborted error, but Query data succeeded; no restore was performed.</li>
 <li>Ran the supported production seed exactly once; it printed <code>Seeded 20 teams and 582 players for 2026/27 Premier League.</code> The post-seed capture at 2026-08-14 13:37:59.513827 UTC recorded WAL <code>0/4652E18</code>. Read-only verification found 20 teams; 599 total rows and 599 distinct IDs, external IDs, and slugs; 582 active; 17 inactive; 582 distinct active portrait paths; no null or missing club references; intact foreign-key and cross-season checks; zero inactive-player pick references; exact fixture parity; all expected inactive identities and moves; and zero active obsolete paths.</li>
 <li>Verified all 582 active portrait URLs as HTTP 200 valid PNGs and all 21 obsolete paths as HTTP 404. The final read-only smoke passed all five desktop/mobile Chromium and mobile WebKit projects, covering the representative addition, move, restored portrait, removal, Other-player silhouette, reflow, and browser/network/HTTP guards. Refreshed and visually inspected seven screenshots with manifest SHA-256 <code>6b5251c6fd96a70f5d32edc074101246303c76805deec1bf499ec382afee134d</code>; the exact deployment&#39;s bounded error, fatal, and HTTP 5xx queries returned no records.</li>
-<li>Marked the roster release complete. The evidence-only closeout branch still requires its own PR/merge, final <code>main</code> synchronization, retained-handoff rehash, and completed branch/worktree cleanup; no closeout PR number or final SHA is claimed before it exists.</li>
+<li>Marked the roster release complete and opened evidence-only closeout <a href="https://github.com/vdoshi96/Pl-predictions/pull/16">PR #16</a>. Its merge, final <code>main</code> synchronization, retained-handoff rehash, and completed branch/worktree cleanup remain; no merge SHA is claimed before it exists.</li>
 </ul>
 <h2 id="2026-08-13">2026-08-13</h2>
 <h3 id="owner-handoff-creation-local-feature-branch">Owner handoff creation (local feature branch)</h3>
@@ -232,7 +232,7 @@
 <li>Next handoff: use <code>main</code> as the base for future pull requests. No GitHub access blocker remains for the current repository workflow.</li>
 </ul>
 
-      <p class="source">Generated deterministically from <a href="LOG.md">docs/context/LOG.md</a>. Canonical SHA-256: <code>5ddc5274f4e480c31aa2ae6ede65a6bcde8ab15528ef409fca30178463a74be5</code>.</p>
+      <p class="source">Generated deterministically from <a href="LOG.md">docs/context/LOG.md</a>. Canonical SHA-256: <code>5ab5cb57ee9929990328ff74b0ee07fa7c7df7650087df9af70c3cdf30a7c471</code>.</p>
     </main>
   </body>
 </html>

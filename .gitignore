@@ -8,6 +8,10 @@
 /output/playwright
 /.playwright-cli
 
+# Private owner-provided player handoffs; preserve locally and never stage.
+/premier-league-players-2026-08-08/
+/premier-league-players-2026-08-13/
+
 # Local and platform state
 .vercel
 .env*

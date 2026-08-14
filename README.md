@@ -14,18 +14,24 @@ The user-facing identity is Dranx Prediction League. Its Premier-League-inspired
 
 The project owner supplied one transparent PNG badge for each of the 20 clubs and explicitly directed their use in this application. Those local files are now the canonical team marks; the shared `TeamMark` uses contain sizing, a neutral backing, and a labelled initials fallback. The original SVG monograms remain only as rollback-safe files during the first PNG release. The owner-provided handoff does not imply affiliation, transfer ownership of the club marks, or authorize the separate Premier League logo/lion/ball files, none of which are used.
 
-The owner also supplied the dated `premier-league-players-2026-08-08/` roster snapshot and directed its use for the player selectors. It contains 587 players across the app's 20 clubs and 580 portrait PNGs. The seven players without a supplied image use the generic `PlayerMark` silhouette. The app imports the snapshot into its season catalogue and serves copied local portraits; it does not run the handoff's acquisition scripts or fetch player data or images at runtime.
+The owner also supplied the dated `premier-league-players-2026-08-13/` roster snapshot and selected it for the player selectors. It contains 582 players across the app's 20 clubs and 582 portrait PNGs. The handoff and application fixture are reconciled internally; this release does not claim independent verification against official club or Premier League roster pages. `PlayerMark` still uses its generic silhouette when an asset path is absent or an image fails to load. The app imports the snapshot into its season catalogue and serves copied local portraits; it does not run the handoff's acquisition scripts or fetch player data or images at runtime.
+
+On 2026-08-14 the owner confirmed that the required permissions for this player-catalogue workflow have been obtained, including acquisition, storage, redistribution, and production use. Owner-run FotMob or Transfermarkt acquisition may therefore run offline and produce a reviewed snapshot. This permission disposition removes the former source-specific licence gate; it does not change the deployed application's no-runtime-fetch, no-scrape, no-hotlink, no-football-API, and no-Cron boundary.
+
+This branch describes the candidate August 13 fixture. Until its release is merged, deployed, and seeded, production remains on the August 8 database baseline of 587 total/active players and 580 portrait paths.
 
 ### Player snapshot source card
 
 | Field                | Value                                                                                                                 |
 | -------------------- | --------------------------------------------------------------------------------------------------------------------- |
-| Local handoff        | `premier-league-players-2026-08-08/` (owner-provided raw snapshot)                                                    |
-| Snapshot date        | 2026-08-08                                                                                                            |
-| Coverage             | 587 players across all 20 application clubs                                                                           |
-| Portrait coverage    | 580 supplied PNGs; seven `PlayerMark` silhouette fallbacks                                                            |
+| Local handoff        | `premier-league-players-2026-08-13/` (owner-provided raw snapshot)                                                    |
+| Snapshot date        | 2026-08-13                                                                                                            |
+| Coverage             | 582 players across all 20 application clubs                                                                           |
+| Portrait coverage    | 582 supplied PNGs; `PlayerMark` silhouette remains only for missing paths or image failures                           |
+| Roster authority     | Owner-selected snapshot; internally reconciled, not independently official-site verified                              |
 | Application boundary | Reviewed roster import and local portrait serving only; no runtime fetch, scrape, or hotlink                          |
 | Result-data boundary | This snapshot supplies selector identities and portraits, not goals, assists, clean sheets, or season-rating outcomes |
+| Production state     | Pre-release baseline remains 587 total/active players and 580 portrait paths until the approved deploy/seed sequence  |
 
 ## Product behavior
 
@@ -48,7 +54,7 @@ Every category uses its own searchable selector:
 - **Underdog player** ranks reviewed average season ratings from highest to lowest.
 - **Overrated player** ranks reviewed average season ratings from lowest to highest.
 
-Player options are searchable by first, last, or full name across the 587-player 2026-08-08 snapshot. Every player category also offers **Other player**. This option shows a required name field for an unavailable or new player. `PlayerMark` shows 580 local portraits. The other seven players use its neutral silhouette. Club categories use the existing local crests. Custom names must match a reviewed result list before they receive an accuracy rank.
+Player options are searchable by first, last, or full name across the 582-player 2026-08-13 snapshot. Every player category also offers **Other player**. This option shows a required name field for an unavailable or new player. `PlayerMark` shows 582 local portraits. Club categories use the existing local crests. Custom names must match a reviewed result list before they receive an accuracy rank.
 
 Table scoring is mutually exclusive for each club: 5 points exact, 3 within three places, 1 in the same half, or 0. An exact table scores 100. The predicted champion is position 1 and has no separate bonus. Spotlight accuracy never changes this score. Let `N` be the current number of active, nondeleted season brackets. Accuracy points are `max(0, N + 1 - outcome rank)`. Overall accuracy sums only resolved categories. A resolved zero-point result still counts as available. Pending categories remain unavailable. Equal overall scores share a competition rank. Category sorts use outcome rank from low to high, put pending entries last, and use participant name for deterministic ties.
 
@@ -67,7 +73,7 @@ The application is one Next.js 16 App Router deployment on Vercel. Dynamic serve
 Standings are deliberately decoupled from source acquisition:
 
 ```text
-permitted export or owner-entered table
+reviewed offline source or owner-entered table
                  |
                  v
        canonical 20-team payload
@@ -82,7 +88,7 @@ authenticated import route / local script / admin form
  atomic Neon snapshot activation and derived scoring
 ```
 
-There is no runtime football API client, production scraper, or Vercel Cron. A future owner-run Codex automation will enter reviewed spotlight outcomes manually. The automation must use permitted or licensed source material. The current importer accepts standings only. The five non-table-derived outcomes remain pending and do not receive zero. Manual entry at `/admin/standings` remains the standings fallback.
+There is no runtime football API client, production scraper, image hotlink, or Vercel Cron. A future owner-run Codex automation may acquire FotMob or Transfermarkt data offline, review it, and enter the five non-table-derived outcomes. The current importer accepts standings only. Those five outcomes remain pending and do not receive zero until a reviewed result payload is entered. Manual entry at `/admin/standings` remains the standings fallback.
 
 See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md), [docs/RESEARCH.md](docs/RESEARCH.md), and [docs/QA.md](docs/QA.md) for the detailed design, source decisions, and current evidence.
 
@@ -150,6 +156,8 @@ npm run docs:generate       # regenerate every Markdown HTML peer
 npm run docs:check          # prove generated HTML is current
 ```
 
+Markdown remains canonical. The documentation generator inventories only Git-tracked or nonignored files through NUL-delimited paths, excludes private handoffs and QA assets, rejects source/output symlinks and unmanaged same-basename HTML, writes peers through same-directory atomic renames, and removes only orphaned HTML carrying a recognized legacy or current generator marker. Source hashes, heading IDs, and local Markdown-to-HTML links are deterministic; focused unit tests enforce those boundaries.
+
 Database commands:
 
 ```bash
@@ -191,9 +199,9 @@ curl --request POST "https://pl-predictions-2026.vercel.app/api/automation/stand
 
 The endpoint has a 64 KiB body limit, validates a complete known-team permutation, rejects stale, implausibly future, or post-final snapshots, records import outcomes, and preserves the last good snapshot on every failure. A database-time-anchored five-minute skew bound protects both capture timestamps. A season-level accepted-through watermark also advances for newer duplicate observations, so delayed changed data cannot regress the active table. The payload's `isFinal` field is advisory only; only an authenticated administrator can confirm final status.
 
-### FotMob boundary
+### Offline source boundary
 
-FotMob was used during one-time research to map factual team identifiers. Its current terms, checked 2026-08-08, prohibit automatic crawlers and systematic or regular extraction; a consumer subscription is not a written automation or redistribution licence. Do not configure Codex or this project to scrape FotMob automatically unless the owner first obtains explicit written permission covering the intended extraction and use. Use a permitted/licensed export or the manual admin table instead. The deployed application stores no source cookies, credentials, HTML, or live API dependency.
+The owner confirmed on 2026-08-14 that the required permissions for this player-catalogue workflow have been obtained. Owner-run FotMob or Transfermarkt acquisition may run offline, retain its private provenance, and produce reviewed local snapshots or result payloads. The deployed application still stores no source cookies or credentials and never performs a runtime source request, scrape, hotlink, football API call, or scheduled acquisition.
 
 ## Admin credential configuration and rotation
 
@@ -230,14 +238,14 @@ For a new environment:
 7. Deploy production with `vercel deploy --prod` and inspect the production URL/logs.
 8. Run the read-only production smoke. If a production write proof is required, run only the separately gated exact-ID submit/privacy/delete smoke and verify cleanup. Never run the full reveal/standings journey against production.
 
-No Vercel Cron should be added. Recurring data acquisition belongs to the owner's separate Codex automation and must respect the source boundary above.
+No Vercel Cron should be added. Recurring data acquisition belongs to the owner's separate offline Codex automation and must preserve the reviewed-import boundary above.
 
 ## Season rollover and club updates
 
 The application intentionally has one code-selected active season.
 
 1. Verify the new membership and display names against official Premier League sources.
-2. Add the new season metadata in `src/data/season.ts` and a complete 20-club fixture in `src/data/teams.ts`. Give every club a stable slug, sort name, permitted asset path, and external mapping only when lawfully sourced.
+2. Add the new season metadata in `src/data/season.ts` and a complete 20-club fixture in `src/data/teams.ts`. Give every club a stable slug, sort name, reviewed local asset path, and stable external mapping.
 3. Keep the old season rows; a new slug makes `npm run db:seed` insert a separate season. Do not recycle IDs.
 4. Run fixture, scoring, importer, integration, and browser tests, then seed and verify exactly 20 teams.
 5. If correcting membership after a season has already been seeded, create an explicit data migration. The idempotent seed updates known teams but deliberately does not delete referenced historical rows.
@@ -247,14 +255,14 @@ The application intentionally has one code-selected active season.
 
 - Club marks use the 20 owner-provided local PNG badges. Names and marks remain their respective owners' property; the repository records the project owner's direction to use this exact set, not a broader licence for other league or club artwork. The original monograms remain rollback-only during the first PNG release.
 - Standings are manual or accepted through the authenticated canonical importer. There is no built-in provider fetch, sync-now source client, scheduled job, or live-data guarantee.
-- The owner-provided 2026-08-08 snapshot supplies 587 player options and 580 local portraits. Seven catalogued players use the generic silhouette, and Other player remains available for unavailable or newly added players.
-- Only underdog-team and overrated-team outcomes are currently derivable. A future owner-run Codex automation will enter the other five reviewed result lists manually. The former Alex/Jordan spotlight cards were hard-coded presentation fixtures, not stored submissions; they were retired so `/spotlight` now represents only complete real entries.
+- The owner-provided 2026-08-13 snapshot supplies 582 player options and 582 local portraits. Other player remains available for unavailable or newly added players.
+- Only underdog-team and overrated-team outcomes are currently derivable. A future owner-run Codex automation may acquire and review the other five result lists offline before entering them. The former Alex/Jordan spotlight cards were hard-coded presentation fixtures, not stored submissions; they were retired so `/spotlight` now represents only complete real entries.
 - Participants have no accounts and cannot edit an entry. The administrator can delete an erroneous parent entry, cascading through all 20 table rows and seven spotlight picks so it can be resubmitted.
 - The opening fixture is reviewed static season data, not a live schedule feed. Because Premier League fixtures can change, the owner must update both the canonical UTC fixture metadata and the persisted season row through a reviewed forward migration before the existing cutoff if the opener moves. A constant-only deploy does not change the database-enforced instant.
 - Season rollover currently requires a reviewed code and seed update.
 
 ## Data and rights attribution
 
-Season membership and club names use the official Premier League 2026/27 table and AGM announcement. FotMob pages supplied one-time factual external-ID mapping only. The application does not fetch or hotlink football data or images at runtime. FotMob average season rating is the requested metric for both player-opinion categories. A future owner-run Codex automation will enter those reviewed rankings manually. The project owner supplied the local club badges and dated player snapshot. The official Premier League logo is not included. The roster import does not supply the five pending outcomes. [docs/RESEARCH.md](docs/RESEARCH.md) records the sources and rights review.
+Season membership and club names use the official Premier League 2026/27 table and AGM announcement. On 2026-08-14 the owner confirmed that the required permissions for this player-catalogue workflow have been obtained, including acquisition, storage, redistribution, and production use. Owner-run FotMob or Transfermarkt acquisition may run offline and produce reviewed local snapshots or result payloads. The deployed application does not fetch, scrape, or hotlink football data or images at runtime. FotMob average season rating is the requested metric for both player-opinion categories. The project owner supplied the local club badges and dated player snapshot. The official Premier League logo is not included. The roster import does not supply the five pending outcomes. [docs/RESEARCH.md](docs/RESEARCH.md) records the dated sources and current permission disposition.
 
 This is an unofficial fan project and is not affiliated with the Premier League. Club names and crests belong to their respective owners.

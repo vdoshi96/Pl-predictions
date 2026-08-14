@@ -3,8 +3,9 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="generated-by" content="scripts/generate-docs-html.mjs" />
     <meta name="canonical-source" content="README.md" />
-    <meta name="canonical-source-sha256" content="02a74d27695cc4345c94a81032831bad24b3b79a56baffd0aef579541aa44070" />
+    <meta name="canonical-source-sha256" content="f219026ca202ebc66b96d3458a2676f05e622d7fc83264a0423ac23d5962b630" />
     <title>Dranx Prediction League</title>
     <style>
       :root { color-scheme: light dark; font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
@@ -38,16 +39,18 @@
   </head>
   <body>
     <main>
-      <h1>Dranx Prediction League</h1>
+      <h1 id="dranx-prediction-league">Dranx Prediction League</h1>
 <p>Dranx Prediction League is an unofficial, mobile-first prediction game for a private invited group. Each participant completes one immutable three-stage entry. The participant orders 20 clubs, chooses seven spotlight predictions, then reviews and submits the package. Before reveal, the table leaderboard shows 0 points and each predicted champion. The other 19 positions and all spotlight picks remain private. After kickoff, table points use the latest valid standings. A separate spotlight page tracks fun accuracy without changing table points.</p>
 <p>Production: <a href="https://pl-predictions-2026.vercel.app">https://pl-predictions-2026.vercel.app</a></p>
 <p>GitHub: <a href="https://github.com/vdoshi96/Pl-predictions">https://github.com/vdoshi96/Pl-predictions</a></p>
 <p>Deployment status: production is public and Ready at the stable alias above. Vercel Authentication is set to <code>preview</code>, so retained preview deployments still require owner sign-in while production remains anonymously accessible. Final production browser and cleanup evidence is recorded in <a href="docs/QA.html">docs/QA.md</a>.</p>
-<h2>Brand and local assets</h2>
+<h2 id="brand-and-local-assets">Brand and local assets</h2>
 <p>The user-facing identity is Dranx Prediction League. Its Premier-League-inspired palette anchors on the league&#39;s official purple, <code>#37003c</code>, with cyan <code>#05f0ff</code>, green <code>#00ff87</code>, and pink <code>#ff2882</code> accents and an original Dranx mark. The original mark is used instead of the official Premier League logo.</p>
 <p>The project owner supplied one transparent PNG badge for each of the 20 clubs and explicitly directed their use in this application. Those local files are now the canonical team marks; the shared <code>TeamMark</code> uses contain sizing, a neutral backing, and a labelled initials fallback. The original SVG monograms remain only as rollback-safe files during the first PNG release. The owner-provided handoff does not imply affiliation, transfer ownership of the club marks, or authorize the separate Premier League logo/lion/ball files, none of which are used.</p>
-<p>The owner also supplied the dated <code>premier-league-players-2026-08-08/</code> roster snapshot and directed its use for the player selectors. It contains 587 players across the app&#39;s 20 clubs and 580 portrait PNGs. The seven players without a supplied image use the generic <code>PlayerMark</code> silhouette. The app imports the snapshot into its season catalogue and serves copied local portraits; it does not run the handoff&#39;s acquisition scripts or fetch player data or images at runtime.</p>
-<h3>Player snapshot source card</h3>
+<p>The owner also supplied the dated <code>premier-league-players-2026-08-13/</code> roster snapshot and selected it for the player selectors. It contains 582 players across the app&#39;s 20 clubs and 582 portrait PNGs. The handoff and application fixture are reconciled internally; this release does not claim independent verification against official club or Premier League roster pages. <code>PlayerMark</code> still uses its generic silhouette when an asset path is absent or an image fails to load. The app imports the snapshot into its season catalogue and serves copied local portraits; it does not run the handoff&#39;s acquisition scripts or fetch player data or images at runtime.</p>
+<p>On 2026-08-14 the owner confirmed that the required permissions for this player-catalogue workflow have been obtained, including acquisition, storage, redistribution, and production use. Owner-run FotMob or Transfermarkt acquisition may therefore run offline and produce a reviewed snapshot. This permission disposition removes the former source-specific licence gate; it does not change the deployed application&#39;s no-runtime-fetch, no-scrape, no-hotlink, no-football-API, and no-Cron boundary.</p>
+<p>This branch describes the candidate August 13 fixture. Until its release is merged, deployed, and seeded, production remains on the August 8 database baseline of 587 total/active players and 580 portrait paths.</p>
+<h3 id="player-snapshot-source-card">Player snapshot source card</h3>
 <table>
 <thead>
 <tr>
@@ -57,19 +60,23 @@
 </thead>
 <tbody><tr>
 <td>Local handoff</td>
-<td><code>premier-league-players-2026-08-08/</code> (owner-provided raw snapshot)</td>
+<td><code>premier-league-players-2026-08-13/</code> (owner-provided raw snapshot)</td>
 </tr>
 <tr>
 <td>Snapshot date</td>
-<td>2026-08-08</td>
+<td>2026-08-13</td>
 </tr>
 <tr>
 <td>Coverage</td>
-<td>587 players across all 20 application clubs</td>
+<td>582 players across all 20 application clubs</td>
 </tr>
 <tr>
 <td>Portrait coverage</td>
-<td>580 supplied PNGs; seven <code>PlayerMark</code> silhouette fallbacks</td>
+<td>582 supplied PNGs; <code>PlayerMark</code> silhouette remains only for missing paths or image failures</td>
+</tr>
+<tr>
+<td>Roster authority</td>
+<td>Owner-selected snapshot; internally reconciled, not independently official-site verified</td>
 </tr>
 <tr>
 <td>Application boundary</td>
@@ -79,8 +86,12 @@
 <td>Result-data boundary</td>
 <td>This snapshot supplies selector identities and portraits, not goals, assists, clean sheets, or season-rating outcomes</td>
 </tr>
+<tr>
+<td>Production state</td>
+<td>Pre-release baseline remains 587 total/active players and 580 portrait paths until the approved deploy/seed sequence</td>
+</tr>
 </tbody></table>
-<h2>Product behavior</h2>
+<h2 id="product-behavior">Product behavior</h2>
 <ul>
 <li><code>/</code> presents the three-stage table, spotlight-pick, and final-review journey, followed by receipt confirmation.</li>
 <li><code>/leaderboard</code> shows table points only, with a maximum of 100. Before reveal, totals remain 0 and spotlight picks stay private. After scoring starts, each card shows the table score and the champion&#39;s current position.</li>
@@ -90,7 +101,7 @@
 <li><code>/admin</code> provides owner-only settings, submission deletion, manual standings, import history, and final-table controls.</li>
 <li><code>/api/automation/standings</code> accepts a source-neutral, bearer-authenticated snapshot or failure record. It never fetches a football-data service itself.</li>
 </ul>
-<h3>Seven spotlight picks</h3>
+<h3 id="seven-spotlight-picks">Seven spotlight picks</h3>
 <p>Every category uses its own searchable selector:</p>
 <ul>
 <li><strong>Top scorer</strong> and <strong>top assister</strong> choose a player and use the chosen player&#39;s occupied rank in the reviewed goals or assists list.</li>
@@ -100,16 +111,16 @@
 <li><strong>Underdog player</strong> ranks reviewed average season ratings from highest to lowest.</li>
 <li><strong>Overrated player</strong> ranks reviewed average season ratings from lowest to highest.</li>
 </ul>
-<p>Player options are searchable by first, last, or full name across the 587-player 2026-08-08 snapshot. Every player category also offers <strong>Other player</strong>. This option shows a required name field for an unavailable or new player. <code>PlayerMark</code> shows 580 local portraits. The other seven players use its neutral silhouette. Club categories use the existing local crests. Custom names must match a reviewed result list before they receive an accuracy rank.</p>
+<p>Player options are searchable by first, last, or full name across the 582-player 2026-08-13 snapshot. Every player category also offers <strong>Other player</strong>. This option shows a required name field for an unavailable or new player. <code>PlayerMark</code> shows 582 local portraits. Club categories use the existing local crests. Custom names must match a reviewed result list before they receive an accuracy rank.</p>
 <p>Table scoring is mutually exclusive for each club: 5 points exact, 3 within three places, 1 in the same half, or 0. An exact table scores 100. The predicted champion is position 1 and has no separate bonus. Spotlight accuracy never changes this score. Let <code>N</code> be the current number of active, nondeleted season brackets. Accuracy points are <code>max(0, N + 1 - outcome rank)</code>. Overall accuracy sums only resolved categories. A resolved zero-point result still counts as available. Pending categories remain unavailable. Equal overall scores share a competition rank. Category sorts use outcome rank from low to high, put pending entries last, and use participant name for deterministic ties.</p>
 <p>Underdog-team and overrated-team rankings use submitted tables and the active standings. For example, an average prediction of 2.4 and actual position 10 gives an underdog index of <code>-7.6</code>. The overrated index is <code>+7.6</code>. Full precision determines rank. A future owner-run Codex automation will enter the other five reviewed outcomes manually. No table receives points before the verified Gameweek 1 opener. A table snapshot from before kickoff remains inactive afterward.</p>
 <p>Submissions close no later than Arsenal v Coventry City&#39;s opening kickoff at <code>2026-08-21T19:00:00.000Z</code> (20:00 BST on Friday 21 August 2026). That season-scoped instant is persisted in PostgreSQL. An owner deadline may close entries earlier but cannot extend the ceiling. A compact calendar-flip countdown beside the open-submissions status begins from the server&#39;s database-time reading; it is presentation only. The guarded insert still acquires the season-row lock before rechecking PostgreSQL&#39;s live wall clock, so a stale page or request blocked across kickoff cannot submit late.</p>
-<h2>Mobile-first interaction</h2>
+<h2 id="mobile-first-interaction">Mobile-first interaction</h2>
 <p>The prediction and manual-standings lists are single-column and have no horizontal overflow at narrow widths. Each row has a dedicated 56 by 56 pixel move handle; <code>touch-action: none</code> is limited to the handle so the rest of the page still scrolls naturally. The same handle supports pointer dragging and direct Arrow Up/Arrow Down reordering with live screen-reader announcements. Position numbers update immediately, the top/bottom-half boundary is visible, focus states are explicit, reduced-motion preferences are respected, and the review action remains reachable above the mobile safe area. The how-to cards use horizontal snap scrolling on phones and a three-column layout on wide screens; numbered overlay pins have matching text callouts so the screenshot annotations are not colour- or vision-dependent.</p>
-<h2>Architecture</h2>
+<h2 id="architecture">Architecture</h2>
 <p>The application is one Next.js 16 App Router deployment on Vercel. Dynamic server components and server actions read and mutate a Vercel Marketplace Neon database through Drizzle and the Neon serverless HTTP driver. Zod validates every public, admin, and standings payload; PostgreSQL constraints repeat the important invariants.</p>
 <p>Standings are deliberately decoupled from source acquisition:</p>
-<pre><code class="language-text">permitted export or owner-entered table
+<pre><code class="language-text">reviewed offline source or owner-entered table
                  |
                  v
        canonical 20-team payload
@@ -123,9 +134,9 @@ authenticated import route / local script / admin form
                  v
  atomic Neon snapshot activation and derived scoring
 </code></pre>
-<p>There is no runtime football API client, production scraper, or Vercel Cron. A future owner-run Codex automation will enter reviewed spotlight outcomes manually. The automation must use permitted or licensed source material. The current importer accepts standings only. The five non-table-derived outcomes remain pending and do not receive zero. Manual entry at <code>/admin/standings</code> remains the standings fallback.</p>
+<p>There is no runtime football API client, production scraper, image hotlink, or Vercel Cron. A future owner-run Codex automation may acquire FotMob or Transfermarkt data offline, review it, and enter the five non-table-derived outcomes. The current importer accepts standings only. Those five outcomes remain pending and do not receive zero until a reviewed result payload is entered. Manual entry at <code>/admin/standings</code> remains the standings fallback.</p>
 <p>See <a href="docs/ARCHITECTURE.html">docs/ARCHITECTURE.md</a>, <a href="docs/RESEARCH.html">docs/RESEARCH.md</a>, and <a href="docs/QA.html">docs/QA.md</a> for the detailed design, source decisions, and current evidence.</p>
-<h2>Stack</h2>
+<h2 id="stack">Stack</h2>
 <ul>
 <li>Node.js 24.x</li>
 <li>Next.js 16.3.0 and React 19.2.8</li>
@@ -135,7 +146,7 @@ authenticated import route / local script / admin form
 <li>Zod, Vitest, Testing Library, and Playwright</li>
 <li>Vercel Hobby-compatible deployment</li>
 </ul>
-<h2>Local setup</h2>
+<h2 id="local-setup">Local setup</h2>
 <p>Prerequisites are Node.js 24, npm, a linked Vercel project, and access to the project&#39;s Neon integration.</p>
 <pre><code class="language-bash">npm ci
 vercel link --project pl-predictions
@@ -145,7 +156,7 @@ npm run db:seed
 npm run dev
 </code></pre>
 <p>Open <a href="http://localhost:3000">http://localhost:3000</a>. Never commit <code>.env.local</code> or paste complete environment values into logs.</p>
-<h3>Environment variables</h3>
+<h3 id="environment-variables">Environment variables</h3>
 <table>
 <thead>
 <tr>
@@ -206,7 +217,7 @@ npm run dev
 </tr>
 </tbody></table>
 <p>There are no <code>NEXT_PUBLIC</code> secrets, football-provider token, or cron secret.</p>
-<h2>Commands</h2>
+<h2 id="commands">Commands</h2>
 <pre><code class="language-bash">npm run dev                 # local development server
 npm run format              # write formatting
 npm run format:check        # verify formatting
@@ -225,6 +236,7 @@ npm run check               # complete local verification chain
 npm run docs:generate       # regenerate every Markdown HTML peer
 npm run docs:check          # prove generated HTML is current
 </code></pre>
+<p>Markdown remains canonical. The documentation generator inventories only Git-tracked or nonignored files through NUL-delimited paths, excludes private handoffs and QA assets, rejects source/output symlinks and unmanaged same-basename HTML, writes peers through same-directory atomic renames, and removes only orphaned HTML carrying a recognized legacy or current generator marker. Source hashes, heading IDs, and local Markdown-to-HTML links are deterministic; focused unit tests enforce those boundaries.</p>
 <p>Database commands:</p>
 <pre><code class="language-bash">npm run db:generate         # generate a migration after an intentional schema change
 npm run db:migrate          # apply committed migrations
@@ -233,11 +245,11 @@ npm run db:test:migrate     # apply migrations only to the isolated test target
 npm run db:test:seed        # seed only the isolated test target
 </code></pre>
 <p>The committed schema history starts with <code>drizzle/0000_oval_slyde.sql</code>. <code>drizzle/0001_left_iron_fist.sql</code> adds and backfills the season-level accepted-through standings watermark. <code>drizzle/0002_breezy_king_cobra.sql</code> persists and backfills each season&#39;s reviewed opening kickoff while preserving the null automatic-deadline sentinel. <code>drizzle/0003_fluffy_franklin_richards.sql</code> adds the season-scoped player catalogue and the seven category-pick rows attached to each prediction. <code>drizzle/0004_aromatic_kat_farrell.sql</code> tightens the player-pick subject constraint so a player ID or both normalized custom-name fields are explicitly required. <code>drizzle/0005_enforce_spotlight_seasons.sql</code> adds database triggers that prevent a player&#39;s club or a category subject from crossing season boundaries. Do not edit an already-applied migration; create a new forward migration.</p>
-<h2>Standings operations</h2>
-<h3>Manual fallback</h3>
+<h2 id="standings-operations">Standings operations</h2>
+<h3 id="manual-fallback">Manual fallback</h3>
 <p>Sign in at <code>/admin/login</code>, open <code>/admin/standings</code>, order all 20 clubs, and optionally enter matchweek, games played, and league points. A save writes one complete provisional snapshot. Invalid, duplicate, stale, incomplete, or concurrent input cannot replace the last active good table.</p>
 <p>A table becomes eligible for final confirmation only when all 20 clubs have 38 played games. Finalization is explicit. Its compare-and-swap database statement claims the exact active snapshot, marks it final, and writes the audit record together; a racing import cannot be accidentally finalized. New imports are blocked until the administrator explicitly undoes final status.</p>
-<h3>Authenticated source-neutral import</h3>
+<h3 id="authenticated-source-neutral-import">Authenticated source-neutral import</h3>
 <p>Prepare a version-1 JSON envelope matching <code>src/features/standings/validation.ts</code>. A snapshot contains the season slug, source label, capture timestamp, optional source timestamp/reference and matchweek, plus exactly 20 unique known <code>teamSlug</code> rows with positions 1–20. Games played and league points may be null. A source failure can instead be recorded with <code>kind: &quot;failure&quot;</code>; it never changes the active table.</p>
 <p>Import locally:</p>
 <pre><code class="language-bash">npm run standings:import -- /absolute/path/to/standings.json
@@ -249,9 +261,9 @@ npm run db:test:seed        # seed only the isolated test target
   --data-binary @/absolute/path/to/standings.json
 </code></pre>
 <p>The endpoint has a 64 KiB body limit, validates a complete known-team permutation, rejects stale, implausibly future, or post-final snapshots, records import outcomes, and preserves the last good snapshot on every failure. A database-time-anchored five-minute skew bound protects both capture timestamps. A season-level accepted-through watermark also advances for newer duplicate observations, so delayed changed data cannot regress the active table. The payload&#39;s <code>isFinal</code> field is advisory only; only an authenticated administrator can confirm final status.</p>
-<h3>FotMob boundary</h3>
-<p>FotMob was used during one-time research to map factual team identifiers. Its current terms, checked 2026-08-08, prohibit automatic crawlers and systematic or regular extraction; a consumer subscription is not a written automation or redistribution licence. Do not configure Codex or this project to scrape FotMob automatically unless the owner first obtains explicit written permission covering the intended extraction and use. Use a permitted/licensed export or the manual admin table instead. The deployed application stores no source cookies, credentials, HTML, or live API dependency.</p>
-<h2>Admin credential configuration and rotation</h2>
+<h3 id="offline-source-boundary">Offline source boundary</h3>
+<p>The owner confirmed on 2026-08-14 that the required permissions for this player-catalogue workflow have been obtained. Owner-run FotMob or Transfermarkt acquisition may run offline, retain its private provenance, and produce reviewed local snapshots or result payloads. The deployed application still stores no source cookies or credentials and never performs a runtime source request, scrape, hotlink, football API call, or scheduled acquisition.</p>
+<h2 id="admin-credential-configuration-and-rotation">Admin credential configuration and rotation</h2>
 <p>The login accepts a username and password. <code>ADMIN_USERNAME</code> defaults to <code>admin</code>; set it explicitly in deployed environments for clarity. The preferred password configuration is <code>ADMIN_PASSWORD_HASH</code>, a randomly salted <code>pbkdf2_sha256</code> hash using 600,000 iterations, a 16-byte salt, and a 32-byte digest. Store only the encoded hash in Vercel&#39;s server-only environments and keep the raw password in the owner&#39;s password manager. Never place the password, hash, or session secret in source, command history, logs, screenshots, or documentation.</p>
 <p>The current owner password is stored in macOS Keychain under service <code>pl-predictions-admin</code> and account <code>vishal</code>. <code>npm run admin:hash-password</code> reads the password from standard input, removes only the single line ending conventionally added by the provider, and emits a newly salted encoded hash. Stream Keychain directly through that command into Vercel so neither plaintext nor the generated hash is stored in a shell variable or temporary file:</p>
 <pre><code class="language-bash">security find-generic-password -a vishal -s pl-predictions-admin -w | npm run --silent admin:hash-password | vercel env add ADMIN_PASSWORD_HASH production --sensitive --force
@@ -264,7 +276,7 @@ vercel deploy --prod
 </code></pre>
 <p>Each password-hash command intentionally produces a different salt; all resulting hashes validate the same Keychain password. <code>ADMIN_SECRET</code> remains a migration-only fallback when <code>ADMIN_PASSWORD_HASH</code> is empty. After the PBKDF2-backed login is verified in every environment, remove the legacy value rather than keeping two active password sources. A malformed or weak configuration fails closed. Rotating <code>ADMIN_SESSION_SECRET</code> separately invalidates all existing eight-hour administrator sessions.</p>
 <p>Every administrator mutation still requires the signed HttpOnly, SameSite Strict cookie and an exact same-origin request. Vercel Firewall limits <code>POST /admin/login</code> to 10 requests per 60 seconds for each IP. Excess requests receive HTTP 429. Deleting an entry removes the parent prediction. PostgreSQL cascades through its 20 table rows and seven spotlight rows. The deletion invalidates the receipt and lets the normalized name submit again. Table ranks, team expectation indexes, and spotlight accuracy, including <code>N</code>, recalculate from the remaining entries. The bounded deletion audit remains.</p>
-<h2>Deployment</h2>
+<h2 id="deployment">Deployment</h2>
 <p>The Vercel project is <code>vdoshi96s-projects/pl-predictions</code>. Neon resource <code>neon-coffee-queen</code> was provisioned through Vercel Marketplace before migrations and seed data were applied.</p>
 <p>For a new environment:</p>
 <ol>
@@ -277,32 +289,32 @@ vercel deploy --prod
 <li>Deploy production with <code>vercel deploy --prod</code> and inspect the production URL/logs.</li>
 <li>Run the read-only production smoke. If a production write proof is required, run only the separately gated exact-ID submit/privacy/delete smoke and verify cleanup. Never run the full reveal/standings journey against production.</li>
 </ol>
-<p>No Vercel Cron should be added. Recurring data acquisition belongs to the owner&#39;s separate Codex automation and must respect the source boundary above.</p>
-<h2>Season rollover and club updates</h2>
+<p>No Vercel Cron should be added. Recurring data acquisition belongs to the owner&#39;s separate offline Codex automation and must preserve the reviewed-import boundary above.</p>
+<h2 id="season-rollover-and-club-updates">Season rollover and club updates</h2>
 <p>The application intentionally has one code-selected active season.</p>
 <ol>
 <li>Verify the new membership and display names against official Premier League sources.</li>
-<li>Add the new season metadata in <code>src/data/season.ts</code> and a complete 20-club fixture in <code>src/data/teams.ts</code>. Give every club a stable slug, sort name, permitted asset path, and external mapping only when lawfully sourced.</li>
+<li>Add the new season metadata in <code>src/data/season.ts</code> and a complete 20-club fixture in <code>src/data/teams.ts</code>. Give every club a stable slug, sort name, reviewed local asset path, and stable external mapping.</li>
 <li>Keep the old season rows; a new slug makes <code>npm run db:seed</code> insert a separate season. Do not recycle IDs.</li>
 <li>Run fixture, scoring, importer, integration, and browser tests, then seed and verify exactly 20 teams.</li>
 <li>If correcting membership after a season has already been seeded, create an explicit data migration. The idempotent seed updates known teams but deliberately does not delete referenced historical rows.</li>
 <li>Verify the first Gameweek 1 kickoff from an official source, update the auditable opening-fixture constant, and add a reviewed forward migration/data update for that season&#39;s <code>opening_kickoff</code>. If the opener changes, handle any stored deadline equal to the old automatic cutoff explicitly; never reopen a season after an effective cutoff or reveal. Set only an optional earlier owner deadline in <code>/admin/settings</code>.</li>
 </ol>
-<h2>Current limitations</h2>
+<h2 id="current-limitations">Current limitations</h2>
 <ul>
 <li>Club marks use the 20 owner-provided local PNG badges. Names and marks remain their respective owners&#39; property; the repository records the project owner&#39;s direction to use this exact set, not a broader licence for other league or club artwork. The original monograms remain rollback-only during the first PNG release.</li>
 <li>Standings are manual or accepted through the authenticated canonical importer. There is no built-in provider fetch, sync-now source client, scheduled job, or live-data guarantee.</li>
-<li>The owner-provided 2026-08-08 snapshot supplies 587 player options and 580 local portraits. Seven catalogued players use the generic silhouette, and Other player remains available for unavailable or newly added players.</li>
-<li>Only underdog-team and overrated-team outcomes are currently derivable. A future owner-run Codex automation will enter the other five reviewed result lists manually. The former Alex/Jordan spotlight cards were hard-coded presentation fixtures, not stored submissions; they were retired so <code>/spotlight</code> now represents only complete real entries.</li>
+<li>The owner-provided 2026-08-13 snapshot supplies 582 player options and 582 local portraits. Other player remains available for unavailable or newly added players.</li>
+<li>Only underdog-team and overrated-team outcomes are currently derivable. A future owner-run Codex automation may acquire and review the other five result lists offline before entering them. The former Alex/Jordan spotlight cards were hard-coded presentation fixtures, not stored submissions; they were retired so <code>/spotlight</code> now represents only complete real entries.</li>
 <li>Participants have no accounts and cannot edit an entry. The administrator can delete an erroneous parent entry, cascading through all 20 table rows and seven spotlight picks so it can be resubmitted.</li>
 <li>The opening fixture is reviewed static season data, not a live schedule feed. Because Premier League fixtures can change, the owner must update both the canonical UTC fixture metadata and the persisted season row through a reviewed forward migration before the existing cutoff if the opener moves. A constant-only deploy does not change the database-enforced instant.</li>
 <li>Season rollover currently requires a reviewed code and seed update.</li>
 </ul>
-<h2>Data and rights attribution</h2>
-<p>Season membership and club names use the official Premier League 2026/27 table and AGM announcement. FotMob pages supplied one-time factual external-ID mapping only. The application does not fetch or hotlink football data or images at runtime. FotMob average season rating is the requested metric for both player-opinion categories. A future owner-run Codex automation will enter those reviewed rankings manually. The project owner supplied the local club badges and dated player snapshot. The official Premier League logo is not included. The roster import does not supply the five pending outcomes. <a href="docs/RESEARCH.html">docs/RESEARCH.md</a> records the sources and rights review.</p>
+<h2 id="data-and-rights-attribution">Data and rights attribution</h2>
+<p>Season membership and club names use the official Premier League 2026/27 table and AGM announcement. On 2026-08-14 the owner confirmed that the required permissions for this player-catalogue workflow have been obtained, including acquisition, storage, redistribution, and production use. Owner-run FotMob or Transfermarkt acquisition may run offline and produce reviewed local snapshots or result payloads. The deployed application does not fetch, scrape, or hotlink football data or images at runtime. FotMob average season rating is the requested metric for both player-opinion categories. The project owner supplied the local club badges and dated player snapshot. The official Premier League logo is not included. The roster import does not supply the five pending outcomes. <a href="docs/RESEARCH.html">docs/RESEARCH.md</a> records the dated sources and current permission disposition.</p>
 <p>This is an unofficial fan project and is not affiliated with the Premier League. Club names and crests belong to their respective owners.</p>
 
-      <p class="source">Generated deterministically from <a href="README.md">README.md</a>. Canonical SHA-256: <code>02a74d27695cc4345c94a81032831bad24b3b79a56baffd0aef579541aa44070</code>.</p>
+      <p class="source">Generated deterministically from <a href="README.md">README.md</a>. Canonical SHA-256: <code>f219026ca202ebc66b96d3458a2676f05e622d7fc83264a0423ac23d5962b630</code>.</p>
     </main>
   </body>
 </html>

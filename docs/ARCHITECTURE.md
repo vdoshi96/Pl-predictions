@@ -7,7 +7,7 @@ Dranx Prediction League is one Next.js 16 App Router application deployed to Ver
 ```text
 participant browser                         owner operations
        |                          +-------------------------------+
-       |                          | manual table or permitted data |
+       |                          | reviewed offline or manual data|
        v                          +---------------+---------------+
 Next.js server components/actions                           |
        |                                                     v
@@ -26,7 +26,7 @@ Next.js server components/actions                           |
                dynamic reads and derived scoring
 ```
 
-The public application never contacts FotMob or another football-data source. The owner-provided `premier-league-players-2026-08-08/` handoff supplies selector identities and portrait files. The deployed app never executes its acquisition code. The handoff does not supply competition outcomes. A future owner-run Codex automation will enter the five non-table-derived outcomes manually. It must use permitted or licensed source material. The current importer and manual editor handle standings only. Missing spotlight outcomes remain pending and do not receive zero.
+The public application never contacts FotMob or another football-data source. The owner-selected `premier-league-players-2026-08-13/` handoff supplies selector identities and portrait files. The deployed app never executes its acquisition code. The handoff and application fixture are reconciled internally; this release does not claim independent roster verification against official club or Premier League pages. The handoff does not supply competition outcomes. The owner confirmed permission on 2026-08-14 for offline acquisition, storage, redistribution, and production use in this player-catalogue workflow, so a future owner-run automation may acquire FotMob or Transfermarkt data offline and submit a reviewed payload. The current importer and manual editor handle standings only. Missing spotlight outcomes remain pending and do not receive zero.
 
 ## Runtime and deployment
 
@@ -111,7 +111,7 @@ Spotlight accuracy is separate from the table score. Each category uses the sele
 - Top scorer and top assister use the player's rank in reviewed goals and assists lists.
 - Most clean sheets uses the selected club's rank in the reviewed club clean-sheets list.
 - For every club, underdog index is `average predicted position - actual position`; overrated index is its inverse, `actual position - average predicted position`. Each category ranks the largest index first using full precision. For an average prediction of 2.4 and actual position 10, the indexes are -7.6 underdog and +7.6 overrated.
-- Underdog player ranks reviewed FotMob average season ratings descending; overrated player ranks them ascending. This defines the intended metric, not permission for runtime or automated FotMob access.
+- Underdog player ranks reviewed FotMob average season ratings descending; overrated player ranks them ascending. Owner-run offline acquisition is allowed; the deployed application has no runtime FotMob access.
 
 Scoring cannot activate before the verified opening kickoff. The active table must also have an observation at or after kickoff. A preseason table cannot receive points only because the clock crossed kickoff. All-zero played-games tables remain inactive. Underdog-team and overrated-team ranks use the active table and all remaining submissions. A future owner-run Codex automation will enter the five other reviewed outcomes manually. Missing outcomes display as pending. They are not incorrect zero-point answers.
 
@@ -120,8 +120,8 @@ Before activation, each table-leaderboard card shows 0 and its predicted champio
 ## Database model and invariants
 
 - `seasons` stores the code-selected season, persisted opening kickoff, optional earlier owner deadline, fairness settings, active/final pointers, and the monotonic accepted-capture watermark.
-- `teams` stores season-scoped names, sort names, factual external mapping, and permitted local asset path.
-- `players` is the season-scoped catalogue of 587 imported 2026-08-08 players, with first/last/display names, club association, active status, and an optional local `/player-faces/` asset path.
+- `teams` stores season-scoped names, sort names, factual external mapping, and reviewed local asset path.
+- `players` is the season-scoped catalogue of 582 imported 2026-08-13 players, with first/last/display names, club association, active status, and an optional local `/player-faces/` asset path.
 - `predictions` and `prediction_items` store immutable participant tables and receipt hashes.
 - `prediction_category_picks` stores exactly one typed choice per spotlight category. Team categories reference a club. Player categories reference either an active catalogue player or a normalized custom player name, never both.
 - `standings_snapshots` and `standings_items` store complete actual tables.
@@ -146,7 +146,9 @@ The user-facing visual system is Dranx Prediction League: a Premier-League-inspi
 
 The 20 canonical club assets are owner-provided transparent PNG badges with accessible club-name alternatives. They are served from `public/team-marks/`; the application does not fetch or hotlink FotMob images. `teams.asset_path` remains the stable database-backed local-asset seam, and the idempotent seed updates existing rows after the PNGs are deployed. The shared `TeamMark` uses contain sizing, a neutral backing, and a labelled initials fallback. Original SVG monograms remain rollback-only for the first PNG release. The separate Premier League logo/lion/ball files are excluded.
 
-The owner-provided `premier-league-players-2026-08-08/` snapshot covers 587 players across the same 20 clubs and includes 580 portrait PNGs. The import maps reviewed roster rows into the season catalogue and copies portraits to local `/player-faces/` paths. `PlayerMark` shows a generic silhouette for the seven players without a supplied image, for a null asset path, or after an image failure. Other player remains available for unavailable or newly added players. The raw folder remains the owner-provided provenance handoff; the deployed app neither runs its acquisition scripts nor hotlinks portrait sources.
+The owner-selected `premier-league-players-2026-08-13/` snapshot covers 582 players across the same 20 clubs and includes 582 portrait PNGs. Relative to August 8, it has 12 additions, 17 removals, and four intra-league moves. The import maps reviewed roster rows into the season catalogue and copies portraits to local `/player-faces/` paths. The exact asset transition deletes 17 obsolete paths and applies four club-move renames without retaining legacy copies. `PlayerMark` shows a generic silhouette for a null asset path or after an image failure. Other player remains available for unavailable or newly added players. The raw folder remains the owner-provided provenance handoff; the deployed app neither runs its acquisition scripts nor hotlinks portrait sources.
+
+Database rollout is deliberately deploy-first and seed-second. Production remains on 587 total/active players and 580 portrait paths until the 582-player code/assets are merged and the exact production deployment is Ready. The idempotent seed then deactivates absent fixture players rather than deleting rows that historical picks may reference, upserts the approved active fixture, and is followed by read-only database and browser verification.
 
 Roster identity and portrait ingestion are separate from result entry. The snapshot does not provide final goals, assists, clean sheets, or season ratings. A future owner-run Codex automation will enter these reviewed outcomes manually. Custom Other-player names still require reconciliation.
 

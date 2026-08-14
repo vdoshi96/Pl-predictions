@@ -186,12 +186,15 @@ export default function RulesPage() {
                 Player list and Other
               </h2>
               <p className="mt-1 text-sm leading-6 text-slate-600">
-                The 2026-08-08 snapshot covers 587 players across all 20 clubs.
-                Player selectors search first, last, or full name; 580 supplied
-                portraits appear locally and the other seven players use a
-                silhouette. Choose Other player for anyone unavailable or new.
-                Custom names must be matched to a manually entered result list
-                before they receive an accuracy result.
+                The 2026-08-13 snapshot covers 582 players across all 20 clubs.
+                It is the owner-selected, internally reconciled roster for this
+                game, not an independently verified official league list. Player
+                selectors search first, last, or full name; 582 supplied
+                portraits appear locally. Choose Other player for anyone
+                unavailable or new. A silhouette appears only if a portrait is
+                missing or fails to load. Custom names must be matched to a
+                manually entered result list before they receive an accuracy
+                result.
               </p>
             </CardContent>
           </Card>
@@ -224,11 +227,11 @@ export default function RulesPage() {
                 The app now stores and displays all seven picks. Underdog-team
                 and overrated-team accuracy can recalculate from the group
                 tables and active standings. The player roster and available
-                portraits are loaded. An owner-run Codex automation will
-                manually enter the other five outcome lists when they are ready;
-                there is no runtime football-data request, scraper, or cron.
-                Only complete submitted entries can appear in the active bracket
-                count.
+                portraits are loaded. An owner-run Codex automation may acquire
+                the other five outcome lists offline, review them, and enter
+                them through an approved path. There is no runtime football-data
+                request, scraper, image hotlink, or cron. Only complete
+                submitted entries can appear in the active bracket count.
               </p>
             </div>
           </CardContent>

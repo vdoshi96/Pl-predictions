@@ -3,8 +3,9 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="generated-by" content="scripts/generate-docs-html.mjs" />
     <meta name="canonical-source" content="LOG.md" />
-    <meta name="canonical-source-sha256" content="d786bd0803531e8204e1b406785192902b549f5165bf4deed1b4efb8a356c346" />
+    <meta name="canonical-source-sha256" content="c7a3b5444dc3381e4907f556a49631e940a70dbe9dd0236d6f5e2b0a5763d9df" />
     <title>Session log</title>
     <style>
       :root { color-scheme: light dark; font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
@@ -38,9 +39,33 @@
   </head>
   <body>
     <main>
-      <h1>Session log</h1>
-<h2>2026-08-08</h2>
-<h3>How-to, countdown, and complete test-entry iteration (complete)</h3>
+      <h1 id="session-log">Session log</h1>
+<h2 id="2026-08-14">2026-08-14</h2>
+<h3 id="august-13-roster-release-preparation-pre-merge">August 13 roster release preparation (pre-merge)</h3>
+<ul>
+<li>Audited the existing <code>roster/2026-08-13-player-update</code> worktree at <code>7d1996ca5e11dd279fd36cc33d4f7269befd613f</code>. Its tracked tree was initially clean, it was one direct commit ahead of live <code>main</code>, and it incorrectly tracked <code>origin/main</code>; no remote feature branch or pull request existed.</li>
+<li>The owner selected the August 13 handoff as release authority with complete internal handoff-to-application reconciliation and no independent official-club or Premier League roster verification.</li>
+<li>Selected the exact refreshed portrait set with 17 obsolete paths removed and four club-move paths renamed; no legacy compatibility copies will be retained. Historical database player rows remain safe because the seed deactivates absent players rather than deleting them, and <code>PlayerMark</code> retains its runtime failure silhouette.</li>
+<li>Confirmed production is still on the August 8 seed baseline: 587 total/active players and 580 portrait paths. The August 13 fixture is not merged, deployed, or seeded; PR, merge, deployment, seed, and live-verification identifiers remain pending release evidence.</li>
+<li>Verified the August 8 primary/worktree handoff payloads, copied the August 13 handoff byte-for-byte into the primary repository, and reconciled <code>PL Players!A1:K583</code> across all 582 rows and 11 columns against raw JSON, final JSON, and the tracked fixture. The final 582 source/public portraits all decode as unique 192×192 PNGs with byte parity and no silhouette match, placeholder, or duplicate group.</li>
+<li>Generated and visually inspected the 33-tile additions/restorations/replacements/moves contact sheet. After its report passed, removed exactly the approved <code>progress.json</code> and two stale mismatch reports from both August 13 copies. The retained copies are byte-identical at 613 files, 24,912,376 bytes, and full manifest SHA-256 <code>f625470979c156e233300ec42924eb858255d902a456af1283a089ae41169630</code>; the report SHA-256 is <code>d6652f98274a7087e2a53a098b8c649ff4e349a76419ee777935a8c771677046</code> and the contact-sheet SHA-256 is <code>326ce20cac6a8be3ba605c0859a43bba10f74f004e80a8e5d132915bf58eb3b1</code>.</li>
+<li>Hardened catalogue publication so all source, provenance, identity-delta, decode/hash, derived-field, and clean-clone fingerprint checks complete before a staged write with rollback. Pinned <code>sharp@0.35.3</code> directly for full image validation and added failure-before-mutation, traversal, wrong-identity, incomplete-handoff, provenance, and release-drift tests.</li>
+<li>Hardened the Markdown-to-HTML generator with NUL-safe Git-scoped discovery, private-path exclusion, symlink and unmanaged-collision refusal, current/legacy ownership markers, atomic writes, marker-owned orphan cleanup, deterministic source hashes/headings/link rewriting, exact CLI validation, and ten focused process tests. Regenerated all 14 managed peers.</li>
+<li>Hardened the isolated-database wrapper with canonical pooled/unpooled identity comparison independent of credentials, protocol/default-port and Neon host normalization, trailing-dot and ambiguous-host rejection, target-specific child attestation, and fail-closed Vitest/Playwright routing. Added seed idempotence/inactive-history, active-selector, historical-rendering, <code>PlayerMark</code> image-error, additions/removals/moves/restorations, wrapper-spoof, and production-smoke selector/image coverage.</li>
+<li>The first post-kickoff Playwright pass caught the test clock still recognizing the retired static isolation marker. Updated it to validate the shared target-specific attestation, added legacy-spoof and target-mismatch tests, and passed the corrected isolated browser run.</li>
+<li>Passed the uninterrupted final <code>CI=1 npm run check</code> against the attested isolated Neon database: 14-document parity, exact 582-player/portrait validation, formatting, ESLint, strict TypeScript, 205 unit/component tests with 11 guarded integration skips, all 11 integration tests, Webpack production build, five pre-kickoff browser journeys, and three post-kickoff browser journeys. The separate focused set passed 77 tests.</li>
+<li>Completed the read-only production recovery preflight without mutating participant data. The aggregate baseline remains 20 teams, 587 total/active players, 0 inactive, and 580 active portrait paths. The provider resource is available, but its configured restore window has not yet been authenticated; production seeding remains stopped until that recovery path is proven.</li>
+</ul>
+<h2 id="2026-08-13">2026-08-13</h2>
+<h3 id="owner-handoff-creation-local-feature-branch">Owner handoff creation (local feature branch)</h3>
+<ul>
+<li>The owner-provided handoff records an offline Transfermarkt 2026/27 first-team comparison with the August 8 snapshot: 12 additions, 17 removals, and four intra-league club changes, leaving 582 players.</li>
+<li>The handoff supplies portraits for the 12 additions and the seven former gaps, replaces ten prior fallbacks, and reports 582 portrait files with no catalogue gaps.</li>
+<li>The handoff includes identity, uniqueness, image, and upstream-comparison evidence. That evidence is intermediate owner-handoff material; the application release relies on a separate final internal reconciliation and does not claim independent official roster verification.</li>
+<li>The local feature commit pointed <code>players:generate</code> at <code>premier-league-players-2026-08-13/</code>, updated the tracked fixture and <code>public/player-faces/</code>, and retained Other player. It was not merged to <code>main</code> on August 13.</li>
+</ul>
+<h2 id="2026-08-08">2026-08-08</h2>
+<h3 id="how-to-countdown-and-complete-test-entry-iteration-complete">How-to, countdown, and complete test-entry iteration (complete)</h3>
 <ul>
 <li>Traced the live Demo Alex and Demo Jordan spotlight cards to the hard-coded <code>LeaderboardDemo</code> component. A read-only production aggregate found zero prediction parents, table items, and category picks before the requested test entry, proving there were no malformed spotlight-only rows to delete.</li>
 <li>Removed the fixture component, its unconditional <code>/spotlight</code> render path, and demo-specific component/browser assertions. The real spotlight view now counts or ranks only complete persisted brackets.</li>
@@ -54,7 +79,7 @@
 <li>A final read-only aggregate found one prediction parent named exactly <code>Dranx Test Entry</code>, 20 table items, seven spotlight picks, and no Alex/Jordan display-name rows. Exact-deployment error-level and HTTP 500 queries returned no records in the preceding 30 minutes.</li>
 <li>Regenerated every HTML peer, published the closeout through <code>main</code>, synchronized local and remote <code>main</code>, removed completed branch state, and retained only the primary worktree. The two owner handoff directories remain untouched and untracked.</li>
 </ul>
-<h3>Research and provisioning</h3>
+<h3 id="research-and-provisioning">Research and provisioning</h3>
 <ul>
 <li>Read the complete greenfield product brief and the owner&#39;s no-live-API/no-cron and mobile-first overrides.</li>
 <li>Verified official 2026/27 league membership and the 20 seeded club display names.</li>
@@ -64,7 +89,7 @@
 <li>Generated server-only credentials, stored the owner login in macOS Keychain, configured Vercel environments without exposing values, pulled local environment names, applied the committed migration, and seeded exactly 20 teams.</li>
 <li>Initialized the local Git repository and created branch <code>agent/build-pl-predictions</code> after the bootstrap checkpoint.</li>
 </ul>
-<h3>Implementation</h3>
+<h3 id="implementation">Implementation</h3>
 <ul>
 <li>Built the mobile-first prediction sorter, review dialog, atomic submission flow, receipt-gated confirmation, fairness deadline/lock/reveal policy, pre-reveal roster, derived leaderboard, and entry comparison.</li>
 <li>Built the owner login/session, status dashboard, season settings, submission deletion, manual standings editor, import history, 38-game final-candidate check, explicit final confirmation, and undo.</li>
@@ -76,7 +101,7 @@
 <li>Hardened prediction writes into one database-clock-guarded SQL statement; early reveal now closes submissions irreversibly, and hidden pre-reveal server payloads omit prediction identifiers and items.</li>
 <li>Added a five-minute database-time timestamp bound, season-level standings accepted-through watermark, historical-content reactivation, duplicate-watermark handling, and exact compare-and-swap final undo.</li>
 </ul>
-<h3>Verification and deployment</h3>
+<h3 id="verification-and-deployment">Verification and deployment</h3>
 <ul>
 <li>Passed formatting, ESLint with zero warnings, and strict TypeScript checks before documentation closeout.</li>
 <li>Passed 95 default-suite tests; the 9 database cases were skipped there by design and then all passed under <code>npm run test:integration</code> against isolated Neon database <code>pl_predictions_test</code>.</li>
@@ -92,18 +117,18 @@
 <li>Passed the explicitly gated 1-case production write smoke: exact QA submit, receipt-only unrevealed access, hidden public roster details, and administrator deletion of the exact created prediction. Final queries found zero predictions, items, or prediction-target audits; the season remained open, unrevealed, and unlocked with null active/final pointers.</li>
 <li>Reviewed Vercel logs for the preceding hour and found zero error entries and zero HTTP 500 responses.</li>
 </ul>
-<h3>Final closeout</h3>
+<h3 id="final-closeout">Final closeout</h3>
 <ul>
 <li>Refreshed final production evidence and labeled screenshot references in canonical Markdown.</li>
 <li>Regenerated every HTML peer and reran parity/format checks before publication.</li>
 <li>Published this final evidence update through the closeout branch, merged it into GitHub <code>main</code>, synchronized local and remote <code>main</code>, and removed completed branch/worktree state.</li>
 </ul>
-<h3>Repository publication</h3>
+<h3 id="repository-publication">Repository publication</h3>
 <ul>
 <li>Published the tested feature history to <a href="https://github.com/vdoshi96/Pl-predictions">vdoshi96/Pl-predictions</a>, merged it into the canonical <code>main</code> release branch, synchronized local and remote <code>main</code>, and removed completed branch/worktree state.</li>
 <li>Published the final production evidence and mobile screenshots to the same canonical <code>main</code> release branch; local and remote release state are synchronized.</li>
 </ul>
-<h3>Dranx branding iteration (complete)</h3>
+<h3 id="dranx-branding-iteration-complete">Dranx branding iteration (complete)</h3>
 <ul>
 <li>Selected <strong>Dranx Prediction League</strong> as the user-facing identity while retaining the repository, Vercel, Neon, URL, environment, and credential identifiers already used operationally.</li>
 <li>Defined a Premier-League-inspired palette anchored on official purple <code>#37003c</code> with cyan <code>#05f0ff</code>, green <code>#00ff87</code>, and pink <code>#ff2882</code> accents and an original Dranx mark.</li>
@@ -120,7 +145,7 @@
 <li>Fast-forwarded local <code>main</code> to match <code>origin/main</code> at that merge before creating the final closeout branch, then removed the completed feature branch.</li>
 <li>Published the final closeout documentation through canonical <code>main</code>, synchronized local and remote <code>main</code>, removed the completed local temporary closeout branch after its merge, and retained one primary worktree. The final closeout merge SHA is intentionally not pinned in this durable end-state note.</li>
 </ul>
-<h3>Gameweek 1 lock and champion leaderboard iteration (complete)</h3>
+<h3 id="gameweek-1-lock-and-champion-leaderboard-iteration-complete">Gameweek 1 lock and champion leaderboard iteration (complete)</h3>
 <ul>
 <li>Verified from the official Premier League opening-weekend announcement and complete fixture list that Arsenal v Coventry City is the first 2026/27 match at 20:00 BST on Friday 21 August 2026, exactly <code>2026-08-21T19:00:00.000Z</code>; recorded that all fixtures remain subject to change.</li>
 <li>Added migration <code>0002_breezy_king_cobra.sql</code> to persist and backfill the verified kickoff per season while retaining null as the automatic-deadline sentinel. A configured owner deadline may close earlier, while null or later values cannot bypass the persisted ceiling.</li>
@@ -138,7 +163,7 @@
 <li>Kept browser verification read-only; no production prediction or standings rows were written. Recaptured and visually inspected the newest prediction, review, leaderboard, and administrator-login mobile evidence.</li>
 <li>Regenerated and checked every HTML peer, published the evidence-only closeout through canonical <code>main</code>, synchronized local and remote <code>main</code>, removed completed branch/worktree state, and retained one primary worktree.</li>
 </ul>
-<h3>Owner-provided club badge iteration (complete)</h3>
+<h3 id="owner-provided-club-badge-iteration-complete">Owner-provided club badge iteration (complete)</h3>
 <ul>
 <li>Received a project-owner-supplied folder containing exactly one transparent 2048-by-2048 PNG badge for each of the 20 verified clubs plus eight out-of-scope Premier League logo/lion/ball/composite files.</li>
 <li>Copied only the 20 club badges into <code>public/team-marks/</code> under canonical slug filenames, changed all fixture paths from SVG to PNG, retained the original monograms as rollback-only first-release files, and excluded all league-brand extras.</li>
@@ -154,7 +179,7 @@
 <li>Diagnosed the first final aggregate rerun&#39;s WebKit timeout as a five-second UI wait expiring while the standings save still completed. Removed the exact isolated snapshot, two import runs, and two audit rows left by that attempt/retry, restored the season pointer/watermark, expanded only that server-action wait to 20 seconds, and passed both a 13.3-second targeted WebKit rerun and the clean complete aggregate chain. Final test-database verification found zero snapshots, runs, audits, or <code>Mobile QA</code> predictions.</li>
 <li>Regenerated and checked every HTML peer, published the evidence-only closeout through canonical <code>main</code>, synchronized local and remote <code>main</code>, removed completed badge branch/worktree state, and retained only the primary worktree. The final closeout merge SHA is intentionally not pinned in this durable end-state note.</li>
 </ul>
-<h3>Spotlight predictions and reviewed player-catalogue iteration (complete; owner controls pending)</h3>
+<h3 id="spotlight-predictions-and-reviewed-player-catalogue-iteration-complete-owner-controls-pending">Spotlight predictions and reviewed player-catalogue iteration (complete; owner controls pending)</h3>
 <ul>
 <li>Expanded the participant journey from one table screen into an immutable three-stage flow: order all 20 clubs and enter a display name, choose seven spotlight predictions, then review the complete entry before one atomic submission.</li>
 <li>Added top scorer, top assister, most clean sheets, underdog team, overrated team, underdog player, and overrated player. The four player categories use keyboard-accessible searchable selectors plus Other-player text input; most clean sheets and both team-opinion categories select clubs through the existing crest catalogue.</li>
@@ -179,7 +204,7 @@
 <li>Left the administrator-login WAF in its live log-only state for verification; the final metrics query recorded exactly four intended bounded-login <code>POST</code> requests. Prepared a per-IP rate limit of 10 requests per 60 seconds with HTTP 429 on excess requests, but did not publish it because owner publication remains required. The staged rule is not live.</li>
 <li>Regenerated and checked all HTML peers, published the final evidence through working <code>main</code>, synchronized local and remote <code>main</code>, removed completed branch state, and retained one primary worktree. The self-referential final evidence merge SHA is intentionally not pinned in this durable end-state note.</li>
 </ul>
-<h3>Table-only leaderboard and spotlight accuracy iteration (complete)</h3>
+<h3 id="table-only-leaderboard-and-spotlight-accuracy-iteration-complete">Table-only leaderboard and spotlight accuracy iteration (complete)</h3>
 <ul>
 <li>Applied the owner&#39;s scoring clarification: the main leaderboard now uses only table-prediction points and remains capped at 100. Spotlight picks never change that score.</li>
 <li>Added a separate <code>/spotlight</code> page with overall and seven category sorts. With <code>N</code> active nondeleted brackets, a selected subject at outcome rank <code>r</code> earns <code>max(0, N + 1 - r)</code> accuracy points. Pending outcomes are excluded, resolved zero-point outcomes remain available, and equal overall totals share a competition rank.</li>
@@ -192,7 +217,7 @@
 <li>Kept this presentation-only release read-only in production. No prediction, standings, administrator, schema, seed, or other production-data write ran.</li>
 <li>Audited the GitHub default-branch blocker. The repository account has administrator access, but the active fine-grained token lacks repository Administration permission. Changing the default branch to <code>main</code> requires Administration read and write for this repository; branch deletion also requires Contents read and write.</li>
 </ul>
-<h3>2026-08-08: GitHub default-branch closeout (complete)</h3>
+<h3 id="2026-08-08-github-default-branch-closeout-complete">2026-08-08: GitHub default-branch closeout (complete)</h3>
 <ul>
 <li>Task: finish the repository-default and legacy-branch cleanup after the owner updated the fine-grained token permissions.</li>
 <li>Outcome: changed the GitHub default branch from <code>agent/build-pl-predictions</code> to <code>main</code>, then deleted the fully merged legacy remote branch.</li>
@@ -201,7 +226,7 @@
 <li>Next handoff: use <code>main</code> as the base for future pull requests. No GitHub access blocker remains for the current repository workflow.</li>
 </ul>
 
-      <p class="source">Generated deterministically from <a href="LOG.md">docs/context/LOG.md</a>. Canonical SHA-256: <code>d786bd0803531e8204e1b406785192902b549f5165bf4deed1b4efb8a356c346</code>.</p>
+      <p class="source">Generated deterministically from <a href="LOG.md">docs/context/LOG.md</a>. Canonical SHA-256: <code>c7a3b5444dc3381e4907f556a49631e940a70dbe9dd0236d6f5e2b0a5763d9df</code>.</p>
     </main>
   </body>
 </html>

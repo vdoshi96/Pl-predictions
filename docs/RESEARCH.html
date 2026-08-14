@@ -3,8 +3,9 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="generated-by" content="scripts/generate-docs-html.mjs" />
     <meta name="canonical-source" content="RESEARCH.md" />
-    <meta name="canonical-source-sha256" content="cfb9ba6efb1ca4371559dc724e25ed74230a6f895d7bcb4a97e6fd357a952ced" />
+    <meta name="canonical-source-sha256" content="3483abd001224f7dea8319e8da35723a3f0d6d1495c2c03b910b68744858e85c" />
     <title>Research: Dranx Prediction League</title>
     <style>
       :root { color-scheme: light dark; font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
@@ -38,9 +39,9 @@
   </head>
   <body>
     <main>
-      <h1>Research: Dranx Prediction League</h1>
-<p>Checked on 2026-08-08. The latest user instruction supersedes the original brief where standings acquisition conflicts: the production application has no live football-data dependency and no Vercel Cron.</p>
-<h2>Season and clubs</h2>
+      <h1 id="research-dranx-prediction-league">Research: Dranx Prediction League</h1>
+<p>External sources were checked on 2026-08-08. The owner supplied the current permission disposition on 2026-08-14. The latest user instruction supersedes the original brief where standings acquisition conflicts: the production application has no live football-data dependency and no Vercel Cron.</p>
+<h2 id="season-and-clubs">Season and clubs</h2>
 <p>The official Premier League 2026/27 table and the league&#39;s 5 June AGM announcement confirm the 20-club field. Coventry City, Ipswich Town, and Hull City joined the league; Burnley, West Ham United, and Wolverhampton Wanderers are not members for 2026/27.</p>
 <p>Decision: the database seed contains exactly the verified 20 clubs. Preferred display names follow official presentation, with <code>AFC Bournemouth</code> sorted under <code>Bournemouth</code> and <code>Brighton &amp; Hove Albion</code> using an ampersand.</p>
 <p>Sources:</p>
@@ -48,14 +49,15 @@
 <li><a href="https://www.premierleague.com/en/tables/premier-league/2026-27">Official 2026/27 Premier League table</a></li>
 <li><a href="https://www.premierleague.com/en/news/4673099/the-202627-premier-league-season-officially-starts/">Premier League AGM membership announcement</a></li>
 </ul>
-<h2>Brand identity and third-party marks</h2>
+<h2 id="brand-identity-and-third-party-marks">Brand identity and third-party marks</h2>
 <p>The user-facing name is <strong>Dranx Prediction League</strong>. The visual direction is Premier-League-inspired rather than an imitation: it uses the league&#39;s official purple, <code>#37003c</code>, with cyan <code>#05f0ff</code>, green <code>#00ff87</code>, and pink <code>#ff2882</code> accents and an original Dranx mark. Existing repository, deployment, database, URL, and environment identifiers retain their operational <code>pl-predictions</code> names.</p>
 <p>The official Premier League logo was not added. The Premier League trademark FAQ states that club names and badges remain member-club marks. The project owner later supplied one transparent local PNG badge per verified club and explicitly directed use of that exact set. This repository records that owner direction without claiming original ownership, affiliation, or broader permission for the unused league logo/lion/ball files. An original Dranx mark keeps the product identity distinct while retaining the requested color reference.</p>
-<h2>FotMob data and rights</h2>
+<h2 id="fotmob-data-dated-research-and-current-permission">FotMob data, dated research, and current permission</h2>
 <p>FotMob league ID <code>47</code> and the canonical team pages expose the factual external IDs used for import matching. Those identifiers are seeded once. The application stores only minimal snapshot facts: team ID, position, played, points, matchweek, capture time, and source URL.</p>
-<p>FotMob&#39;s current terms, checked 2026-08-08, prohibit robots/crawlers and systematic or regular extraction. A consumer subscription is not evidence of a data redistribution or automation licence. The Premier League also says club names and badges remain member-club marks.</p>
-<p>Decision: do not implement recurring FotMob scraping in the product. A future owner-run Codex automation will enter reviewed spotlight outcomes manually. The existing source-neutral importer remains limited to standings. The app also supports manual standings. It stores no source HTML, browser cookies, or subscription credentials.</p>
-<p>Crest decision: FotMob&#39;s image URLs identify the genuine marks but do not grant redistribution or hotlinking rights, so the application does not fetch or hotlink them. The project owner&#39;s later 20-file PNG handoff supersedes the presentation portion of the original monogram decision for this exact local set. <code>TeamMark</code> uses contain sizing and a safe initials fallback; original SVG monograms remain rollback-only during the first PNG release.</p>
+<p>The terms review completed on 2026-08-08 recorded restrictions on robots/crawlers and systematic or regular extraction. That paragraph is retained as dated research rather than the current project permission gate. The Premier League separately says club names and badges remain member-club marks.</p>
+<p>Current disposition: on 2026-08-14 the owner confirmed that the required permissions for this player-catalogue workflow have been obtained, including acquisition, storage, redistribution, and production use. Owner-run FotMob or Transfermarkt acquisition may run offline and produce a reviewed local snapshot or result payload. Confidential licence documents remain outside source control and chat.</p>
+<p>Decision: do not implement source acquisition in the deployed product. The existing source-neutral importer remains limited to standings, and the app also supports manual standings. The app stores no source HTML, browser cookies, or subscription credentials and performs no runtime source request, scrape, image hotlink, football API call, or scheduled acquisition.</p>
+<p>Historical crest finding: under the 2026-08-08 terms-only review, FotMob image URLs identified the genuine marks but were not treated as redistribution or hotlinking permission. The project owner&#39;s later 20-file PNG handoff superseded the presentation portion of the original monogram decision for this exact local set. <code>TeamMark</code> uses contain sizing and a safe initials fallback; original SVG monograms remain rollback-only during the first PNG release. The deployed application still does not fetch or hotlink them.</p>
 <p>Sources:</p>
 <ul>
 <li><a href="https://www.fotmob.com/leagues/47/overview">FotMob Premier League page</a></li>
@@ -63,7 +65,7 @@
 <li><a href="https://www.fotmob.com/term-of-service">FotMob Terms of Use</a></li>
 <li><a href="https://www.premierleague.com/en/about/faq/other">Premier League trademark and data FAQ</a></li>
 </ul>
-<h2>Framework and UI</h2>
+<h2 id="framework-and-ui">Framework and UI</h2>
 <p>Decision: pin Next.js <code>16.3.0</code>, React/React DOM <code>19.2.8</code>, Node <code>24.x</code>, Tailwind <code>4.3.3</code>, and use the App Router with Node runtime. Next 16 uses the async request APIs and no longer provides <code>next lint</code>; ESLint runs directly.</p>
 <p>Decision: use the maintained dnd-kit rewrite (<code>@dnd-kit/react</code> and <code>@dnd-kit/helpers</code> <code>0.5.0</code>). Its current sortable primitive supports pointer and keyboard interaction. The UI uses a semantic handle button and applies <code>touch-action: none</code> only to that handle so mobile scrolling remains usable.</p>
 <p>Sources:</p>
@@ -78,7 +80,7 @@
 <li><a href="https://dndkit.com/react/hooks/use-sortable/">dnd-kit sortable hook</a></li>
 <li><a href="https://dndkit.com/react/guides/sensors/">dnd-kit sensors</a></li>
 </ul>
-<h2>Database and deployment</h2>
+<h2 id="database-and-deployment">Database and deployment</h2>
 <p>Vercel Postgres is discontinued for new databases. Neon is provisioned through Vercel Marketplace and injects a pooled <code>DATABASE_URL</code>. The project uses <code>@neondatabase/serverless</code> <code>1.1.0</code>, Drizzle ORM <code>0.45.2</code>, and committed Drizzle Kit <code>0.31.10</code> migrations.</p>
 <p>Decision: use <code>drizzle-orm/neon-http</code>. Prediction creation is one guarded PostgreSQL common-table-expression statement, so database-time fairness checks, the parent, and all 20 items succeed together. Snapshot creation uses an atomic Drizzle batch with pre-generated UUIDs. Both patterns match short serverless requests, and the database schema duplicates application invariants with unique and check constraints.</p>
 <p>The Vercel project <code>vdoshi96s-projects/pl-predictions</code> and its Neon resource <code>neon-coffee-queen</code> were provisioned before scaffolding. No Vercel Cron is configured because the owner explicitly chose Codex-driven updates and no runtime data API.</p>
@@ -94,20 +96,20 @@
 <li><a href="https://vercel.com/docs/deployment-protection">Vercel deployment protection scopes</a></li>
 <li><a href="https://vercel.com/docs/deployment-protection/methods-to-protect-deployments/vercel-authentication">Vercel Authentication deployment protection</a></li>
 </ul>
-<h2>Rejected alternatives</h2>
+<h2 id="rejected-alternatives">Rejected alternatives</h2>
 <ul>
 <li><code>football-data.org</code> and its token: superseded by the no-live-API instruction.</li>
-<li>Runtime FotMob scraping: conflicts with current published terms and makes the site brittle.</li>
-<li>FotMob crest downloads and the official Premier League logo without documented authorization: conflict with repository policy and the current official terms.</li>
+<li>Runtime FotMob acquisition: violates the selected offline-review architecture and makes the site brittle.</li>
+<li>Unapproved crest downloads and the official Premier League logo: outside the owner-selected local asset sets and project identity.</li>
 <li>Vercel Cron: unnecessary for the selected owner-run automation model.</li>
 <li><code>@vercel/postgres</code>: obsolete for new Vercel databases.</li>
 <li>Legacy dnd-kit packages and recipes: superseded by the maintained React package.</li>
 <li>Supabase, Firebase, external auth, and Redis: unnecessary and explicitly out of scope.</li>
 </ul>
-<h2>Failure behavior</h2>
+<h2 id="failure-behavior">Failure behavior</h2>
 <p>Malformed, stale, duplicate, unauthorized, or incomplete imports never replace the last active snapshot. All-zero preseason tables remain unscored. If no valid active standings exist, the leaderboard still shows submission count and a clear scoring-not-started state. Manual admin entry remains available even when the external source is inaccessible.</p>
 
-      <p class="source">Generated deterministically from <a href="RESEARCH.md">docs/RESEARCH.md</a>. Canonical SHA-256: <code>cfb9ba6efb1ca4371559dc724e25ed74230a6f895d7bcb4a97e6fd357a952ced</code>.</p>
+      <p class="source">Generated deterministically from <a href="RESEARCH.md">docs/RESEARCH.md</a>. Canonical SHA-256: <code>3483abd001224f7dea8319e8da35723a3f0d6d1495c2c03b910b68744858e85c</code>.</p>
     </main>
   </body>
 </html>

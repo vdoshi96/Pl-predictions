@@ -1,5 +1,31 @@
 # Session log
 
+## 2026-08-14
+
+### August 13 roster release preparation (pre-merge)
+
+- Audited the existing `roster/2026-08-13-player-update` worktree at `7d1996ca5e11dd279fd36cc33d4f7269befd613f`. Its tracked tree was initially clean, it was one direct commit ahead of live `main`, and it incorrectly tracked `origin/main`; no remote feature branch or pull request existed.
+- The owner selected the August 13 handoff as release authority with complete internal handoff-to-application reconciliation and no independent official-club or Premier League roster verification.
+- Selected the exact refreshed portrait set with 17 obsolete paths removed and four club-move paths renamed; no legacy compatibility copies will be retained. Historical database player rows remain safe because the seed deactivates absent players rather than deleting them, and `PlayerMark` retains its runtime failure silhouette.
+- Confirmed production is still on the August 8 seed baseline: 587 total/active players and 580 portrait paths. The August 13 fixture is not merged, deployed, or seeded; PR, merge, deployment, seed, and live-verification identifiers remain pending release evidence.
+- Verified the August 8 primary/worktree handoff payloads, copied the August 13 handoff byte-for-byte into the primary repository, and reconciled `PL Players!A1:K583` across all 582 rows and 11 columns against raw JSON, final JSON, and the tracked fixture. The final 582 source/public portraits all decode as unique 192×192 PNGs with byte parity and no silhouette match, placeholder, or duplicate group.
+- Generated and visually inspected the 33-tile additions/restorations/replacements/moves contact sheet. After its report passed, removed exactly the approved `progress.json` and two stale mismatch reports from both August 13 copies. The retained copies are byte-identical at 613 files, 24,912,376 bytes, and full manifest SHA-256 `f625470979c156e233300ec42924eb858255d902a456af1283a089ae41169630`; the report SHA-256 is `d6652f98274a7087e2a53a098b8c649ff4e349a76419ee777935a8c771677046` and the contact-sheet SHA-256 is `326ce20cac6a8be3ba605c0859a43bba10f74f004e80a8e5d132915bf58eb3b1`.
+- Hardened catalogue publication so all source, provenance, identity-delta, decode/hash, derived-field, and clean-clone fingerprint checks complete before a staged write with rollback. Pinned `sharp@0.35.3` directly for full image validation and added failure-before-mutation, traversal, wrong-identity, incomplete-handoff, provenance, and release-drift tests.
+- Hardened the Markdown-to-HTML generator with NUL-safe Git-scoped discovery, private-path exclusion, symlink and unmanaged-collision refusal, current/legacy ownership markers, atomic writes, marker-owned orphan cleanup, deterministic source hashes/headings/link rewriting, exact CLI validation, and ten focused process tests. Regenerated all 14 managed peers.
+- Hardened the isolated-database wrapper with canonical pooled/unpooled identity comparison independent of credentials, protocol/default-port and Neon host normalization, trailing-dot and ambiguous-host rejection, target-specific child attestation, and fail-closed Vitest/Playwright routing. Added seed idempotence/inactive-history, active-selector, historical-rendering, `PlayerMark` image-error, additions/removals/moves/restorations, wrapper-spoof, and production-smoke selector/image coverage.
+- The first post-kickoff Playwright pass caught the test clock still recognizing the retired static isolation marker. Updated it to validate the shared target-specific attestation, added legacy-spoof and target-mismatch tests, and passed the corrected isolated browser run.
+- Passed the uninterrupted final `CI=1 npm run check` against the attested isolated Neon database: 14-document parity, exact 582-player/portrait validation, formatting, ESLint, strict TypeScript, 205 unit/component tests with 11 guarded integration skips, all 11 integration tests, Webpack production build, five pre-kickoff browser journeys, and three post-kickoff browser journeys. The separate focused set passed 77 tests.
+- Completed the read-only production recovery preflight without mutating participant data. The aggregate baseline remains 20 teams, 587 total/active players, 0 inactive, and 580 active portrait paths. The provider resource is available, but its configured restore window has not yet been authenticated; production seeding remains stopped until that recovery path is proven.
+
+## 2026-08-13
+
+### Owner handoff creation (local feature branch)
+
+- The owner-provided handoff records an offline Transfermarkt 2026/27 first-team comparison with the August 8 snapshot: 12 additions, 17 removals, and four intra-league club changes, leaving 582 players.
+- The handoff supplies portraits for the 12 additions and the seven former gaps, replaces ten prior fallbacks, and reports 582 portrait files with no catalogue gaps.
+- The handoff includes identity, uniqueness, image, and upstream-comparison evidence. That evidence is intermediate owner-handoff material; the application release relies on a separate final internal reconciliation and does not claim independent official roster verification.
+- The local feature commit pointed `players:generate` at `premier-league-players-2026-08-13/`, updated the tracked fixture and `public/player-faces/`, and retained Other player. It was not merged to `main` on August 13.
+
 ## 2026-08-08
 
 ### How-to, countdown, and complete test-entry iteration (complete)

@@ -1,25 +1,33 @@
 import { expect, type Page } from "@playwright/test";
 
-const CATALOG_PLAYER_PICKS = [
+export const ROSTER_TRANSITION_PLAYER_PICKS = [
   {
     category: "top_scorer",
     label: "Top scorer",
-    option: "Cole Palmer",
-    search: "Cole",
+    option: "Ronald Araujo",
+    portraitPath: "/player-faces/fc_liverpool_araujo_ronald.png",
+    search: "Araujo",
   },
   {
     category: "top_assister",
     label: "Top assister",
-    option: "Declan Rice",
-    search: "Rice",
+    option: "Dwight McNeil",
+    portraitPath: "/player-faces/crystal_palace_mcneil_dwight.png",
+    search: "McNeil",
   },
   {
     category: "underdog_player",
     label: "Underdog player",
-    option: "Elliot Anderson",
-    search: "Anderson",
+    option: "Alysson",
+    portraitPath: "/player-faces/aston_villa_alysson_alysson.png",
+    search: "Alysson",
   },
 ] as const;
+
+const REMOVED_PLAYER = {
+  name: "Lucas Digne",
+  search: "Lucas Digne",
+} as const;
 
 const OTHER_PLAYER_PICK = {
   category: "overrated_player",
@@ -48,11 +56,33 @@ export async function completeSpotlightPicks(
   page: Page,
   customNamePrefix: string,
 ): Promise<string[]> {
-  const selectedPlayerNames: string[] = CATALOG_PLAYER_PICKS.map(
+  const selectedPlayerNames: string[] = ROSTER_TRANSITION_PLAYER_PICKS.map(
     (pick) => pick.option,
   );
 
-  for (const pick of CATALOG_PLAYER_PICKS) {
+  const removalCheckCard = page.locator(
+    `[data-category="${ROSTER_TRANSITION_PLAYER_PICKS[0].category}"]`,
+  );
+  const removalCheckCombobox = removalCheckCard.getByRole("combobox", {
+    name: ROSTER_TRANSITION_PLAYER_PICKS[0].label,
+  });
+  await removalCheckCombobox.click();
+  await removalCheckCombobox.fill(REMOVED_PLAYER.search);
+  await expect(
+    removalCheckCard.getByRole("option", {
+      name: REMOVED_PLAYER.name,
+      exact: true,
+    }),
+  ).toHaveCount(0);
+  await expect(
+    removalCheckCard.getByText(
+      "No matching player. Try another search or choose Other player below.",
+      { exact: true },
+    ),
+  ).toBeVisible();
+  await removalCheckCombobox.press("Escape");
+
+  for (const pick of ROSTER_TRANSITION_PLAYER_PICKS) {
     const card = page.locator(`[data-category="${pick.category}"]`);
     const combobox = card.getByRole("combobox", { name: pick.label });
 
@@ -63,7 +93,13 @@ export async function completeSpotlightPicks(
       exact: true,
     });
     await expect(option).toBeVisible();
-    await expect(option.locator("img")).toBeVisible();
+    const portrait = option.locator("img");
+    await expect(portrait).toBeVisible();
+    await expect
+      .poll(async () =>
+        decodeURIComponent((await portrait.getAttribute("src")) ?? ""),
+      )
+      .toContain(pick.portraitPath);
     await option.click();
   }
 

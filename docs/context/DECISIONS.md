@@ -1,5 +1,19 @@
 # Decisions
 
+## 2026-08-14: Offline source permission and runtime boundary
+
+The owner confirmed in the 2026-08-14 Codex task that the required permissions for this player-catalogue workflow have been obtained, including acquisition, storage, redistribution, and production use. Confidential licence documents remain outside source control and chat. This confirmation supersedes the repository's earlier source-specific permission gates for the approved player workflow.
+
+Owner-run FotMob or Transfermarkt acquisition may run offline and produce a reviewed local snapshot or result payload. The deployed application must remain free of runtime source requests, scraping, image hotlinking, football APIs, and scheduled acquisition. This decision does not alter participant privacy, prediction secrecy, security, or submission-integrity controls.
+
+## 2026-08-14: Owner-selected August 13 roster refresh
+
+Replace the 2026-08-08 selector snapshot with the owner-selected `premier-league-players-2026-08-13/` handoff: 582 players across the application's 20 clubs and 582 local `/player-faces/` portraits. Relative to August 8, the active fixture has 12 additions, 17 removals, and four intra-league club moves. Keep Other player available for unavailable or newly added players. `PlayerMark` still uses its generic silhouette when an asset path is absent or an image fails.
+
+The handoff, normalized fixture, tracked application fixture, and portrait inventory are reconciled internally. The roster was not independently verified against official club or Premier League roster pages for this release. This decision supersedes the 2026-08-08 player-count and seven-fallback split without rewriting that dated release history.
+
+Use the exact refreshed asset set: delete the 17 obsolete portrait paths and apply the four club-move renames without retaining legacy compatibility copies. Preserve inactive database player rows referenced by historical picks; the seed deactivates rather than deletes them. This roster is selector input only, does not provide spotlight outcomes, and does not change the deployed application's no-runtime-acquisition boundary.
+
 ## 2026-08-08: Complete-entry test data, fixture retirement, and deadline countdown
 
 Remove the hard-coded Alex/Jordan spotlight presentation cards. Read-only live-page and production-database checks proved they were component fixtures, not prediction parents or partial stage-two writes, so no production deletion is warranted. The public spotlight page must derive its bracket count and, after reveal, every displayed pick and accuracy result from complete persisted submissions only.
@@ -14,7 +28,7 @@ Use three 390 × 844 captures from the live mobile flow for the public how-to se
 
 Use the owner's dated `premier-league-players-2026-08-08/` handoff as the local selector snapshot for the 2026/27 season. Import all 587 players across the application's 20 clubs, copy the 580 supplied portraits to `/player-faces/`, and deliberately show the `PlayerMark` silhouette for the seven players without a supplied image. Keep Other player available for unavailable or newly added players instead of inventing a catalogue row or portrait.
 
-Preserve the raw handoff as owner-provided provenance, but do not run its acquisition scripts, fetch its upstream sources, or hotlink its images in production. This decision imports roster identity and portrait data only. It does not provide the reviewed goals, assists, club clean-sheets, or average season rating rankings needed for the five pending spotlight outcomes, and it does not change the source-neutral result-ingestion boundary.
+Preserve the raw handoff as owner-provided provenance, but do not run its acquisition scripts, fetch its upstream sources, or hotlink its images in production. This decision imports roster identity and portrait data only. It does not provide the reviewed goals, assists, club clean-sheets, or average season rating rankings needed for the five pending spotlight outcomes, and it does not change the source-neutral result-ingestion boundary. The 2026-08-13 roster refresh above supersedes the player-count and fallback split while retaining this runtime boundary.
 
 ## 2026-08-08: Three-stage immutable entry and spotlight placeholders
 
@@ -28,7 +42,7 @@ Keep the main leaderboard limited to the 5–3–1–0 table score. Its maximum 
 
 Use the selected subject's occupied outcome rank. Let `N` be the current number of active, nondeleted brackets for the season. Rank 1 earns `N` accuracy points, rank 2 earns `N - 1`, and later ranks decrease to zero. Equal outcomes share rank and accuracy points. Overall available accuracy sums only categories with a reviewed result. Pending outcomes remain unavailable and are not incorrect zero-point answers. Because scores are derived, an administrator deletion changes `N` and recalculates the accuracy view.
 
-A future owner-run Codex automation will enter the five non-table-derived reviewed outcomes manually. The automation must obey the existing source and rights boundary. This decision supersedes the combined 240-point working rule below.
+A future owner-run Codex automation may acquire the five non-table-derived outcomes offline, review them, and enter them through an approved import or administrative path. No acquisition runs inside the deployed application. This decision supersedes the combined 240-point working rule below.
 
 ## 2026-08-08: Superseded unified 240-point working rule
 
@@ -36,7 +50,7 @@ This earlier implementation rule used the mutually exclusive 5–3–1–0 table
 
 Define underdog-team index as `average predicted position - actual position` and overrated-team index as `actual position - average predicted position`; rank the largest value first using unrounded precision. An average prediction of 2.4 and actual position 10 therefore produces -7.6 underdog and +7.6 overrated. Top scorer, top assister, and most clean sheets use reviewed result-list positions. Underdog player ranks reviewed FotMob average season ratings descending, while overrated player ranks them ascending.
 
-The metric definition does not authorize data acquisition. The deployed application must not contact or scrape FotMob. Team expectation outcomes may derive from submitted tables and the active standings, but the other five categories remain pending until a permitted, reviewed source-neutral outcome and custom-name reconciliation path exists. Pending means unavailable, not an incorrect zero-point result. The then-visible leaderboard test run was hard-coded presentation evidence only and never entered stored standings, predictions, or real totals; the later complete-entry decision above retires that fixture.
+The 2026-08-14 owner permission decision above supersedes this earlier source-permission gate. The deployed application still must not contact or scrape FotMob. Team expectation outcomes may derive from submitted tables and the active standings, but the other five categories remain pending until an offline-acquired, reviewed outcome and custom-name reconciliation path exists. Pending means unavailable, not an incorrect zero-point result. The then-visible leaderboard test run was hard-coded presentation evidence only and never entered stored standings, predictions, or real totals; the later complete-entry decision above retires that fixture.
 
 ## 2026-08-08: Spotlight privacy, PBKDF2 admin login, and cascade deletion
 
@@ -70,7 +84,7 @@ This decision superseded the launch identity but does not erase the historical m
 
 ## 2026-08-08: Static operational data boundary
 
-The deployed application has no live football API, scheduled scraper, or Vercel Cron. A source-neutral canonical importer plus manual admin editor write validated snapshots. This implements the owner's Codex-run automation preference while isolating source acquisition and preserving the last good snapshot. FotMob must not be scraped automatically without a written licence covering the intended extraction and use.
+The deployed application has no live football API, scheduled scraper, or Vercel Cron. A source-neutral canonical importer plus manual admin editor write validated snapshots. This implements the owner's Codex-run automation preference while isolating source acquisition and preserving the last good snapshot. The 2026-08-14 permission decision now allows owner-run FotMob or Transfermarkt acquisition offline; it does not permit acquisition inside the deployed application.
 
 ## 2026-08-08: Vercel-managed Neon and Drizzle
 
@@ -84,9 +98,9 @@ Use the current `@dnd-kit/react` sortable API. Pointer and keyboard behavior are
 
 Design from the narrow single-column journey outward. Use 56-pixel dedicated move handles, a wrapping full-width navigation, safe-area-aware submission action, no horizontal overflow in the prediction list, explicit focus/live announcements, and reduced-motion support. Desktop density is an enhancement of the same semantic flow rather than a separate interface.
 
-## 2026-08-08: Monograms until crest rights are cleared
+## 2026-08-08: Historical monogram fallback before the owner badge handoff (superseded)
 
-FotMob image locations and a consumer subscription do not provide redistribution permission. Ship crisp club monograms with real names and documented source status; preserve a local asset field so permitted real marks can replace them later.
+At the time, FotMob image locations and a consumer subscription were not treated as redistribution permission. The project therefore shipped crisp club monograms with real names and a local asset seam. The later owner-provided badge decision superseded this presentation fallback for the exact 20-file set, while the 2026-08-14 permission decision superseded the source-specific gate for the approved player workflow.
 
 ## 2026-08-08: Derived scoring and shared ranks
 

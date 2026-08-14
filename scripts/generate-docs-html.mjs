@@ -1,25 +1,54 @@
 import { execFileSync } from "node:child_process";
 import { createHash } from "node:crypto";
-import { readFileSync, writeFileSync } from "node:fs";
-import { basename, dirname, extname, join, relative } from "node:path";
+import {
+  lstatSync,
+  readFileSync,
+  renameSync,
+  unlinkSync,
+  writeFileSync,
+} from "node:fs";
+import {
+  basename,
+  dirname,
+  extname,
+  isAbsolute,
+  join,
+  resolve,
+} from "node:path";
 import process from "node:process";
-import { marked } from "marked";
+import { fileURLToPath } from "node:url";
+import { Marked } from "marked";
 
-const projectRoot = process.cwd();
-const checkOnly = process.argv.includes("--check");
+export const GENERATOR_ID = "scripts/generate-docs-html.mjs";
+export const CURRENT_OWNER_MARKER = `<meta name="generated-by" content="${GENERATOR_ID}" />`;
 
-const markdownFiles = execFileSync(
-  "git",
-  ["ls-files", "--cached", "--others", "--exclude-standard", "*.md", "**/*.md"],
-  { cwd: projectRoot, encoding: "utf8" },
-)
-  .trim()
-  .split("\n")
-  .filter(Boolean)
-  .filter((file) => !file.startsWith(".agents/"))
-  .sort();
+const PRIVATE_ROOTS = new Set([
+  ".agents",
+  ".codex",
+  ".git",
+  ".next",
+  ".playwright-cli",
+  ".vercel",
+  "Premier League 2026-27 PNG Assets",
+  "References",
+  "coverage",
+  "node_modules",
+  "out",
+  "output",
+  "playwright-report",
+  "test-results",
+]);
 
-marked.use({ gfm: true, breaks: false });
+const PRIVATE_PREFIXES = ["premier-league-players-"];
+const PRIVATE_PATH_PREFIXES = ["docs/assets/"];
+
+function comparePaths(left, right) {
+  return left < right ? -1 : left > right ? 1 : 0;
+}
+
+function displayPath(file) {
+  return JSON.stringify(file);
+}
 
 function htmlEscape(value) {
   return value
@@ -29,25 +58,191 @@ function htmlEscape(value) {
     .replaceAll(">", "&gt;");
 }
 
+function htmlUnescape(value) {
+  return value
+    .replaceAll("&quot;", '"')
+    .replaceAll("&gt;", ">")
+    .replaceAll("&lt;", "<")
+    .replaceAll("&amp;", "&");
+}
+
+function metaContent(html, name) {
+  const escapedName = name.replaceAll(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const tag = html.match(
+    new RegExp(`<meta\\s+[^>]*name=["']${escapedName}["'][^>]*>`, "i"),
+  )?.[0];
+  if (!tag) return null;
+
+  const content = tag.match(/\bcontent=["']([^"']*)["']/i)?.[1];
+  return content === undefined ? null : htmlUnescape(content);
+}
+
+function ownershipFor(html) {
+  const generator = metaContent(html, "generated-by");
+  const canonicalSource = metaContent(html, "canonical-source");
+  const sourceHash = metaContent(html, "canonical-source-sha256");
+
+  if (generator === GENERATOR_ID) {
+    return { kind: "current", canonicalSource, sourceHash };
+  }
+
+  if (canonicalSource !== null && /^[a-f0-9]{64}$/.test(sourceHash ?? "")) {
+    return { kind: "legacy", canonicalSource, sourceHash };
+  }
+
+  return null;
+}
+
+function splitNulBuffer(buffer) {
+  const values = [];
+  let start = 0;
+
+  for (let index = 0; index < buffer.length; index += 1) {
+    if (buffer[index] !== 0) continue;
+    values.push(buffer.subarray(start, index).toString("utf8"));
+    start = index + 1;
+  }
+
+  if (start !== buffer.length) {
+    throw new Error("Git returned a non-NUL-terminated file inventory.");
+  }
+
+  return values.filter(Boolean);
+}
+
+function gitInventory(projectRoot) {
+  const output = execFileSync(
+    "git",
+    ["ls-files", "-z", "--cached", "--others", "--exclude-standard"],
+    { cwd: projectRoot, encoding: "buffer" },
+  );
+  return splitNulBuffer(output);
+}
+
+function isPrivatePath(file) {
+  const normalized = file.replaceAll("\\", "/");
+  const root = normalized.split("/", 1)[0];
+  return (
+    PRIVATE_ROOTS.has(root) ||
+    PRIVATE_PREFIXES.some((prefix) => root.startsWith(prefix)) ||
+    PRIVATE_PATH_PREFIXES.some((prefix) => normalized.startsWith(prefix))
+  );
+}
+
+function validateInventoryPath(file) {
+  if (
+    file.length === 0 ||
+    isAbsolute(file) ||
+    file.split("/").some((segment) => segment === "..")
+  ) {
+    throw new Error(
+      `Git returned an unsafe documentation path: ${displayPath(file)}`,
+    );
+  }
+}
+
+function lstatIfPresent(file) {
+  try {
+    return lstatSync(file);
+  } catch (error) {
+    if (error && typeof error === "object" && error.code === "ENOENT") {
+      return null;
+    }
+    throw error;
+  }
+}
+
+function requireRegularFile(absolutePath, relativePath, kind) {
+  const stats = lstatIfPresent(absolutePath);
+  if (!stats) return null;
+  if (stats.isSymbolicLink()) {
+    throw new Error(
+      `Refusing ${kind} symlink ${displayPath(relativePath)}; documentation sources and peers must be regular files.`,
+    );
+  }
+  if (!stats.isFile()) {
+    throw new Error(
+      `Refusing non-file ${kind} path ${displayPath(relativePath)}.`,
+    );
+  }
+  return stats;
+}
+
 function titleFor(markdown, file) {
   return markdown.match(/^#\s+(.+)$/m)?.[1]?.trim() ?? basename(file, ".md");
 }
 
-function render(file) {
-  const absoluteSource = join(projectRoot, file);
-  const markdown = readFileSync(absoluteSource, "utf8");
-  const digest = createHash("sha256").update(markdown).digest("hex");
+function slugBase(value) {
+  return (
+    value
+      .normalize("NFKD")
+      .toLowerCase()
+      .replaceAll(/[\u0300-\u036f]/g, "")
+      .replaceAll(/[^a-z0-9\s_-]/g, "")
+      .trim()
+      .replaceAll(/[\s_]+/g, "-")
+      .replaceAll(/-+/g, "-") || "section"
+  );
+}
+
+function renderMarkdown(markdown) {
+  const slugCounts = new Map();
+  const renderer = {
+    heading({ tokens, depth }) {
+      const headingHtml = this.parser.parseInline(tokens);
+      const headingText = this.parser.parseInline(
+        tokens,
+        this.parser.textRenderer,
+      );
+      const base = slugBase(headingText);
+      const count = (slugCounts.get(base) ?? 0) + 1;
+      slugCounts.set(base, count);
+      const slug = count === 1 ? base : `${base}-${count}`;
+      return `<h${depth} id="${htmlEscape(slug)}">${headingHtml}</h${depth}>\n`;
+    },
+  };
+  const parser = new Marked({ gfm: true, breaks: false, renderer });
+  const parsed = parser.parse(markdown);
+  if (typeof parsed !== "string") {
+    throw new Error(
+      "The Markdown renderer unexpectedly returned async output.",
+    );
+  }
+  return rewriteMarkdownLinks(parsed);
+}
+
+function rewriteMarkdownLinks(html) {
+  return html.replaceAll(/href="([^"]*)"/g, (match, href) => {
+    if (
+      href.startsWith("#") ||
+      href.startsWith("?") ||
+      href.startsWith("/") ||
+      href.startsWith("//") ||
+      /^[a-z][a-z0-9+.-]*:/i.test(href)
+    ) {
+      return match;
+    }
+
+    const parts = href.match(/^([^?#]*)([?#].*)?$/);
+    if (!parts?.[1].toLowerCase().endsWith(".md")) return match;
+    return `href="${parts[1].slice(0, -3)}.html${parts[2] ?? ""}"`;
+  });
+}
+
+function render(file, sourceBytes) {
+  const markdown = sourceBytes.toString("utf8");
+  const digest = createHash("sha256").update(sourceBytes).digest("hex");
   const title = titleFor(markdown, file);
   const sourceLink = basename(file);
-  const rendered = marked
-    .parse(markdown)
-    .replaceAll(/href="([^"#?]+)\.md((?:[?#][^"]*)?)"/g, 'href="$1.html$2"');
+  const sourceHref = encodeURIComponent(sourceLink);
+  const rendered = renderMarkdown(markdown);
 
   return `<!doctype html>
 <html lang="en">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    ${CURRENT_OWNER_MARKER}
     <meta name="canonical-source" content="${htmlEscape(sourceLink)}" />
     <meta name="canonical-source-sha256" content="${digest}" />
     <title>${htmlEscape(title)}</title>
@@ -84,42 +279,197 @@ function render(file) {
   <body>
     <main>
       ${rendered}
-      <p class="source">Generated deterministically from <a href="${htmlEscape(sourceLink)}">${htmlEscape(file)}</a>. Canonical SHA-256: <code>${digest}</code>.</p>
+      <p class="source">Generated deterministically from <a href="${htmlEscape(sourceHref)}">${htmlEscape(file)}</a>. Canonical SHA-256: <code>${digest}</code>.</p>
     </main>
   </body>
 </html>
 `;
 }
 
-const changed = [];
+function htmlPathFor(source) {
+  return join(dirname(source), `${basename(source, extname(source))}.html`);
+}
 
-for (const file of markdownFiles) {
-  const htmlPath = join(dirname(file), `${basename(file, extname(file))}.html`);
-  const absoluteHtml = join(projectRoot, htmlPath);
-  const expected = render(file);
-  let current = null;
+function atomicWrite(absolutePath, contents, counter) {
+  const temporaryPath = join(
+    dirname(absolutePath),
+    `.${basename(absolutePath)}.tmp-${process.pid}-${counter}`,
+  );
 
   try {
-    current = readFileSync(absoluteHtml, "utf8");
-  } catch {
-    // Missing peers are handled below.
-  }
-
-  if (current !== expected) {
-    changed.push(relative(projectRoot, absoluteHtml));
-    if (!checkOnly) writeFileSync(absoluteHtml, expected);
+    writeFileSync(temporaryPath, contents, {
+      encoding: "utf8",
+      flag: "wx",
+      mode: 0o644,
+    });
+    renameSync(temporaryPath, absolutePath);
+  } catch (error) {
+    try {
+      unlinkSync(temporaryPath);
+    } catch (cleanupError) {
+      if (
+        !cleanupError ||
+        typeof cleanupError !== "object" ||
+        cleanupError.code !== "ENOENT"
+      ) {
+        throw cleanupError;
+      }
+    }
+    throw error;
   }
 }
 
-if (changed.length > 0 && checkOnly) {
-  process.stderr.write(
-    `Documentation HTML is stale or missing:\n${changed.join("\n")}\n`,
+export function generateDocumentation({
+  projectRoot = process.cwd(),
+  checkOnly = false,
+} = {}) {
+  const inventory = gitInventory(projectRoot);
+  inventory.forEach(validateInventoryPath);
+
+  const scopedInventory = inventory
+    .filter((file) => !isPrivatePath(file))
+    .sort(comparePaths);
+  const markdownFiles = scopedInventory.filter((file) => {
+    if (extname(file).toLowerCase() !== ".md") return false;
+    return requireRegularFile(join(projectRoot, file), file, "source") !== null;
+  });
+  const markdownSet = new Set(markdownFiles);
+  const expectedByHtml = new Map();
+  const changes = [];
+
+  for (const file of markdownFiles) {
+    const htmlPath = htmlPathFor(file);
+    const existingTarget = expectedByHtml.get(htmlPath);
+    if (existingTarget) {
+      throw new Error(
+        `Refusing documentation peer collision at ${displayPath(htmlPath)} because both ${displayPath(existingTarget.file)} and ${displayPath(file)} map to it.`,
+      );
+    }
+
+    const absoluteSource = join(projectRoot, file);
+    const sourceStats = requireRegularFile(absoluteSource, file, "source");
+    if (!sourceStats) {
+      throw new Error(
+        `Git-listed Markdown source is missing: ${displayPath(file)}`,
+      );
+    }
+
+    const absoluteHtml = join(projectRoot, htmlPath);
+    const expected = render(file, readFileSync(absoluteSource));
+    const htmlStats = requireRegularFile(absoluteHtml, htmlPath, "HTML peer");
+    let current = null;
+
+    if (htmlStats) {
+      current = readFileSync(absoluteHtml, "utf8");
+      const ownership = ownershipFor(current);
+      if (!ownership) {
+        throw new Error(
+          `Refusing unmanaged HTML collision at ${displayPath(htmlPath)}.`,
+        );
+      }
+      if (
+        ownership.canonicalSource !== null &&
+        ownership.canonicalSource !== basename(file)
+      ) {
+        throw new Error(
+          `Refusing generated HTML collision at ${displayPath(htmlPath)} because it names ${displayPath(ownership.canonicalSource)} as its canonical source.`,
+        );
+      }
+    }
+
+    expectedByHtml.set(htmlPath, { file, absoluteHtml, expected });
+    if (current !== expected) {
+      changes.push({
+        kind: current === null ? "missing" : "stale",
+        path: htmlPath,
+        absoluteHtml,
+        expected,
+      });
+    }
+  }
+
+  const orphans = [];
+  const htmlFiles = scopedInventory.filter(
+    (file) => extname(file).toLowerCase() === ".html",
   );
-  process.exit(1);
+
+  for (const htmlFile of htmlFiles) {
+    if (expectedByHtml.has(htmlFile)) continue;
+
+    const absoluteHtml = join(projectRoot, htmlFile);
+    const stats = requireRegularFile(absoluteHtml, htmlFile, "HTML file");
+    if (!stats) continue;
+    const ownership = ownershipFor(readFileSync(absoluteHtml, "utf8"));
+    if (!ownership) continue;
+    if (ownership.canonicalSource === null) {
+      throw new Error(
+        `Generated HTML ${displayPath(htmlFile)} is missing canonical-source metadata.`,
+      );
+    }
+    if (
+      basename(ownership.canonicalSource) !== ownership.canonicalSource ||
+      extname(ownership.canonicalSource).toLowerCase() !== ".md"
+    ) {
+      throw new Error(
+        `Generated HTML ${displayPath(htmlFile)} has an unsafe canonical source ${displayPath(ownership.canonicalSource)}.`,
+      );
+    }
+
+    const source = join(dirname(htmlFile), ownership.canonicalSource);
+    if (!markdownSet.has(source) || htmlPathFor(source) !== htmlFile) {
+      orphans.push({ path: htmlFile, absoluteHtml });
+    }
+  }
+
+  if (checkOnly && (changes.length > 0 || orphans.length > 0)) {
+    const details = [
+      ...changes.map(({ kind, path }) => `${kind}: ${displayPath(path)}`),
+      ...orphans.map(({ path }) => `orphan: ${displayPath(path)}`),
+    ];
+    throw new Error(
+      `Documentation HTML is stale, missing, or orphaned:\n${details.join("\n")}`,
+    );
+  }
+
+  if (!checkOnly) {
+    changes.forEach(({ absoluteHtml, expected }, index) => {
+      atomicWrite(absoluteHtml, expected, index);
+    });
+    orphans.forEach(({ absoluteHtml }) => unlinkSync(absoluteHtml));
+  }
+
+  return {
+    markdownCount: markdownFiles.length,
+    changedCount: changes.length,
+    orphanCount: orphans.length,
+  };
 }
 
-process.stdout.write(
-  checkOnly
-    ? `Documentation parity verified for ${markdownFiles.length} Markdown files.\n`
-    : `Generated ${markdownFiles.length} HTML documentation peers.\n`,
-);
+function runCli() {
+  const args = process.argv.slice(2);
+  if (args.length > 1 || (args.length === 1 && args[0] !== "--check")) {
+    throw new Error(`Usage: node ${GENERATOR_ID} [--check]`);
+  }
+
+  const checkOnly = args[0] === "--check";
+  const result = generateDocumentation({ checkOnly });
+  process.stdout.write(
+    checkOnly
+      ? `Documentation parity verified for ${result.markdownCount} Markdown files.\n`
+      : `Generated ${result.markdownCount} HTML documentation peers (${result.changedCount} written, ${result.orphanCount} orphaned peers removed).\n`,
+  );
+}
+
+const isMain =
+  process.argv[1] !== undefined &&
+  fileURLToPath(import.meta.url) === resolve(process.argv[1]);
+
+if (isMain) {
+  try {
+    runCli();
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    process.stderr.write(`${message}\n`);
+    process.exitCode = 1;
+  }
+}

@@ -1,6 +1,12 @@
 import { fileURLToPath } from "node:url";
 import { defineConfig } from "vitest/config";
 
+import { assertIsolatedDatabaseEnvironment } from "./scripts/test-database-identity.mjs";
+
+if (process.env.RUN_DB_INTEGRATION === "1") {
+  assertIsolatedDatabaseEnvironment(process.env, "Neon integration tests");
+}
+
 export default defineConfig({
   resolve: {
     alias: {

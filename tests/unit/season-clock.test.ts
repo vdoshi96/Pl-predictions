@@ -1,15 +1,33 @@
 import { describe, expect, it } from "vitest";
 
+import {
+  createTestDatabaseAttestation,
+  databaseIdentitySha256,
+  parseDatabaseUrl,
+} from "../../scripts/test-database-identity.mjs";
 import { resolveIsolatedTestNow } from "@/features/seasons/clock";
 
+const productionUrl =
+  "postgresql://production@db.example/application?sslmode=require";
+const testUrl =
+  "postgresql://tester:secret@db.example/test_league?sslmode=require";
+const productionIdentitySha256 = databaseIdentitySha256(
+  parseDatabaseUrl(productionUrl, "synthetic production URL"),
+);
+const testIdentitySha256 = databaseIdentitySha256(
+  parseDatabaseUrl(testUrl, "synthetic test URL"),
+);
+
 const isolatedEnvironment = {
-  DATABASE_URL:
-    "postgresql://tester:secret@db.example/test_league?sslmode=require",
+  DATABASE_URL: testUrl,
   NODE_ENV: "test",
-  PL_PREDICTIONS_ISOLATED_TEST_DATABASE: "verified-isolated-test-database",
+  PL_PREDICTIONS_ISOLATED_TEST_DATABASE: createTestDatabaseAttestation(
+    productionIdentitySha256,
+    testIdentitySha256,
+  ),
+  PL_PREDICTIONS_PRODUCTION_DATABASE_IDENTITY_SHA256: productionIdentitySha256,
   PL_PREDICTIONS_TEST_NOW_ISO: "2026-08-08T12:00:00.000Z",
-  TEST_DATABASE_URL:
-    "postgresql://tester:different-secret@db.example/test_league?sslmode=require",
+  TEST_DATABASE_URL: testUrl,
 };
 
 describe("isolated test clock", () => {
@@ -33,6 +51,22 @@ describe("isolated test clock", () => {
       resolveIsolatedTestNow({
         ...isolatedEnvironment,
         DATABASE_URL: "postgresql://tester@db.example/production",
+      }),
+    ).toBeNull();
+  });
+
+  it("ignores a copied legacy marker or target-mismatched attestation", () => {
+    expect(
+      resolveIsolatedTestNow({
+        ...isolatedEnvironment,
+        PL_PREDICTIONS_ISOLATED_TEST_DATABASE:
+          "verified-isolated-test-database",
+      }),
+    ).toBeNull();
+    expect(
+      resolveIsolatedTestNow({
+        ...isolatedEnvironment,
+        TEST_DATABASE_URL: "postgresql://tester@db.example/other_test_database",
       }),
     ).toBeNull();
   });

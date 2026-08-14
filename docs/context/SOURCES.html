@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="generated-by" content="scripts/generate-docs-html.mjs" />
     <meta name="canonical-source" content="SOURCES.md" />
-    <meta name="canonical-source-sha256" content="9864e270d4ca329f5ff8c235746a651a1b9c42ca42e38b6305cce9e2ba4c7da2" />
+    <meta name="canonical-source-sha256" content="b3c5565579b778640e4d6b6326b719cc454025756b1324eb76490fdaca862e70" />
     <title>Sources</title>
     <style>
       :root { color-scheme: light dark; font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
@@ -47,12 +47,12 @@
 <li>Latest owner overrides: mobile-first for the majority-mobile audience; recurring updates will be owner-run Codex automation; no runtime live-data API and no Vercel Cron.</li>
 <li>Permission disposition: in the 2026-08-14 Codex task, the owner confirmed that the required permissions for acquisition, storage, redistribution, and production use in this player-catalogue workflow have been obtained. Confidential licence documents remain outside source control and chat.</li>
 <li>Current scoring override: the main leaderboard uses table points only and has a 100-point maximum. Spotlight predictions use a separate fun-accuracy page with overall and category sorts. Let <code>N</code> be the current number of active, nondeleted season brackets. Accuracy points are <code>max(0, N + 1 - outcome rank)</code>. Overall accuracy excludes pending categories.</li>
-<li>Current outcome-input direction: a future owner-run Codex automation may acquire the five non-table-derived outcomes offline, review them, and enter them through an approved path. The automation is not part of this iteration and does not run in the deployed application.</li>
+<li>Current outcome-input direction: owner-run automation may acquire the five non-table-derived outcomes offline, but the owner reviews and enters the facts through authenticated <code>/admin/results</code>. Acquisition is not part of the deployed application and never runs at request time or on a schedule.</li>
 <li>Current spotlight-predictions brief: one three-stage immutable entry containing the 20-club table and seven required categories; searchable first/last-name player selectors with Other-player fallback; clubs for most clean sheets; local player portraits and club crests with visual fallbacks; public rules and spotlight pages; and administrator deletion. The owner-supplied raw login password is operational secret input and is intentionally not copied into repository documentation.</li>
 <li>Current identity direction: user-facing name <strong>Dranx Prediction League</strong>; Premier-League-inspired palette using official purple <code>#37003c</code> with cyan <code>#05f0ff</code>, green <code>#00ff87</code>, and pink <code>#ff2882</code> accents; original Dranx mark; operational <code>pl-predictions</code> identifiers unchanged.</li>
 <li>Current club-asset direction: the project owner supplied a folder containing one transparent PNG badge for each of the 20 verified clubs and explicitly directed their use. The same folder&#39;s Premier League logo/lion/ball/composite files are outside that team-mark replacement and are not used.</li>
 <li>Current player-asset direction: the reviewed selector snapshot is <code>premier-league-players-2026-08-13/</code>. Other player remains available for unavailable or newly added players. The 2026-08-08 folder remains provenance only.</li>
-<li>Current how-to direction: use screenshots captured from the public live mobile flow at 390 × 844 pixels, without submitting the walkthrough draft. The three source captures live under <code>public/how-to-play/</code>; their numbered overlays and matching callout text are first-party application documentation rather than a third-party data source.</li>
+<li>Current how-to direction: use screenshots captured from the current verified mobile flow at 390 × 844 pixels. The current sources were staged before a reversible isolated submission and created no production entry. The three source captures live under <code>public/how-to-play/</code>; their numbered overlays and matching callout text are first-party application documentation rather than a third-party data source.</li>
 </ul>
 <h2 id="owner-provided-player-snapshot-source-card">Owner-provided player snapshot source card</h2>
 <ul>
@@ -62,7 +62,7 @@
 <li>Handoff provenance: the local README identifies Transfermarkt 2026 first-team squad pages as the roster source and FotMob CDN portraits for every catalogued player. For this repository, the operative provenance is the project owner&#39;s local handoff, selected roster, and 2026-08-14 permission confirmation; this record does not claim original ownership of third-party material.</li>
 <li>Application use: roster rows are imported into the season catalogue and reviewed portraits are copied to local <code>/player-faces/</code> paths. <code>PlayerMark</code> uses its generic silhouette when an asset path is absent or an image fails.</li>
 <li>Runtime boundary: the deployed application does not execute the handoff&#39;s acquisition scripts, call those upstream sources, scrape player pages, or hotlink portraits. Other player covers unavailable or newly added players.</li>
-<li>Outcome boundary: this is a selector identity and portrait snapshot, not a goals, assists, clean-sheets, or player-rating result feed. A future owner-run Codex automation may acquire those five outcomes offline, review them, and enter them through an approved path.</li>
+<li>Outcome boundary: this is a selector identity and portrait snapshot, not a goals, assists, clean-sheets, or player-rating result feed. Offline work may acquire those outcomes, but reviewed facts enter only through the authenticated manual results desk.</li>
 <li>Production boundary: the August 13 application was merged through PR #15, deployed, and seeded once through the approved sequence after a six-hour Neon restore window and read-only just-before-seed time-travel result were proven. The live catalogue now has 599 total rows, 582 active players, 17 preserved inactive rows, and 582 distinct active portrait paths. This release state does not change the no-runtime-acquisition boundary.</li>
 </ul>
 <h2 id="season-sources-and-permission-disposition">Season sources and permission disposition</h2>
@@ -84,13 +84,13 @@
 <li>Team expectation data is internal: average each club&#39;s predicted position across the remaining valid submissions, then compare it with the active validated standings. Underdog is average prediction minus actual position; overrated is the inverse.</li>
 <li>The requested player-opinion metric is FotMob average season rating, descending for underdog and ascending for overrated. The owner may acquire it through an authorized offline workflow. There is no runtime FotMob client, scraper, scheduled job, or stored provider credential.</li>
 <li>The owner has supplied the dated 582-player selector catalogue and 582 portrait PNGs. The handoff does not include reviewed top-scorer, assists, clean-sheets, or player-rating rankings. Do not infer or fabricate these results.</li>
-<li>A future owner-run Codex automation may acquire the five outcomes offline and enter the reviewed results through an approved path. The payload, review path, provenance fields, and final-state rules remain a later design task.</li>
+<li><code>/admin/results</code> is the approved reviewed-entry path. It presents five owner-facing tables backed by immutable versions of goals, assists, club clean sheets, and one shared player-ratings dataset. Saving seals facts and exact Other-name aliases into a working snapshot; publication, finalization, and final-status undo use exact compare-and-swap pointers and atomic audits. Missing datasets or unresolved aliases remain pending, and no provider acquisition is built into this workflow.</li>
 </ul>
 <h2 id="technical-authority">Technical authority</h2>
 <p>Current official Next.js, React, Node.js/Vercel runtime, Tailwind CSS, dnd-kit, Neon, Drizzle, Vercel Marketplace/Git integration, Vercel Authentication, and GitHub documentation informed the pinned stack and deployment flow. Exact links, decisions, caveats, rejected alternatives, and failure behavior are recorded in <code>docs/RESEARCH.md</code>.</p>
 <p>Implementation and current checked-out behavior remain authoritative when a historical note differs.</p>
 
-      <p class="source">Generated deterministically from <a href="SOURCES.md">docs/context/SOURCES.md</a>. Canonical SHA-256: <code>9864e270d4ca329f5ff8c235746a651a1b9c42ca42e38b6305cce9e2ba4c7da2</code>.</p>
+      <p class="source">Generated deterministically from <a href="SOURCES.md">docs/context/SOURCES.md</a>. Canonical SHA-256: <code>b3c5565579b778640e4d6b6326b719cc454025756b1324eb76490fdaca862e70</code>.</p>
     </main>
   </body>
 </html>

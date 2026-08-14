@@ -1,16 +1,26 @@
+import { mkdir } from "node:fs/promises";
+import path from "node:path";
+
 import { neon } from "@neondatabase/serverless";
 import { expect, test } from "@playwright/test";
-import { and, eq, gte, inArray } from "drizzle-orm";
+import { and, count, eq, gte, inArray } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/neon-http";
 
 import {
   adminAuditLogs,
+  predictionCategoryPicks,
+  predictionItems,
   predictions,
   seasons,
+  standingsImportRunItems,
   standingsImportRuns,
+  standingsItems,
   standingsSnapshots,
 } from "../../src/db/schema";
-import { completeSpotlightPicks } from "./spotlight-helpers";
+import {
+  completeSpotlightPicks,
+  expectCompletePredictionDraftPersisted,
+} from "./spotlight-helpers";
 
 const qaName = `Mobile QA ${Date.now().toString().slice(-8)}`;
 let qaEntryId: string | null = null;
@@ -18,7 +28,6 @@ let qaSnapshotId: string | null = null;
 let qaRunId: string | null = null;
 let qaAuditIds: string[] = [];
 let qaStartedAt: Date | null = null;
-let qaSnapshotCreatedByRun = false;
 let preexistingSnapshotIds: Set<string> | null = null;
 let originalSeason: {
   activeSnapshotId: string | null;
@@ -26,7 +35,6 @@ let originalSeason: {
   id: string;
   revealPredictions: boolean;
   standingsAcceptedThrough: Date | null;
-  submissionDeadline: Date | null;
   submissionsLocked: boolean;
   updatedAt: Date;
 } | null = null;
@@ -43,11 +51,97 @@ function getQaDb() {
 async function expectNoHorizontalOverflow(
   page: import("@playwright/test").Page,
 ) {
-  const widths = await page.evaluate(() => ({
-    client: document.documentElement.clientWidth,
-    scroll: document.documentElement.scrollWidth,
-  }));
-  expect(widths.scroll).toBe(widths.client);
+  const layout = await page.evaluate(() => {
+    const client = document.documentElement.clientWidth;
+    const originalScrollX = window.scrollX;
+    const originalScrollY = window.scrollY;
+    window.scrollTo(document.documentElement.scrollWidth, originalScrollY);
+    const maximumScrollX = window.scrollX;
+    window.scrollTo(originalScrollX, originalScrollY);
+    return {
+      bodyScroll: document.body.scrollWidth,
+      client,
+      maximumScrollX,
+    };
+  });
+  expect(
+    layout.bodyScroll,
+    "The document body must stay within the viewport; wide tables may scroll only inside their labelled containers.",
+  ).toBeLessThanOrEqual(layout.client);
+  expect(
+    layout.maximumScrollX,
+    "The page itself must not be horizontally scrollable.",
+  ).toBe(0);
+}
+
+async function captureAnnotatedEvidence(
+  page: import("@playwright/test").Page,
+  screenshotDirectory: string | undefined,
+  fileName: string,
+  title: string,
+  notes: readonly string[],
+) {
+  if (!screenshotDirectory) return;
+  await mkdir(screenshotDirectory, { recursive: true });
+  await page.evaluate(
+    ({ annotationNotes, annotationTitle }) => {
+      document.querySelector("[data-qa-evidence-annotation]")?.remove();
+      const annotation = document.createElement("aside");
+      annotation.dataset.qaEvidenceAnnotation = "true";
+      annotation.setAttribute("aria-label", "QA evidence annotation");
+      Object.assign(annotation.style, {
+        background: "rgba(55, 0, 60, 0.96)",
+        border: "2px solid #05f0ff",
+        borderRadius: "12px",
+        bottom: "8px",
+        boxShadow: "0 8px 24px rgba(0, 0, 0, 0.35)",
+        color: "white",
+        font: "600 11px/1.35 system-ui, sans-serif",
+        left: "8px",
+        maxWidth: "calc(100vw - 16px)",
+        padding: "9px 11px",
+        position: "fixed",
+        right: "8px",
+        zIndex: "2147483647",
+      });
+      const heading = document.createElement("strong");
+      heading.style.color = "#05f0ff";
+      heading.style.display = "block";
+      heading.style.marginBottom = "4px";
+      heading.textContent = annotationTitle;
+      annotation.append(heading);
+      annotationNotes.forEach((note, index) => {
+        const line = document.createElement("div");
+        line.textContent = `${index + 1}. ${note}`;
+        annotation.append(line);
+      });
+      document.body.append(annotation);
+    },
+    { annotationNotes: notes, annotationTitle: title },
+  );
+  const annotation = page.locator("[data-qa-evidence-annotation]");
+  await expect(annotation).toBeVisible();
+  try {
+    await page.screenshot({
+      animations: "disabled",
+      path: path.join(screenshotDirectory, fileName),
+    });
+  } finally {
+    await annotation.evaluate((element) => element.remove());
+  }
+}
+
+async function capturePlainEvidence(
+  page: import("@playwright/test").Page,
+  screenshotDirectory: string | undefined,
+  fileName: string,
+) {
+  if (!screenshotDirectory) return;
+  await mkdir(screenshotDirectory, { recursive: true });
+  await page.screenshot({
+    animations: "disabled",
+    path: path.join(screenshotDirectory, fileName),
+  });
 }
 
 async function handleCenter(
@@ -184,47 +278,236 @@ test.afterEach(async () => {
   if (!process.env.DATABASE_URL) return;
 
   const db = getQaDb();
-  if (qaEntryId) {
-    await db.delete(predictions).where(eq(predictions.id, qaEntryId));
-    await db
-      .delete(adminAuditLogs)
-      .where(eq(adminAuditLogs.targetId, qaEntryId));
+  const cleanupEntryIds = new Set<string>();
+  if (qaEntryId) cleanupEntryIds.add(qaEntryId);
+  if (originalSeason) {
+    const recoveredEntries = await db
+      .select({ id: predictions.id })
+      .from(predictions)
+      .where(
+        and(
+          eq(predictions.seasonId, originalSeason.id),
+          eq(predictions.participantName, qaName),
+        ),
+      );
+    for (const entry of recoveredEntries) cleanupEntryIds.add(entry.id);
   }
 
-  if (originalSeason && qaSnapshotId) {
-    await db
+  const cleanupSnapshotIds = new Set<string>();
+  if (qaSnapshotId) cleanupSnapshotIds.add(qaSnapshotId);
+  const cleanupRunIds = new Set<string>();
+  if (qaRunId) cleanupRunIds.add(qaRunId);
+  const cleanupAuditIds = new Set(qaAuditIds);
+
+  if (originalSeason && qaStartedAt) {
+    const [currentSeason] = await db
+      .select({
+        activeSnapshotId: seasons.activeSnapshotId,
+        finalSnapshotId: seasons.finalSnapshotId,
+        revealPredictions: seasons.revealPredictions,
+        standingsAcceptedThrough: seasons.standingsAcceptedThrough,
+        submissionsLocked: seasons.submissionsLocked,
+      })
+      .from(seasons)
+      .where(eq(seasons.id, originalSeason.id))
+      .limit(1);
+    if (
+      currentSeason?.activeSnapshotId &&
+      currentSeason.activeSnapshotId !== originalSeason.activeSnapshotId
+    ) {
+      cleanupSnapshotIds.add(currentSeason.activeSnapshotId);
+    }
+
+    const [recoveredSnapshots, recoveredRuns, recoveredAudits] =
+      await Promise.all([
+        db
+          .select({ id: standingsSnapshots.id })
+          .from(standingsSnapshots)
+          .where(
+            and(
+              eq(standingsSnapshots.seasonId, originalSeason.id),
+              eq(standingsSnapshots.source, "manual-admin"),
+              gte(standingsSnapshots.createdAt, qaStartedAt),
+            ),
+          ),
+        db
+          .select({ id: standingsImportRuns.id })
+          .from(standingsImportRuns)
+          .where(
+            and(
+              eq(standingsImportRuns.seasonId, originalSeason.id),
+              eq(standingsImportRuns.source, "manual-admin"),
+              gte(standingsImportRuns.createdAt, qaStartedAt),
+            ),
+          ),
+        db
+          .select({ id: adminAuditLogs.id })
+          .from(adminAuditLogs)
+          .where(
+            and(
+              eq(adminAuditLogs.seasonId, originalSeason.id),
+              inArray(adminAuditLogs.action, [
+                "prediction.deleted",
+                "season.predictions_revealed_early",
+                "standings.manual.saved",
+              ]),
+              gte(adminAuditLogs.createdAt, qaStartedAt),
+            ),
+          ),
+      ]);
+    for (const snapshot of recoveredSnapshots) {
+      cleanupSnapshotIds.add(snapshot.id);
+    }
+    for (const run of recoveredRuns) cleanupRunIds.add(run.id);
+    for (const audit of recoveredAudits) cleanupAuditIds.add(audit.id);
+
+    const restored = await db
       .update(seasons)
       .set({
         activeSnapshotId: originalSeason.activeSnapshotId,
         finalSnapshotId: originalSeason.finalSnapshotId,
         revealPredictions: originalSeason.revealPredictions,
         standingsAcceptedThrough: originalSeason.standingsAcceptedThrough,
-        submissionDeadline: originalSeason.submissionDeadline,
         submissionsLocked: originalSeason.submissionsLocked,
-        updatedAt: new Date(),
+        updatedAt: originalSeason.updatedAt,
       })
-      .where(
-        and(
-          eq(seasons.id, originalSeason.id),
-          eq(seasons.activeSnapshotId, qaSnapshotId),
-        ),
-      );
+      .where(eq(seasons.id, originalSeason.id))
+      .returning({ id: seasons.id });
+    expect(
+      restored,
+      "Cleanup must restore the exact isolated season it inspected.",
+    ).toHaveLength(1);
   }
 
-  if (qaAuditIds.length > 0) {
+  for (const entryId of cleanupEntryIds) {
+    await db.delete(predictions).where(eq(predictions.id, entryId));
+    await db.delete(adminAuditLogs).where(eq(adminAuditLogs.targetId, entryId));
+  }
+  if (cleanupAuditIds.size > 0) {
     await db
       .delete(adminAuditLogs)
-      .where(inArray(adminAuditLogs.id, qaAuditIds));
+      .where(inArray(adminAuditLogs.id, [...cleanupAuditIds]));
   }
-  if (qaRunId) {
+  if (cleanupRunIds.size > 0) {
     await db
       .delete(standingsImportRuns)
-      .where(eq(standingsImportRuns.id, qaRunId));
+      .where(inArray(standingsImportRuns.id, [...cleanupRunIds]));
   }
-  if (qaSnapshotId && qaSnapshotCreatedByRun) {
+  const createdSnapshotIds = [...cleanupSnapshotIds].filter(
+    (snapshotId) => !preexistingSnapshotIds?.has(snapshotId),
+  );
+  if (createdSnapshotIds.length > 0) {
     await db
       .delete(standingsSnapshots)
-      .where(eq(standingsSnapshots.id, qaSnapshotId));
+      .where(inArray(standingsSnapshots.id, createdSnapshotIds));
+  }
+
+  const zeroCounts: Array<PromiseLike<Array<{ value: number }>>> = [];
+  if (originalSeason) {
+    zeroCounts.push(
+      db
+        .select({ value: count() })
+        .from(predictions)
+        .where(
+          and(
+            eq(predictions.seasonId, originalSeason.id),
+            eq(predictions.participantName, qaName),
+          ),
+        ),
+    );
+  }
+  if (cleanupEntryIds.size > 0) {
+    zeroCounts.push(
+      db
+        .select({ value: count() })
+        .from(predictionItems)
+        .where(inArray(predictionItems.predictionId, [...cleanupEntryIds])),
+      db
+        .select({ value: count() })
+        .from(predictionCategoryPicks)
+        .where(
+          inArray(predictionCategoryPicks.predictionId, [...cleanupEntryIds]),
+        ),
+      db
+        .select({ value: count() })
+        .from(adminAuditLogs)
+        .where(inArray(adminAuditLogs.targetId, [...cleanupEntryIds])),
+    );
+  }
+  if (cleanupAuditIds.size > 0) {
+    zeroCounts.push(
+      db
+        .select({ value: count() })
+        .from(adminAuditLogs)
+        .where(inArray(adminAuditLogs.id, [...cleanupAuditIds])),
+    );
+  }
+  if (cleanupRunIds.size > 0) {
+    zeroCounts.push(
+      db
+        .select({ value: count() })
+        .from(standingsImportRuns)
+        .where(inArray(standingsImportRuns.id, [...cleanupRunIds])),
+      db
+        .select({ value: count() })
+        .from(standingsImportRunItems)
+        .where(inArray(standingsImportRunItems.runId, [...cleanupRunIds])),
+    );
+  }
+  if (createdSnapshotIds.length > 0) {
+    zeroCounts.push(
+      db
+        .select({ value: count() })
+        .from(standingsSnapshots)
+        .where(inArray(standingsSnapshots.id, createdSnapshotIds)),
+      db
+        .select({ value: count() })
+        .from(standingsItems)
+        .where(inArray(standingsItems.snapshotId, createdSnapshotIds)),
+    );
+  }
+  if (originalSeason && qaStartedAt) {
+    zeroCounts.push(
+      db
+        .select({ value: count() })
+        .from(adminAuditLogs)
+        .where(
+          and(
+            eq(adminAuditLogs.seasonId, originalSeason.id),
+            inArray(adminAuditLogs.action, [
+              "prediction.deleted",
+              "season.predictions_revealed_early",
+              "standings.manual.saved",
+            ]),
+            gte(adminAuditLogs.createdAt, qaStartedAt),
+          ),
+        ),
+    );
+  }
+  for (const [residue] of await Promise.all(zeroCounts)) {
+    expect(residue?.value ?? 0).toBe(0);
+  }
+  if (originalSeason) {
+    const [restoredSeason] = await db
+      .select({
+        activeSnapshotId: seasons.activeSnapshotId,
+        finalSnapshotId: seasons.finalSnapshotId,
+        revealPredictions: seasons.revealPredictions,
+        standingsAcceptedThrough: seasons.standingsAcceptedThrough,
+        submissionsLocked: seasons.submissionsLocked,
+        updatedAt: seasons.updatedAt,
+      })
+      .from(seasons)
+      .where(eq(seasons.id, originalSeason.id))
+      .limit(1);
+    expect(restoredSeason).toEqual({
+      activeSnapshotId: originalSeason.activeSnapshotId,
+      finalSnapshotId: originalSeason.finalSnapshotId,
+      revealPredictions: originalSeason.revealPredictions,
+      standingsAcceptedThrough: originalSeason.standingsAcceptedThrough,
+      submissionsLocked: originalSeason.submissionsLocked,
+      updatedAt: originalSeason.updatedAt,
+    });
   }
 
   qaEntryId = null;
@@ -232,7 +515,6 @@ test.afterEach(async () => {
   qaRunId = null;
   qaAuditIds = [];
   qaStartedAt = null;
-  qaSnapshotCreatedByRun = false;
   preexistingSnapshotIds = null;
   originalSeason = null;
 });
@@ -330,6 +612,16 @@ test("desktop public routes render the complete league without overflow", async 
   await expect(
     page.getByRole("heading", { level: 1, name: "Spotlight accuracy" }),
   ).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: "How spotlight points work" }),
+  ).toBeVisible();
+  await expect(
+    page.getByText(/your pick earns more spotlight points/i),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("link", { name: "Read the full scoring rules" }),
+  ).toHaveAttribute("href", "/rules#spotlight-scoring");
+  await expect(page.getByText(/max\(0, N \+ 1/u)).toHaveCount(0);
   await expectNoHorizontalOverflow(page);
 
   await page.goto("/rules");
@@ -345,6 +637,10 @@ test("desktop public routes render the complete league without overflow", async 
   await expect(
     page.getByRole("heading", { level: 3, name: "Top scorer" }),
   ).toBeVisible();
+  await expect(
+    page.getByText(/occupied result rank earns max\(0, N \+ 1/u),
+  ).toBeVisible();
+  await expect(page.getByText(/owner-run Codex automation/i)).toHaveCount(0);
   await expectNoHorizontalOverflow(page);
 });
 
@@ -356,10 +652,18 @@ test("mobile journey preserves privacy and gives the owner full control", async 
     !testInfo.project.name.startsWith("mobile-"),
     "Mobile-only end-to-end coverage.",
   );
-  test.setTimeout(120_000);
+  test.setTimeout(180_000);
 
   const adminSecret =
     process.env.PLAYWRIGHT_ADMIN_PASSWORD ?? process.env.ADMIN_SECRET;
+  const screenshotDirectory =
+    testInfo.project.name === "mobile-chromium"
+      ? process.env.QA_SCREENSHOT_DIR
+      : undefined;
+  const walkthroughScreenshotDirectory =
+    testInfo.project.name === "mobile-chromium"
+      ? process.env.WALKTHROUGH_SCREENSHOT_DIR
+      : undefined;
   expect(
     adminSecret,
     "PLAYWRIGHT_ADMIN_PASSWORD or ADMIN_SECRET must be available for E2E",
@@ -373,7 +677,6 @@ test("mobile journey preserves privacy and gives the owner full control", async 
       id: seasons.id,
       revealPredictions: seasons.revealPredictions,
       standingsAcceptedThrough: seasons.standingsAcceptedThrough,
-      submissionDeadline: seasons.submissionDeadline,
       submissionsLocked: seasons.submissionsLocked,
       updatedAt: seasons.updatedAt,
     })
@@ -392,13 +695,6 @@ test("mobile journey preserves privacy and gives the owner full control", async 
   expect(originalSeason?.finalSnapshotId).toBeNull();
   expect(originalSeason?.revealPredictions).toBe(false);
   expect(originalSeason?.submissionsLocked).toBe(false);
-  const isolatedNow = new Date(
-    process.env.PL_PREDICTIONS_TEST_NOW_ISO ?? new Date().toISOString(),
-  );
-  expect(
-    !originalSeason?.submissionDeadline ||
-      originalSeason.submissionDeadline.getTime() > isolatedNow.getTime(),
-  ).toBe(true);
 
   await page.goto("/");
   await expect(
@@ -451,6 +747,35 @@ test("mobile journey preserves privacy and gives the owner full control", async 
     "aria-label",
     /^Arsenal, predicted position 1 of 20$/,
   );
+  await page.getByRole("textbox", { name: "Your display name" }).fill(qaName);
+  await page
+    .getByRole("heading", { name: "Who is making this prediction?" })
+    .evaluate((element) => element.scrollIntoView({ block: "start" }));
+  await capturePlainEvidence(
+    page,
+    walkthroughScreenshotDirectory,
+    "step-1-table-mobile.png",
+  );
+  await page
+    .getByRole("button", { name: "Continue to spotlight picks" })
+    .click();
+  const alphabeticalWarning = page.getByRole("dialog", {
+    name: "This table is still alphabetical",
+  });
+  await expect(alphabeticalWarning).toBeVisible();
+  await captureAnnotatedEvidence(
+    page,
+    screenshotDirectory,
+    "alphabetical-warning-mobile.png",
+    "Intentional A–Z safeguard",
+    [
+      "The deterministic table is labelled as a blank slate.",
+      "Keep editing is safe; Yes, use A–Z records explicit page-memory intent.",
+    ],
+  );
+  await alphabeticalWarning
+    .getByRole("button", { name: "Keep editing" })
+    .click();
   const keyboardHandle = page.getByRole("button", { name: /^Move Arsenal,/ });
   await keyboardHandle.focus();
   await page.keyboard.press("ArrowDown");
@@ -470,6 +795,36 @@ test("mobile journey preserves privacy and gives the owner full control", async 
     page.getByRole("heading", { name: "Make your spotlight picks" }),
   ).toBeVisible();
   const customPlayerNames = await completeSpotlightPicks(page, qaName);
+  await expectCompletePredictionDraftPersisted(page, qaName);
+  await expect(page.getByText(/Draft saved in this browser/u)).toBeVisible();
+  await page
+    .getByRole("heading", { name: "Make your spotlight picks" })
+    .evaluate((element) => element.scrollIntoView({ block: "start" }));
+  await capturePlainEvidence(
+    page,
+    walkthroughScreenshotDirectory,
+    "step-2-spotlight-mobile.png",
+  );
+  await page.reload();
+  await expect(
+    page.getByRole("heading", { name: "Make your spotlight picks" }),
+  ).toBeVisible();
+  await expect(
+    page.getByText(/Draft restored from this browser/u),
+  ).toBeVisible();
+  await expect(
+    page.getByText(/^7 of 7 spotlight categories started\./u),
+  ).toBeVisible();
+  await captureAnnotatedEvidence(
+    page,
+    screenshotDirectory,
+    "draft-restored-mobile.png",
+    "Complete browser-local draft restored",
+    [
+      "Reload returns to Stage 2 with all seven category shapes intact.",
+      "Catalogue identities remain server-validated at submission.",
+    ],
+  );
   await page.getByRole("button", { name: "Review all predictions" }).click();
   const review = page.getByRole("dialog", {
     name: "Review every prediction",
@@ -481,7 +836,19 @@ test("mobile journey preserves privacy and gives the owner full control", async 
       .getByRole("list", { name: "Prediction review, positions 1 through 20" })
       .getByRole("listitem"),
   ).toHaveCount(20);
+  const reviewScroller = review.locator(".overflow-y-auto");
+  await reviewScroller.evaluate((element) => {
+    element.scrollTop = 0;
+  });
+  await expect
+    .poll(() => reviewScroller.evaluate((element) => element.scrollTop))
+    .toBe(0);
   await expectNoHorizontalOverflow(page);
+  await capturePlainEvidence(
+    page,
+    walkthroughScreenshotDirectory,
+    "step-3-review-mobile.png",
+  );
 
   await review.getByRole("button", { name: "Submit prediction" }).click();
   await expect(page.getByText(`You’re in, ${qaName}.`)).toBeVisible();
@@ -565,6 +932,47 @@ test("mobile journey preserves privacy and gives the owner full control", async 
     page.getByRole("heading", { level: 1, name: "Season control room" }),
   ).toBeVisible();
 
+  await page.goto("/admin/results", { waitUntil: "networkidle" });
+  await expect(
+    page.getByRole("heading", { level: 1, name: "Spotlight results" }),
+  ).toBeVisible();
+  for (const resultTableName of [
+    "Top scorer",
+    "Top assister",
+    "Most clean sheets",
+    "Underdog player ratings",
+    "Overrated player ratings",
+  ]) {
+    await expect(
+      page.getByRole("heading", { level: 3, name: resultTableName }),
+    ).toBeVisible();
+  }
+  const topScorerResults = page
+    .getByRole("heading", { level: 3, name: "Top scorer" })
+    .locator("xpath=ancestor::section");
+  await topScorerResults.getByRole("button", { name: "Add row" }).click();
+  await topScorerResults
+    .getByRole("spinbutton", { name: /^Top scorer Goals for /u })
+    .fill("3");
+  await expect(
+    topScorerResults.getByRole("cell", { exact: true, name: "1" }),
+  ).toBeVisible();
+  await expect(page.getByText("Unsaved changes", { exact: true })).toHaveCount(
+    1,
+  );
+  await expectNoHorizontalOverflow(page);
+  await topScorerResults.scrollIntoViewIfNeeded();
+  await page.evaluate(() => {
+    if (document.activeElement instanceof HTMLElement) {
+      document.activeElement.blur();
+    }
+  });
+  await capturePlainEvidence(
+    page,
+    screenshotDirectory,
+    "admin-results-mobile.png",
+  );
+
   await page.goto("/admin/standings", { waitUntil: "networkidle" });
   await expect(
     page.getByRole("heading", { level: 1, name: "Current standings" }),
@@ -609,8 +1017,6 @@ test("mobile journey preserves privacy and gives the owner full control", async 
     .limit(1);
   qaSnapshotId = seasonAfterStandings?.activeSnapshotId ?? null;
   expect(qaSnapshotId).toBeTruthy();
-  qaSnapshotCreatedByRun = !preexistingSnapshotIds!.has(qaSnapshotId!);
-
   const [createdRun] = await getQaDb()
     .select({ id: standingsImportRuns.id })
     .from(standingsImportRuns)
@@ -634,21 +1040,57 @@ test("mobile journey preserves privacy and gives the owner full control", async 
   qaAuditIds.push(...snapshotAudits.map((audit) => audit.id));
 
   await page.goto("/admin/settings", { waitUntil: "networkidle" });
+  await expect(
+    page.getByRole("heading", { level: 2, name: "Fixed submission deadline" }),
+  ).toBeVisible();
+  await expect(page.locator('input[type="datetime-local"]')).toHaveCount(0);
+  await expect(
+    page.getByText("Central Time baseline", { exact: true }),
+  ).toBeVisible();
+  await expect(
+    page
+      .getByText("Central Time baseline", { exact: true })
+      .locator("xpath=following-sibling::time"),
+  ).toContainText(/C(?:S|D)T/u);
+  const kickoffZone = page.getByLabel("View kickoff in another time zone");
+  await expect(kickoffZone).toHaveValue("America/Chicago");
+  await expect(
+    kickoffZone.locator("xpath=following-sibling::time"),
+  ).toContainText(/C(?:S|D)T/u);
+  await kickoffZone.selectOption("UTC");
+  await expect(
+    kickoffZone.locator("xpath=following-sibling::time"),
+  ).toContainText("UTC");
+  await expectNoHorizontalOverflow(page);
   await page
-    .getByRole("checkbox", { name: /Reveal predictions early/u })
-    .check();
-  page.once("dialog", (dialog) => dialog.accept());
-  await page.getByRole("button", { name: "Save season settings" }).click();
-  await expect(page).toHaveURL(/\/admin\/settings\?saved=1$/u);
+    .getByRole("heading", { level: 2, name: "Fixed submission deadline" })
+    .scrollIntoViewIfNeeded();
+  await captureAnnotatedEvidence(
+    page,
+    screenshotDirectory,
+    "admin-settings-mobile.png",
+    "Fixed kickoff and protected closure — isolated QA",
+    [
+      "The earlier-deadline editor is gone; kickoff is the only deadline.",
+      "The same instant is shown in Central Time and the selected IANA zone.",
+      "No lock or reveal action was invoked for this evidence image.",
+    ],
+  );
+  await page.getByRole("button", { name: "Reveal predictions early" }).click();
+  const revealDialog = page.getByRole("dialog", {
+    name: "Reveal predictions early?",
+  });
+  await revealDialog.getByLabel("Type REVEAL to confirm").fill("REVEAL");
+  await revealDialog.getByRole("button", { name: "Confirm REVEAL" }).click();
   await expect(page.getByRole("status")).toContainText(
-    "Season settings saved.",
+    "Predictions are public and submissions are permanently closed.",
   );
   const settingsAudits = await getQaDb()
     .select({ id: adminAuditLogs.id })
     .from(adminAuditLogs)
     .where(
       and(
-        eq(adminAuditLogs.action, "season.settings.updated"),
+        eq(adminAuditLogs.action, "season.predictions_revealed_early"),
         eq(adminAuditLogs.targetId, originalSeason!.id),
         gte(adminAuditLogs.createdAt, qaStartedAt!),
       ),

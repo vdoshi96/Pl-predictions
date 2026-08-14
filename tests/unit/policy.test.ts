@@ -2,17 +2,15 @@ import { describe, expect, it } from "vitest";
 import { getSeasonAccess } from "@/shared/policy";
 
 const before = new Date("2026-08-14T17:59:59.999Z");
-const deadline = new Date("2026-08-14T18:00:00.000Z");
 const openingKickoff = new Date("2026-08-21T19:00:00.000Z");
 
 describe("getSeasonAccess", () => {
-  it("accepts submissions and keeps entries private before the deadline", () => {
+  it("stays open until kickoff", () => {
     expect(
       getSeasonAccess(
         {
           openingKickoff,
           revealPredictions: false,
-          submissionDeadline: deadline,
           submissionsLocked: false,
         },
         before,
@@ -21,27 +19,26 @@ describe("getSeasonAccess", () => {
       deadlinePassed: false,
       predictionsRevealed: false,
       seasonStarted: false,
-      submissionDeadline: deadline,
+      submissionDeadline: openingKickoff,
       submissionsOpen: true,
     });
   });
 
-  it("closes and reveals at the exact deadline", () => {
+  it("closes and reveals at the exact opening kickoff", () => {
     expect(
       getSeasonAccess(
         {
           openingKickoff,
           revealPredictions: false,
-          submissionDeadline: deadline,
           submissionsLocked: false,
         },
-        deadline,
+        openingKickoff,
       ),
     ).toEqual({
       deadlinePassed: true,
       predictionsRevealed: true,
-      seasonStarted: false,
-      submissionDeadline: deadline,
+      seasonStarted: true,
+      submissionDeadline: openingKickoff,
       submissionsOpen: false,
     });
   });
@@ -52,7 +49,6 @@ describe("getSeasonAccess", () => {
         {
           openingKickoff,
           revealPredictions: true,
-          submissionDeadline: deadline,
           submissionsLocked: false,
         },
         before,
@@ -65,7 +61,6 @@ describe("getSeasonAccess", () => {
       {
         openingKickoff,
         revealPredictions: false,
-        submissionDeadline: null,
         submissionsLocked: true,
       },
       before,
@@ -80,7 +75,6 @@ describe("getSeasonAccess", () => {
         {
           openingKickoff,
           revealPredictions: false,
-          submissionDeadline: null,
           submissionsLocked: false,
         },
         new Date("2026-08-21T18:59:59.999Z"),
@@ -98,7 +92,6 @@ describe("getSeasonAccess", () => {
         {
           openingKickoff,
           revealPredictions: false,
-          submissionDeadline: null,
           submissionsLocked: false,
         },
         openingKickoff,
@@ -119,7 +112,6 @@ describe("getSeasonAccess", () => {
         {
           openingKickoff: historicalKickoff,
           revealPredictions: false,
-          submissionDeadline: null,
           submissionsLocked: false,
         },
         new Date("2026-01-01T00:00:00.000Z"),

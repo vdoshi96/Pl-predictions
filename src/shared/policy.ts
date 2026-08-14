@@ -6,7 +6,6 @@ import {
 export type SeasonAccessSettings = {
   openingKickoff: Date;
   revealPredictions: boolean;
-  submissionDeadline: Date | null;
   submissionsLocked: boolean;
 };
 
@@ -23,7 +22,6 @@ export function getSeasonAccess(
   now: Date,
 ): SeasonAccess {
   const submissionDeadline = getEffectiveSubmissionDeadline(
-    settings.submissionDeadline,
     settings.openingKickoff,
   );
   const deadlinePassed = now.getTime() >= submissionDeadline.getTime();

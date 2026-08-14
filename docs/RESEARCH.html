@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="generated-by" content="scripts/generate-docs-html.mjs" />
     <meta name="canonical-source" content="RESEARCH.md" />
-    <meta name="canonical-source-sha256" content="3483abd001224f7dea8319e8da35723a3f0d6d1495c2c03b910b68744858e85c" />
+    <meta name="canonical-source-sha256" content="cabd5791a1c9d03d7e6fb22781d808f229a694045c37bf704bf52398aa82ffbd" />
     <title>Research: Dranx Prediction League</title>
     <style>
       :root { color-scheme: light dark; font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
@@ -56,7 +56,7 @@
 <p>FotMob league ID <code>47</code> and the canonical team pages expose the factual external IDs used for import matching. Those identifiers are seeded once. The application stores only minimal snapshot facts: team ID, position, played, points, matchweek, capture time, and source URL.</p>
 <p>The terms review completed on 2026-08-08 recorded restrictions on robots/crawlers and systematic or regular extraction. That paragraph is retained as dated research rather than the current project permission gate. The Premier League separately says club names and badges remain member-club marks.</p>
 <p>Current disposition: on 2026-08-14 the owner confirmed that the required permissions for this player-catalogue workflow have been obtained, including acquisition, storage, redistribution, and production use. Owner-run FotMob or Transfermarkt acquisition may run offline and produce a reviewed local snapshot or result payload. Confidential licence documents remain outside source control and chat.</p>
-<p>Decision: do not implement source acquisition in the deployed product. The existing source-neutral importer remains limited to standings, and the app also supports manual standings. The app stores no source HTML, browser cookies, or subscription credentials and performs no runtime source request, scrape, image hotlink, football API call, or scheduled acquisition.</p>
+<p>Decision: do not implement source acquisition in the deployed product. The existing source-neutral importer remains limited to standings, and the app also supports manual standings. Reviewed goals, assists, club clean sheets, and shared player ratings enter through authenticated <code>/admin/results</code>; that desk versions manually reviewed facts and is not an acquisition client. The app stores no source HTML, browser cookies, or subscription credentials and performs no runtime source request, scrape, image hotlink, football API call, or scheduled acquisition.</p>
 <p>Historical crest finding: under the 2026-08-08 terms-only review, FotMob image URLs identified the genuine marks but were not treated as redistribution or hotlinking permission. The project owner&#39;s later 20-file PNG handoff superseded the presentation portion of the original monogram decision for this exact local set. <code>TeamMark</code> uses contain sizing and a safe initials fallback; original SVG monograms remain rollback-only during the first PNG release. The deployed application still does not fetch or hotlink them.</p>
 <p>Sources:</p>
 <ul>
@@ -107,9 +107,9 @@
 <li>Supabase, Firebase, external auth, and Redis: unnecessary and explicitly out of scope.</li>
 </ul>
 <h2 id="failure-behavior">Failure behavior</h2>
-<p>Malformed, stale, duplicate, unauthorized, or incomplete imports never replace the last active snapshot. All-zero preseason tables remain unscored. If no valid active standings exist, the leaderboard still shows submission count and a clear scoring-not-started state. Manual admin entry remains available even when the external source is inaccessible.</p>
+<p>Malformed, stale, duplicate, unauthorized, or incomplete standings imports never replace the last active table. All-zero preseason tables remain unscored. If no valid active standings exist, the leaderboard still shows submission count and a clear scoring-not-started state. Manual standings entry remains available even when the external source is inaccessible. Manual spotlight-result saves are separately sealed and pointer-guarded: a malformed or stale attempt preserves the last active factual version, while missing datasets and unresolved Other-player identities remain pending.</p>
 
-      <p class="source">Generated deterministically from <a href="RESEARCH.md">docs/RESEARCH.md</a>. Canonical SHA-256: <code>3483abd001224f7dea8319e8da35723a3f0d6d1495c2c03b910b68744858e85c</code>.</p>
+      <p class="source">Generated deterministically from <a href="RESEARCH.md">docs/RESEARCH.md</a>. Canonical SHA-256: <code>cabd5791a1c9d03d7e6fb22781d808f229a694045c37bf704bf52398aa82ffbd</code>.</p>
     </main>
   </body>
 </html>

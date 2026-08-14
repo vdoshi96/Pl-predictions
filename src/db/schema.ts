@@ -5,6 +5,7 @@ import {
   index,
   integer,
   jsonb,
+  numeric,
   pgTable,
   primaryKey,
   smallint,
@@ -211,6 +212,10 @@ export const players = pgTable(
       table.seasonId,
       table.externalId,
     ),
+    uniqueIndex("players_season_normalized_display_name_unique").on(
+      table.seasonId,
+      sql`lower(regexp_replace(btrim(${table.displayName}), '[[:space:]]+', ' ', 'g'))`,
+    ),
     index("players_season_sort_name_idx").on(table.seasonId, table.sortName),
     index("players_team_id_idx").on(table.teamId),
     check(
@@ -282,6 +287,213 @@ export const predictionCategoryPicks = pgTable(
           )
         )
       )`,
+    ),
+  ],
+);
+
+export const spotlightResultSnapshots = pgTable(
+  "spotlight_result_snapshots",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    seasonId: uuid("season_id")
+      .notNull()
+      .references(() => seasons.id, { onDelete: "cascade" }),
+    dataset: varchar("dataset", { length: 32 }).notNull(),
+    source: varchar("source", { length: 64 }).notNull(),
+    sourceReference: text("source_reference"),
+    capturedAt: timestamp("captured_at", {
+      mode: "date",
+      withTimezone: true,
+    }).notNull(),
+    coveredThroughRank: smallint("covered_through_rank"),
+    contentHash: varchar("content_hash", { length: 64 }).notNull(),
+    sealedAt: timestamp("sealed_at", {
+      mode: "date",
+      withTimezone: true,
+    }),
+    createdAt: timestamp("created_at", { mode: "date", withTimezone: true })
+      .defaultNow()
+      .notNull(),
+  },
+  (table) => [
+    index("spotlight_result_snapshots_content_idx").on(
+      table.seasonId,
+      table.dataset,
+      table.contentHash,
+    ),
+    index("spotlight_result_snapshots_season_dataset_created_idx").on(
+      table.seasonId,
+      table.dataset,
+      table.createdAt,
+    ),
+    check(
+      "spotlight_result_snapshots_dataset_check",
+      sql`${table.dataset} in ('goals', 'assists', 'clean_sheets', 'player_ratings')`,
+    ),
+    check(
+      "spotlight_result_snapshots_coverage_check",
+      sql`${table.coveredThroughRank} is null or ${table.coveredThroughRank} between 1 and 1000`,
+    ),
+    check(
+      "spotlight_result_snapshots_content_hash_check",
+      sql`char_length(${table.contentHash}) = 64`,
+    ),
+    check(
+      "spotlight_result_snapshots_sealed_at_check",
+      sql`${table.sealedAt} is null or ${table.sealedAt} >= ${table.createdAt}`,
+    ),
+  ],
+);
+
+export const spotlightResultItems = pgTable(
+  "spotlight_result_items",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    snapshotId: uuid("snapshot_id")
+      .notNull()
+      .references(() => spotlightResultSnapshots.id, { onDelete: "cascade" }),
+    playerId: uuid("player_id").references(() => players.id, {
+      onDelete: "restrict",
+    }),
+    teamId: uuid("team_id").references(() => teams.id, {
+      onDelete: "restrict",
+    }),
+    metricValue: numeric("metric_value", {
+      mode: "number",
+      precision: 8,
+      scale: 3,
+    }).notNull(),
+    outcomeRank: smallint("outcome_rank").notNull(),
+  },
+  (table) => [
+    uniqueIndex("spotlight_result_items_snapshot_player_unique").on(
+      table.snapshotId,
+      table.playerId,
+    ),
+    uniqueIndex("spotlight_result_items_snapshot_team_unique").on(
+      table.snapshotId,
+      table.teamId,
+    ),
+    index("spotlight_result_items_player_idx").on(table.playerId),
+    index("spotlight_result_items_team_idx").on(table.teamId),
+    check(
+      "spotlight_result_items_subject_check",
+      sql`(
+        ${table.playerId} is not null
+        and ${table.teamId} is null
+      ) or (
+        ${table.playerId} is null
+        and ${table.teamId} is not null
+      )`,
+    ),
+    check(
+      "spotlight_result_items_metric_check",
+      sql`${table.metricValue} >= 0`,
+    ),
+    check(
+      "spotlight_result_items_rank_check",
+      sql`${table.outcomeRank} between 1 and 1000`,
+    ),
+  ],
+);
+
+export const spotlightResultStates = pgTable(
+  "spotlight_result_states",
+  {
+    seasonId: uuid("season_id")
+      .notNull()
+      .references(() => seasons.id, { onDelete: "cascade" }),
+    dataset: varchar("dataset", { length: 32 }).notNull(),
+    workingSnapshotId: uuid("working_snapshot_id").references(
+      () => spotlightResultSnapshots.id,
+      { onDelete: "restrict" },
+    ),
+    activeSnapshotId: uuid("active_snapshot_id").references(
+      () => spotlightResultSnapshots.id,
+      { onDelete: "restrict" },
+    ),
+    finalSnapshotId: uuid("final_snapshot_id").references(
+      () => spotlightResultSnapshots.id,
+      { onDelete: "restrict" },
+    ),
+    updatedAt: timestamp("updated_at", { mode: "date", withTimezone: true })
+      .defaultNow()
+      .notNull(),
+  },
+  (table) => [
+    primaryKey({
+      name: "spotlight_result_states_season_dataset_pk",
+      columns: [table.seasonId, table.dataset],
+    }),
+    check(
+      "spotlight_result_states_dataset_check",
+      sql`${table.dataset} in ('goals', 'assists', 'clean_sheets', 'player_ratings')`,
+    ),
+    check(
+      "spotlight_result_states_final_active_check",
+      sql`${table.finalSnapshotId} is null or ${table.finalSnapshotId} = ${table.activeSnapshotId}`,
+    ),
+  ],
+);
+
+export const spotlightResultAliases = pgTable(
+  "spotlight_result_aliases",
+  {
+    seasonId: uuid("season_id")
+      .notNull()
+      .references(() => seasons.id, { onDelete: "cascade" }),
+    normalizedCustomPlayerName: varchar("normalized_custom_player_name", {
+      length: 120,
+    }).notNull(),
+    customPlayerName: varchar("custom_player_name", { length: 120 }).notNull(),
+    playerId: uuid("player_id")
+      .notNull()
+      .references(() => players.id, { onDelete: "restrict" }),
+    createdAt: timestamp("created_at", { mode: "date", withTimezone: true })
+      .defaultNow()
+      .notNull(),
+    updatedAt: timestamp("updated_at", { mode: "date", withTimezone: true })
+      .defaultNow()
+      .notNull(),
+  },
+  (table) => [
+    primaryKey({
+      name: "spotlight_result_aliases_season_name_pk",
+      columns: [table.seasonId, table.normalizedCustomPlayerName],
+    }),
+    index("spotlight_result_aliases_player_idx").on(table.playerId),
+    check(
+      "spotlight_result_aliases_name_check",
+      sql`char_length(${table.customPlayerName}) between 2 and 120
+        and char_length(${table.normalizedCustomPlayerName}) between 2 and 120`,
+    ),
+  ],
+);
+
+export const spotlightResultSnapshotAliases = pgTable(
+  "spotlight_result_snapshot_aliases",
+  {
+    snapshotId: uuid("snapshot_id")
+      .notNull()
+      .references(() => spotlightResultSnapshots.id, { onDelete: "cascade" }),
+    normalizedCustomPlayerName: varchar("normalized_custom_player_name", {
+      length: 120,
+    }).notNull(),
+    customPlayerName: varchar("custom_player_name", { length: 120 }).notNull(),
+    playerId: uuid("player_id")
+      .notNull()
+      .references(() => players.id, { onDelete: "restrict" }),
+  },
+  (table) => [
+    primaryKey({
+      name: "spotlight_result_snapshot_aliases_snapshot_name_pk",
+      columns: [table.snapshotId, table.normalizedCustomPlayerName],
+    }),
+    index("spotlight_result_snapshot_aliases_player_idx").on(table.playerId),
+    check(
+      "spotlight_result_snapshot_aliases_name_check",
+      sql`char_length(${table.customPlayerName}) between 2 and 120
+        and char_length(${table.normalizedCustomPlayerName}) between 2 and 120`,
     ),
   ],
 );
@@ -517,6 +729,21 @@ export type PredictionCategoryPick =
   typeof predictionCategoryPicks.$inferSelect;
 export type NewPredictionCategoryPick =
   typeof predictionCategoryPicks.$inferInsert;
+export type SpotlightResultSnapshot =
+  typeof spotlightResultSnapshots.$inferSelect;
+export type NewSpotlightResultSnapshot =
+  typeof spotlightResultSnapshots.$inferInsert;
+export type SpotlightResultItem = typeof spotlightResultItems.$inferSelect;
+export type NewSpotlightResultItem = typeof spotlightResultItems.$inferInsert;
+export type SpotlightResultState = typeof spotlightResultStates.$inferSelect;
+export type NewSpotlightResultState = typeof spotlightResultStates.$inferInsert;
+export type SpotlightResultAlias = typeof spotlightResultAliases.$inferSelect;
+export type NewSpotlightResultAlias =
+  typeof spotlightResultAliases.$inferInsert;
+export type SpotlightResultSnapshotAlias =
+  typeof spotlightResultSnapshotAliases.$inferSelect;
+export type NewSpotlightResultSnapshotAlias =
+  typeof spotlightResultSnapshotAliases.$inferInsert;
 export type StandingsSnapshot = typeof standingsSnapshots.$inferSelect;
 export type NewStandingsSnapshot = typeof standingsSnapshots.$inferInsert;
 export type StandingsItem = typeof standingsItems.$inferSelect;

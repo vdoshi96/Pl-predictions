@@ -12,6 +12,7 @@ import type { PredictionTeam } from "./prediction-sorter";
 import type { SpotlightReviewItem } from "./spotlight-predictions-form";
 
 export interface ReviewDialogProps {
+  confirmDisabled?: boolean;
   open: boolean;
   participantName: string;
   spotlightPicks: SpotlightReviewItem[];
@@ -23,6 +24,7 @@ export interface ReviewDialogProps {
 }
 
 export function ReviewDialog({
+  confirmDisabled = false,
   open,
   participantName,
   spotlightPicks,
@@ -192,7 +194,7 @@ export function ReviewDialog({
               <Button
                 size="lg"
                 onClick={onConfirm}
-                disabled={pending}
+                disabled={pending || confirmDisabled}
                 aria-busy={pending}
               >
                 {pending ? "Submitting…" : "Submit prediction"}

@@ -15,7 +15,7 @@ import {
   isFinalStandingsCandidate,
   requireAdminMutation,
 } from "@/features/admin";
-import { getActiveSeasonView } from "@/features/seasons/queries";
+import { getActiveSeasonContext } from "@/features/seasons/queries";
 import {
   finalizeSnapshotAtomically,
   undoFinalSnapshotAtomically,
@@ -34,7 +34,7 @@ export async function saveManualStandings(
 ): Promise<ManualStandingsResult> {
   try {
     await requireAdminMutation();
-    const { season } = await getActiveSeasonView();
+    const { season } = await getActiveSeasonContext();
     const result = await importCanonicalStandings({
       capturedAt: new Date().toISOString(),
       isFinal: false,
@@ -74,7 +74,7 @@ export async function saveManualStandings(
 
 export async function finalizeActiveSnapshot() {
   await requireAdminMutation();
-  const { season } = await getActiveSeasonView();
+  const { season } = await getActiveSeasonContext();
   if (!season.activeSnapshotId)
     throw new Error("No active snapshot to finalize.");
   const db = getDb();
@@ -99,7 +99,7 @@ export async function finalizeActiveSnapshot() {
 
 export async function undoFinalSnapshot() {
   await requireAdminMutation();
-  const { season } = await getActiveSeasonView();
+  const { season } = await getActiveSeasonContext();
   if (!season.finalSnapshotId) throw new Error("The season is not final.");
   const audit = await getAdminAuditMetadata();
   const db = getDb();

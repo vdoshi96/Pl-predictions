@@ -13,6 +13,7 @@ import Link from "next/link";
 
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
+import { RULES_PENDING_RESULTS_MESSAGE } from "@/content/public-copy";
 import { HowToPlay } from "@/components/how-to-play";
 
 export const metadata: Metadata = { title: "How to play & scoring" };
@@ -116,7 +117,7 @@ export default function RulesPage() {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card id="spotlight-scoring">
           <CardContent>
             <div className="flex items-start gap-3">
               <span className="grid size-11 shrink-0 place-items-center rounded-xl bg-[#ffe3ef] text-[#8f0033]">
@@ -189,12 +190,12 @@ export default function RulesPage() {
                 The 2026-08-13 snapshot covers 582 players across all 20 clubs.
                 It is the owner-selected, internally reconciled roster for this
                 game, not an independently verified official league list. Player
-                selectors search first, last, or full name; 582 supplied
-                portraits appear locally. Choose Other player for anyone
-                unavailable or new. A silhouette appears only if a portrait is
-                missing or fails to load. Custom names must be matched to a
-                manually entered result list before they receive an accuracy
-                result.
+                selectors search first, last, or full name after two letters and
+                show up to 20 matches; 582 supplied portraits appear locally.
+                Choose Other player for anyone unavailable or new. A silhouette
+                appears only if a portrait is missing or fails to load. Each
+                custom name must be matched to a canonical season player before
+                its reviewed result dataset can be published and scored.
               </p>
             </CardContent>
           </Card>
@@ -227,11 +228,8 @@ export default function RulesPage() {
                 The app now stores and displays all seven picks. Underdog-team
                 and overrated-team accuracy can recalculate from the group
                 tables and active standings. The player roster and available
-                portraits are loaded. An owner-run Codex automation may acquire
-                the other five outcome lists offline, review them, and enter
-                them through an approved path. There is no runtime football-data
-                request, scraper, image hotlink, or cron. Only complete
-                submitted entries can appear in the active bracket count.
+                portraits are loaded. {RULES_PENDING_RESULTS_MESSAGE} Only
+                complete submitted entries appear in the active bracket count.
               </p>
             </div>
           </CardContent>

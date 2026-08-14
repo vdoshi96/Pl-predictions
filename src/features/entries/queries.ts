@@ -15,7 +15,7 @@ import {
 import { getAdminSession } from "@/features/admin";
 import { hasPredictionReceipt } from "@/features/predictions/receipt";
 import { getSpotlightPicksByPredictionId } from "@/features/leaderboard/pick-queries";
-import { getLeaderboardView } from "@/features/leaderboard/queries";
+import { getEntrySpotlightPicksWithAccuracy } from "@/features/leaderboard/queries";
 import type { SpotlightPickDisplay } from "@/features/leaderboard/spotlight-pick-grid";
 import { authoritativeDatabaseTimeSql } from "@/features/seasons/clock";
 import { hasSeasonStarted } from "@/features/seasons/deadline";
@@ -69,7 +69,14 @@ export async function getEntryComparison(
       id: predictions.id,
       participantName: predictions.participantName,
       receiptTokenHash: predictions.receiptTokenHash,
-      season: seasons,
+      season: {
+        activeSnapshotId: seasons.activeSnapshotId,
+        id: seasons.id,
+        openingKickoff: seasons.openingKickoff,
+        revealPredictions: seasons.revealPredictions,
+        standingsAcceptedThrough: seasons.standingsAcceptedThrough,
+        submissionsLocked: seasons.submissionsLocked,
+      },
     })
     .from(predictions)
     .innerJoin(seasons, eq(seasons.id, predictions.seasonId))
@@ -82,7 +89,6 @@ export async function getEntryComparison(
     {
       openingKickoff: entry.season.openingKickoff,
       revealPredictions: entry.season.revealPredictions,
-      submissionDeadline: entry.season.submissionDeadline,
       submissionsLocked: entry.season.submissionsLocked,
     },
     entry.databaseNow,
@@ -146,12 +152,15 @@ export async function getEntryComparison(
       ? scoring.summary.items.map((item) => [item.teamId, item] as const)
       : [],
   );
-  const spotlightAccuracyEntry =
-    scoring.status === "scored"
-      ? (await getLeaderboardView()).spotlightAccuracyEntries?.find(
-          (leaderboardEntry) => leaderboardEntry.id === entry.id,
-        )
-      : null;
+  const spotlightPicksWithAccuracy = access.predictionsRevealed
+    ? await getEntrySpotlightPicksWithAccuracy({
+        actualTable: actualRows,
+        predictionId: entry.id,
+        seasonId: entry.season.id,
+        spotlightPicks,
+        teamScoringActive: scoring.status === "scored",
+      })
+    : spotlightPicks;
 
   return {
     comparisonItems: predictedRows.map((item) => {
@@ -176,7 +185,7 @@ export async function getEntryComparison(
           matchweek: snapshot.matchweek,
         }
       : null,
-    spotlightPicks: spotlightAccuracyEntry?.spotlightPicks ?? spotlightPicks,
+    spotlightPicks: spotlightPicksWithAccuracy,
     tableScore: scoring.status === "scored" ? scoring.summary.total : null,
     totalScore: scoring.status === "scored" ? scoring.summary.total : null,
   };

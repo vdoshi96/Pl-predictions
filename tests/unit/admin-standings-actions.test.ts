@@ -4,7 +4,7 @@ const mocks = vi.hoisted(() => ({
   batch: vi.fn(),
   finalizeSnapshotAtomically: vi.fn(),
   getAdminAuditMetadata: vi.fn(),
-  getActiveSeasonView: vi.fn(),
+  getActiveSeasonContext: vi.fn(),
   getDb: vi.fn(),
   redirect: vi.fn(),
   requireAdminMutation: vi.fn(),
@@ -38,7 +38,7 @@ vi.mock("@/features/admin", () => ({
   requireAdminMutation: mocks.requireAdminMutation,
 }));
 vi.mock("@/features/seasons/queries", () => ({
-  getActiveSeasonView: mocks.getActiveSeasonView,
+  getActiveSeasonContext: mocks.getActiveSeasonContext,
 }));
 vi.mock("@/features/standings/finalization", () => ({
   finalizeSnapshotAtomically: mocks.finalizeSnapshotAtomically,
@@ -75,7 +75,7 @@ function databaseWithCandidate(
 
 beforeEach(() => {
   vi.clearAllMocks();
-  mocks.getActiveSeasonView.mockResolvedValue({
+  mocks.getActiveSeasonContext.mockResolvedValue({
     season: {
       activeSnapshotId: "00000000-0000-4000-8000-000000000001",
       finalSnapshotId: "00000000-0000-4000-8000-000000000001",

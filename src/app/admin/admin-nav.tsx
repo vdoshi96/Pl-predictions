@@ -9,6 +9,7 @@ const links = [
   { href: "/admin/submissions", label: "Submissions" },
   { href: "/admin/settings", label: "Settings" },
   { href: "/admin/standings", label: "Standings" },
+  { href: "/admin/results", label: "Results" },
 ] as const;
 
 type AdminRoute = (typeof links)[number]["href"];

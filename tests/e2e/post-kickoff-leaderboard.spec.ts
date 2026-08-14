@@ -127,7 +127,6 @@ test.afterEach(async () => {
         revealPredictions: fixture.originalSeason.revealPredictions,
         standingsAcceptedThrough:
           fixture.originalSeason.standingsAcceptedThrough,
-        submissionDeadline: fixture.originalSeason.submissionDeadline,
         submissionsLocked: fixture.originalSeason.submissionsLocked,
         updatedAt: fixture.originalSeason.updatedAt,
       })
@@ -149,7 +148,6 @@ test.afterEach(async () => {
           revealPredictions: fixture.originalSeason.revealPredictions,
           standingsAcceptedThrough:
             fixture.originalSeason.standingsAcceptedThrough,
-          submissionDeadline: fixture.originalSeason.submissionDeadline,
           submissionsLocked: fixture.originalSeason.submissionsLocked,
           updatedAt: fixture.originalSeason.updatedAt,
         })
@@ -237,6 +235,10 @@ test("post-kickoff table and spotlight rankings stay split at desktop and mobile
     originalSeason,
     "The isolated database must contain the active season.",
   ).toBeDefined();
+  expect(
+    originalSeason?.submissionDeadline,
+    "The legacy earlier-deadline field must remain an untouched null sentinel.",
+  ).toBeNull();
 
   const [existingPredictionCount] = await db
     .select({ value: count() })
@@ -344,7 +346,6 @@ test("post-kickoff table and spotlight rankings stay split at desktop and mobile
       finalSnapshotId: null,
       revealPredictions: true,
       standingsAcceptedThrough: preKickoffCapturedAt,
-      submissionDeadline: new Date("2026-08-21T19:00:00.000Z"),
       submissionsLocked: true,
       updatedAt: preKickoffCapturedAt,
     })

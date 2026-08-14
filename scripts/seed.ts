@@ -10,32 +10,8 @@ import {
   PREMIER_LEAGUE_2026_27_TEAMS,
 } from "@/data";
 import { getDb, type Database } from "@/db/client";
-import { players, seasons, teams } from "@/db/schema";
-import { assertDeadlineNotAfterOpeningKickoff } from "@/features/seasons/deadline";
-
-export function parseSeedDeadline(
-  value = process.env.PREDICTION_DEADLINE_ISO,
-): Date | null {
-  const candidate = value?.trim();
-  if (!candidate) return null;
-
-  if (!/(?:Z|[+-]\d{2}:\d{2})$/u.test(candidate)) {
-    throw new Error(
-      "PREDICTION_DEADLINE_ISO must include Z or an explicit UTC offset.",
-    );
-  }
-
-  const deadline = new Date(candidate);
-  if (Number.isNaN(deadline.getTime())) {
-    throw new Error("PREDICTION_DEADLINE_ISO must be a valid ISO timestamp.");
-  }
-
-  assertDeadlineNotAfterOpeningKickoff(deadline);
-  return deadline.getTime() ===
-    Date.parse(ACTIVE_SEASON.openingFixture.kickoffIso)
-    ? null
-    : deadline;
-}
+import { players, seasons, spotlightResultStates, teams } from "@/db/schema";
+import { SPOTLIGHT_RESULT_DATASETS } from "@/features/results/types";
 
 export function buildPlayerSeedValues(
   seasonId: string,
@@ -77,7 +53,6 @@ export async function seedDatabase(db: Database = getDb()): Promise<{
       openingKickoff: new Date(ACTIVE_SEASON.openingFixture.kickoffIso),
       slug: ACTIVE_SEASON.slug,
       startYear: ACTIVE_SEASON.startYear,
-      submissionDeadline: parseSeedDeadline(),
     })
     .onConflictDoNothing({ target: seasons.slug });
 
@@ -90,6 +65,16 @@ export async function seedDatabase(db: Database = getDb()): Promise<{
   if (!season) {
     throw new Error("The active season could not be created or loaded.");
   }
+
+  await db
+    .insert(spotlightResultStates)
+    .values(
+      SPOTLIGHT_RESULT_DATASETS.map((dataset) => ({
+        dataset,
+        seasonId: season.id,
+      })),
+    )
+    .onConflictDoNothing();
 
   const updatedAt = new Date();
   const teamUpserts = PREMIER_LEAGUE_2026_27_TEAMS.map((team) =>

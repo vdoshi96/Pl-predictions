@@ -9,7 +9,10 @@ import {
   predictionItems,
   predictions,
 } from "../../src/db/schema";
-import { completeSpotlightPicks } from "./spotlight-helpers";
+import {
+  acceptAlphabeticalPrediction,
+  completeSpotlightPicks,
+} from "./spotlight-helpers";
 
 const qaName = `Production QA ${Date.now().toString(36)}`;
 let qaEntryId: string | null = null;
@@ -193,6 +196,7 @@ test("production enforces its current submission state and cleans any QA entry",
   await participantName.fill(qaName);
   await expect(continueButton).toBeEnabled();
   await continueButton.click();
+  await acceptAlphabeticalPrediction(page);
   const privatePlayerNames = await completeSpotlightPicks(page, qaName);
   await page.getByRole("button", { name: "Review all predictions" }).click();
   submissionAttempted = true;

@@ -83,7 +83,6 @@ export function buildAtomicPredictionInsertQuery(
         "id",
         "opening_kickoff",
         "reveal_predictions",
-        "submission_deadline",
         "submissions_locked"
       from "seasons"
       where "id" = ${input.seasonId}::uuid
@@ -101,10 +100,6 @@ export function buildAtomicPredictionInsertQuery(
       where "submissions_locked" = false
         and "reveal_predictions" = false
         and "checked_at" < "opening_kickoff"
-        and (
-          "submission_deadline" is null
-          or "checked_at" < "submission_deadline"
-        )
     ),
     inserted_prediction as (
       insert into "predictions" (

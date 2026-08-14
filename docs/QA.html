@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="generated-by" content="scripts/generate-docs-html.mjs" />
     <meta name="canonical-source" content="QA.md" />
-    <meta name="canonical-source-sha256" content="d5f751e318ecfae406a11be09c3b3d1d01534a781e90c12af7a8e2fc17e1a03e" />
+    <meta name="canonical-source-sha256" content="28ba0a865578d1ba2623f8946b0fd5eb3b72e6d862b301caf56b5c3f8834045c" />
     <title>Quality assurance</title>
     <style>
       :root { color-scheme: light dark; font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
@@ -40,7 +40,61 @@
   <body>
     <main>
       <h1 id="quality-assurance">Quality assurance</h1>
-<p>Evidence date: 2026-08-14. The current evidence covers the completed August 13 roster/portrait release from local reconciliation through GitHub merge, production deployment, Neon recovery proof, one supported seed, read-only production verification, evidence closeout, and repository cleanup. The completed August 8 how-to, database-time countdown, retained test entry, and fixture-retirement evidence remains below as dated production history.</p>
+<p>Evidence date: 2026-08-14. The current evidence covers the adversarial-review remediation for findings 3 and 8–13. Code, isolated database, production build, browser, visual, documentation, and additive production-migration gates are complete; GitHub merge, exact deployment verification, bounded production smoke, evidence closeout, and repository cleanup remain required before this work can be called released. The August 13 roster/portrait application remains the deployed production baseline until the remediation code is released. The completed August 13 roster/portrait release and August 8 feature evidence remain below as dated production history.</p>
+<h2 id="adversarial-review-remediation-local-verification-complete">Adversarial-review remediation: local verification complete</h2>
+<p>The participant draft, manual results workflow, narrow and lazy player-catalogue delivery, bounded player search, explicit A–Z intent check, participant-facing copy, and fixed-kickoff/typed-closure controls for findings 3 and 8–13 are implemented in the isolated feature worktree. Findings 1, 2, 4, 5, 6, and 7 remain intentionally out of scope.</p>
+<table>
+<thead>
+<tr>
+<th>Gate</th>
+<th>Result</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Fresh isolated schema</td>
+<td>Passed: migrations <code>0000</code> through <code>0007</code> applied cleanly and the supported seed completed against <code>pl_results_sealed_20260814_c</code>. The final results-focused Neon run passed 4 of 4 cases on that fresh schema.</td>
+</tr>
+<tr>
+<td>Complete integration</td>
+<td>Passed all 18 isolated Neon cases across both integration files, including result sealing/aliases/ties/CAS, targeted player validation, closure row-lock races, and last-good preservation.</td>
+</tr>
+<tr>
+<td>Unit and component coverage</td>
+<td>Passed the complete local suite: 256 tests passed and 20 guarded integration cases skipped in the non-integration run.</td>
+</tr>
+<tr>
+<td>Static and schema checks</td>
+<td>Full formatting, ESLint, strict TypeScript, Drizzle schema consistency, the 582-player/portrait release validator, and <code>git diff --check</code> passed.</td>
+</tr>
+<tr>
+<td>Production build</td>
+<td><code>npm run build:verify</code> passed with Webpack and emitted <code>/admin/results</code> plus dynamic <code>/api/player-catalogue</code>; the client-boundary scan found no server result-transition code in browser chunks.</td>
+</tr>
+<tr>
+<td>Browser acceptance</td>
+<td>The isolated pre-kickoff matrix passed 7 routed journeys with 13 intentional skips: desktop Chromium, 390-pixel mobile Chromium, exact 320/430-pixel Chromium participant/admin reflow, and mobile WebKit. The fixed-clock post-kickoff matrix passed desktop and exact 320/430-pixel Chromium (3 passed, 2 intentional skips). Cleanup assertions left no prediction, standings, audit, or season-state residue.</td>
+</tr>
+<tr>
+<td>Visual evidence</td>
+<td>Passed visual inspection for four new isolated QA images (<code>alphabetical-warning</code>, <code>draft-restored</code>, <code>admin-results</code>, and <code>admin-settings</code>) and three recaptured 390 × 844 public walkthrough sources. The results image records a local unsaved row only; no Save, Publish, Finalize, Lock, or Reveal action was invoked.</td>
+</tr>
+<tr>
+<td>Documentation parity</td>
+<td><code>npm run docs:generate</code> wrote the 11 stale peers, and <code>npm run docs:check</code> verified all 14 Markdown/HTML pairs.</td>
+</tr>
+<tr>
+<td>Aggregate-chain boundary</td>
+<td>A final <code>CI=1 npm run check</code> attempt completed documentation and player checks, formatting, ESLint, strict TypeScript, the 256-passed/20-skipped unit suite, all 18 isolated Neon integration cases, and the Webpack production build. It did not pass overall: the isolated development-server Playwright stage repeatedly encountered Next Fast Refresh reloads, truncated JSON responses, and router-initialization corruption. The equivalent standalone production-server Chromium matrix (including exact 320/430-pixel coverage) and mobile WebKit journey, plus the separate fixed-clock post-kickoff matrix, remain green as recorded above.</td>
+</tr>
+<tr>
+<td>Production migration</td>
+<td>Passed the migration-first stop gate. Read-only preflight found the active season&#39;s legacy deadline <code>NULL</code>, 599 total/582 active players, zero normalized display-name duplicates, migration history ending at <code>0005</code>, and no result tables. Additive migrations <code>0006</code> and <code>0007</code> then ran before the remediation code release. A transaction-scoped <code>READ ONLY</code> postcheck followed by <code>ROLLBACK</code> found all 8 migration rows with exact committed hashes (<code>0006</code>: <code>1000ff0034a9954dbb4aeedcd26ece126b39adacc069d084c0d9945deb0c4be0</code>; <code>0007</code>: <code>6b539a65a70a896bead07ba7010bd71834874bb3b3b1b5ae784536ef0f914db4</code>), exactly four pending dataset states with every working/active/final pointer <code>NULL</code>, zero result snapshots/items/aliases, the expected 3 unique indexes and 14 valid enabled triggers, zero closure/result audit rows, and <code>submissions_locked = false</code> plus <code>predictions_revealed = false</code>. The migration created no result facts and left the previously deployed application compatible.</td>
+</tr>
+<tr>
+<td>Remaining release gates</td>
+<td>Pending: GitHub merge, exact Ready deployment verification, bounded read-only production smoke, final production-evidence refresh, local-main synchronization, test-database cleanup, and worktree removal. No release SHA, pull request, result publication, lock/reveal action, or remediation-code deployment is claimed yet.</td>
+</tr>
+</tbody></table>
 <h2 id="august-13-roster-refresh-completed-release-results">August 13 roster refresh: completed release results</h2>
 <table>
 <thead>
@@ -231,18 +285,28 @@
 <li>overrated player Alysson.</li>
 </ul>
 <p>The final post-release database verification exposed only safe aggregate facts: one parent, 20 child positions, seven category picks, and the sole display name <code>Dranx Test Entry</code>. It found no display name containing Alex or Jordan. It did not print prediction IDs, receipt material, database URLs, private pick subjects, or credentials. Before reveal, the public spotlight page reports one active bracket but does not serialize or display those seven choices.</p>
-<h2 id="annotated-live-mobile-walkthrough">Annotated live-mobile walkthrough</h2>
-<p>The participant-facing <code>/rules</code> section uses three first-party captures from the live 390 by 844 public flow:</p>
+<h2 id="current-mobile-walkthrough-sources">Current mobile walkthrough sources</h2>
+<p>The participant-facing <code>/rules</code> section uses three first-party captures from the current isolated 390 by 844 application flow:</p>
 <ol>
 <li><code>public/how-to-play/step-1-table-mobile.png</code> — ordered club table, reorder handles, display-name field, and continue action.</li>
 <li><code>public/how-to-play/step-2-spotlight-mobile.png</code> — selected player/club controls and the review action.</li>
 <li><code>public/how-to-play/step-3-review-mobile.png</code> — the complete 20-position and seven-pick review with the final submit action.</li>
 </ol>
-<p>Each image receives two numbered overlay pins at render time. The same numbers and instructions appear as adjacent HTML text, so the annotations remain accessible, selectable, responsive, and understandable without colour. The walkthrough draft used the unsaved display name “How to play preview”; it never created a second production entry.</p>
-<h2 id="production-deployment-and-mobile-evidence">Production deployment and mobile evidence</h2>
+<p>Each image receives two numbered overlay pins at render time. The same numbers and instructions appear as adjacent HTML text, so the annotations remain accessible, selectable, responsive, and understandable without colour. They were captured before the journey&#39;s reversible isolated submission; no production entry was created.</p>
+<h2 id="current-remediation-mobile-evidence">Current remediation mobile evidence</h2>
+<p>The completed isolated run added four 390 by 844 evidence images. The A–Z, restored-draft, and settings captures include in-image annotations; the results capture intentionally shows a local unsaved edit and the adjacent caption records its no-write boundary.</p>
+<p><strong>Intentional A–Z confirmation:</strong> the accessible dialog explains that the deterministic order is only a blank slate and offers Keep editing or Yes, use A–Z.</p>
+<p><img src="assets/qa/alphabetical-warning-mobile.png" alt="Isolated intentional alphabetical-order confirmation"></p>
+<p><strong>Complete browser-local draft restore:</strong> a reload returns to Stage 2 with all seven category shapes intact while the lazy catalogue reloads and Other player remains available.</p>
+<p><img src="assets/qa/draft-restored-mobile.png" alt="Isolated complete prediction draft restored on mobile"></p>
+<p><strong>Manual results desk:</strong> one local row is present with a numeric metric and a visible Unsaved changes state. The journey invoked no result Save, Publish, Finalize, or Undo action.</p>
+<p><img src="assets/qa/admin-results-mobile.png" alt="Isolated manual results row edit on mobile"></p>
+<p><strong>Fixed kickoff settings:</strong> the earlier-deadline editor is absent; the seeded countdown, Central baseline, selectable IANA-zone rendering, and separately protected closure actions remain. The capture invoked neither Lock nor Reveal.</p>
+<p><img src="assets/qa/admin-settings-mobile.png" alt="Isolated fixed-kickoff administrator settings on mobile"></p>
+<h2 id="august-13-production-deployment-and-mobile-evidence-historical">August 13 production deployment and mobile evidence (historical)</h2>
 <p>GitHub <a href="https://github.com/vdoshi96/Pl-predictions/pull/15">PR #15</a> merged the tested August 13 catalogue into <code>main</code> at <code>cc4129dbd1513675bb44424cb4c667694c74d120</code>. Vercel production deployment <code>dpl_2CAJEZ3cXpm7NU6K972sN31bVBkz</code> was Ready at <a href="https://pl-predictions-835vjpg3z-vdoshi96s-projects.vercel.app">https://pl-predictions-835vjpg3z-vdoshi96s-projects.vercel.app</a>. Deployment-ID read-back proved <a href="https://pl-predictions-2026.vercel.app">https://pl-predictions-2026.vercel.app</a> resolved to that same deployment at roster release verification time.</p>
 <p>The final read-only smoke passed all five browser projects against the immutable URL. It exercised the timer, all three entry stages without submitting, added Ronald Araujo, moved Dwight McNeil, restored Alysson, the absence of removed Lucas Digne, Other player&#39;s silhouette, the table leaderboard, private pre-reveal spotlight state, the annotated how-to, administrator login, 320–430-pixel reflow, WebKit, local imagery, no horizontal overflow, and browser/network/HTTP guards. All 582 active portrait URLs returned HTTP 200 with PNG content types and PNG signatures, all 21 obsolete paths returned HTTP 404, and the exact deployment&#39;s bounded error, fatal, and HTTP 5xx log queries returned no records.</p>
-<p>Only the newest completed production run is retained under <code>docs/assets/qa/</code>. All seven artifacts were visually inspected for readable type, clear hierarchy, painted local imagery, reachable actions, correct annotations, and absence of clipping. Their manifest SHA-256 is <code>6b5251c6fd96a70f5d32edc074101246303c76805deec1bf499ec382afee134d</code>.</p>
+<p>These seven named artifacts are the retained August 13 production set and remain below as dated release history while the four current isolated-remediation images above await the post-deploy production refresh. The seven historical artifacts were visually inspected for readable type, clear hierarchy, painted local imagery, reachable actions, correct annotations, and absence of clipping. Their recorded manifest SHA-256 is <code>6b5251c6fd96a70f5d32edc074101246303c76805deec1bf499ec382afee134d</code>.</p>
 <p><strong>Submission countdown — mobile Chromium at 390 by 844:</strong> the compact calendar-flip timer is prominent inside the open-submissions card without overwhelming the hero or first-stage action.</p>
 <p><img src="assets/qa/countdown-mobile.png" alt="Production submission countdown on mobile Chromium"></p>
 <p><strong>Prediction sorter — mobile Chromium at 390 by 844:</strong> the reordered table, 56-pixel handle, painted crests, and sticky continue action fit without horizontal overflow.</p>
@@ -273,7 +337,7 @@
 <li>The retained primary August 8 handoff has independent full manifest SHA-256 <code>29d8dc2efda79ae5cde906214b91402008d89dbde71adca97e837aeab15e7ee3</code>. Its substantive non-<code>.DS_Store</code> parity manifest is <code>e3c5d7c6ea5c75725fa4d3518333cd171e37d8a8cb407ecfa9fac0047bab3c5a</code>, and its symlink path/target manifest is <code>4e800f7c8103c59463469dfb492bdaaf1785a5f3e762a5427fc53596f540d888</code>. Primary and worktree substantive content plus symlinks matched; only two Finder <code>.DS_Store</code> files differed byte-for-byte.</li>
 <li>The retained primary August 13 handoff has independent full manifest SHA-256 <code>e1ee3b985b8e26799d0ec06632ebf9a1250ac1fab6e5749be0b4574a67aec83d</code>; the existing original-algorithm manifest <code>f625470979c156e233300ec42924eb858255d902a456af1283a089ae41169630</code> remains valid. Its worktree copy was byte-identical.</li>
 <li>The verified worktree duplicates moved recoverably to <code>/Users/vishal/.Trash/premier-league-players-2026-08-08-worktree-duplicate-2026-08-14</code> and <code>/Users/vishal/.Trash/premier-league-players-2026-08-13-worktree-duplicate-2026-08-14</code> before normal worktree removal and pruning.</li>
-<li>The superseded QA set and hash-identical output screenshot duplicates moved recoverably to <code>/Users/vishal/.Trash/Pl-Predictions-superseded-QA-2026-08-14</code>. The newest seven canonical screenshots remain under <code>docs/assets/qa/</code>, and the current output report/results remain retained.</li>
+<li>The superseded QA set and hash-identical output screenshot duplicates moved recoverably to <code>/Users/vishal/.Trash/Pl-Predictions-superseded-QA-2026-08-14</code>. The seven dated production screenshots remain under <code>docs/assets/qa/</code> alongside four current isolated-remediation images until the post-deploy production set is refreshed; the current output report/results remain retained.</li>
 <li>The local <code>roster/2026-08-13-player-update</code> and <code>vishal/august-13-player-catalogue-closeout</code> branches were deleted. Remote <code>roster/2026-08-13-player-update</code>, <code>vishal/august-13-player-catalogue-closeout</code>, <code>agent/dranx-brand-refresh</code>, and <code>agent/dranx-release-closeout</code> were deleted only after ancestry proof. One primary worktree remains.</li>
 <li>The unrelated untracked <code>Premier League 2026-27 PNG Assets/</code> folder remains intentionally retained and out of scope.</li>
 </ul>
@@ -287,7 +351,7 @@
 <li><input checked="" disabled="" type="checkbox"> Regenerate final HTML peers, publish this closeout through <code>main</code>, synchronize local and remote <code>main</code>, and remove completed branch state.</li>
 </ul>
 
-      <p class="source">Generated deterministically from <a href="QA.md">docs/QA.md</a>. Canonical SHA-256: <code>d5f751e318ecfae406a11be09c3b3d1d01534a781e90c12af7a8e2fc17e1a03e</code>.</p>
+      <p class="source">Generated deterministically from <a href="QA.md">docs/QA.md</a>. Canonical SHA-256: <code>28ba0a865578d1ba2623f8946b0fd5eb3b72e6d862b301caf56b5c3f8834045c</code>.</p>
     </main>
   </body>
 </html>

@@ -27,7 +27,7 @@ The terms review completed on 2026-08-08 recorded restrictions on robots/crawler
 
 Current disposition: on 2026-08-14 the owner confirmed that the required permissions for this player-catalogue workflow have been obtained, including acquisition, storage, redistribution, and production use. Owner-run FotMob or Transfermarkt acquisition may run offline and produce a reviewed local snapshot or result payload. Confidential licence documents remain outside source control and chat.
 
-Decision: do not implement source acquisition in the deployed product. The existing source-neutral importer remains limited to standings, and the app also supports manual standings. The app stores no source HTML, browser cookies, or subscription credentials and performs no runtime source request, scrape, image hotlink, football API call, or scheduled acquisition.
+Decision: do not implement source acquisition in the deployed product. The existing source-neutral importer remains limited to standings, and the app also supports manual standings. Reviewed goals, assists, club clean sheets, and shared player ratings enter through authenticated `/admin/results`; that desk versions manually reviewed facts and is not an acquisition client. The app stores no source HTML, browser cookies, or subscription credentials and performs no runtime source request, scrape, image hotlink, football API call, or scheduled acquisition.
 
 Historical crest finding: under the 2026-08-08 terms-only review, FotMob image URLs identified the genuine marks but were not treated as redistribution or hotlinking permission. The project owner's later 20-file PNG handoff superseded the presentation portion of the original monogram decision for this exact local set. `TeamMark` uses contain sizing and a safe initials fallback; original SVG monograms remain rollback-only during the first PNG release. The deployed application still does not fetch or hotlink them.
 
@@ -88,4 +88,4 @@ Sources:
 
 ## Failure behavior
 
-Malformed, stale, duplicate, unauthorized, or incomplete imports never replace the last active snapshot. All-zero preseason tables remain unscored. If no valid active standings exist, the leaderboard still shows submission count and a clear scoring-not-started state. Manual admin entry remains available even when the external source is inaccessible.
+Malformed, stale, duplicate, unauthorized, or incomplete standings imports never replace the last active table. All-zero preseason tables remain unscored. If no valid active standings exist, the leaderboard still shows submission count and a clear scoring-not-started state. Manual standings entry remains available even when the external source is inaccessible. Manual spotlight-result saves are separately sealed and pointer-guarded: a malformed or stale attempt preserves the last active factual version, while missing datasets and unresolved Other-player identities remain pending.

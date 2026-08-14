@@ -7,7 +7,6 @@ import {
   snapshotContentHash,
   standingsActivationGuard,
 } from "../../scripts/import-standings";
-import { parseSeedDeadline } from "../../scripts/seed";
 
 const snapshot = canonicalStandingsSnapshotSchema.parse({
   capturedAt: "2026-09-01T12:00:00.000Z",
@@ -113,37 +112,6 @@ describe("source-neutral standings import helpers", () => {
   it("does not treat a source finality claim as authoritative content", () => {
     expect(snapshotContentHash({ ...snapshot, isFinal: true })).toBe(
       snapshotContentHash(snapshot),
-    );
-  });
-});
-
-describe("seed deadline", () => {
-  it("uses null as the automatic Gameweek 1 deadline sentinel", () => {
-    expect(parseSeedDeadline("")).toBeNull();
-    expect(parseSeedDeadline("2026-08-21T19:00:00.000Z")).toBeNull();
-  });
-
-  it("accepts an explicit ISO timestamp", () => {
-    expect(parseSeedDeadline("2026-08-21T18:00:00.000Z")?.toISOString()).toBe(
-      "2026-08-21T18:00:00.000Z",
-    );
-  });
-
-  it("rejects an invalid timestamp", () => {
-    expect(() => parseSeedDeadline("not-a-date")).toThrow(
-      "PREDICTION_DEADLINE_ISO",
-    );
-  });
-
-  it("rejects timestamps without an explicit timezone", () => {
-    expect(() => parseSeedDeadline("2026-08-21T18:00:00")).toThrow(
-      "explicit UTC offset",
-    );
-  });
-
-  it("rejects a seed deadline after the opening kickoff", () => {
-    expect(() => parseSeedDeadline("2026-08-21T19:00:00.001Z")).toThrow(
-      "cannot be after the Gameweek 1 opening kickoff",
     );
   });
 });

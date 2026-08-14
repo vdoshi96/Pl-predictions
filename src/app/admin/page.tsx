@@ -13,7 +13,7 @@ import {
   standingsSnapshots,
 } from "@/db/schema";
 import { getAdminSession } from "@/features/admin";
-import { getActiveSeasonView } from "@/features/seasons/queries";
+import { getActiveSeasonContext } from "@/features/seasons/queries";
 import { formatUtcDateTime } from "@/shared/format";
 import { getSeasonAccess } from "@/shared/policy";
 
@@ -25,7 +25,7 @@ export const dynamic = "force-dynamic";
 export default async function AdminPage() {
   if (!(await getAdminSession())) redirect("/admin/login");
 
-  const { databaseNow, season } = await getActiveSeasonView();
+  const { databaseNow, season } = await getActiveSeasonContext();
   const db = getDb();
   const [[submissionCount], latestRuns, activeSnapshots] = await Promise.all([
     db
@@ -59,7 +59,6 @@ export default async function AdminPage() {
     {
       openingKickoff: season.openingKickoff,
       revealPredictions: season.revealPredictions,
-      submissionDeadline: season.submissionDeadline,
       submissionsLocked: season.submissionsLocked,
     },
     databaseNow,
@@ -107,8 +106,8 @@ export default async function AdminPage() {
             Season control room
           </h1>
           <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-600">
-            Manage fairness, submissions, and the one validated standings
-            snapshot used for every score.
+            Manage fairness, submissions, validated standings, and reviewed
+            spotlight-result snapshots.
           </p>
         </div>
 

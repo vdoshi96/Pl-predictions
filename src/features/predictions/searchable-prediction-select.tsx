@@ -13,6 +13,7 @@ import {
 import { cn } from "@/components/ui/cn";
 
 export type SearchablePredictionOption = Readonly<{
+  assetPath?: string | null;
   displayName: string;
   id: string;
   searchText: string;
@@ -25,14 +26,20 @@ export interface SearchablePredictionSelectProps {
   description: string;
   disabled?: boolean;
   emptyMessage: string;
+  expanded?: boolean;
   invalid?: boolean;
   invalidMessage?: string;
   label: string;
+  maximumResults?: number;
+  minimumQueryLength?: number;
+  minimumQueryMessage?: string;
   onChange: (value: SelectValue) => void;
+  onExpandedChange?: (expanded: boolean) => void;
   onOtherValueChange?: (value: string) => void;
   options: readonly SearchablePredictionOption[];
   otherValue?: string;
   renderLeading?: (option: SearchablePredictionOption) => ReactNode;
+  selectedOption?: SearchablePredictionOption | null;
   value: SelectValue;
 }
 
@@ -50,14 +57,20 @@ export function SearchablePredictionSelect({
   description,
   disabled = false,
   emptyMessage,
+  expanded: controlledExpanded,
   invalid = false,
   invalidMessage = "Choose a valid option.",
   label,
+  maximumResults,
+  minimumQueryLength = 0,
+  minimumQueryMessage,
   onChange,
+  onExpandedChange,
   onOtherValueChange,
   options,
   otherValue = "",
   renderLeading,
+  selectedOption: selectedOptionFallback = null,
   value,
 }: SearchablePredictionSelectProps) {
   const generatedId = useId().replaceAll(":", "");
@@ -68,25 +81,38 @@ export function SearchablePredictionSelect({
   const otherInputId = `${inputId}-other`;
   const containerRef = useRef<HTMLDivElement>(null);
   const otherInputRef = useRef<HTMLInputElement>(null);
-  const [expanded, setExpanded] = useState(false);
+  const [uncontrolledExpanded, setUncontrolledExpanded] = useState(false);
   const [query, setQuery] = useState("");
   const [activeIndex, setActiveIndex] = useState(0);
-  const selectedOption = options.find((option) => option.id === value) ?? null;
+  const expanded = controlledExpanded ?? uncontrolledExpanded;
+  const selectedOption =
+    options.find((option) => option.id === value) ??
+    (selectedOptionFallback?.id === value ? selectedOptionFallback : null);
   const inputValue = expanded
     ? query
     : value === "other"
       ? "Other player"
       : (selectedOption?.displayName ?? "");
   const normalizedQuery = normalizeSearch(query);
-  const filteredOptions = useMemo(
+  const queryReady = normalizedQuery.length >= minimumQueryLength;
+  const matchingOptions = useMemo(
     () =>
-      normalizedQuery
-        ? options.filter((option) =>
-            normalizeSearch(option.searchText).includes(normalizedQuery),
-          )
-        : [...options],
-    [normalizedQuery, options],
+      queryReady
+        ? normalizedQuery
+          ? options.filter((option) =>
+              normalizeSearch(option.searchText).includes(normalizedQuery),
+            )
+          : [...options]
+        : [],
+    [normalizedQuery, options, queryReady],
   );
+  const filteredOptions =
+    maximumResults === undefined
+      ? matchingOptions
+      : matchingOptions.slice(0, Math.max(0, maximumResults));
+  const queryPrompt =
+    minimumQueryMessage ??
+    `Type at least ${minimumQueryLength} character${minimumQueryLength === 1 ? "" : "s"} to search.`;
   const visibleChoiceCount = filteredOptions.length + (allowOther ? 1 : 0);
   const activeChoiceIndex = Math.min(
     Math.max(0, activeIndex),
@@ -126,11 +152,13 @@ export function SearchablePredictionSelect({
     if (disabled) return;
     setQuery("");
     setActiveIndex(0);
-    setExpanded(true);
+    if (!expanded) onExpandedChange?.(true);
+    if (controlledExpanded === undefined) setUncontrolledExpanded(true);
   }
 
   function closePicker() {
-    setExpanded(false);
+    if (expanded) onExpandedChange?.(false);
+    if (controlledExpanded === undefined) setUncontrolledExpanded(false);
     setQuery("");
   }
 
@@ -191,7 +219,9 @@ export function SearchablePredictionSelect({
       </p>
       <p className="sr-only" aria-live="polite">
         {expanded
-          ? `${filteredOptions.length} matching option${filteredOptions.length === 1 ? "" : "s"}${allowOther ? ", plus Other player" : ""}.`
+          ? !queryReady
+            ? `${queryPrompt}${allowOther ? " Other player is available." : ""}`
+            : `${matchingOptions.length} matching option${matchingOptions.length === 1 ? "" : "s"}${matchingOptions.length > filteredOptions.length ? `. Showing the first ${filteredOptions.length}` : ""}${allowOther ? ", plus Other player" : ""}.`
           : value === null
             ? "No option selected."
             : "Option selected."}
@@ -221,7 +251,12 @@ export function SearchablePredictionSelect({
           )}
           disabled={disabled}
           onChange={(event) => {
-            if (!expanded) setExpanded(true);
+            if (!expanded) {
+              onExpandedChange?.(true);
+              if (controlledExpanded === undefined) {
+                setUncontrolledExpanded(true);
+              }
+            }
             setQuery(event.target.value);
             setActiveIndex(0);
           }}
@@ -257,9 +292,14 @@ export function SearchablePredictionSelect({
           aria-label={`${label} options`}
           className="border-border absolute inset-x-0 top-[calc(100%+0.35rem)] z-30 max-h-72 overflow-y-auto overscroll-contain rounded-xl border bg-white p-1.5 shadow-2xl"
         >
+          {queryReady && matchingOptions.length > filteredOptions.length ? (
+            <p className="px-3 py-2 text-xs font-bold text-slate-500">
+              {filteredOptions.length} of {matchingOptions.length} matches
+            </p>
+          ) : null}
           {filteredOptions.length === 0 ? (
             <p className="px-3 py-3 text-sm leading-5 text-slate-500">
-              {emptyMessage}
+              {queryReady ? emptyMessage : queryPrompt}
             </p>
           ) : null}
           {filteredOptions.map((option, index) => (

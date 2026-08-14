@@ -11,6 +11,7 @@ export type SpotlightPickDisplay = Readonly<{
   accuracyPoints?: number | null;
   metricLabel?: string | null;
   resultRank?: number | null;
+  resultStatus?: "outside-range" | "ranked";
   shortName?: string | null;
   subject: "player" | "team";
 }>;
@@ -53,13 +54,18 @@ export function SpotlightPickGrid({
             <strong className="text-brand-strong block text-xs leading-4 break-words">
               {pick.displayName}
             </strong>
-            {pick.resultRank !== null &&
-            pick.resultRank !== undefined &&
-            pick.accuracyPoints !== null &&
+            {pick.accuracyPoints !== null &&
             pick.accuracyPoints !== undefined ? (
               <span className="mt-0.5 block text-[0.65rem] leading-4 font-semibold text-slate-500">
-                {pick.metricLabel ? `${pick.metricLabel} · ` : ""}Result rank{" "}
-                {pick.resultRank} · {pick.accuracyPoints} accuracy{" "}
+                {pick.resultStatus === "outside-range" ? (
+                  <>{pick.metricLabel} · </>
+                ) : (
+                  <>
+                    {pick.metricLabel ? `${pick.metricLabel} · ` : ""}Result
+                    rank {pick.resultRank} ·{" "}
+                  </>
+                )}
+                {pick.accuracyPoints} accuracy{" "}
                 {pick.accuracyPoints === 1 ? "pt" : "pts"}
               </span>
             ) : (

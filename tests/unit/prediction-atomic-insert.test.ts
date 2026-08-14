@@ -63,7 +63,7 @@ describe("atomic prediction insertion", () => {
     expect(statement).toContain('where "submissions_locked" = false');
     expect(statement).toContain('and "reveal_predictions" = false');
     expect(statement).toContain('and "checked_at" < "opening_kickoff"');
-    expect(statement).toContain('or "checked_at" < "submission_deadline"');
+    expect(statement).not.toContain("submission_deadline");
     expect(statement).toContain('clock_timestamp() as "checked_at"');
     expect(statement).toContain("for update");
     expect(statement).toContain(

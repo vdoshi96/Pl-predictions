@@ -1,13 +1,14 @@
 # Sources
 
-Checked on 2026-08-08.
+External-source notes were checked on 2026-08-08. The August 13 handoff authority and release boundary were updated on 2026-08-14.
 
 ## Product authority
 
 - Original owner brief: `/Users/vishal/.codex/attachments/52a70e1f-75be-4dba-a2ab-739d8a99b417/pasted-text.txt` (local conversation attachment; intentionally not copied into the repository).
 - Latest owner overrides: mobile-first for the majority-mobile audience; recurring updates will be owner-run Codex automation; no runtime live-data API and no Vercel Cron.
+- Permission disposition: in the 2026-08-14 Codex task, the owner confirmed that the required permissions for acquisition, storage, redistribution, and production use in this player-catalogue workflow have been obtained. Confidential licence documents remain outside source control and chat.
 - Current scoring override: the main leaderboard uses table points only and has a 100-point maximum. Spotlight predictions use a separate fun-accuracy page with overall and category sorts. Let `N` be the current number of active, nondeleted season brackets. Accuracy points are `max(0, N + 1 - outcome rank)`. Overall accuracy excludes pending categories.
-- Current outcome-input direction: a future owner-run Codex automation will enter the five non-table-derived outcomes manually. The automation is not part of this iteration.
+- Current outcome-input direction: a future owner-run Codex automation may acquire the five non-table-derived outcomes offline, review them, and enter them through an approved path. The automation is not part of this iteration and does not run in the deployed application.
 - Current spotlight-predictions brief: one three-stage immutable entry containing the 20-club table and seven required categories; searchable first/last-name player selectors with Other-player fallback; clubs for most clean sheets; local player portraits and club crests with visual fallbacks; public rules and spotlight pages; and administrator deletion. The owner-supplied raw login password is operational secret input and is intentionally not copied into repository documentation.
 - Current identity direction: user-facing name **Dranx Prediction League**; Premier-League-inspired palette using official purple `#37003c` with cyan `#05f0ff`, green `#00ff87`, and pink `#ff2882` accents; original Dranx mark; operational `pl-predictions` identifiers unchanged.
 - Current club-asset direction: the project owner supplied a folder containing one transparent PNG badge for each of the 20 verified clubs and explicitly directed their use. The same folder's Premier League logo/lion/ball/composite files are outside that team-mark replacement and are not used.
@@ -17,12 +18,15 @@ Checked on 2026-08-08.
 ## Owner-provided player snapshot source card
 
 - Local handoff: `premier-league-players-2026-08-13/`; its `README.txt` records snapshot date 2026-08-13, 582 players across the application's 20 clubs, and 582 supplied PNGs.
-- Handoff provenance: the local README identifies Transfermarkt 2026 first-team squad pages as the roster source and FotMob CDN portraits for every catalogued player. For this repository, the operative provenance is the project owner's local handoff and direction to use it; this record does not claim broader ownership or redistribution permission.
+- Roster authority: the owner selected this dated handoff for the release. The handoff, normalized fixture, tracked application fixture, and portrait inventory are reconciled internally; this release does not claim independent verification against official club or Premier League roster pages.
+- Release delta: relative to August 8, the active fixture has 12 additions, 17 removals, and four intra-league moves. The selected asset transition removes 17 obsolete portrait paths and applies four club-move renames without legacy copies.
+- Handoff provenance: the local README identifies Transfermarkt 2026 first-team squad pages as the roster source and FotMob CDN portraits for every catalogued player. For this repository, the operative provenance is the project owner's local handoff, selected roster, and 2026-08-14 permission confirmation; this record does not claim original ownership of third-party material.
 - Application use: roster rows are imported into the season catalogue and reviewed portraits are copied to local `/player-faces/` paths. `PlayerMark` uses its generic silhouette when an asset path is absent or an image fails.
 - Runtime boundary: the deployed application does not execute the handoff's acquisition scripts, call those upstream sources, scrape player pages, or hotlink portraits. Other player covers unavailable or newly added players.
-- Outcome boundary: this is a selector identity and portrait snapshot, not a goals, assists, clean-sheets, or player-rating result feed. A future owner-run Codex automation will enter the five reviewed outcomes manually.
+- Outcome boundary: this is a selector identity and portrait snapshot, not a goals, assists, clean-sheets, or player-rating result feed. A future owner-run Codex automation may acquire those five outcomes offline, review them, and enter them through an approved path.
+- Production boundary: the live database remains on the August 8 seed baseline of 587 total/active players and 580 portrait paths until the August 13 application is merged, deployed, and seeded through the approved production sequence.
 
-## Season and rights
+## Season sources and permission disposition
 
 - [Official Premier League 2026/27 table](https://www.premierleague.com/en/tables/premier-league/2026-27): authoritative 20-club membership and display-name check.
 - [Premier League 2026/27 AGM announcement](https://www.premierleague.com/en/news/4673099/the-202627-premier-league-season-officially-starts/): membership-change corroboration.
@@ -30,19 +34,19 @@ Checked on 2026-08-08.
 - [Complete official 2026/27 fixture list](https://www.premierleague.com/en/news/4675097/all-380-fixtures-for-202627-premier-league-season), checked 2026-08-08: Arsenal v Coventry is the sole Friday fixture before the other Matchweek 1 matches; the league explicitly states that all fixtures are subject to change.
 - [Official fixture-change guidance](https://www.premierleague.com/en/news/4324634): scheduling can change for broadcast and competition conflicts, so the static UTC deadline must be reverified and reviewed if the opener moves.
 - [FotMob Premier League page](https://www.fotmob.com/leagues/47/overview) and canonical team pages: one-time factual league/team identifier mapping only.
-- [FotMob Terms of Use](https://www.fotmob.com/term-of-service), checked 2026-08-08: restriction on automatic crawlers and systematic or regular extraction. A consumer subscription is not treated as permission for automation or redistribution.
+- [FotMob Terms of Use](https://www.fotmob.com/term-of-service), checked 2026-08-08: historical terms snapshot retained as dated research, not the current project permission gate.
 - [Premier League logo portal](https://logo.premierleague.com/), checked 2026-08-08: logo access and use are limited to directed commercial partners and genuine editorial news-media users; this private prediction tool is neither.
 - [Premier League trademark and data FAQ](https://www.premierleague.com/en/about/faq/other): club names and badges remain member-club marks.
 
-FotMob's official terms, the Premier League logo portal, and the Premier League trademark FAQ were checked on 2026-08-08. The production app never requests or hotlinks FotMob or another football-data source. The project owner's supplied 20-club PNG set and dated player snapshot are stored locally and used at the owner's direction; this repository does not claim original ownership of those assets or broader permission for unused league-brand files. The original Dranx mark remains the application identity, and the official Premier League logo is not included. A future standings or spotlight-outcome automation must use manual input, a permitted export, or a source whose written licence covers the intended collection and use.
+FotMob's official terms, the Premier League logo portal, and the Premier League trademark FAQ were checked on 2026-08-08 and are retained as dated research. On 2026-08-14 the owner confirmed that the required permissions for this player-catalogue workflow have been obtained, including acquisition, storage, redistribution, and production use. Owner-run FotMob or Transfermarkt acquisition may therefore run offline. The production app never requests, scrapes, or hotlinks FotMob or another football-data source, and no acquisition runs on Vercel Cron. The project owner's supplied 20-club PNG set and dated player snapshot are stored locally and used at the owner's direction; this repository does not claim original ownership of third-party assets or permission for unused league-brand files. The original Dranx mark remains the application identity, and the official Premier League logo is not included.
 
 ## Spotlight outcome authority and pending inputs
 
 - The owner clarified that spotlight accuracy never changes the table leaderboard. The table maximum remains 100. Let `N` be the current number of active, nondeleted season brackets. Accuracy points are `max(0, N + 1 - outcome rank)`. Overall accuracy excludes pending categories. A resolved zero-point result still counts as available. Equal overall scores share a competition rank. Category sorts use outcome rank from low to high and put pending entries last.
 - Team expectation data is internal: average each club's predicted position across the remaining valid submissions, then compare it with the active validated standings. Underdog is average prediction minus actual position; overrated is the inverse.
-- The requested player-opinion metric is FotMob average season rating, descending for underdog and ascending for overrated. This product rule does not supersede FotMob's terms or authorize automated extraction. There is no runtime FotMob client, scraper, scheduled job, or stored provider credential.
+- The requested player-opinion metric is FotMob average season rating, descending for underdog and ascending for overrated. The owner may acquire it through an authorized offline workflow. There is no runtime FotMob client, scraper, scheduled job, or stored provider credential.
 - The owner has supplied the dated 582-player selector catalogue and 582 portrait PNGs. The handoff does not include reviewed top-scorer, assists, clean-sheets, or player-rating rankings. Do not infer or fabricate these results.
-- A future owner-run Codex automation will enter the five reviewed outcomes manually. Its source material must be permitted or licensed. The payload, review path, provenance fields, and final-state rules remain a later design task.
+- A future owner-run Codex automation may acquire the five outcomes offline and enter the reviewed results through an approved path. The payload, review path, provenance fields, and final-state rules remain a later design task.
 
 ## Technical authority
 

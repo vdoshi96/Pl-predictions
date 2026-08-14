@@ -2,30 +2,23 @@ import "server-only";
 
 import { sql, type SQL } from "drizzle-orm";
 
-const ISOLATED_TEST_MARKER = "verified-isolated-test-database";
+import { assertIsolatedDatabaseEnvironment } from "../../../scripts/test-database-identity.mjs";
 
 type ClockEnvironment = {
   DATABASE_URL?: string;
   NODE_ENV?: string;
   PL_PREDICTIONS_ISOLATED_TEST_DATABASE?: string;
+  PL_PREDICTIONS_PRODUCTION_DATABASE_IDENTITY_SHA256?: string;
   PL_PREDICTIONS_TEST_NOW_ISO?: string;
   TEST_DATABASE_URL?: string;
 };
 
-function databaseIdentity(value: string): string | null {
+function hasVerifiedIsolatedDatabase(environment: ClockEnvironment): boolean {
   try {
-    const url = new URL(value);
-    if (!url.hostname || !url.pathname || url.pathname === "/") return null;
-
-    return [
-      url.protocol,
-      url.username,
-      url.hostname.toLowerCase(),
-      url.port,
-      url.pathname.replace(/\/+$/u, ""),
-    ].join("|");
+    assertIsolatedDatabaseEnvironment(environment, "Isolated test clock");
+    return true;
   } catch {
-    return null;
+    return false;
   }
 }
 
@@ -39,18 +32,11 @@ export function resolveIsolatedTestNow(
 ): Date | null {
   if (
     environment.NODE_ENV === "production" ||
-    environment.PL_PREDICTIONS_ISOLATED_TEST_DATABASE !== ISOLATED_TEST_MARKER
+    !environment.PL_PREDICTIONS_ISOLATED_TEST_DATABASE?.trim() ||
+    !hasVerifiedIsolatedDatabase(environment)
   ) {
     return null;
   }
-
-  const databaseUrl = environment.DATABASE_URL?.trim();
-  const testDatabaseUrl = environment.TEST_DATABASE_URL?.trim();
-  if (!databaseUrl || !testDatabaseUrl) return null;
-
-  const database = databaseIdentity(databaseUrl);
-  const testDatabase = databaseIdentity(testDatabaseUrl);
-  if (!database || database !== testDatabase) return null;
 
   const value = environment.PL_PREDICTIONS_TEST_NOW_ISO?.trim();
   if (!value) return null;

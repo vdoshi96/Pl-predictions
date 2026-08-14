@@ -8,7 +8,10 @@ import {
   dragWithMouse,
   dragWithWebKitTouch,
 } from "./production-drag-helpers";
-import { completeSpotlightPicks } from "./spotlight-helpers";
+import {
+  completeSpotlightPicks,
+  ROSTER_TRANSITION_PLAYER_PICKS,
+} from "./spotlight-helpers";
 
 async function expectNoHorizontalOverflow(
   page: import("@playwright/test").Page,
@@ -273,16 +276,21 @@ test("production public routes are mobile-safe and healthy", async ({
     });
     await expect(reviewDialog).toBeVisible();
     await expect(reviewDialog.locator("[data-category]")).toHaveCount(7);
-    for (const playerName of [
-      "Cole Palmer",
-      "Declan Rice",
-      "Elliot Anderson",
-    ]) {
-      await expectPlayerPortraitLoaded(
-        reviewDialog.getByRole("img", {
-          name: `${playerName} player portrait`,
-        }),
-      );
+    for (const pick of ROSTER_TRANSITION_PLAYER_PICKS) {
+      const playerMark = reviewDialog.getByRole("img", {
+        name: `${pick.option} player portrait`,
+      });
+      await expectPlayerPortraitLoaded(playerMark);
+      await expect
+        .poll(async () =>
+          decodeURIComponent(
+            (await playerMark.locator("img").getAttribute("src")) ?? "",
+          ),
+        )
+        .toContain(pick.portraitPath);
+      await expect(
+        reviewDialog.getByText(pick.option, { exact: true }),
+      ).toBeVisible();
     }
     const customPlayerFallback = reviewDialog.getByRole("img", {
       name: "Production Preview Other player portrait",

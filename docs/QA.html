@@ -3,8 +3,9 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="generated-by" content="scripts/generate-docs-html.mjs" />
     <meta name="canonical-source" content="QA.md" />
-    <meta name="canonical-source-sha256" content="821df66fa723d47d5dbf9b01bd931a55ebd34a71ab71564736d20050ae62ef16" />
+    <meta name="canonical-source-sha256" content="8e04d7374e45a5e46c7b96637cd07fb6e86faedcb9890152abcf545bc35b9552" />
     <title>Quality assurance</title>
     <style>
       :root { color-scheme: light dark; font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
@@ -38,9 +39,74 @@
   </head>
   <body>
     <main>
-      <h1>Quality assurance</h1>
-<p>Evidence date: 2026-08-08. This document records the newest verification for the annotated how-to, database-time countdown, complete retained test entry, and removal of the hard-coded spotlight demonstration. Earlier release history remains in <code>docs/context/LOG.md</code>.</p>
-<h2>Current results</h2>
+      <h1 id="quality-assurance">Quality assurance</h1>
+<p>Evidence date: 2026-08-14. The current evidence covers the pre-merge August 13 roster/portrait refresh. The completed August 8 how-to, database-time countdown, retained test entry, and fixture-retirement evidence remains below as dated production history; it does not verify the new roster.</p>
+<h2 id="august-13-roster-refresh-current-pre-merge-results">August 13 roster refresh: current pre-merge results</h2>
+<table>
+<thead>
+<tr>
+<th>Gate</th>
+<th>Command or environment</th>
+<th>Result</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Repository/GitHub audit</td>
+<td>read-only Git plus GitHub API inspection</td>
+<td>Feature worktree began clean at <code>7d1996ca</code>, one direct commit ahead of live <code>main</code> <code>38aa37ad</code>. The branch incorrectly tracked <code>origin/main</code>; no remote feature branch, pull request, or feature checks existed.</td>
+</tr>
+<tr>
+<td>Candidate roster/portrait state</td>
+<td>owner handoff plus application-fixture reconciliation</td>
+<td>Passed for 582 players and 582 portraits: 12 additions, 17 removals, four intra-league moves, seven restored portraits, and ten replaced portraits relative to August 8. The fixture, raw JSON, final JSON, workbook, source portraits, tracked fixture, and published portraits reconcile exactly.</td>
+</tr>
+<tr>
+<td>Roster authority</td>
+<td>owner decision recorded 2026-08-14</td>
+<td>Treat the August 13 handoff as owner-selected and internally reconcile it without rerunning its acquisition scripts. This release does not claim independent official-club or Premier League roster verification.</td>
+</tr>
+<tr>
+<td>Compatibility</td>
+<td>owner decision recorded 2026-08-14</td>
+<td>Use the exact refreshed asset set: remove 17 obsolete paths and apply four club-move renames without legacy copies. Preserve inactive database rows for historical picks and retain the runtime silhouette fallback.</td>
+</tr>
+<tr>
+<td>Documentation generator</td>
+<td><code>npx vitest run tests/unit/docs-generator.test.ts</code></td>
+<td>Passed ten focused tests for NUL-safe Git discovery, private exclusion, deterministic hashes/links/headings, legacy/current ownership, unmanaged and duplicate-target collisions, symlinks, atomic output, staged/unstaged source deletion, exact CLI flags, and marker-owned orphan cleanup.</td>
+</tr>
+<tr>
+<td>Final handoff evidence</td>
+<td>retained private report and contact sheet</td>
+<td>Report status <code>passed</code>; <code>PL Players!A1:K583</code> reconciled all 582 rows and 11 columns with no formulas, errors, or mismatches. All 582 PNGs decoded at 192×192 with unique encoded and decoded-pixel SHA-256 values. The 33-tile contact sheet passed visual inspection.</td>
+</tr>
+<tr>
+<td>Exact private cleanup</td>
+<td>approved two-copy stale-artifact removal</td>
+<td>After the passing pre-cleanup gate, removed only <code>progress.json</code> and the two superseded mismatch reports from both August 13 copies. The retained copies are byte-identical: 613 files, 24,912,376 bytes, full manifest SHA-256 <code>f625470979c156e233300ec42924eb858255d902a456af1283a089ae41169630</code>.</td>
+</tr>
+<tr>
+<td>Catalogue and safety coverage</td>
+<td>focused Vitest plus <code>npm run players:check</code></td>
+<td>Passed 77 focused tests. The release validator proved exact 582-file coverage, full decode, dimensions, unique hashes/pixels, exact transition identities, provenance IDs, derived selector fields, traversal rejection, validation-before-mutation, rollback, and clean-clone release fingerprints.</td>
+</tr>
+<tr>
+<td>Production baseline</td>
+<td>approved read-only pre-release state</td>
+<td>Production remains unchanged at 587 total/active players and 580 portrait paths. The 582-player fixture is not merged, deployed, or seeded.</td>
+</tr>
+<tr>
+<td>Complete pre-merge chain</td>
+<td><code>CI=1 npm run check</code> against attested isolated Neon</td>
+<td>Passed uninterrupted on the final pre-PR revision: 14-document parity, catalogue validation, formatting, ESLint, strict TypeScript, 205 unit/component tests with 11 guarded integration skips, all 11 isolated Neon integration tests, Webpack production build, five pre-kickoff browser journeys, and three post-kickoff journeys.</td>
+</tr>
+<tr>
+<td>Release and production proof</td>
+<td>GitHub, Vercel, approved seed, read-only live verification</td>
+<td><code>TBD after release</code>: feature PR, merge SHA, exact Ready deployment, alias mapping, one production-seed result, database counts, selector/portrait/browser proof, and any required documentation-closeout PR.</td>
+</tr>
+</tbody></table>
+<h2 id="august-8-completed-production-release-historical">August 8 completed production release (historical)</h2>
 <table>
 <thead>
 <tr>
@@ -57,7 +123,7 @@
 <tr>
 <td>Reviewed player catalogue</td>
 <td><code>npm run players:check</code> within the aggregate check</td>
-<td>Verified 582 players, 582 portraits, and zero silhouette fallbacks on the 2026-08-13 roster branch.</td>
+<td>Verified the then-current August 8 fixture: 587 players, 580 portrait paths, and seven silhouette fallbacks.</td>
 </tr>
 <tr>
 <td>Production data preflight</td>
@@ -90,8 +156,9 @@
 <td>Both queries returned no records after the smoke run.</td>
 </tr>
 </tbody></table>
-<p>The first aggregate-check attempt stopped at Prettier before lint, tests, integration, or build ran. After formatting the one flagged mobile test, the clean uninterrupted run above passed. The local environment uses the repository&#39;s verified Webpack build because the restricted sandbox does not permit a default Turbopack helper to bind its internal port.</p>
-<h2>Feature coverage</h2>
+<p>The historical first aggregate-check attempt stopped at Prettier before lint, tests, integration, or build ran. After formatting the one flagged mobile test, the clean uninterrupted August 8 run above passed. The local environment uses the repository&#39;s verified Webpack build because the restricted sandbox does not permit a default Turbopack helper to bind its internal port.</p>
+<p>The first August 14 post-kickoff browser run exposed one integration error in the newly hardened test harness: the wrapper emitted a target-specific attestation, while the isolated test clock still recognized only the retired static marker. The clock therefore ignored the fixed test instant and safely used the live database time. The clock now validates the shared dynamic attestation; legacy-marker spoof and target-mismatch tests were added. The corrected post-kickoff run and the later uninterrupted aggregate check both passed.</p>
+<h2 id="historical-august-8-feature-coverage">Historical August 8 feature coverage</h2>
 <p>The default, integration, and browser suites now cover:</p>
 <ul>
 <li>a compact four-tile days/hours/minutes/seconds countdown beside the open-submissions status;</li>
@@ -104,7 +171,7 @@
 <li>the existing 56-pixel mouse/touch/keyboard reorder handles, searchable selectors, Other-player path, safe-area action, long-name wrapping, table scoring, standings, administrator deletion, and compare-and-swap protections.</li>
 </ul>
 <p>The countdown is an informational display. The server calculates its starting duration from PostgreSQL time, while the atomic submission statement still locks the season and rechecks PostgreSQL <code>clock_timestamp()</code> against the effective deadline. Device-clock changes or a stale open page therefore cannot authorize a late write.</p>
-<h2>Production data verification</h2>
+<h2 id="production-data-verification">Production data verification</h2>
 <p>Read-only live inspection established the baseline before any requested mutation:</p>
 <ul>
 <li><code>/leaderboard</code> showed no entries;</li>
@@ -124,7 +191,7 @@
 <li>overrated player Alysson.</li>
 </ul>
 <p>The final post-release database verification exposed only safe aggregate facts: one parent, 20 child positions, seven category picks, and the sole display name <code>Dranx Test Entry</code>. It found no display name containing Alex or Jordan. It did not print prediction IDs, receipt material, database URLs, private pick subjects, or credentials. Before reveal, the public spotlight page reports one active bracket but does not serialize or display those seven choices.</p>
-<h2>Annotated live-mobile walkthrough</h2>
+<h2 id="annotated-live-mobile-walkthrough">Annotated live-mobile walkthrough</h2>
 <p>The participant-facing <code>/rules</code> section uses three first-party captures from the live 390 by 844 public flow:</p>
 <ol>
 <li><code>public/how-to-play/step-1-table-mobile.png</code> — ordered club table, reorder handles, display-name field, and continue action.</li>
@@ -132,7 +199,7 @@
 <li><code>public/how-to-play/step-3-review-mobile.png</code> — the complete 20-position and seven-pick review with the final submit action.</li>
 </ol>
 <p>Each image receives two numbered overlay pins at render time. The same numbers and instructions appear as adjacent HTML text, so the annotations remain accessible, selectable, responsive, and understandable without colour. The walkthrough draft used the unsaved display name “How to play preview”; it never created a second production entry.</p>
-<h2>Production deployment and mobile evidence</h2>
+<h2 id="production-deployment-and-mobile-evidence">Production deployment and mobile evidence</h2>
 <p>GitHub <a href="https://github.com/vdoshi96/Pl-predictions/pull/13">PR #13</a> merged the tested feature into <code>main</code> at <code>a7785b9b16b64be825e06ef8f181ab5f98031524</code>. Vercel production deployment <code>dpl_2L4cprnsWShhesujY7sTLKffywhg</code> is Ready at <a href="https://pl-predictions-9h7r762li-vdoshi96s-projects.vercel.app">https://pl-predictions-9h7r762li-vdoshi96s-projects.vercel.app</a>. The standard release alias command moved <a href="https://pl-predictions-2026.vercel.app">https://pl-predictions-2026.vercel.app</a> to that exact deployment, and deployment-ID read-back verified the mapping.</p>
 <p>The final read-only smoke passed all five browser projects against the immutable URL. It exercised the timer, all three entry stages without submitting, the table leaderboard, private pre-reveal spotlight state, absence of Alex/Jordan fixtures, the annotated how-to, administrator login, 320–430-pixel reflow, WebKit, local imagery, no horizontal overflow, and browser/network/HTTP guards. The exact-deployment error-level and HTTP 500 log queries returned no records in the preceding 30 minutes.</p>
 <p>Only the newest completed production run is retained under <code>docs/assets/qa/</code>. All seven artifacts were visually inspected for readable type, clear hierarchy, painted local imagery, reachable actions, correct annotations, and absence of clipping.</p>
@@ -150,16 +217,28 @@
 <p><img src="assets/qa/how-to-mobile.png" alt="Production annotated how-to section on mobile Chromium"></p>
 <p><strong>Administrator sign-in — mobile Chromium at 390 by 844:</strong> the owner-only credential form and navigation reflow cleanly.</p>
 <p><img src="assets/qa/admin-login-mobile.png" alt="Production administrator sign-in on mobile Chromium"></p>
-<h2>Security and cleanup boundaries</h2>
+<h2 id="security-and-cleanup-boundaries">Security and cleanup boundaries</h2>
 <ul>
 <li>No environment value, receipt token, database URL, administrator credential, or subscription cookie is committed or printed.</li>
 <li>Production creation was limited to the explicitly requested retained test entry. The destructive production-write smoke was not used because that harness intentionally deletes its QA entry.</li>
 <li>The retained entry followed the same atomic write path as every participant: parent plus 20 table rows plus seven spotlight rows, or nothing.</li>
 <li>Alex/Jordan removal is a code cleanup, not a data deletion. No legitimate production submission was deleted.</li>
 <li>Public pre-reveal output continues to expose only the permitted table-leaderboard projection and complete-bracket count.</li>
-<li>The owner-provided raw roster and club-asset handoffs remain untouched and untracked.</li>
+<li>The private handoffs remain untracked, ignored by exact root-anchored rules, excluded from generated documentation, and absent from the release diff. Acquisition scripts were not executed. The August 13 handoff was copied byte-for-byte into the primary repository, received only the approved final report/contact sheet and exact stale-artifact cleanup in both copies, and was reverified byte-identical afterward.</li>
+<li>The four known moderate <code>npm</code> advisories remain confined to the pre-existing development-only <code>drizzle-kit</code> legacy <code>esbuild</code> chain. The production dependency closure excludes that chain, the feature adds no runtime version change, and the uninterrupted release checks passed; no breaking forced downgrade was applied.</li>
 </ul>
-<h2>Release closeout state</h2>
+<h2 id="august-13-roster-release-closeout-state">August 13 roster release closeout state</h2>
+<ul>
+<li><input checked="" disabled="" type="checkbox"> Complete the read-only Git/worktree/GitHub audit and record the production pre-seed baseline.</li>
+<li><input checked="" disabled="" type="checkbox"> Record the owner-selected roster authority, internal-only verification boundary, and exact no-legacy compatibility decision.</li>
+<li><input checked="" disabled="" type="checkbox"> Pass the final complete local verification chain and visually inspect every added, restored, replaced, and renamed portrait.</li>
+<li><input disabled="" type="checkbox"> Push the feature branch under its own upstream, open the PR, and merge only after every available check is green.</li>
+<li><input disabled="" type="checkbox"> Verify the exact merged production deployment and stable alias, then run the approved idempotent production seed exactly once.</li>
+<li><input disabled="" type="checkbox"> Verify 582 active players, expected inactive historical rows, 582 portrait paths, representative additions/removals/moves, Other player, historical references, and every active portrait in the live UI.</li>
+<li><input disabled="" type="checkbox"> Record the exact PR, merge SHA, deployment, seed, browser/image verification, and any production-specific documentation closeout.</li>
+<li><input disabled="" type="checkbox"> Synchronize local <code>main</code>, verify retained handoff hashes, and remove the completed branch/worktree only after all release gates pass.</li>
+</ul>
+<h2 id="august-8-release-closeout-state-historical">August 8 release closeout state (historical)</h2>
 <ul>
 <li><input checked="" disabled="" type="checkbox"> Implement and locally verify the countdown, annotated walkthrough, navigation copy, and fixture removal.</li>
 <li><input checked="" disabled="" type="checkbox"> Create and verify one complete retained production test bracket.</li>
@@ -169,7 +248,7 @@
 <li><input checked="" disabled="" type="checkbox"> Regenerate final HTML peers, publish this closeout through <code>main</code>, synchronize local and remote <code>main</code>, and remove completed branch state.</li>
 </ul>
 
-      <p class="source">Generated deterministically from <a href="QA.md">docs/QA.md</a>. Canonical SHA-256: <code>821df66fa723d47d5dbf9b01bd931a55ebd34a71ab71564736d20050ae62ef16</code>.</p>
+      <p class="source">Generated deterministically from <a href="QA.md">docs/QA.md</a>. Canonical SHA-256: <code>8e04d7374e45a5e46c7b96637cd07fb6e86faedcb9890152abcf545bc35b9552</code>.</p>
     </main>
   </body>
 </html>

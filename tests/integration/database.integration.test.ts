@@ -6,7 +6,11 @@ import { Pool } from "@neondatabase/serverless";
 import { and, count, eq, sql } from "drizzle-orm";
 import { afterEach, describe, expect, it } from "vitest";
 
-import { ACTIVE_SEASON } from "@/data";
+import {
+  ACTIVE_SEASON,
+  PREMIER_LEAGUE_2026_27_PLAYER_COUNT,
+  PREMIER_LEAGUE_2026_27_PLAYERS,
+} from "@/data";
 import { getDb } from "@/db/client";
 import {
   players,
@@ -26,12 +30,18 @@ import { normalizedParticipantNameKey } from "@/features/predictions/normalizati
 import { createPrediction } from "@/features/predictions/service";
 import type { ValidatedPredictionCategoryPick } from "@/features/predictions/validation";
 import { resolveIsolatedTestNow } from "@/features/seasons/clock";
+import { getActiveSeasonView } from "@/features/seasons/queries";
 import { PublicError } from "@/shared/errors";
 import { STANDINGS_FUTURE_TIMESTAMP_ERROR_CODE } from "@/features/standings/validation";
 import { importCanonicalStandings } from "../../scripts/import-standings";
+import { seedDatabase } from "../../scripts/seed";
+import { getSpotlightPicksByPredictionId } from "@/features/leaderboard/pick-queries";
+import { assertIsolatedDatabaseEnvironment } from "../test-environment-safety";
 
-const enabled =
-  process.env.RUN_DB_INTEGRATION === "1" && Boolean(process.env.DATABASE_URL);
+const enabled = process.env.RUN_DB_INTEGRATION === "1";
+if (enabled) {
+  assertIsolatedDatabaseEnvironment(process.env, "Neon integration tests");
+}
 const createdPredictionIds = new Set<string>();
 const importSources = new Set<string>();
 const originalSeasonSubmissionSettings = new Map<
@@ -208,6 +218,222 @@ afterEach(async () => {
 });
 
 describe.runIf(enabled)("Neon integration", () => {
+  it("reseeds by stable external ID while retaining inactive historical player references", async () => {
+    const { activeTeams, db, season } = await activeFixture();
+    const fixturePlayer = PREMIER_LEAGUE_2026_27_PLAYERS.find(
+      (player) =>
+        player.externalId &&
+        player.assetPath &&
+        activeTeams.some((team) => team.slug === player.teamSlug),
+    );
+    if (!fixturePlayer?.externalId || !fixturePlayer.assetPath) {
+      throw new Error("A seeded portrait player is required.");
+    }
+
+    const expectedTeam = activeTeams.find(
+      (team) => team.slug === fixturePlayer.teamSlug,
+    );
+    const staleTeam = activeTeams.find((team) => team.id !== expectedTeam?.id);
+    if (!expectedTeam || !staleTeam) {
+      throw new Error("Two seeded teams are required.");
+    }
+
+    const [fixturePlayerBefore] = await db
+      .select()
+      .from(players)
+      .where(
+        and(
+          eq(players.seasonId, season.id),
+          eq(players.externalId, fixturePlayer.externalId),
+        ),
+      )
+      .limit(1);
+    if (!fixturePlayerBefore) {
+      throw new Error("The selected fixture player is not seeded.");
+    }
+
+    const suffix = randomUUID().replaceAll("-", "").slice(0, 10);
+    const historicalPlayerId = randomUUID();
+    const historicalExternalId =
+      1_900_000_000 + (Number.parseInt(suffix.slice(0, 7), 16) % 100_000_000);
+    const historicalAssetPath = `/player-faces/qa-historical-${suffix}.png`;
+    let predictionId: string | undefined;
+
+    await db.insert(players).values({
+      assetPath: historicalAssetPath,
+      displayName: "QA Historical Player",
+      externalId: historicalExternalId,
+      firstName: "QA Historical",
+      id: historicalPlayerId,
+      isActive: true,
+      lastName: "Player",
+      seasonId: season.id,
+      slug: `qa-historical-${suffix}`,
+      sortName: `Player, QA Historical ${suffix}`,
+      teamId: staleTeam.id,
+    });
+
+    try {
+      const categoryPicks = categoryPicksFor(activeTeams);
+      categoryPicks[0] = {
+        category: "top_scorer",
+        playerId: historicalPlayerId,
+      };
+      categoryPicks[1] = {
+        category: "top_assister",
+        playerId: fixturePlayerBefore.id,
+      };
+      const created = await createPrediction({
+        categoryPicks,
+        honeypot: "",
+        participantName: `Seed QA ${suffix}`,
+        items: activeTeams.map((team, index) => ({
+          predictedPosition: index + 1,
+          teamId: team.id,
+        })),
+      });
+      predictionId = created.id;
+      createdPredictionIds.add(created.id);
+
+      await db
+        .update(players)
+        .set({
+          assetPath: `/player-faces/qa-stale-${suffix}.png`,
+          displayName: "QA Stale Fixture Player",
+          firstName: "QA Stale",
+          isActive: false,
+          lastName: "Fixture Player",
+          slug: `qa-stale-${suffix}`,
+          sortName: `Stale, QA ${suffix}`,
+          teamId: staleTeam.id,
+        })
+        .where(eq(players.id, fixturePlayerBefore.id));
+
+      const firstSeed = await seedDatabase(db);
+      expect(firstSeed).toEqual({
+        playerCount: PREMIER_LEAGUE_2026_27_PLAYER_COUNT,
+        seasonId: season.id,
+        teamCount: 20,
+      });
+
+      const [[fixturePlayerAfter], [historicalPlayerAfter], referencedPicks] =
+        await Promise.all([
+          db
+            .select()
+            .from(players)
+            .where(eq(players.id, fixturePlayerBefore.id))
+            .limit(1),
+          db
+            .select()
+            .from(players)
+            .where(eq(players.id, historicalPlayerId))
+            .limit(1),
+          db
+            .select({
+              category: predictionCategoryPicks.category,
+              playerId: predictionCategoryPicks.playerId,
+            })
+            .from(predictionCategoryPicks)
+            .where(eq(predictionCategoryPicks.predictionId, created.id)),
+        ]);
+
+      expect(fixturePlayerAfter).toMatchObject({
+        assetPath: fixturePlayer.assetPath,
+        displayName: fixturePlayer.displayName,
+        externalId: fixturePlayer.externalId,
+        id: fixturePlayerBefore.id,
+        isActive: true,
+        slug: fixturePlayer.slug,
+        teamId: expectedTeam.id,
+      });
+      expect(historicalPlayerAfter).toMatchObject({
+        assetPath: historicalAssetPath,
+        externalId: historicalExternalId,
+        id: historicalPlayerId,
+        isActive: false,
+      });
+      expect(
+        referencedPicks.find((pick) => pick.category === "top_scorer"),
+      ).toMatchObject({ playerId: historicalPlayerId });
+      expect(
+        referencedPicks.find((pick) => pick.category === "top_assister"),
+      ).toMatchObject({ playerId: fixturePlayerBefore.id });
+
+      const historicalPicks = await getSpotlightPicksByPredictionId([
+        created.id,
+      ]);
+      expect(historicalPicks.get(created.id)?.[0]).toMatchObject({
+        assetPath: historicalAssetPath,
+        category: "top_scorer",
+        displayName: "QA Historical Player",
+      });
+      expect(historicalPicks.get(created.id)?.[1]).toMatchObject({
+        assetPath: fixturePlayer.assetPath,
+        category: "top_assister",
+        displayName: fixturePlayer.displayName,
+      });
+
+      const activeSeasonView = await getActiveSeasonView();
+      expect(activeSeasonView.players).toHaveLength(
+        PREMIER_LEAGUE_2026_27_PLAYER_COUNT,
+      );
+      expect(
+        activeSeasonView.players.some(
+          (player) => player.id === historicalPlayerId,
+        ),
+      ).toBe(false);
+      expect(
+        activeSeasonView.players.some(
+          (player) => player.id === fixturePlayerBefore.id,
+        ),
+      ).toBe(true);
+
+      const secondSeed = await seedDatabase(db);
+      expect(secondSeed).toEqual(firstSeed);
+      const [[fixturePlayerAfterSecondSeed], [historicalAfterSecondSeed]] =
+        await Promise.all([
+          db
+            .select({ id: players.id, isActive: players.isActive })
+            .from(players)
+            .where(eq(players.id, fixturePlayerBefore.id))
+            .limit(1),
+          db
+            .select({ id: players.id, isActive: players.isActive })
+            .from(players)
+            .where(eq(players.id, historicalPlayerId))
+            .limit(1),
+        ]);
+      expect(fixturePlayerAfterSecondSeed).toEqual({
+        id: fixturePlayerBefore.id,
+        isActive: true,
+      });
+      expect(historicalAfterSecondSeed).toEqual({
+        id: historicalPlayerId,
+        isActive: false,
+      });
+    } finally {
+      if (predictionId) {
+        await db.delete(predictions).where(eq(predictions.id, predictionId));
+        createdPredictionIds.delete(predictionId);
+      }
+      await db.delete(players).where(eq(players.id, historicalPlayerId));
+      await db
+        .update(players)
+        .set({
+          assetPath: fixturePlayerBefore.assetPath,
+          displayName: fixturePlayerBefore.displayName,
+          firstName: fixturePlayerBefore.firstName,
+          isActive: fixturePlayerBefore.isActive,
+          lastName: fixturePlayerBefore.lastName,
+          slug: fixturePlayerBefore.slug,
+          sortName: fixturePlayerBefore.sortName,
+          teamId: fixturePlayerBefore.teamId,
+          updatedAt: fixturePlayerBefore.updatedAt,
+        })
+        .where(eq(players.id, fixturePlayerBefore.id));
+    }
+  });
+
   it("atomically creates and cascades one prediction with 20 table rows and 7 spotlight picks", async () => {
     const { activeTeams, db } = await activeFixture();
     const suffix = randomUUID().slice(0, 8);

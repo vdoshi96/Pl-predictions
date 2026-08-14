@@ -7,4 +7,4 @@ Potential project skills after the workflow stabilizes:
 - Verify prediction reveal/deadline privacy and scoring across a deployed build.
 - Generate and check same-content HTML peers for every tracked Markdown file.
 
-Do not formalize a FotMob scraper unless the owner supplies written automation/data-use permission.
+Owner-run FotMob or Transfermarkt acquisition may be formalized only as an offline, reviewed workflow. Do not add it to the deployed application, a public runtime route, or Vercel Cron.

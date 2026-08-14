@@ -1,6 +1,6 @@
 # Research: Dranx Prediction League
 
-Checked on 2026-08-08. The latest user instruction supersedes the original brief where standings acquisition conflicts: the production application has no live football-data dependency and no Vercel Cron.
+External sources were checked on 2026-08-08. The owner supplied the current permission disposition on 2026-08-14. The latest user instruction supersedes the original brief where standings acquisition conflicts: the production application has no live football-data dependency and no Vercel Cron.
 
 ## Season and clubs
 
@@ -19,15 +19,17 @@ The user-facing name is **Dranx Prediction League**. The visual direction is Pre
 
 The official Premier League logo was not added. The Premier League trademark FAQ states that club names and badges remain member-club marks. The project owner later supplied one transparent local PNG badge per verified club and explicitly directed use of that exact set. This repository records that owner direction without claiming original ownership, affiliation, or broader permission for the unused league logo/lion/ball files. An original Dranx mark keeps the product identity distinct while retaining the requested color reference.
 
-## FotMob data and rights
+## FotMob data, dated research, and current permission
 
 FotMob league ID `47` and the canonical team pages expose the factual external IDs used for import matching. Those identifiers are seeded once. The application stores only minimal snapshot facts: team ID, position, played, points, matchweek, capture time, and source URL.
 
-FotMob's current terms, checked 2026-08-08, prohibit robots/crawlers and systematic or regular extraction. A consumer subscription is not evidence of a data redistribution or automation licence. The Premier League also says club names and badges remain member-club marks.
+The terms review completed on 2026-08-08 recorded restrictions on robots/crawlers and systematic or regular extraction. That paragraph is retained as dated research rather than the current project permission gate. The Premier League separately says club names and badges remain member-club marks.
 
-Decision: do not implement recurring FotMob scraping in the product. A future owner-run Codex automation will enter reviewed spotlight outcomes manually. The existing source-neutral importer remains limited to standings. The app also supports manual standings. It stores no source HTML, browser cookies, or subscription credentials.
+Current disposition: on 2026-08-14 the owner confirmed that the required permissions for this player-catalogue workflow have been obtained, including acquisition, storage, redistribution, and production use. Owner-run FotMob or Transfermarkt acquisition may run offline and produce a reviewed local snapshot or result payload. Confidential licence documents remain outside source control and chat.
 
-Crest decision: FotMob's image URLs identify the genuine marks but do not grant redistribution or hotlinking rights, so the application does not fetch or hotlink them. The project owner's later 20-file PNG handoff supersedes the presentation portion of the original monogram decision for this exact local set. `TeamMark` uses contain sizing and a safe initials fallback; original SVG monograms remain rollback-only during the first PNG release.
+Decision: do not implement source acquisition in the deployed product. The existing source-neutral importer remains limited to standings, and the app also supports manual standings. The app stores no source HTML, browser cookies, or subscription credentials and performs no runtime source request, scrape, image hotlink, football API call, or scheduled acquisition.
+
+Historical crest finding: under the 2026-08-08 terms-only review, FotMob image URLs identified the genuine marks but were not treated as redistribution or hotlinking permission. The project owner's later 20-file PNG handoff superseded the presentation portion of the original monogram decision for this exact local set. `TeamMark` uses contain sizing and a safe initials fallback; original SVG monograms remain rollback-only during the first PNG release. The deployed application still does not fetch or hotlink them.
 
 Sources:
 
@@ -77,8 +79,8 @@ Sources:
 ## Rejected alternatives
 
 - `football-data.org` and its token: superseded by the no-live-API instruction.
-- Runtime FotMob scraping: conflicts with current published terms and makes the site brittle.
-- FotMob crest downloads and the official Premier League logo without documented authorization: conflict with repository policy and the current official terms.
+- Runtime FotMob acquisition: violates the selected offline-review architecture and makes the site brittle.
+- Unapproved crest downloads and the official Premier League logo: outside the owner-selected local asset sets and project identity.
 - Vercel Cron: unnecessary for the selected owner-run automation model.
 - `@vercel/postgres`: obsolete for new Vercel databases.
 - Legacy dnd-kit packages and recipes: superseded by the maintained React package.

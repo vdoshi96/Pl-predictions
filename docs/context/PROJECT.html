@@ -3,8 +3,9 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="generated-by" content="scripts/generate-docs-html.mjs" />
     <meta name="canonical-source" content="PROJECT.md" />
-    <meta name="canonical-source-sha256" content="2f6f98a32415af1825bd1453aa0f5dbab3a8a75514432656bade9d1d890e533d" />
+    <meta name="canonical-source-sha256" content="f0342be600b206092b685a8228135b16f55bdfb0fb65ee1919d44e653d2b8815" />
     <title>Project</title>
     <style>
       :root { color-scheme: light dark; font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
@@ -38,15 +39,15 @@
   </head>
   <body>
     <main>
-      <h1>Project</h1>
+      <h1 id="project">Project</h1>
 <p>Dranx Prediction League is an unofficial prediction game for a private invited group covering the 2026/27 English Premier League. A participant completes one immutable three-stage entry: order exactly 20 clubs and enter one display name, choose all seven spotlight predictions, then review the whole package before submission. The categories are top scorer, top assister, most clean sheets, underdog team, overrated team, underdog player, and overrated player. The first, second, sixth, and seventh choose a searchable player or Other-player name; the other three choose one of the existing clubs.</p>
 <p>Before reveal, the public table leaderboard exposes only each participant&#39;s name, submission time, predicted champion, and 0-point total. Prediction IDs, positions 2–20, and all seven spotlight picks stay private to the receipt browser and administrator. After reveal, the main leaderboard compares each table with the active standings. Its 5–3–1 tiers have a maximum of 100. A separate spotlight page tracks fun accuracy and never changes table points. Let <code>N</code> be the current number of active, nondeleted season brackets. Accuracy points are <code>max(0, N + 1 - outcome rank)</code>. Overall accuracy sums only resolved categories. Pending categories remain unavailable. Equal overall scores share a competition rank.</p>
-<p>Team underdog index is average predicted position minus actual position. Team overrated index is the inverse, and the largest value ranks first. Top scorer, top assister, and most clean sheets use the selected subject&#39;s occupied result rank. Underdog player ranks reviewed FotMob season ratings from high to low. Overrated player ranks them from low to high. A future owner-run Codex automation will enter these five reviewed outcomes manually. The app has no runtime FotMob access. The 2026-08-13 selector snapshot supplies 582 players and 582 local portraits. Other player remains available.</p>
+<p>Team underdog index is average predicted position minus actual position. Team overrated index is the inverse, and the largest value ranks first. Top scorer, top assister, and most clean sheets use the selected subject&#39;s occupied result rank. Underdog player ranks reviewed FotMob season ratings from high to low. Overrated player ranks them from low to high. A future owner-run Codex automation may acquire FotMob or Transfermarkt data offline, review it, and enter these five outcomes. The app has no runtime FotMob access. The owner-selected 2026-08-13 selector snapshot supplies 582 players and 582 local portraits; it is internally reconciled and not independently official-site verified. Other player remains available. Production stays on the August 8 seed baseline of 587 active players and 580 portrait paths until the refreshed application is deployed and the approved seed runs.</p>
 <p>Primary users are invited participants on mobile devices and one owner-administrator. Arsenal v Coventry City&#39;s verified <code>2026-08-21T19:00:00.000Z</code> opening kickoff is the persisted, non-extendable submission ceiling for the 2026/27 season. The owner can close earlier, manually lock, reveal early, delete erroneous entries, manage standings/import visibility, and confirm or undo final status. Login uses the <code>admin</code> username by default with a server-only salted PBKDF2 password hash; <code>ADMIN_SECRET</code> is a migration fallback only. Deleting a prediction cascades through its 20 table items and seven spotlight picks, after which the same normalized name may submit again and consensus scores derive from the remaining entries.</p>
 <p>The user-facing visual system uses the Premier League&#39;s official purple, <code>#37003c</code>, with cyan <code>#05f0ff</code>, green <code>#00ff87</code>, and pink <code>#ff2882</code> accents and an original Dranx mark. The official Premier League logo is not included. The project owner supplied and directed use of 20 transparent local PNG club badges; <code>TeamMark</code> displays them with contain sizing and an accessible initials fallback, while the original monograms remain rollback-only for the first PNG release.</p>
 <p>Constraints: one Next.js/Vercel application, Vercel-managed Neon, and one atomic submission with 20 table rows and seven category rows. The app has no end-user accounts, runtime football API, production scraper, cron, or extra personal data. It remains compatible with free and Hobby tiers. Operational identifiers retain their existing <code>pl-predictions</code> names. <code>/rules</code> explains table points, separate spotlight accuracy, and pending outcomes.</p>
 
-      <p class="source">Generated deterministically from <a href="PROJECT.md">docs/context/PROJECT.md</a>. Canonical SHA-256: <code>2f6f98a32415af1825bd1453aa0f5dbab3a8a75514432656bade9d1d890e533d</code>.</p>
+      <p class="source">Generated deterministically from <a href="PROJECT.md">docs/context/PROJECT.md</a>. Canonical SHA-256: <code>f0342be600b206092b685a8228135b16f55bdfb0fb65ee1919d44e653d2b8815</code>.</p>
     </main>
   </body>
 </html>

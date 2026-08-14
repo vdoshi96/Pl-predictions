@@ -15,6 +15,7 @@ import { SiteHeader } from "@/components/site-header";
 import { TeamMark } from "@/components/team-mark";
 import { Card, CardContent } from "@/components/ui/card";
 import { PREMIER_LEAGUE_2026_27_TEAMS } from "@/data/teams";
+import { SpotlightPickGrid } from "@/features/leaderboard/spotlight-pick-grid";
 import {
   PredictionForm,
   type PredictionSubmissionResult,
@@ -177,6 +178,52 @@ describe("PlayerMark", () => {
     expect(placeholder).toBeVisible();
     expect(placeholder.querySelector("svg")).toBeInTheDocument();
     expect(placeholder.querySelector("img")).not.toBeInTheDocument();
+  });
+
+  it("falls back to the silhouette when a supplied portrait fails to load", () => {
+    render(
+      <PlayerMark
+        name="Historical roster player"
+        src="/player-faces/historical-roster-player.png"
+      />,
+    );
+
+    const mark = screen.getByRole("img", {
+      name: "Historical roster player player portrait",
+    });
+    const image = mark.querySelector("img");
+    expect(image).toBeInTheDocument();
+    if (!image) throw new Error("Expected a player portrait image.");
+
+    fireEvent.error(image);
+
+    expect(mark.querySelector("img")).not.toBeInTheDocument();
+    expect(mark.querySelector("svg")).toBeInTheDocument();
+  });
+
+  it("renders an inactive historical player returned for a persisted pick", () => {
+    render(
+      <SpotlightPickGrid
+        picks={[
+          {
+            assetPath: "/player-faces/historical-roster-player.png",
+            category: "top_scorer",
+            displayName: "Historical roster player",
+            label: "Top scorer",
+            subject: "player",
+          },
+        ]}
+      />,
+    );
+
+    expect(screen.getByText("Historical roster player")).toBeVisible();
+    const mark = screen.getByRole("img", {
+      name: "Historical roster player player portrait",
+    });
+    expect(mark.querySelector("img")).toHaveAttribute(
+      "src",
+      expect.stringContaining("historical-roster-player.png"),
+    );
   });
 });
 

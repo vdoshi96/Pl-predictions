@@ -2,17 +2,33 @@
 
 import {
   AlertCircle,
+  AlertTriangle,
   CheckCircle2,
   LockKeyhole,
   ShieldCheck,
 } from "lucide-react";
 import Link from "next/link";
-import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
+import {
+  type FormEvent,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 
+import { AlphabeticalOrderDialog } from "./alphabetical-order-dialog";
+import type { PredictionCategory } from "./categories";
+import {
+  parsePredictionDraft,
+  predictionDraftStorageKey,
+  serializePredictionDraft,
+  type PredictionDraft,
+} from "./prediction-draft";
 import {
   PredictionSorter,
   type PredictionTeam,
@@ -53,12 +69,12 @@ export type PredictionSubmissionResult =
     };
 
 export interface PredictionFormProps {
-  players?: PredictionPlayer[];
   teams: PredictionTeam[];
   onSubmit: (
     submission: PredictionSubmissionPayload,
   ) => Promise<PredictionSubmissionResult>;
   seasonName?: string;
+  seasonSlug?: string;
   disabled?: boolean;
   disabledReason?: string;
   onPendingChange?: (pending: boolean) => void;
@@ -71,6 +87,71 @@ export interface PredictionFormProps {
 
 const EXPECTED_TEAM_COUNT = 20;
 
+type PlayerCatalogueStatus = "idle" | "loading" | "ready" | "error";
+
+function parsePlayerCataloguePayload(
+  value: unknown,
+  expectedSeasonSlug: string,
+): PredictionPlayer[] {
+  if (typeof value !== "object" || value === null || Array.isArray(value)) {
+    throw new Error("The player catalogue response was invalid.");
+  }
+
+  const payload = value as Record<string, unknown>;
+  if (
+    payload.seasonSlug !== expectedSeasonSlug ||
+    !Array.isArray(payload.players) ||
+    payload.players.length > 1_000
+  ) {
+    throw new Error("The player catalogue did not match this season.");
+  }
+
+  const seenIds = new Set<string>();
+  return payload.players.map((candidate) => {
+    if (
+      typeof candidate !== "object" ||
+      candidate === null ||
+      Array.isArray(candidate)
+    ) {
+      throw new Error("The player catalogue response was invalid.");
+    }
+    const player = candidate as Record<string, unknown>;
+    const id = typeof player.id === "string" ? player.id : "";
+    const displayName =
+      typeof player.displayName === "string" ? player.displayName : "";
+    const firstName =
+      player.firstName === null || typeof player.firstName === "string"
+        ? player.firstName
+        : null;
+    const lastName =
+      player.lastName === null || typeof player.lastName === "string"
+        ? player.lastName
+        : null;
+    const assetPath =
+      player.assetPath === null ||
+      (typeof player.assetPath === "string" &&
+        player.assetPath.startsWith("/player-faces/") &&
+        !player.assetPath.includes(".."))
+        ? player.assetPath
+        : null;
+
+    if (
+      !id ||
+      id.length > 100 ||
+      seenIds.has(id) ||
+      !displayName.trim() ||
+      displayName.length > 120 ||
+      (typeof firstName === "string" && firstName.length > 80) ||
+      (typeof lastName === "string" && lastName.length > 80)
+    ) {
+      throw new Error("The player catalogue response was invalid.");
+    }
+    seenIds.add(id);
+
+    return { assetPath, displayName, firstName, id, lastName };
+  });
+}
+
 export function normalizeDisplayName(value: string) {
   return value.normalize("NFKC").trim().replace(/\s+/g, " ");
 }
@@ -82,11 +163,23 @@ function buildTeamSetSignature(teams: readonly PredictionTeam[]) {
     .join("|");
 }
 
-function buildPlayerSetSignature(players: readonly PredictionPlayer[]) {
-  return players
-    .map((player) => player.id)
-    .sort()
-    .join("|");
+function draftHasChanges(
+  draft: PredictionDraft,
+  alphabeticalTeamIds: readonly string[],
+) {
+  return (
+    draft.participantName.length > 0 ||
+    draft.orderedTeamIds.length !== alphabeticalTeamIds.length ||
+    draft.orderedTeamIds.some(
+      (teamId, index) => teamId !== alphabeticalTeamIds[index],
+    ) ||
+    Object.keys(draft.spotlightPicks).length > 0 ||
+    draft.stage === "spotlight"
+  );
+}
+
+function draftContentSignature(draft: PredictionDraft, seasonSlug: string) {
+  return JSON.stringify({ ...draft, seasonSlug });
 }
 
 function messageFromUnknownError(error: unknown) {
@@ -96,20 +189,23 @@ function messageFromUnknownError(error: unknown) {
 }
 
 export function PredictionForm({
-  players = [],
   teams,
   onSubmit,
   seasonName = "2026/27 Premier League",
+  seasonSlug = "2026-27",
   disabled = false,
   disabledReason = "Predictions are currently closed.",
   onPendingChange,
   onSuccess,
   onError,
 }: PredictionFormProps) {
+  const resolvedSeasonSlug = seasonSlug.trim();
   const teamSetSignature = buildTeamSetSignature(teams);
-  const playerSetSignature = buildPlayerSetSignature(players);
+  const activeSeasonSlugRef = useRef(resolvedSeasonSlug);
+  const previousSeasonSlugRef = useRef(resolvedSeasonSlug);
   const previousTeamSetSignatureRef = useRef(teamSetSignature);
-  const previousPlayerSetSignatureRef = useRef(playerSetSignature);
+  const lastPersistedDraftContentRef = useRef<string | null>(null);
+  const skipNextDraftPersistenceRef = useRef(false);
   const pendingRef = useRef(false);
   const [orderedTeamIds, setOrderedTeamIds] = useState<string[]>(() =>
     sortTeamsAlphabetically(teams).map((team) => team.id),
@@ -118,6 +214,7 @@ export function PredictionForm({
   const [honeypot, setHoneypot] = useState("");
   const [stage, setStage] = useState<"table" | "spotlight">("table");
   const [spotlightPicks, setSpotlightPicks] = useState<SpotlightPicksDraft>({});
+  const spotlightPicksRef = useRef<SpotlightPicksDraft>({});
   const [spotlightValidationAttempted, setSpotlightValidationAttempted] =
     useState(false);
   const [reviewOpen, setReviewOpen] = useState(false);
@@ -126,6 +223,28 @@ export function PredictionForm({
   const [success, setSuccess] = useState<
     Extract<PredictionSubmissionResult, { ok: true }> | undefined
   >();
+  const [alphabeticalWarningOpen, setAlphabeticalWarningOpen] = useState(false);
+  const [alphabeticalOrderAcknowledged, setAlphabeticalOrderAcknowledged] =
+    useState(false);
+  const [draftReady, setDraftReady] = useState(false);
+  const [draftStatus, setDraftStatus] = useState<
+    "idle" | "restored" | "saved" | "unavailable"
+  >("idle");
+  const [persistedDraftContent, setPersistedDraftContent] = useState<
+    string | null
+  >(null);
+  const [cataloguePlayers, setCataloguePlayers] = useState<PredictionPlayer[]>(
+    [],
+  );
+  const [playerCatalogueStatus, setPlayerCatalogueStatus] =
+    useState<PlayerCatalogueStatus>("idle");
+  const [playerCatalogueMessage, setPlayerCatalogueMessage] = useState<
+    string | null
+  >(null);
+  const [expandedSelectorCategory, setExpandedSelectorCategory] =
+    useState<PredictionCategory | null>(null);
+  const playerCatalogueRequestRef = useRef<Promise<void> | null>(null);
+  const playerCatalogueAbortRef = useRef<AbortController | null>(null);
 
   const teamById = useMemo(
     () => new Map(teams.map((team) => [team.id, team])),
@@ -138,6 +257,20 @@ export function PredictionForm({
         .filter((team): team is PredictionTeam => Boolean(team)),
     [orderedTeamIds, teamById],
   );
+  const alphabeticalTeams = useMemo(
+    () => sortTeamsAlphabetically(teams),
+    [teams],
+  );
+  const alphabeticalTeamIds = useMemo(
+    () => alphabeticalTeams.map((team) => team.id),
+    [alphabeticalTeams],
+  );
+  const isAlphabetical =
+    orderedTeamIds.length === alphabeticalTeamIds.length &&
+    orderedTeamIds.every(
+      (teamId, index) => teamId === alphabeticalTeamIds[index],
+    );
+  const storageKey = predictionDraftStorageKey(resolvedSeasonSlug);
   const normalizedName = normalizeDisplayName(participantName);
   const normalizedNameKeyLength =
     normalizedName.toLocaleLowerCase("en-GB").length;
@@ -146,6 +279,7 @@ export function PredictionForm({
     orderedTeams.length === EXPECTED_TEAM_COUNT &&
     uniqueTeamCount === EXPECTED_TEAM_COUNT;
   const canContinue =
+    draftReady &&
     !disabled &&
     !pending &&
     hasCompleteTable &&
@@ -153,44 +287,361 @@ export function PredictionForm({
     normalizedName.length <= 40 &&
     normalizedNameKeyLength <= 40;
   const spotlightReviewItems = useMemo(
-    () => buildSpotlightReviewItems(spotlightPicks, players, orderedTeams),
-    [orderedTeams, players, spotlightPicks],
+    () =>
+      buildSpotlightReviewItems(spotlightPicks, cataloguePlayers, orderedTeams),
+    [cataloguePlayers, orderedTeams, spotlightPicks],
   );
   const spotlightComplete =
     spotlightPicksAreComplete(spotlightPicks) &&
     spotlightReviewItems.length === 7;
   const canSubmit = canContinue && spotlightComplete;
+  const currentDraft: PredictionDraft = {
+    orderedTeamIds,
+    participantName,
+    spotlightPicks,
+    stage,
+  };
+  const currentDraftHasChanges = draftHasChanges(
+    currentDraft,
+    alphabeticalTeamIds,
+  );
+  const currentDraftContent = draftContentSignature(
+    currentDraft,
+    resolvedSeasonSlug,
+  );
+  const currentDraftIsPersisted =
+    currentDraftHasChanges && currentDraftContent === persistedDraftContent;
+  const draftStatusMessage = !draftReady
+    ? "Checking this browser for a saved draft…"
+    : draftStatus === "unavailable"
+      ? "This browser could not save a draft. Refreshing may lose your changes."
+      : draftStatus === "restored" && currentDraftIsPersisted
+        ? "Draft restored from this browser."
+        : currentDraftIsPersisted
+          ? "Draft saved in this browser until you submit."
+          : "Not submitted. Your progress will be saved in this browser until you submit.";
 
+  const persistDraftSnapshot = useCallback(
+    (nextDraft: PredictionDraft) => {
+      if (
+        !draftReady ||
+        success ||
+        disabled ||
+        activeSeasonSlugRef.current !== resolvedSeasonSlug
+      ) {
+        return;
+      }
+
+      try {
+        if (!draftHasChanges(nextDraft, alphabeticalTeamIds)) {
+          window.localStorage.removeItem(storageKey);
+          lastPersistedDraftContentRef.current = null;
+          setPersistedDraftContent(null);
+          setDraftStatus("idle");
+          return;
+        }
+
+        const content = draftContentSignature(nextDraft, resolvedSeasonSlug);
+        if (content !== lastPersistedDraftContentRef.current) {
+          window.localStorage.setItem(
+            storageKey,
+            serializePredictionDraft(nextDraft, resolvedSeasonSlug),
+          );
+          lastPersistedDraftContentRef.current = content;
+          setDraftStatus("saved");
+        } else {
+          setDraftStatus((currentStatus) =>
+            currentStatus === "restored" ? currentStatus : "saved",
+          );
+        }
+        setPersistedDraftContent(content);
+      } catch {
+        setDraftStatus("unavailable");
+      }
+    },
+    [
+      alphabeticalTeamIds,
+      disabled,
+      draftReady,
+      resolvedSeasonSlug,
+      storageKey,
+      success,
+    ],
+  );
+
+  /* eslint-disable react-hooks/set-state-in-effect -- localStorage is a browser-only external store; hydration and write outcomes must update the visible draft state. */
   useEffect(() => {
-    if (previousTeamSetSignatureRef.current === teamSetSignature) return;
+    const seasonChanged = previousSeasonSlugRef.current !== resolvedSeasonSlug;
+    const teamSetChanged =
+      previousTeamSetSignatureRef.current !== teamSetSignature;
+    if (!seasonChanged && !teamSetChanged) return;
 
+    previousSeasonSlugRef.current = resolvedSeasonSlug;
     previousTeamSetSignatureRef.current = teamSetSignature;
-    setOrderedTeamIds(sortTeamsAlphabetically(teams).map((team) => team.id));
+    activeSeasonSlugRef.current = resolvedSeasonSlug;
+    skipNextDraftPersistenceRef.current = true;
+    lastPersistedDraftContentRef.current = null;
+
+    if (seasonChanged) {
+      playerCatalogueAbortRef.current?.abort();
+      playerCatalogueAbortRef.current = null;
+      playerCatalogueRequestRef.current = null;
+    }
+
+    setOrderedTeamIds(alphabeticalTeamIds);
+    setParticipantName("");
+    spotlightPicksRef.current = {};
     setSpotlightPicks({});
     setStage("table");
+    setSpotlightValidationAttempted(false);
     setReviewOpen(false);
+    setAlphabeticalWarningOpen(false);
+    setAlphabeticalOrderAcknowledged(false);
     setError(null);
-  }, [teamSetSignature, teams]);
+    setDraftReady(false);
+    setDraftStatus("idle");
+    setPersistedDraftContent(null);
+    if (seasonChanged) {
+      setCataloguePlayers([]);
+      setPlayerCatalogueStatus("idle");
+      setPlayerCatalogueMessage(null);
+    }
+    setExpandedSelectorCategory(null);
+  }, [alphabeticalTeamIds, resolvedSeasonSlug, teamSetSignature]);
 
   useEffect(() => {
-    if (previousPlayerSetSignatureRef.current === playerSetSignature) return;
-
-    previousPlayerSetSignatureRef.current = playerSetSignature;
-    const activePlayerIds = new Set(players.map((player) => player.id));
-    setSpotlightPicks((current) => {
-      let changed = false;
-      const next = { ...current };
-      for (const [category, pick] of Object.entries(next)) {
-        if (pick?.kind === "player" && !activePlayerIds.has(pick.playerId)) {
-          delete next[category as keyof SpotlightPicksDraft];
-          changed = true;
-        }
+    try {
+      const serialized = window.localStorage.getItem(storageKey);
+      if (!serialized) {
+        lastPersistedDraftContentRef.current = null;
+        setPersistedDraftContent(null);
+        setDraftStatus("idle");
+        setDraftReady(true);
+        return;
       }
-      return changed ? next : current;
+
+      const restored = parsePredictionDraft(
+        serialized,
+        resolvedSeasonSlug,
+        alphabeticalTeams,
+      );
+      if (!restored) {
+        window.localStorage.removeItem(storageKey);
+        lastPersistedDraftContentRef.current = null;
+        setPersistedDraftContent(null);
+        setDraftStatus("idle");
+        setDraftReady(true);
+        return;
+      }
+
+      setOrderedTeamIds(restored.orderedTeamIds);
+      setParticipantName(restored.participantName);
+      spotlightPicksRef.current = restored.spotlightPicks;
+      setSpotlightPicks(restored.spotlightPicks);
+      setStage(restored.stage);
+      const restoredContent = draftContentSignature(
+        restored,
+        resolvedSeasonSlug,
+      );
+      lastPersistedDraftContentRef.current = restoredContent;
+      setPersistedDraftContent(restoredContent);
+      skipNextDraftPersistenceRef.current = true;
+      setDraftStatus("restored");
+      setDraftReady(true);
+    } catch {
+      lastPersistedDraftContentRef.current = null;
+      setPersistedDraftContent(null);
+      setDraftStatus("unavailable");
+      setDraftReady(true);
+    }
+  }, [alphabeticalTeams, resolvedSeasonSlug, storageKey, teamSetSignature]);
+
+  useEffect(() => {
+    if (!draftReady || success || disabled) return;
+    if (skipNextDraftPersistenceRef.current) {
+      skipNextDraftPersistenceRef.current = false;
+      return;
+    }
+
+    persistDraftSnapshot({
+      orderedTeamIds,
+      participantName,
+      spotlightPicks,
+      stage,
     });
+  }, [
+    draftReady,
+    disabled,
+    orderedTeamIds,
+    participantName,
+    persistDraftSnapshot,
+    spotlightPicks,
+    stage,
+    success,
+  ]);
+
+  useEffect(() => {
+    if (!draftReady || !disabled || success) return;
+
+    try {
+      window.localStorage.removeItem(storageKey);
+    } catch {
+      // The server-verified permanent closure remains authoritative even when
+      // this browser's storage backend is unavailable.
+    }
+    lastPersistedDraftContentRef.current = null;
+    setPersistedDraftContent(null);
+    setOrderedTeamIds(alphabeticalTeamIds);
+    setParticipantName("");
+    spotlightPicksRef.current = {};
+    setSpotlightPicks({});
+    setStage("table");
+    setSpotlightValidationAttempted(false);
     setReviewOpen(false);
+    setAlphabeticalWarningOpen(false);
+    setAlphabeticalOrderAcknowledged(false);
+    setExpandedSelectorCategory(null);
     setError(null);
-  }, [playerSetSignature, players]);
+    setDraftStatus("idle");
+  }, [alphabeticalTeamIds, disabled, draftReady, storageKey, success]);
+  /* eslint-enable react-hooks/set-state-in-effect */
+
+  useEffect(() => {
+    if (!currentDraftHasChanges || draftStatus !== "unavailable" || success)
+      return;
+
+    const warnBeforeUnload = (event: BeforeUnloadEvent) => {
+      event.preventDefault();
+      event.returnValue = "";
+    };
+    window.addEventListener("beforeunload", warnBeforeUnload);
+    return () => window.removeEventListener("beforeunload", warnBeforeUnload);
+  }, [currentDraftHasChanges, draftStatus, success]);
+
+  const loadPlayerCatalogue = useCallback(
+    async (force = false) => {
+      if (
+        playerCatalogueRequestRef.current ||
+        (!force && playerCatalogueStatus !== "idle")
+      ) {
+        return;
+      }
+
+      const request = (async () => {
+        const controller = new AbortController();
+        const requestSeasonSlug = resolvedSeasonSlug;
+        playerCatalogueAbortRef.current = controller;
+        setPlayerCatalogueStatus("loading");
+        setPlayerCatalogueMessage(null);
+        try {
+          const response = await fetch("/api/player-catalogue", {
+            cache: "no-store",
+            headers: { Accept: "application/json" },
+            signal: controller.signal,
+          });
+          if (!response.ok)
+            throw new Error("The player catalogue is unavailable.");
+          const loadedPlayers = parsePlayerCataloguePayload(
+            await response.json(),
+            requestSeasonSlug,
+          );
+          if (
+            controller.signal.aborted ||
+            activeSeasonSlugRef.current !== requestSeasonSlug
+          ) {
+            return;
+          }
+          const loadedPlayerIds = new Set(
+            loadedPlayers.map((player) => player.id),
+          );
+          const currentPicks = spotlightPicksRef.current;
+          const stalePlayerCategories = Object.entries(currentPicks).flatMap(
+            ([category, pick]) =>
+              pick?.kind === "player" && !loadedPlayerIds.has(pick.playerId)
+                ? [category as keyof SpotlightPicksDraft]
+                : [],
+          );
+          if (stalePlayerCategories.length > 0) {
+            const nextPicks = { ...currentPicks };
+            for (const category of stalePlayerCategories) {
+              const currentPick = currentPicks[category];
+              if (
+                currentPick?.kind === "player" &&
+                !loadedPlayerIds.has(currentPick.playerId)
+              ) {
+                delete nextPicks[category];
+              }
+            }
+            spotlightPicksRef.current = nextPicks;
+            setSpotlightPicks(nextPicks);
+            persistDraftSnapshot({
+              orderedTeamIds,
+              participantName,
+              spotlightPicks: nextPicks,
+              stage,
+            });
+          }
+          setCataloguePlayers(loadedPlayers);
+          setPlayerCatalogueStatus("ready");
+          if (stalePlayerCategories.length > 0) {
+            setPlayerCatalogueMessage(
+              `${stalePlayerCategories.length} saved player ${
+                stalePlayerCategories.length === 1
+                  ? "selection is"
+                  : "selections are"
+              } no longer in this season’s catalogue. Choose again or use Other player.`,
+            );
+          }
+        } catch {
+          if (
+            controller.signal.aborted ||
+            activeSeasonSlugRef.current !== requestSeasonSlug
+          ) {
+            return;
+          }
+          setPlayerCatalogueStatus("error");
+          setPlayerCatalogueMessage(
+            "The player catalogue could not be loaded. Retry, or use Other player in each player category.",
+          );
+        } finally {
+          if (playerCatalogueAbortRef.current === controller) {
+            playerCatalogueAbortRef.current = null;
+          }
+        }
+      })();
+
+      playerCatalogueRequestRef.current = request;
+      try {
+        await request;
+      } finally {
+        playerCatalogueRequestRef.current = null;
+      }
+    },
+    [
+      playerCatalogueStatus,
+      orderedTeamIds,
+      participantName,
+      persistDraftSnapshot,
+      resolvedSeasonSlug,
+      setCataloguePlayers,
+      setPlayerCatalogueMessage,
+      setPlayerCatalogueStatus,
+      stage,
+    ],
+  );
+
+  useEffect(() => {
+    if (draftReady && stage === "spotlight") {
+      void loadPlayerCatalogue();
+    }
+  }, [draftReady, loadPlayerCatalogue, stage]);
+
+  useEffect(
+    () => () => {
+      playerCatalogueAbortRef.current?.abort();
+    },
+    [],
+  );
 
   function setPendingState(nextPending: boolean) {
     pendingRef.current = nextPending;
@@ -199,8 +650,52 @@ export function PredictionForm({
   }
 
   function handleOrderChange(nextTeams: PredictionTeam[]) {
-    setOrderedTeamIds(nextTeams.map((team) => team.id));
+    const nextOrderedTeamIds = nextTeams.map((team) => team.id);
+    setOrderedTeamIds(nextOrderedTeamIds);
+    persistDraftSnapshot({
+      orderedTeamIds: nextOrderedTeamIds,
+      participantName,
+      spotlightPicks,
+      stage,
+    });
+    setAlphabeticalWarningOpen(false);
     setError(null);
+  }
+
+  function handleSpotlightPicksChange(
+    update: (currentPicks: SpotlightPicksDraft) => SpotlightPicksDraft,
+  ) {
+    const nextPicks = update(spotlightPicksRef.current);
+    spotlightPicksRef.current = nextPicks;
+    setSpotlightPicks(nextPicks);
+    persistDraftSnapshot({
+      orderedTeamIds,
+      participantName,
+      spotlightPicks: nextPicks,
+      stage,
+    });
+    setError(null);
+  }
+
+  function continueToSpotlight() {
+    if (disabled) {
+      setAlphabeticalWarningOpen(false);
+      setError(disabledReason);
+      return;
+    }
+    setParticipantName(normalizedName);
+    setAlphabeticalWarningOpen(false);
+    setStage("spotlight");
+    persistDraftSnapshot({
+      orderedTeamIds,
+      participantName: normalizedName,
+      spotlightPicks,
+      stage: "spotlight",
+    });
+    window.requestAnimationFrame(() => {
+      document.getElementById("spotlight-picks-heading")?.focus();
+      window.scrollTo({ behavior: "smooth", top: 0 });
+    });
   }
 
   function buildSubmission(): PredictionSubmissionPayload {
@@ -238,17 +733,23 @@ export function PredictionForm({
       return;
     }
 
-    setParticipantName(normalizedName);
-    setStage("spotlight");
-    window.requestAnimationFrame(() => {
-      document.getElementById("spotlight-picks-heading")?.focus();
-      window.scrollTo({ behavior: "smooth", top: 0 });
-    });
+    if (isAlphabetical && !alphabeticalOrderAcknowledged) {
+      setAlphabeticalWarningOpen(true);
+      return;
+    }
+
+    continueToSpotlight();
   }
 
   function handleFinalReview(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setError(null);
+
+    if (disabled) {
+      setError(disabledReason);
+      return;
+    }
+
     setSpotlightValidationAttempted(true);
 
     if (!spotlightComplete) {
@@ -299,6 +800,14 @@ export function PredictionForm({
       setError(result.message);
       onError?.(result.message, submission);
       return;
+    }
+
+    try {
+      window.localStorage.removeItem(storageKey);
+      lastPersistedDraftContentRef.current = null;
+      setPersistedDraftContent(null);
+    } catch {
+      // Submission succeeded on the server; local cleanup must not mask success.
     }
 
     setSuccess(result);
@@ -362,12 +871,6 @@ export function PredictionForm({
             </span>
             Step 1 of 3 · Your table
           </div>
-          <PredictionSorter
-            teams={orderedTeams}
-            onChange={handleOrderChange}
-            disabled={disabled || pending}
-          />
-
           <Card className="overflow-visible" id="submit-prediction">
             <CardContent className="grid gap-4">
               <div className="flex items-start gap-3">
@@ -398,7 +901,14 @@ export function PredictionForm({
                   type="text"
                   value={participantName}
                   onChange={(event) => {
-                    setParticipantName(event.target.value);
+                    const nextParticipantName = event.target.value;
+                    setParticipantName(nextParticipantName);
+                    persistDraftSnapshot({
+                      orderedTeamIds,
+                      participantName: nextParticipantName,
+                      spotlightPicks,
+                      stage,
+                    });
                     setError(null);
                   }}
                   autoComplete="name"
@@ -407,7 +917,7 @@ export function PredictionForm({
                   minLength={2}
                   maxLength={40}
                   required
-                  disabled={disabled || pending}
+                  disabled={!draftReady || disabled || pending}
                   aria-describedby="participant-name-help"
                   className="border-border text-brand-strong focus:border-accent-lilac mt-2 min-h-12 w-full rounded-xl border bg-white px-3.5 text-base outline-none placeholder:text-slate-400 focus:ring-2 focus:ring-[#dffcff] disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-500"
                   placeholder="e.g. Vishal"
@@ -462,19 +972,80 @@ export function PredictionForm({
               ) : null}
             </CardContent>
           </Card>
+
+          <aside
+            aria-labelledby="alphabetical-blank-slate-heading"
+            className="flex items-start gap-3 rounded-2xl border border-amber-200 bg-amber-50 p-4 text-amber-950"
+          >
+            <AlertTriangle
+              aria-hidden="true"
+              className="mt-0.5 size-5 shrink-0 text-amber-800"
+            />
+            <div>
+              <h2
+                id="alphabetical-blank-slate-heading"
+                className="text-sm font-black"
+              >
+                The table starts A–Z as a blank slate
+              </h2>
+              <p className="mt-1 text-sm leading-5 text-amber-900">
+                This is not last season’s table or a suggested prediction.
+                Reorder the clubs, or confirm the A–Z order when you continue if
+                it is really your prediction.
+              </p>
+            </div>
+          </aside>
+
+          <PredictionSorter
+            teams={orderedTeams}
+            onChange={handleOrderChange}
+            onReset={() => setAlphabeticalOrderAcknowledged(false)}
+            disabled={!draftReady || disabled || pending}
+          />
         </>
       ) : (
-        <SpotlightPredictionsForm
-          disabled={disabled || pending}
-          invalid={spotlightValidationAttempted}
-          onChange={(nextPicks) => {
-            setSpotlightPicks(nextPicks);
-            setError(null);
-          }}
-          picks={spotlightPicks}
-          players={players}
-          teams={orderedTeams}
-        />
+        <>
+          {playerCatalogueStatus === "loading" ? (
+            <p
+              className="rounded-xl border border-sky-200 bg-sky-50 p-3 text-sm font-bold text-sky-900"
+              role="status"
+            >
+              Loading this season’s player catalogue… Other player remains
+              available while it loads.
+            </p>
+          ) : null}
+          {playerCatalogueMessage ? (
+            <div
+              className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-amber-200 bg-amber-50 p-3 text-sm font-bold text-amber-900"
+              role="alert"
+            >
+              <span>{playerCatalogueMessage}</span>
+              {playerCatalogueStatus === "error" ? (
+                <Button
+                  onClick={() => void loadPlayerCatalogue(true)}
+                  size="sm"
+                  type="button"
+                  variant="secondary"
+                >
+                  Retry player catalogue
+                </Button>
+              ) : null}
+            </div>
+          ) : null}
+          <SpotlightPredictionsForm
+            disabled={disabled || pending}
+            invalid={spotlightValidationAttempted}
+            onChange={handleSpotlightPicksChange}
+            onSelectorExpandedChange={(category, expanded) =>
+              setExpandedSelectorCategory((current) =>
+                expanded ? category : current === category ? null : current,
+              )
+            }
+            picks={spotlightPicks}
+            players={cataloguePlayers}
+            teams={orderedTeams}
+          />
+        </>
       )}
 
       {stage === "spotlight" && error && !reviewOpen ? (
@@ -487,7 +1058,11 @@ export function PredictionForm({
         </p>
       ) : null}
 
-      <div className="border-border/80 sticky bottom-0 z-20 -mx-2 border-t bg-white/95 px-2 pt-3 pb-[max(1rem,env(safe-area-inset-bottom))] shadow-[0_-16px_30px_-26px_rgba(55,0,60,0.6)] backdrop-blur sm:static sm:mx-0 sm:border-0 sm:bg-transparent sm:p-0 sm:shadow-none sm:backdrop-blur-none">
+      <div
+        className={`border-border/80 sticky bottom-0 z-20 -mx-2 border-t bg-white/95 px-2 pt-3 pb-[max(1rem,env(safe-area-inset-bottom))] shadow-[0_-16px_30px_-26px_rgba(55,0,60,0.6)] backdrop-blur sm:static sm:mx-0 sm:border-0 sm:bg-transparent sm:p-0 sm:shadow-none sm:backdrop-blur-none ${
+          stage === "spotlight" && expandedSelectorCategory ? "hidden" : ""
+        }`}
+      >
         <div
           className={stage === "spotlight" ? "grid gap-2 sm:grid-cols-2" : ""}
         >
@@ -498,6 +1073,12 @@ export function PredictionForm({
               size="lg"
               onClick={() => {
                 setStage("table");
+                persistDraftSnapshot({
+                  orderedTeamIds,
+                  participantName,
+                  spotlightPicks,
+                  stage: "table",
+                });
                 setError(null);
                 window.requestAnimationFrame(() => window.scrollTo({ top: 0 }));
               }}
@@ -509,7 +1090,7 @@ export function PredictionForm({
             type="submit"
             size="lg"
             className="w-full"
-            disabled={stage === "table" ? !canContinue : pending}
+            disabled={stage === "table" ? !canContinue : pending || disabled}
             aria-describedby="review-button-help"
           >
             {stage === "table"
@@ -519,15 +1100,26 @@ export function PredictionForm({
         </div>
         <p
           id="review-button-help"
+          aria-live="polite"
           className="mt-2 text-center text-xs leading-5 text-slate-500"
         >
           {stage === "table"
-            ? "Nothing is saved yet. Your table stays here if you go back."
-            : `${Object.keys(spotlightPicks).length} of 7 spotlight categories started.`}
+            ? draftStatusMessage
+            : `${Object.keys(spotlightPicks).length} of 7 spotlight categories started. ${draftStatusMessage}`}
         </p>
       </div>
 
+      <AlphabeticalOrderDialog
+        onConfirm={() => {
+          setAlphabeticalOrderAcknowledged(true);
+          continueToSpotlight();
+        }}
+        onOpenChange={setAlphabeticalWarningOpen}
+        open={alphabeticalWarningOpen}
+      />
+
       <ReviewDialog
+        confirmDisabled={!canSubmit}
         open={reviewOpen}
         participantName={normalizedName}
         spotlightPicks={spotlightReviewItems}

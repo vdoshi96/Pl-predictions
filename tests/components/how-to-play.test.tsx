@@ -6,14 +6,14 @@ import { HowToPlay } from "@/components/how-to-play";
 afterEach(cleanup);
 
 describe("HowToPlay", () => {
-  it("shows three annotated steps backed by live mobile screenshots", () => {
+  it("shows three annotated steps backed by current mobile screenshots", () => {
     render(<HowToPlay />);
 
     expect(
       screen.getByRole("heading", { name: "How to play in three steps" }),
     ).toBeVisible();
     expect(
-      screen.getByText(/captured from the live mobile site/iu),
+      screen.getByText(/captured from the current mobile flow/iu),
     ).toBeVisible();
 
     for (const heading of [
@@ -34,8 +34,10 @@ describe("HowToPlay", () => {
       ]),
     );
 
+    expect(screen.getByText(/Enter your display name first/iu)).toBeVisible();
+    expect(screen.getByText(/A–Z is only a blank slate/iu)).toBeVisible();
     expect(
-      screen.getByText(/Use the six-dot handles to drag clubs/iu),
+      screen.getByText(/Type at least two letters to search up to 20/iu),
     ).toBeVisible();
     expect(screen.getByText(/Complete all seven categories/iu)).toBeVisible();
     expect(

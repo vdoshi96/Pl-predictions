@@ -4,6 +4,7 @@ import Link from "next/link";
 
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
+import { SPOTLIGHT_SCORING_MESSAGE } from "@/content/public-copy";
 import { LeaderboardEntryLink } from "@/features/leaderboard/entry-link";
 import { getLeaderboardView } from "@/features/leaderboard/queries";
 import { SpotlightPickGrid } from "@/features/leaderboard/spotlight-pick-grid";
@@ -12,7 +13,6 @@ import {
   isPredictionCategory,
   type PredictionCategory,
 } from "@/features/predictions/categories";
-import { getActiveSeasonView } from "@/features/seasons/queries";
 import { formatUtcDateTime } from "@/shared/format";
 
 export const metadata: Metadata = { title: "Spotlight accuracy" };
@@ -62,11 +62,7 @@ export default async function SpotlightPage({
 }: {
   searchParams: Promise<{ sort?: string | string[] }>;
 }) {
-  const [{ season }, view, query] = await Promise.all([
-    getActiveSeasonView(),
-    getLeaderboardView(),
-    searchParams,
-  ]);
+  const [view, query] = await Promise.all([getLeaderboardView(), searchParams]);
   const sort = parseSort(query.sort);
   const selectedDefinition =
     sort === "overall"
@@ -98,7 +94,7 @@ export default async function SpotlightPage({
         <section className="brand-hero rounded-3xl p-5 text-white sm:p-8">
           <div className="flex flex-wrap items-center gap-2">
             <Badge className="bg-accent text-brand ring-accent">
-              {season.name}
+              {view.seasonName}
             </Badge>
             <Badge className="bg-white/15 text-white ring-white/20">
               Just for fun
@@ -141,16 +137,17 @@ export default async function SpotlightPage({
             </span>
             <div>
               <h2 className="text-brand-strong text-xl font-black">
-                Bracket-count scoring
+                How spotlight points work
               </h2>
               <p className="mt-1 text-sm leading-6 text-slate-600">
-                With N active brackets, a result rank earns max(0, N + 1 − rank)
-                accuracy points. Rank 1 therefore earns N points, rank 2 earns N
-                − 1, and so on. Only categories with an entered result count
-                toward the available accuracy score; the owner-run Codex
-                automation will enter the other five result lists manually when
-                they are ready.
+                {SPOTLIGHT_SCORING_MESSAGE}
               </p>
+              <Link
+                className="text-brand focus-visible:ring-accent-blue mt-3 inline-flex min-h-11 items-center rounded-lg font-black underline decoration-2 underline-offset-4 outline-none focus-visible:ring-2"
+                href="/rules#spotlight-scoring"
+              >
+                Read the full scoring rules
+              </Link>
             </div>
           </CardContent>
         </Card>
@@ -266,13 +263,17 @@ export default async function SpotlightPage({
                 const selectedPick =
                   sort === "overall" ? null : resultFor(entry, sort);
                 const selectedResultRank = selectedPick?.resultRank;
+                const selectedOutsideRange =
+                  selectedPick?.resultStatus === "outside-range";
                 const selectedAccuracyPoints = selectedPick?.accuracyPoints;
                 const displayedRank =
                   sort === "overall"
                     ? hasAvailableResults
                       ? entry.accuracyRank
                       : "—"
-                    : (selectedResultRank ?? "—");
+                    : selectedOutsideRange
+                      ? ">"
+                      : (selectedResultRank ?? "—");
                 const displayedScore =
                   sort === "overall"
                     ? hasAvailableResults
@@ -280,7 +281,9 @@ export default async function SpotlightPage({
                       : "—"
                     : (selectedAccuracyPoints ?? "—");
                 const rankLabel = selectedDefinition
-                  ? `${selectedDefinition.label} result rank ${selectedResultRank ?? "pending"}`
+                  ? selectedOutsideRange
+                    ? `${selectedDefinition.label} outside the published result range`
+                    : `${selectedDefinition.label} result rank ${selectedResultRank ?? "pending"}`
                   : hasAvailableResults
                     ? `Accuracy rank ${entry.accuracyRank}`
                     : "Accuracy rank pending";
@@ -309,7 +312,9 @@ export default async function SpotlightPage({
                           </span>
                           <span className="mt-1 block text-xs font-semibold text-slate-600">
                             {selectedDefinition
-                              ? `${selectedDefinition.label} result rank ${selectedResultRank ?? "pending"}`
+                              ? selectedOutsideRange
+                                ? `${selectedDefinition.label} ${selectedPick?.metricLabel}`
+                                : `${selectedDefinition.label} result rank ${selectedResultRank ?? "pending"}`
                               : `${entry.availableCategoryCount} of 7 results available`}
                           </span>
                         </div>

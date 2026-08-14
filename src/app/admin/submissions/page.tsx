@@ -14,7 +14,7 @@ import {
   predictions,
 } from "@/db/schema";
 import { getAdminSession } from "@/features/admin";
-import { getActiveSeasonView } from "@/features/seasons/queries";
+import { getActiveSeasonContext } from "@/features/seasons/queries";
 import { formatUtcDateTime } from "@/shared/format";
 
 import { AdminNav } from "../admin-nav";
@@ -29,7 +29,7 @@ export default async function AdminSubmissionsPage({
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
   if (!(await getAdminSession())) redirect("/admin/login");
-  const { season } = await getActiveSeasonView();
+  const { season } = await getActiveSeasonContext();
   const params = await searchParams;
   const db = getDb();
   const rows = await db

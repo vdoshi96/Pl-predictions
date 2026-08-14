@@ -13,7 +13,10 @@ import {
   standingsSnapshots,
 } from "@/db/schema";
 import { getAdminSession, isFinalStandingsCandidate } from "@/features/admin";
-import { getActiveSeasonView } from "@/features/seasons/queries";
+import {
+  getActiveSeasonContext,
+  getSeasonTeams,
+} from "@/features/seasons/queries";
 import { ManualStandingsForm } from "@/features/standings/manual-standings-form";
 import { formatUtcDateTime } from "@/shared/format";
 
@@ -34,7 +37,8 @@ export default async function AdminStandingsPage({
 }) {
   if (!(await getAdminSession())) redirect("/admin/login");
   const params = await searchParams;
-  const { season, teams } = await getActiveSeasonView();
+  const { season } = await getActiveSeasonContext();
+  const teams = await getSeasonTeams(season.id);
   const db = getDb();
   const [activeSnapshots, latestRuns] = await Promise.all([
     season.activeSnapshotId

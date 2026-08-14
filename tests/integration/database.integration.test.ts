@@ -3,7 +3,7 @@
 import { randomUUID } from "node:crypto";
 
 import { Pool } from "@neondatabase/serverless";
-import { and, count, eq, sql } from "drizzle-orm";
+import { and, count, eq, inArray, sql } from "drizzle-orm";
 import { afterEach, describe, expect, it } from "vitest";
 
 import {
@@ -13,6 +13,7 @@ import {
 } from "@/data";
 import { getDb } from "@/db/client";
 import {
+  adminAuditLogs,
   players,
   predictionCategoryPicks,
   predictionItems,
@@ -30,7 +31,11 @@ import { normalizedParticipantNameKey } from "@/features/predictions/normalizati
 import { createPrediction } from "@/features/predictions/service";
 import type { ValidatedPredictionCategoryPick } from "@/features/predictions/validation";
 import { resolveIsolatedTestNow } from "@/features/seasons/clock";
-import { getActiveSeasonView } from "@/features/seasons/queries";
+import { closeSeasonPermanentlyAtomically } from "@/features/seasons/closure";
+import {
+  getActiveSeasonContext,
+  getActiveSeasonPlayers,
+} from "@/features/seasons/queries";
 import { PublicError } from "@/shared/errors";
 import { STANDINGS_FUTURE_TIMESTAMP_ERROR_CODE } from "@/features/standings/validation";
 import { importCanonicalStandings } from "../../scripts/import-standings";
@@ -43,6 +48,7 @@ if (enabled) {
   assertIsolatedDatabaseEnvironment(process.env, "Neon integration tests");
 }
 const createdPredictionIds = new Set<string>();
+const closureAuditRequestIds = new Set<string>();
 const importSources = new Set<string>();
 const originalSeasonSubmissionSettings = new Map<
   string,
@@ -117,6 +123,13 @@ afterEach(async () => {
     await db.delete(predictions).where(eq(predictions.id, id));
   }
   createdPredictionIds.clear();
+
+  if (closureAuditRequestIds.size > 0) {
+    await db
+      .delete(adminAuditLogs)
+      .where(inArray(adminAuditLogs.requestId, [...closureAuditRequestIds]));
+    closureAuditRequestIds.clear();
+  }
 
   for (const [seasonId, settings] of originalSeasonSubmissionSettings) {
     await db
@@ -373,19 +386,14 @@ describe.runIf(enabled)("Neon integration", () => {
         displayName: fixturePlayer.displayName,
       });
 
-      const activeSeasonView = await getActiveSeasonView();
-      expect(activeSeasonView.players).toHaveLength(
-        PREMIER_LEAGUE_2026_27_PLAYER_COUNT,
-      );
+      const { season: activeSeason } = await getActiveSeasonContext();
+      const activePlayers = await getActiveSeasonPlayers(activeSeason.id);
+      expect(activePlayers).toHaveLength(PREMIER_LEAGUE_2026_27_PLAYER_COUNT);
       expect(
-        activeSeasonView.players.some(
-          (player) => player.id === historicalPlayerId,
-        ),
+        activePlayers.some((player) => player.id === historicalPlayerId),
       ).toBe(false);
       expect(
-        activeSeasonView.players.some(
-          (player) => player.id === fixturePlayerBefore.id,
-        ),
+        activePlayers.some((player) => player.id === fixturePlayerBefore.id),
       ).toBe(true);
 
       const secondSeed = await seedDatabase(db);
@@ -558,7 +566,7 @@ describe.runIf(enabled)("Neon integration", () => {
     );
   });
 
-  it("closes at the database deadline boundary without partial rows", async () => {
+  it("ignores the legacy earlier-deadline column during an atomic submission", async () => {
     const { activeTeams, db, season } = await activeFixture();
     rememberSeasonSubmissionSettings(season);
     await db
@@ -577,22 +585,16 @@ describe.runIf(enabled)("Neon integration", () => {
       teamId: team.id,
     }));
 
-    await expect(
-      createPrediction(
-        {
-          categoryPicks: categoryPicksFor(activeTeams),
-          honeypot: "",
-          items,
-          participantName,
-        },
-        new Date("2000-01-01T00:00:00.000Z"),
-      ),
-    ).rejects.toEqual(
-      expect.objectContaining<Partial<PublicError>>({
-        code: "SUBMISSIONS_CLOSED",
-        message: "Predictions are closed for this season.",
-      }),
+    const created = await createPrediction(
+      {
+        categoryPicks: categoryPicksFor(activeTeams),
+        honeypot: "",
+        items,
+        participantName,
+      },
+      new Date("2000-01-01T00:00:00.000Z"),
     );
+    createdPredictionIds.add(created.id);
 
     const [persisted] = await db
       .select({ value: count() })
@@ -603,7 +605,7 @@ describe.runIf(enabled)("Neon integration", () => {
           eq(predictions.normalizedParticipantName, normalizedName),
         ),
       );
-    expect(persisted?.value).toBe(0);
+    expect(persisted?.value).toBe(1);
   });
 
   it("serializes a concurrent admin lock before the guarded insert", async () => {
@@ -687,14 +689,203 @@ describe.runIf(enabled)("Neon integration", () => {
     }
   }, 15_000);
 
-  it("rechecks wall-clock time after a row lock crosses the deadline", async () => {
+  it("allows only one permanent close transition and one truthful audit", async () => {
+    const { db, season } = await activeFixture();
+    rememberSeasonSubmissionSettings(season);
+    await db
+      .update(seasons)
+      .set({
+        openingKickoff: new Date("2099-08-21T19:00:00.000Z"),
+        revealPredictions: false,
+        submissionsLocked: false,
+      })
+      .where(eq(seasons.id, season.id));
+
+    const lockRequestId = `closure-lock-${randomUUID()}`;
+    const revealRequestId = `closure-reveal-${randomUUID()}`;
+    closureAuditRequestIds.add(lockRequestId);
+    closureAuditRequestIds.add(revealRequestId);
+
+    const outcomes = await Promise.all([
+      closeSeasonPermanentlyAtomically(db, {
+        intent: "lock",
+        requestId: lockRequestId,
+        seasonId: season.id,
+      }),
+      closeSeasonPermanentlyAtomically(db, {
+        intent: "reveal",
+        requestId: revealRequestId,
+        seasonId: season.id,
+      }),
+    ]);
+    expect(outcomes.filter(Boolean)).toHaveLength(1);
+
+    const [closedSeason] = await db
+      .select({
+        revealPredictions: seasons.revealPredictions,
+        submissionsLocked: seasons.submissionsLocked,
+      })
+      .from(seasons)
+      .where(eq(seasons.id, season.id))
+      .limit(1);
+    expect(closedSeason).toEqual({
+      revealPredictions: true,
+      submissionsLocked: true,
+    });
+
+    const audits = await db
+      .select({
+        action: adminAuditLogs.action,
+        requestId: adminAuditLogs.requestId,
+      })
+      .from(adminAuditLogs)
+      .where(
+        inArray(adminAuditLogs.requestId, [lockRequestId, revealRequestId]),
+      );
+    expect(audits).toHaveLength(1);
+    expect(audits[0]?.action).toMatch(
+      /^season\.(submissions_locked|predictions_revealed_early)$/u,
+    );
+
+    const noOpRequestId = `closure-noop-${randomUUID()}`;
+    closureAuditRequestIds.add(noOpRequestId);
+    await expect(
+      closeSeasonPermanentlyAtomically(db, {
+        intent: "lock",
+        requestId: noOpRequestId,
+        seasonId: season.id,
+      }),
+    ).resolves.toBe(false);
+    const [noOpAuditCount] = await db
+      .select({ value: count() })
+      .from(adminAuditLogs)
+      .where(eq(adminAuditLogs.requestId, noOpRequestId));
+    expect(noOpAuditCount?.value).toBe(0);
+  });
+
+  it("does not mutate or audit a close request after natural kickoff", async () => {
+    const { db, season } = await activeFixture();
+    rememberSeasonSubmissionSettings(season);
+    await db
+      .update(seasons)
+      .set({
+        openingKickoff: new Date("2000-01-01T00:00:00.000Z"),
+        revealPredictions: false,
+        submissionsLocked: false,
+      })
+      .where(eq(seasons.id, season.id));
+
+    const requestId = `closure-natural-${randomUUID()}`;
+    closureAuditRequestIds.add(requestId);
+    await expect(
+      closeSeasonPermanentlyAtomically(db, {
+        intent: "reveal",
+        requestId,
+        seasonId: season.id,
+      }),
+    ).resolves.toBe(false);
+
+    const [[unchangedSeason], [auditCount]] = await Promise.all([
+      db
+        .select({
+          revealPredictions: seasons.revealPredictions,
+          submissionsLocked: seasons.submissionsLocked,
+        })
+        .from(seasons)
+        .where(eq(seasons.id, season.id))
+        .limit(1),
+      db
+        .select({ value: count() })
+        .from(adminAuditLogs)
+        .where(eq(adminAuditLogs.requestId, requestId)),
+    ]);
+    expect(unchangedSeason).toEqual({
+      revealPredictions: false,
+      submissionsLocked: false,
+    });
+    expect(auditCount?.value).toBe(0);
+  });
+
+  it("does not close or audit when its season row lock crosses kickoff", async () => {
+    const { db, season } = await activeFixture();
+    rememberSeasonSubmissionSettings(season);
+    await db.execute(sql`
+      update "seasons"
+      set
+        "opening_kickoff" = clock_timestamp() + interval '2 seconds',
+        "submissions_locked" = false,
+        "reveal_predictions" = false
+      where "id" = ${season.id}::uuid
+    `);
+
+    const databaseUrl = process.env.DATABASE_URL;
+    if (!databaseUrl) throw new Error("DATABASE_URL is required.");
+    const pool = new Pool({ connectionString: databaseUrl });
+    const blocker = await pool.connect();
+    const requestId = `closure-kickoff-race-${randomUUID()}`;
+    closureAuditRequestIds.add(requestId);
+    let transactionOpen = false;
+
+    try {
+      await blocker.query("begin");
+      transactionOpen = true;
+      await blocker.query("select id from seasons where id = $1 for update", [
+        season.id,
+      ]);
+
+      let closeSettled = false;
+      const closeOutcome = closeSeasonPermanentlyAtomically(db, {
+        authoritativeNow: sql<Date>`clock_timestamp()`,
+        intent: "lock",
+        requestId,
+        seasonId: season.id,
+      }).then((value) => {
+        closeSettled = true;
+        return value;
+      });
+
+      await new Promise((resolve) => setTimeout(resolve, 150));
+      expect(closeSettled).toBe(false);
+      await new Promise((resolve) => setTimeout(resolve, 2_100));
+
+      await blocker.query("commit");
+      transactionOpen = false;
+      await expect(closeOutcome).resolves.toBe(false);
+
+      const [[unchangedSeason], [auditCount]] = await Promise.all([
+        db
+          .select({
+            revealPredictions: seasons.revealPredictions,
+            submissionsLocked: seasons.submissionsLocked,
+          })
+          .from(seasons)
+          .where(eq(seasons.id, season.id))
+          .limit(1),
+        db
+          .select({ value: count() })
+          .from(adminAuditLogs)
+          .where(eq(adminAuditLogs.requestId, requestId)),
+      ]);
+      expect(unchangedSeason).toEqual({
+        revealPredictions: false,
+        submissionsLocked: false,
+      });
+      expect(auditCount?.value).toBe(0);
+    } finally {
+      if (transactionOpen) await blocker.query("rollback");
+      blocker.release();
+      await pool.end();
+    }
+  }, 15_000);
+
+  it("rechecks wall-clock time after a row lock crosses opening kickoff", async () => {
     const { activeTeams, db, season } = await activeFixture();
     rememberSeasonSubmissionSettings(season);
     await db.execute(sql`
       update "seasons"
       set
-        "opening_kickoff" = clock_timestamp() + interval '10 seconds',
-        "submission_deadline" = clock_timestamp() + interval '2 seconds',
+        "opening_kickoff" = clock_timestamp() + interval '2 seconds',
+        "submission_deadline" = clock_timestamp() + interval '10 seconds',
         "submissions_locked" = false,
         "reveal_predictions" = false
       where "id" = ${season.id}::uuid

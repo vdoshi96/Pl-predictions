@@ -1,95 +1,75 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { redirect } from "next/navigation";
-import { eq, sql } from "drizzle-orm";
-import { z } from "zod";
 
 import { getDb } from "@/db/client";
-import { adminAuditLogs, seasons } from "@/db/schema";
 import { getAdminAuditMetadata, requireAdminMutation } from "@/features/admin";
-import { authoritativeDatabaseTimeSql } from "@/features/seasons/clock";
-import { getActiveSeasonView } from "@/features/seasons/queries";
-import { parseOptionalUtcDeadline } from "@/features/seasons/deadline";
+import {
+  closeSeasonPermanentlyAtomically,
+  parseSeasonClosureIntent,
+} from "@/features/seasons/closure";
+import { getActiveSeasonContext } from "@/features/seasons/queries";
 
-const settingsSchema = z.object({
-  submissionDeadline: z
-    .string()
-    .trim()
-    .regex(/^(?:\d{4}-\d{2}-\d{2}T\d{2}:\d{2})?$/u)
-    .max(16),
-  submissionsLocked: z.boolean(),
-  revealPredictions: z.boolean(),
-});
+export type CloseSeasonActionState = Readonly<{
+  changed: boolean;
+  message: string;
+  ok: boolean;
+}>;
 
-export async function updateSeasonSettings(formData: FormData) {
-  await requireAdminMutation();
-  const { season } = await getActiveSeasonView();
-  const parsed = settingsSchema.safeParse({
-    submissionDeadline: formData.get("submissionDeadline") ?? "",
-    submissionsLocked: formData.get("submissionsLocked") === "on",
-    revealPredictions: formData.get("revealPredictions") === "on",
-  });
-
-  if (!parsed.success) redirect("/admin/settings?error=invalid");
-
-  let deadline: Date | null;
-  try {
-    deadline = parseOptionalUtcDeadline(
-      parsed.data.submissionDeadline,
-      season.openingKickoff,
-    );
-  } catch {
-    redirect("/admin/settings?error=deadline");
-  }
-
-  const audit = await getAdminAuditMetadata();
-  const now = new Date();
-  const db = getDb();
-  const authoritativeNow = authoritativeDatabaseTimeSql();
-  const requestedEffectiveDeadline = deadline ?? season.openingKickoff;
-  const requestedDeadlinePassed = sql<boolean>`${requestedEffectiveDeadline} <= ${authoritativeNow}`;
-  const irreversibleClosure = sql<boolean>`(
-    ${seasons.revealPredictions}
-    or ${seasons.submissionsLocked}
-    or (
-      ${seasons.submissionDeadline} is not null
-      and ${seasons.submissionDeadline} <= ${authoritativeNow}
-    )
-    or ${parsed.data.revealPredictions}
-    or ${parsed.data.submissionsLocked}
-    or ${requestedDeadlinePassed}
-  )`;
-  await db.batch([
-    db
-      .update(seasons)
-      .set({
-        revealPredictions: irreversibleClosure,
-        submissionDeadline: deadline,
-        submissionsLocked: irreversibleClosure,
-        updatedAt: now,
-      })
-      .where(eq(seasons.id, season.id)),
-    db.insert(adminAuditLogs).values({
-      seasonId: season.id,
-      actor: "admin",
-      action: "season.settings.updated",
-      targetType: "season",
-      targetId: season.id,
-      requestId: audit.requestId,
-      metadata: {
-        fairnessRule: "reveal-is-irreversible",
-        requestedDeadline: deadline?.toISOString() ?? null,
-        requestedEffectiveDeadline: requestedEffectiveDeadline.toISOString(),
-        requestedRevealPredictions: parsed.data.revealPredictions,
-        requestedSubmissionsLocked: parsed.data.submissionsLocked,
-      },
-    }),
-  ]);
-
+function revalidateSeasonViews() {
   revalidatePath("/");
   revalidatePath("/leaderboard");
+  revalidatePath("/spotlight");
   revalidatePath("/admin");
   revalidatePath("/admin/settings");
-  redirect("/admin/settings?saved=1");
+}
+
+/**
+ * Permanently closes submissions and reveals predictions in one compare-and-
+ * swap statement. The audit exists only when this request wins the transition.
+ */
+export async function closeSeasonPermanently(
+  _previousState: CloseSeasonActionState,
+  formData: FormData,
+): Promise<CloseSeasonActionState> {
+  await requireAdminMutation();
+  const intent = parseSeasonClosureIntent({
+    confirmationPhrase: formData.get("confirmationPhrase"),
+    intent: formData.get("intent"),
+  });
+
+  if (!intent) {
+    return {
+      changed: false,
+      message: "Type the exact confirmation phrase before continuing.",
+      ok: false,
+    };
+  }
+
+  const { season } = await getActiveSeasonContext();
+  const audit = await getAdminAuditMetadata();
+  const changed = await closeSeasonPermanentlyAtomically(getDb(), {
+    intent,
+    requestId: audit.requestId,
+    seasonId: season.id,
+  });
+
+  if (!changed) {
+    return {
+      changed: false,
+      message:
+        "Submissions are already permanently closed. No change or audit was recorded.",
+      ok: true,
+    };
+  }
+
+  revalidateSeasonViews();
+  return {
+    changed: true,
+    message:
+      intent === "lock"
+        ? "Submissions are permanently locked and predictions are now public."
+        : "Predictions are public and submissions are permanently closed.",
+    ok: true,
+  };
 }

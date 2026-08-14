@@ -4,8 +4,12 @@ import { submitPrediction } from "@/app/actions/predictions";
 import { SubmissionCountdown } from "@/components/submission-countdown";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
+import { HOME_SPOTLIGHT_MESSAGE } from "@/content/public-copy";
 import { PredictionForm } from "@/features/predictions/prediction-form";
-import { getActiveSeasonView } from "@/features/seasons/queries";
+import {
+  getActiveSeasonContext,
+  getSeasonTeams,
+} from "@/features/seasons/queries";
 import { formatUtcDateTime } from "@/shared/format";
 import { getSeasonAccess } from "@/shared/policy";
 
@@ -18,12 +22,12 @@ const scoringRules = [
 ] as const;
 
 export default async function PredictionPage() {
-  const { databaseNow, players, season, teams } = await getActiveSeasonView();
+  const { databaseNow, season } = await getActiveSeasonContext();
+  const teams = await getSeasonTeams(season.id);
   const access = getSeasonAccess(
     {
       openingKickoff: season.openingKickoff,
       revealPredictions: season.revealPredictions,
-      submissionDeadline: season.submissionDeadline,
       submissionsLocked: season.submissionsLocked,
     },
     databaseNow,
@@ -75,11 +79,8 @@ export default async function PredictionPage() {
               </p>
               <p className="mt-1 text-xs leading-5 text-white/65">
                 Submission deadline:{" "}
-                {formatUtcDateTime(access.submissionDeadline)}
-                {access.submissionDeadline.getTime() ===
-                season.openingKickoff.getTime()
-                  ? " · Arsenal v Coventry kickoff"
-                  : ` · hard ceiling ${formatUtcDateTime(season.openingKickoff)}`}
+                {formatUtcDateTime(access.submissionDeadline)} · Arsenal v
+                Coventry kickoff
               </p>
               {access.submissionsOpen ? (
                 <SubmissionCountdown
@@ -104,11 +105,8 @@ export default async function PredictionPage() {
                 </h2>
               </div>
               <p className="mt-1 text-sm leading-6 text-slate-600">
-                The main leaderboard uses only the existing 5–3–1 table tiers
-                and stays capped at 100. Spotlight picks have a separate
-                just-for-fun accuracy score based on the active bracket count.
-                An owner-run Codex automation will manually enter the five
-                result lists that are not derived from the league table.
+                The main leaderboard uses the 5–3–1 scoring tiers and stays
+                capped at 100. {HOME_SPOTLIGHT_MESSAGE}
               </p>
             </div>
             <div className="grid grid-cols-3 gap-2" aria-label="Scoring tiers">
@@ -135,13 +133,6 @@ export default async function PredictionPage() {
 
         <div className="order-2 min-w-0 sm:order-3">
           <PredictionForm
-            players={players.map((player) => ({
-              assetPath: player.assetPath,
-              displayName: player.displayName,
-              firstName: player.firstName,
-              id: player.id,
-              lastName: player.lastName,
-            }))}
             teams={teams.map((team) => ({
               id: team.id,
               displayName: team.displayName,
@@ -151,6 +142,7 @@ export default async function PredictionPage() {
             }))}
             onSubmit={submitPrediction}
             seasonName={season.name}
+            seasonSlug={season.slug}
             disabled={!access.submissionsOpen}
             disabledReason={closedReason}
           />

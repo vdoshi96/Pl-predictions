@@ -19,10 +19,11 @@ import {
   scorePredictionIfActive,
   type RankedLeaderboardEntry,
 } from "@/features/scoring";
+import { getManualResultAssignments } from "@/features/results/queries";
 import { hasSeasonStarted } from "@/features/seasons/deadline";
 import { getSeasonAccess } from "@/shared/policy";
 
-import { getActiveSeasonView } from "../seasons/queries";
+import { getActiveSeasonContext, getSeasonTeams } from "../seasons/queries";
 import { getSpotlightPicksByPredictionId } from "./pick-queries";
 import type { SpotlightPickDisplay } from "./spotlight-pick-grid";
 
@@ -69,6 +70,7 @@ export type LeaderboardView = {
   entries: LeaderboardRosterEntry[];
   predictionsRevealed: boolean;
   scoredEntries: ScoredLeaderboardEntry[] | null;
+  seasonName: string;
   seasonStarted: boolean;
   snapshot: {
     capturedAt: Date;
@@ -95,7 +97,77 @@ type AvailableSpotlightResult = {
   accuracyPoints: number;
   metricLabel: string;
   resultRank: number;
+  resultStatus?: "outside-range" | "ranked";
 };
+
+type RankedTeamResult = {
+  index: number;
+  rank: number;
+};
+
+type RankedTeamResults = {
+  overratedByTeamId: ReadonlyMap<string, RankedTeamResult>;
+  underdogByTeamId: ReadonlyMap<string, RankedTeamResult>;
+};
+
+type PredictionItemForConsensus = {
+  predictedPosition: number;
+  teamId: string;
+};
+
+function buildRankedTeamResults(
+  entryIds: readonly string[],
+  itemsByPrediction: ReadonlyMap<string, readonly PredictionItemForConsensus[]>,
+  actualTable: readonly { actualPosition: number; teamId: string }[],
+  scoringActive: boolean,
+): RankedTeamResults {
+  const expectationIndexes = scoringActive
+    ? calculateTeamExpectationIndexes(
+        entryIds.map((entryId) => itemsByPrediction.get(entryId) ?? []),
+        actualTable,
+      )
+    : [];
+
+  return {
+    overratedByTeamId: new Map(
+      rankTeamExpectationIndexes(expectationIndexes, "overrated").map(
+        (item) => [
+          item.teamId,
+          { index: item.overratedIndex, rank: item.rank },
+        ],
+      ),
+    ),
+    underdogByTeamId: new Map(
+      rankTeamExpectationIndexes(expectationIndexes, "underdog").map((item) => [
+        item.teamId,
+        { index: item.underdogIndex, rank: item.rank },
+      ]),
+    ),
+  };
+}
+
+function availableTeamResult(
+  category: string,
+  teamId: string | null,
+  rankedTeamResults: RankedTeamResults,
+  activeBracketCount: number,
+): AvailableSpotlightResult | null {
+  if (!teamId) return null;
+  const result =
+    category === "underdog_team"
+      ? rankedTeamResults.underdogByTeamId.get(teamId)
+      : category === "overrated_team"
+        ? rankedTeamResults.overratedByTeamId.get(teamId)
+        : undefined;
+  if (!result) return null;
+
+  return {
+    accuracyPoints: scoreCategoryRank(result.rank, activeBracketCount),
+    metricLabel: formatExpectationIndex(result.index),
+    resultRank: result.rank,
+    resultStatus: "ranked",
+  };
+}
 
 function buildSpotlightAccuracyEntries(
   entryRows: readonly {
@@ -149,32 +221,121 @@ function buildSpotlightAccuracyEntries(
   }));
 }
 
+export async function getEntrySpotlightPicksWithAccuracy({
+  actualTable,
+  predictionId,
+  seasonId,
+  spotlightPicks,
+  teamScoringActive,
+}: {
+  actualTable: readonly {
+    actualPosition: number;
+    playedGames: number | null;
+    teamId: string;
+  }[];
+  predictionId: string;
+  seasonId: string;
+  spotlightPicks: readonly SpotlightPickDisplay[];
+  teamScoringActive: boolean;
+}): Promise<SpotlightPickDisplay[]> {
+  const db = getDb();
+  const entryRows = await db
+    .select({ id: predictions.id })
+    .from(predictions)
+    .where(eq(predictions.seasonId, seasonId));
+  if (entryRows.length === 0) return [...spotlightPicks];
+
+  const entryIds = entryRows.map((entry) => entry.id);
+  const [itemRows, teamPickRows] = teamScoringActive
+    ? await Promise.all([
+        db
+          .select({
+            predictedPosition: predictionItems.predictedPosition,
+            predictionId: predictionItems.predictionId,
+            teamId: predictionItems.teamId,
+          })
+          .from(predictionItems)
+          .where(inArray(predictionItems.predictionId, entryIds)),
+        db
+          .select({
+            category: predictionCategoryPicks.category,
+            teamId: predictionCategoryPicks.teamId,
+          })
+          .from(predictionCategoryPicks)
+          .where(
+            and(
+              eq(predictionCategoryPicks.predictionId, predictionId),
+              inArray(predictionCategoryPicks.category, [
+                "underdog_team",
+                "overrated_team",
+              ]),
+            ),
+          ),
+      ])
+    : [[], []];
+  const itemsByPrediction = new Map<string, PredictionItemForConsensus[]>();
+  for (const item of itemRows) {
+    const group = itemsByPrediction.get(item.predictionId) ?? [];
+    group.push(item);
+    itemsByPrediction.set(item.predictionId, group);
+  }
+
+  const rankedTeamResults = buildRankedTeamResults(
+    entryIds,
+    itemsByPrediction,
+    actualTable,
+    teamScoringActive,
+  );
+  const resultByCategory = new Map(
+    teamPickRows.flatMap((pick) => {
+      const result = availableTeamResult(
+        pick.category,
+        pick.teamId,
+        rankedTeamResults,
+        entryRows.length,
+      );
+      return result ? [[pick.category, result] as const] : [];
+    }),
+  );
+  const manualResults = await getManualResultAssignments(
+    seasonId,
+    [predictionId],
+    entryRows.length,
+  );
+  for (const [category, result] of manualResults.get(predictionId) ?? []) {
+    resultByCategory.set(category, result);
+  }
+
+  return spotlightPicks.map((pick) => {
+    const result = resultByCategory.get(pick.category);
+    return result ? { ...pick, ...result } : pick;
+  });
+}
+
 export async function getLeaderboardView(): Promise<LeaderboardView> {
-  const {
-    databaseNow,
-    season,
-    teams: seasonTeams,
-  } = await getActiveSeasonView();
+  const { databaseNow, season } = await getActiveSeasonContext();
   const db = getDb();
   const access = getSeasonAccess(
     {
       openingKickoff: season.openingKickoff,
       revealPredictions: season.revealPredictions,
-      submissionDeadline: season.submissionDeadline,
       submissionsLocked: season.submissionsLocked,
     },
     databaseNow,
   );
-  const entryRows = await db
-    .select({
-      createdAt: predictions.createdAt,
-      id: predictions.id,
-      participantName: predictions.participantName,
-      publicKey: predictions.normalizedParticipantName,
-    })
-    .from(predictions)
-    .where(eq(predictions.seasonId, season.id))
-    .orderBy(asc(predictions.normalizedParticipantName));
+  const [seasonTeams, entryRows] = await Promise.all([
+    getSeasonTeams(season.id),
+    db
+      .select({
+        createdAt: predictions.createdAt,
+        id: predictions.id,
+        participantName: predictions.participantName,
+        publicKey: predictions.normalizedParticipantName,
+      })
+      .from(predictions)
+      .where(eq(predictions.seasonId, season.id))
+      .orderBy(asc(predictions.normalizedParticipantName)),
+  ]);
 
   entryRows.sort((left, right) =>
     nameCollator.compare(left.participantName, right.participantName),
@@ -231,6 +392,7 @@ export async function getLeaderboardView(): Promise<LeaderboardView> {
       entries,
       predictionsRevealed: false,
       scoredEntries: null,
+      seasonName: season.name,
       seasonStarted: access.seasonStarted,
       snapshot: null,
       spotlightAccuracyEntries: null,
@@ -245,9 +407,15 @@ export async function getLeaderboardView(): Promise<LeaderboardView> {
     spotlightPicks:
       spotlightPicksByPredictionId.get(entryRows[index]?.id ?? "") ?? [],
   }));
-  const pendingSpotlightAccuracyEntries = buildSpotlightAccuracyEntries(
+  const manualResultAssignments = await getManualResultAssignments(
+    season.id,
+    entryRows.map((entry) => entry.id),
+    entryRows.length,
+  );
+  const manualSpotlightAccuracyEntries = buildSpotlightAccuracyEntries(
     entryRows,
     spotlightPicksByPredictionId,
+    manualResultAssignments,
   );
 
   if (!season.activeSnapshotId) {
@@ -255,9 +423,10 @@ export async function getLeaderboardView(): Promise<LeaderboardView> {
       entries: revealedEntries,
       predictionsRevealed: true,
       scoredEntries: null,
+      seasonName: season.name,
       seasonStarted: access.seasonStarted,
       snapshot: null,
-      spotlightAccuracyEntries: pendingSpotlightAccuracyEntries,
+      spotlightAccuracyEntries: manualSpotlightAccuracyEntries,
     };
   }
 
@@ -272,9 +441,10 @@ export async function getLeaderboardView(): Promise<LeaderboardView> {
       entries: revealedEntries,
       predictionsRevealed: true,
       scoredEntries: null,
+      seasonName: season.name,
       seasonStarted: access.seasonStarted,
       snapshot: null,
-      spotlightAccuracyEntries: pendingSpotlightAccuracyEntries,
+      spotlightAccuracyEntries: manualSpotlightAccuracyEntries,
     };
   }
 
@@ -305,6 +475,7 @@ export async function getLeaderboardView(): Promise<LeaderboardView> {
         isStandingsScoringActive(actualTable)
           ? []
           : null,
+      seasonName: season.name,
       seasonStarted: access.seasonStarted,
       snapshot: observedSnapshot,
       spotlightAccuracyEntries: [],
@@ -359,45 +530,25 @@ export async function getLeaderboardView(): Promise<LeaderboardView> {
     access.seasonStarted && snapshotObservedAfterKickoff;
   const scoringActive =
     scoringWindowOpen && isStandingsScoringActive(actualTable);
-  const expectationIndexes = scoringActive
-    ? calculateTeamExpectationIndexes(
-        entryRows.map((entry) => itemsByPrediction.get(entry.id) ?? []),
-        actualTable,
-      )
-    : [];
-  const underdogResultByTeamId = new Map(
-    rankTeamExpectationIndexes(expectationIndexes, "underdog").map((item) => [
-      item.teamId,
-      { index: item.underdogIndex, rank: item.rank },
-    ]),
+  const rankedTeamResults = buildRankedTeamResults(
+    entryRows.map((entry) => entry.id),
+    itemsByPrediction,
+    actualTable,
+    scoringActive,
   );
-  const overratedResultByTeamId = new Map(
-    rankTeamExpectationIndexes(expectationIndexes, "overrated").map((item) => [
-      item.teamId,
-      { index: item.overratedIndex, rank: item.rank },
-    ]),
-  );
-  const rankedTeamPicksByPredictionId = new Map<
-    string,
-    Map<string, AvailableSpotlightResult>
-  >();
+  const rankedTeamPicksByPredictionId = manualResultAssignments;
 
   for (const pick of teamSpotlightRows) {
-    if (!pick.teamId) continue;
-    const result =
-      pick.category === "underdog_team"
-        ? underdogResultByTeamId.get(pick.teamId)
-        : pick.category === "overrated_team"
-          ? overratedResultByTeamId.get(pick.teamId)
-          : undefined;
+    const result = availableTeamResult(
+      pick.category,
+      pick.teamId,
+      rankedTeamResults,
+      entryRows.length,
+    );
     if (!result) continue;
     const byCategory =
       rankedTeamPicksByPredictionId.get(pick.predictionId) ?? new Map();
-    byCategory.set(pick.category, {
-      accuracyPoints: scoreCategoryRank(result.rank, entryRows.length),
-      metricLabel: formatExpectationIndex(result.index),
-      resultRank: result.rank,
-    });
+    byCategory.set(pick.category, result);
     rankedTeamPicksByPredictionId.set(pick.predictionId, byCategory);
   }
 
@@ -456,6 +607,7 @@ export async function getLeaderboardView(): Promise<LeaderboardView> {
             Boolean(entry),
           ),
         ),
+    seasonName: season.name,
     seasonStarted: access.seasonStarted,
     snapshot: observedSnapshot,
     spotlightAccuracyEntries,

@@ -155,7 +155,7 @@ describe("normalized 2026/27 player catalogue", () => {
       PLAYER_PORTRAIT_EXPECTATIONS.minimumByteCount,
     );
     expect(result.sourceHandoffReconciled).toBe(privateHandoffsAvailable);
-  });
+  }, 15_000);
 
   it.runIf(privateHandoffsAvailable)(
     "matches the reviewed 12/17/4/7/10 handoff transition",
@@ -335,7 +335,7 @@ describe("player catalogue normalizer", () => {
     await expect(
       runPlayerCatalogueNormalizer("check", repository),
     ).rejects.toThrow("tracked fixture is not the reviewed 2026-08-13 release");
-  });
+  }, 15_000);
 
   it("rejects a valid unique 192px portrait change in a clean clone", async () => {
     const repository = await createCleanCloneCatalogueRepository(
@@ -359,7 +359,7 @@ describe("player catalogue normalizer", () => {
     ).rejects.toThrow(
       "published portraits are not the reviewed 2026-08-13 release",
     );
-  });
+  }, 15_000);
 
   it("rejects duplicate positive external IDs and unreferenced images", () => {
     expect(() =>

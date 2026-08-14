@@ -97,6 +97,7 @@ test("production public routes are mobile-safe and healthy", async ({
   }
   const browserErrors: string[] = [];
   const networkErrors: string[] = [];
+  const unexpectedMutationRequests: string[] = [];
   const productionOrigin = new URL(process.env.PLAYWRIGHT_BASE_URL!).origin;
   const isCanceledWebKitAdminPrefetch = (text: string) =>
     testInfo.project.name === "mobile-webkit" &&
@@ -134,6 +135,15 @@ test("production public routes are mobile-safe and healthy", async ({
       !isCanceledPlayerFaceCandidate
     ) {
       networkErrors.push(`${request.method()} ${request.url()} ${errorText}`);
+    }
+  });
+  page.on("request", (request) => {
+    const requestUrl = new URL(request.url());
+    if (
+      requestUrl.origin === productionOrigin &&
+      !["GET", "HEAD", "OPTIONS"].includes(request.method())
+    ) {
+      unexpectedMutationRequests.push(`${request.method()} ${request.url()}`);
     }
   });
   page.on("response", (response) => {
@@ -425,4 +435,8 @@ test("production public routes are mobile-safe and healthy", async ({
 
   expect(browserErrors).toEqual([]);
   expect(networkErrors).toEqual([]);
+  expect(
+    unexpectedMutationRequests,
+    "The production smoke must not send a same-origin mutation request.",
+  ).toEqual([]);
 });

@@ -7,7 +7,11 @@ import { getDb } from "@/db/client";
 import { PublicError } from "@/shared/errors";
 import { getSeasonAccess } from "@/shared/policy";
 
-import { getActiveSeasonView } from "../seasons/queries";
+import {
+  getActiveSeasonContext,
+  getActiveSeasonPlayerIds,
+  getSeasonTeams,
+} from "../seasons/queries";
 import { insertPredictionAtomically } from "./atomic-insert";
 import { normalizedParticipantNameKey } from "./normalization";
 import { createReceiptToken, hashReceiptToken } from "./receipt";
@@ -15,7 +19,18 @@ import {
   createPredictionCategoryPicksSchema,
   createPredictionItemsSchema,
   participantNameSchema,
+  predictionCategoryPicksSchema,
+  predictionItemsSchema,
 } from "./validation";
+
+const unscopedInputSchema = z
+  .object({
+    categoryPicks: predictionCategoryPicksSchema,
+    honeypot: z.string().max(200).default(""),
+    items: predictionItemsSchema,
+    participantName: participantNameSchema,
+  })
+  .strict();
 
 function inputSchema(
   activeTeamIds: readonly string[],
@@ -61,12 +76,11 @@ export async function createPrediction(
   input: unknown,
   now?: Date,
 ): Promise<CreatedPrediction> {
-  const { databaseNow, players, season, teams } = await getActiveSeasonView();
+  const { databaseNow, season } = await getActiveSeasonContext();
   const access = getSeasonAccess(
     {
       openingKickoff: season.openingKickoff,
       revealPredictions: season.revealPredictions,
-      submissionDeadline: season.submissionDeadline,
       submissionsLocked: season.submissionsLocked,
     },
     now ?? databaseNow,
@@ -79,21 +93,37 @@ export async function createPrediction(
     );
   }
 
+  const unscoped = unscopedInputSchema.safeParse(input);
+  if (!unscoped.success) {
+    throw new PublicError(
+      "BAD_REQUEST",
+      unscoped.error.issues[0]?.message ??
+        "Check your prediction and try again.",
+    );
+  }
+
+  if (unscoped.data.honeypot.trim() !== "") {
+    throw new PublicError(
+      "BAD_REQUEST",
+      "We could not accept this prediction. Refresh and try again.",
+    );
+  }
+
+  const candidatePlayerIds = unscoped.data.categoryPicks.flatMap((pick) =>
+    "playerId" in pick ? [pick.playerId] : [],
+  );
+  const [teams, activePlayerIds] = await Promise.all([
+    getSeasonTeams(season.id),
+    getActiveSeasonPlayerIds(season.id, candidatePlayerIds),
+  ]);
   const parsed = inputSchema(
     teams.map((team) => team.id),
-    players.map((player) => player.id),
-  ).safeParse(input);
+    activePlayerIds,
+  ).safeParse(unscoped.data);
   if (!parsed.success) {
     throw new PublicError(
       "BAD_REQUEST",
       parsed.error.issues[0]?.message ?? "Check your prediction and try again.",
-    );
-  }
-
-  if (parsed.data.honeypot.trim() !== "") {
-    throw new PublicError(
-      "BAD_REQUEST",
-      "We could not accept this prediction. Refresh and try again.",
     );
   }
 

@@ -1,5 +1,31 @@
 # Decisions
 
+## 2026-08-14: Browser-local drafts and intentional A–Z acknowledgement
+
+Persist an in-progress entry only in versioned, season-keyed browser `localStorage`. The draft contains the display name, exact ordered current-team IDs, stage, partial typed picks, and selected-player display metadata. Restore only after hydration and only when the current 20-team permutation and category shapes validate. Keep restored player IDs through catalogue loading or failure; a successful current-season catalogue response is the only client event that may prove one stale. Clear storage only after successful atomic submission or server-verified permanent closure. Validation, network, and server failures retain it; use `beforeunload` only when storage itself is unavailable.
+
+Place the display name before the sorter and label deterministic A–Z as a blank slate, not a suggestion. Continuing with the exact A–Z order requires an accessible **Yes, use A–Z** acknowledgement kept only in page memory. Reset, season/team change, and restored A–Z drafts require a fresh acknowledgement.
+
+## 2026-08-14: Sealed manual result snapshots and pinned aliases
+
+Implement `/admin/results` as five owner-facing tables backed by four factual datasets: `goals`, `assists`, `clean_sheets`, and one `player_ratings` dataset shown in synchronized highest/lowest views. Counts are nonnegative integers; ratings retain up to three decimal places and rank without pre-rounding. Newly identified factual players are inactive result-only season rows and never enter the participant catalogue.
+
+Saving creates a new immutable working version. Facts and the exact current Other-player alias mappings are written during construction, the snapshot is sealed, and only then may the working pointer advance. Sealed snapshots, items, and pinned aliases reject update, delete, and append. Publishing uses compare-and-swap to advance the exact active pointer only after submissions are permanently closed/revealed, at least one active bracket exists, every relevant custom name is pinned, and the owner attests complete coverage through the current bracket count `N`, including boundary ties. The shared ratings dataset must cover both directions. Finalization pins the exact active version; its owner-only undo removes final status without changing season reveal.
+
+Missing datasets and unresolved identities remain pending. After a complete snapshot publishes, listed subjects use competition rank; an omitted canonical subject is explicitly outside scoring range with zero points and counts as available. Store the coverage bracket count on the snapshot, but calculate accuracy with the current active bracket count so later prediction deletion can only reduce points safely. This decision implements and supersedes the future administrative-result path described in the 2026-08-08 spotlight decision while preserving the no-runtime-acquisition boundary.
+
+## 2026-08-14: Deferred player catalogue and bounded selectors
+
+Keep the 582-player catalogue out of the initial homepage HTML and RSC. The first transition to Stage 2 lazily requests the dynamic same-origin `/api/player-catalogue` route. That no-store route SQL-filters active rows for the current season and returns only `id`, `firstName`, `lastName`, `displayName`, and local `assetPath` values. A successful response remains in form state for that season; failure exposes an explicit Retry and preserves Other player.
+
+Require at least two normalized search characters before catalogue matches appear, announce the total match count, and render no more than 20 matching rows. Keep Other player available during loading, empty, and error states, and hide the sticky review action while a selector popup is open. Submission validation must query only the active player IDs referenced by the submitted picks instead of loading the full catalogue.
+
+## 2026-08-14: Opening kickoff as the sole timed submission cutoff
+
+Use each season row's persisted `opening_kickoff` as the sole timed cutoff. The nullable `submission_deadline` column remains only for schema and migration compatibility and is ignored by runtime policy, seed, environment configuration, administrator pages, and the guarded prediction insert. The post-lock PostgreSQL wall clock remains authoritative at the boundary.
+
+The administrator settings page displays the fixed opening kickoff rather than an editable deadline. It always shows the instant in `America/Chicago` and lets the owner compare Eastern, Central, Mountain, Pacific, or UTC through IANA-zone `Intl.DateTimeFormat`, including the correct seasonal abbreviation. Earlier closure is available only through irreversible manual lock or early reveal; both actions reveal predictions and permanently close submissions. Their accessible dialogs require the exact typed phrases `LOCK` and `REVEAL`, which the server validates again. One database-time compare-and-swap records the distinct intent only for the winning transition; a naturally closed, concurrent, or already-closed attempt is a truthful no-op with no misleading success audit. This decision supersedes only the optional configured-earlier-deadline clause in the 2026-08-08 opening-kickoff decision below and preserves that dated history.
+
 ## 2026-08-14: Offline source permission and runtime boundary
 
 The owner confirmed in the 2026-08-14 Codex task that the required permissions for this player-catalogue workflow have been obtained, including acquisition, storage, redistribution, and production use. Confidential licence documents remain outside source control and chat. This confirmation supersedes the repository's earlier source-specific permission gates for the approved player workflow.
@@ -22,7 +48,7 @@ Create the retained `Dranx Test Entry` through the same public three-stage flow 
 
 Show a compact days/hours/minutes/seconds calendar-flip countdown beside the server-derived open-submissions status. Calculate the initial remaining duration from PostgreSQL time and the effective deadline, then advance that duration with a monotonic client timer so a participant's device clock cannot move the display. Refresh the server page at zero. The countdown is informational; only the post-lock PostgreSQL `clock_timestamp()` check can authorize or reject a submission.
 
-Use three 390 × 844 captures from the live mobile flow for the public how-to section. Keep each screenshot's numbered overlay pins synchronized with adjacent text callouts so the instructions remain understandable to screen-reader users and without relying on colour alone.
+Use three 390 × 844 captures from the current verified mobile flow for the public how-to section. Keep each screenshot's numbered overlay pins synchronized with adjacent text callouts so the instructions remain understandable to screen-reader users and without relying on colour alone.
 
 ## 2026-08-08: Owner-provided player snapshot import
 
@@ -42,7 +68,7 @@ Keep the main leaderboard limited to the 5–3–1–0 table score. Its maximum 
 
 Use the selected subject's occupied outcome rank. Let `N` be the current number of active, nondeleted brackets for the season. Rank 1 earns `N` accuracy points, rank 2 earns `N - 1`, and later ranks decrease to zero. Equal outcomes share rank and accuracy points. Overall available accuracy sums only categories with a reviewed result. Pending outcomes remain unavailable and are not incorrect zero-point answers. Because scores are derived, an administrator deletion changes `N` and recalculates the accuracy view.
 
-A future owner-run Codex automation may acquire the five non-table-derived outcomes offline, review them, and enter them through an approved import or administrative path. No acquisition runs inside the deployed application. This decision supersedes the combined 240-point working rule below.
+At that iteration, the five non-table-derived outcomes remained pending until an approved offline-review and administrative-entry path existed. No acquisition runs inside the deployed application. The 2026-08-14 sealed manual-results decision above now implements that path; this separate-accuracy decision still supersedes the combined 240-point working rule below.
 
 ## 2026-08-08: Superseded unified 240-point working rule
 

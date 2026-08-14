@@ -10,19 +10,19 @@ const walkthroughSteps = [
     callouts: [
       {
         label:
-          "Use the six-dot handles to drag clubs, or focus a handle and use the arrow keys.",
+          "Enter your display name first, then drag the six-dot handles or focus one and use the arrow keys.",
         marker: "1",
-        position: { left: "86%", top: "42%" },
+        position: { left: "86%", top: "52%" },
       },
       {
         label:
-          "After all 20 clubs are ranked and your display name is entered, continue to spotlight picks.",
+          "A–Z is only a blank slate. Reorder it, or explicitly confirm A–Z if that is your real prediction.",
         marker: "2",
-        position: { left: "84%", top: "92%" },
+        position: { left: "84%", top: "18%" },
       },
     ],
     description:
-      "Put every club in your predicted finishing order, then enter the display name that will appear on the leaderboard.",
+      "Enter the display name that will appear on the leaderboard, then put every club in your predicted finishing order.",
     image: "/how-to-play/step-1-table-mobile.png",
     step: 1,
     title: "Build your 1–20 table",
@@ -32,9 +32,9 @@ const walkthroughSteps = [
     callouts: [
       {
         label:
-          "Search players by first or last name; club categories use the same accessible selector pattern.",
+          "Type at least two letters to search up to 20 player matches; Other player always remains available.",
         marker: "1",
-        position: { left: "84%", top: "38%" },
+        position: { left: "84%", top: "70%" },
       },
       {
         label:
@@ -92,8 +92,8 @@ export function HowToPlay() {
             How to play in three steps
           </h2>
           <p className="mt-1 max-w-3xl text-sm leading-6 text-slate-600">
-            These annotated 390 × 844 screenshots were captured from the live
-            mobile site. Swipe the cards on a phone, then follow the numbered
+            These annotated 390 × 844 screenshots were captured from the current
+            mobile flow. Swipe the cards on a phone, then follow the numbered
             notes below each screen.
           </p>
         </div>

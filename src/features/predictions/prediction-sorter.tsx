@@ -28,6 +28,7 @@ export interface PredictionTeam {
 export interface PredictionSorterProps {
   teams: PredictionTeam[];
   onChange: (teams: PredictionTeam[]) => void;
+  onReset?: () => void;
   disabled?: boolean;
   mode?: "prediction" | "standings";
   className?: string;
@@ -160,6 +161,7 @@ function SortableTeamRow({
 export function PredictionSorter({
   teams,
   onChange,
+  onReset,
   disabled = false,
   mode = "prediction",
   className,
@@ -287,6 +289,7 @@ export function PredictionSorter({
   function resetToAlphabetical() {
     if (!isAlphabetical) {
       onChange(alphabeticalTeams);
+      onReset?.();
       setAnnouncement(
         `${mode === "standings" ? "Current" : "Prediction"} table reset to alphabetical order.`,
       );

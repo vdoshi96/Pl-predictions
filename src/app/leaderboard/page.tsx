@@ -7,17 +7,13 @@ import { Card, CardContent } from "@/components/ui/card";
 import { ChampionPick } from "@/features/leaderboard/champion-pick";
 import { LeaderboardEntryLink } from "@/features/leaderboard/entry-link";
 import { getLeaderboardView } from "@/features/leaderboard/queries";
-import { getActiveSeasonView } from "@/features/seasons/queries";
 import { formatUtcDateTime } from "@/shared/format";
 
 export const metadata: Metadata = { title: "Table leaderboard" };
 export const dynamic = "force-dynamic";
 
 export default async function LeaderboardPage() {
-  const [{ season }, view] = await Promise.all([
-    getActiveSeasonView(),
-    getLeaderboardView(),
-  ]);
+  const view = await getLeaderboardView();
   const scoringStarted = view.scoredEntries !== null;
 
   return (
@@ -26,7 +22,7 @@ export default async function LeaderboardPage() {
         <section className="brand-hero rounded-3xl p-5 text-white sm:p-8">
           <div className="flex flex-wrap items-center gap-2">
             <Badge className="bg-accent text-brand ring-accent">
-              {season.name}
+              {view.seasonName}
             </Badge>
             <Badge className="bg-white/15 text-white ring-white/20">
               100-point table

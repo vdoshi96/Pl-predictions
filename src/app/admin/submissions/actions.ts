@@ -7,14 +7,14 @@ import { z } from "zod";
 
 import { getDb } from "@/db/client";
 import { getAdminAuditMetadata, requireAdminMutation } from "@/features/admin";
-import { getActiveSeasonView } from "@/features/seasons/queries";
+import { getActiveSeasonContext } from "@/features/seasons/queries";
 
 export async function deleteSubmission(formData: FormData) {
   await requireAdminMutation();
   const id = z.string().uuid().safeParse(formData.get("predictionId"));
   if (!id.success) redirect("/admin/submissions?error=invalid");
 
-  const { season } = await getActiveSeasonView();
+  const { season } = await getActiveSeasonContext();
   const audit = await getAdminAuditMetadata();
   const db = getDb();
   const result = await db.execute<{ deleted: boolean }>(sql`

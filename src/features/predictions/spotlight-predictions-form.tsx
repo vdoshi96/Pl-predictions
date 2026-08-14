@@ -1,7 +1,7 @@
 "use client";
 
 import { Sparkles } from "lucide-react";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 
 import { PlayerMark } from "@/components/player-mark";
 import { TeamMark } from "@/components/team-mark";
@@ -29,7 +29,12 @@ export interface PredictionPlayer {
 
 export type SpotlightPickDraft =
   | { kind: "custom-player"; customPlayerName: string }
-  | { kind: "player"; playerId: string }
+  | {
+      assetPath?: string | null;
+      displayName: string;
+      kind: "player";
+      playerId: string;
+    }
   | { kind: "team"; teamId: string };
 
 export type SpotlightPicksDraft = Partial<
@@ -67,7 +72,9 @@ export function spotlightPicksAreComplete(picks: SpotlightPicksDraft): boolean {
       return pick.kind === "team" && Boolean(pick.teamId);
     }
 
-    if (pick.kind === "player") return Boolean(pick.playerId);
+    if (pick.kind === "player") {
+      return Boolean(pick.playerId && pick.displayName.trim());
+    }
     return (
       pick.kind === "custom-player" &&
       normalizedCustomName(pick.customPlayerName).length >= 2 &&
@@ -135,15 +142,13 @@ export function buildSpotlightReviewItems(
 
     if (pick.kind === "player") {
       const player = playerById.get(pick.playerId);
-      if (player) {
-        reviewItems.push({
-          assetPath: player.assetPath,
-          category: definition.category,
-          displayName: player.displayName,
-          label: definition.label,
-          subject: "player",
-        });
-      }
+      reviewItems.push({
+        assetPath: player?.assetPath ?? pick.assetPath,
+        category: definition.category,
+        displayName: player?.displayName ?? pick.displayName,
+        label: definition.label,
+        subject: "player",
+      });
       continue;
     }
 
@@ -161,7 +166,13 @@ export function buildSpotlightReviewItems(
 export interface SpotlightPredictionsFormProps {
   disabled?: boolean;
   invalid?: boolean;
-  onChange: (picks: SpotlightPicksDraft) => void;
+  onChange: (
+    update: (currentPicks: SpotlightPicksDraft) => SpotlightPicksDraft,
+  ) => void;
+  onSelectorExpandedChange?: (
+    category: PredictionCategory,
+    expanded: boolean,
+  ) => void;
   picks: SpotlightPicksDraft;
   players: readonly PredictionPlayer[];
   teams: readonly PredictionTeam[];
@@ -171,10 +182,13 @@ export function SpotlightPredictionsForm({
   disabled = false,
   invalid = false,
   onChange,
+  onSelectorExpandedChange,
   picks,
   players,
   teams,
 }: SpotlightPredictionsFormProps) {
+  const [expandedSelectorCategory, setExpandedSelectorCategory] =
+    useState<PredictionCategory | null>(null);
   const teamOptions = useMemo<SearchablePredictionOption[]>(
     () =>
       teams.map((team) => ({
@@ -187,6 +201,7 @@ export function SpotlightPredictionsForm({
   const playerOptions = useMemo<SearchablePredictionOption[]>(
     () =>
       players.map((player) => ({
+        assetPath: player.assetPath,
         displayName: player.displayName,
         id: player.id,
         searchText: [player.firstName, player.lastName, player.displayName]
@@ -208,10 +223,12 @@ export function SpotlightPredictionsForm({
     category: PredictionCategory,
     nextPick: SpotlightPickDraft | null,
   ) {
-    const nextPicks = { ...picks };
-    if (nextPick) nextPicks[category] = nextPick;
-    else delete nextPicks[category];
-    onChange(nextPicks);
+    onChange((currentPicks) => {
+      const nextPicks = { ...currentPicks };
+      if (nextPick) nextPicks[category] = nextPick;
+      else delete nextPicks[category];
+      return nextPicks;
+    });
   }
 
   return (
@@ -234,7 +251,7 @@ export function SpotlightPredictionsForm({
             </h2>
             <p className="mt-2 text-sm leading-6 text-slate-600">
               {players.length > 0
-                ? `Search ${players.length.toLocaleString("en-GB")} players by first or last name. Other player remains available for anyone new or unavailable, and missing portraits use a silhouette.`
+                ? `Type at least 2 letters to search ${players.length.toLocaleString("en-GB")} ${players.length === 1 ? "player" : "players"} by name. Up to 20 matches are shown, and Other player remains available for anyone new or unavailable.`
                 : "No player catalogue is loaded yet. Other player remains available in every player category."}
             </p>
           </div>
@@ -282,6 +299,10 @@ export function SpotlightPredictionsForm({
                         : "No player catalogue is loaded. Choose Other player below."
                       : "No matching club. Try another search."
                   }
+                  expanded={
+                    !disabled &&
+                    expandedSelectorCategory === definition.category
+                  }
                   invalid={pickInvalid}
                   invalidMessage={
                     isPlayer
@@ -291,6 +312,9 @@ export function SpotlightPredictionsForm({
                       : "Choose a club."
                   }
                   label={definition.label}
+                  maximumResults={isPlayer ? 20 : undefined}
+                  minimumQueryLength={isPlayer ? 2 : 0}
+                  minimumQueryMessage="Type at least 2 letters to search players."
                   onChange={(nextValue) => {
                     if (nextValue === null) {
                       updatePick(definition.category, null);
@@ -303,10 +327,18 @@ export function SpotlightPredictionsForm({
                         kind: "custom-player",
                       });
                     } else if (isPlayer) {
-                      updatePick(definition.category, {
-                        kind: "player",
-                        playerId: nextValue,
-                      });
+                      const player = playerById.get(nextValue);
+                      updatePick(
+                        definition.category,
+                        player
+                          ? {
+                              assetPath: player.assetPath,
+                              displayName: player.displayName,
+                              kind: "player",
+                              playerId: player.id,
+                            }
+                          : null,
+                      );
                     } else {
                       updatePick(definition.category, {
                         kind: "team",
@@ -320,19 +352,28 @@ export function SpotlightPredictionsForm({
                       kind: "custom-player",
                     })
                   }
+                  onExpandedChange={(expanded) => {
+                    setExpandedSelectorCategory((current) =>
+                      expanded
+                        ? definition.category
+                        : current === definition.category
+                          ? null
+                          : current,
+                    );
+                    onSelectorExpandedChange?.(definition.category, expanded);
+                  }}
                   options={isPlayer ? playerOptions : teamOptions}
                   otherValue={otherValue}
                   renderLeading={(option) => {
                     if (isPlayer) {
-                      const player = playerById.get(option.id);
-                      return player ? (
+                      return (
                         <PlayerMark
                           decorative
-                          name={player.displayName}
+                          name={option.displayName}
                           size="sm"
-                          src={player.assetPath}
+                          src={option.assetPath}
                         />
-                      ) : null;
+                      );
                     }
 
                     const team = teamById.get(option.id);
@@ -347,6 +388,16 @@ export function SpotlightPredictionsForm({
                       />
                     ) : null;
                   }}
+                  selectedOption={
+                    pick?.kind === "player"
+                      ? {
+                          assetPath: pick.assetPath,
+                          displayName: pick.displayName,
+                          id: pick.playerId,
+                          searchText: pick.displayName,
+                        }
+                      : null
+                  }
                   value={selectedValue}
                 />
               </CardContent>

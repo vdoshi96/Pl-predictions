@@ -20,6 +20,7 @@ import {
   PredictionForm,
   type PredictionSubmissionResult,
 } from "@/features/predictions/prediction-form";
+import { predictionDraftStorageKey } from "@/features/predictions/prediction-draft";
 import {
   PredictionSorter,
   type PredictionTeam,
@@ -50,6 +51,8 @@ afterEach(() => {
 });
 
 beforeEach(() => {
+  window.localStorage.clear();
+  stubPlayerCatalogue(playerFixtures);
   vi.stubGlobal("requestAnimationFrame", (callback: FrameRequestCallback) => {
     callback(0);
     return 1;
@@ -67,6 +70,7 @@ const teams: PredictionTeam[] = PREMIER_LEAGUE_2026_27_TEAMS.map((team) => ({
 
 const playerFixtures: PredictionPlayer[] = [
   {
+    assetPath: "/player-faces/mohamed-salah.png",
     displayName: "Mohamed Salah",
     firstName: "Mohamed",
     id: "mohamed-salah",
@@ -79,6 +83,23 @@ const playerFixtures: PredictionPlayer[] = [
     lastName: "Saka",
   },
 ];
+
+function stubPlayerCatalogue(
+  players: readonly PredictionPlayer[],
+  seasonSlug = "2026-27",
+) {
+  vi.stubGlobal(
+    "fetch",
+    vi.fn().mockResolvedValue({
+      json: vi.fn().mockResolvedValue({ players, seasonSlug }),
+      ok: true,
+    }),
+  );
+}
+
+function stubPlayerCatalogueFailure() {
+  vi.stubGlobal("fetch", vi.fn().mockRejectedValue(new Error("offline")));
+}
 
 function getSpotlightCategory(category: string) {
   const card = document.querySelector<HTMLElement>(
@@ -115,6 +136,24 @@ function completeSpotlightPicks() {
   chooseClub("overrated_team", "Overrated team", "Manchester United");
   chooseOtherPlayer("underdog_player", "Underdog player", "  Elliot Anderson");
   chooseOtherPlayer("overrated_player", "Overrated player", "Antony Matheus  ");
+}
+
+function acceptAlphabeticalPrediction() {
+  const warning = screen.getByRole("dialog", {
+    name: /this table is still alphabetical/i,
+  });
+  fireEvent.click(
+    within(warning).getByRole("button", {
+      name: /yes, use a–z/i,
+    }),
+  );
+}
+
+function continueWithAlphabeticalPrediction() {
+  fireEvent.click(
+    screen.getByRole("button", { name: /continue to spotlight picks/i }),
+  );
+  acceptAlphabeticalPrediction();
 }
 
 function SorterHarness({
@@ -339,7 +378,142 @@ describe("PredictionSorter", () => {
 });
 
 describe("PredictionForm", () => {
+  it("asks for the display name before the A–Z blank-slate table", () => {
+    render(<PredictionForm teams={teams} onSubmit={vi.fn()} />);
+
+    const nameHeading = screen.getByRole("heading", {
+      name: /who is making this prediction/i,
+    });
+    const tableHeading = screen.getByRole("heading", {
+      name: /your predicted table/i,
+    });
+
+    expect(
+      nameHeading.compareDocumentPosition(tableHeading) &
+        Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy();
+    expect(
+      screen.getByRole("heading", {
+        name: /table starts a–z as a blank slate/i,
+      }),
+    ).toBeVisible();
+    expect(screen.getByText(/not last season’s table/i)).toBeVisible();
+    expect(
+      screen.getByText(/progress will be saved in this browser/i),
+    ).toBeVisible();
+    expect(screen.getByText(/^not submitted\./i)).toBeVisible();
+  });
+
+  it("remembers an intentional A–Z choice in page memory until Reset", () => {
+    render(<PredictionForm teams={teams} onSubmit={vi.fn()} />);
+    fireEvent.change(screen.getByLabelText(/your display name/i), {
+      target: { value: "Alex" },
+    });
+
+    continueWithAlphabeticalPrediction();
+    fireEvent.click(screen.getByRole("button", { name: /back to table/i }));
+    fireEvent.click(
+      screen.getByRole("button", { name: /continue to spotlight picks/i }),
+    );
+    expect(
+      screen.queryByRole("dialog", {
+        name: /this table is still alphabetical/i,
+      }),
+    ).not.toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole("button", { name: /back to table/i }));
+    const arsenalHandle = screen.getByRole("button", {
+      name: /move arsenal.*arrow up or arrow down.*drag this handle/i,
+    });
+    fireEvent.keyDown(arsenalHandle, { code: "ArrowDown", key: "ArrowDown" });
+    fireEvent.click(
+      screen.getByRole("button", { name: /reset prediction table/i }),
+    );
+    fireEvent.click(
+      screen.getByRole("button", { name: /continue to spotlight picks/i }),
+    );
+    expect(
+      screen.getByRole("dialog", {
+        name: /this table is still alphabetical/i,
+      }),
+    ).toBeVisible();
+  });
+
+  it("discards a corrupt same-season browser draft", async () => {
+    const storageKey = predictionDraftStorageKey("2026-27");
+    window.localStorage.setItem(storageKey, "{not-json");
+
+    render(
+      <PredictionForm seasonSlug="2026-27" teams={teams} onSubmit={vi.fn()} />,
+    );
+
+    await waitFor(() =>
+      expect(window.localStorage.getItem(storageKey)).toBeNull(),
+    );
+    expect(screen.getByLabelText(/your display name/i)).toHaveValue("");
+    expect(
+      screen.getByRole("button", { name: /continue to spotlight picks/i }),
+    ).toBeDisabled();
+  });
+
+  it("asks again before using A–Z from a restored browser draft", async () => {
+    const seasonSlug = "2026-27";
+    window.localStorage.setItem(
+      predictionDraftStorageKey(seasonSlug),
+      JSON.stringify({
+        orderedTeamIds: teams.map((team) => team.id),
+        participantName: "Alex",
+        savedAt: "2026-08-14T12:00:00.000Z",
+        seasonSlug,
+        spotlightPicks: {},
+        stage: "table",
+        version: 1,
+      }),
+    );
+
+    render(
+      <PredictionForm
+        seasonSlug={seasonSlug}
+        teams={teams}
+        onSubmit={vi.fn()}
+      />,
+    );
+    expect(
+      await screen.findByText(/draft restored from this browser/i),
+    ).toBeVisible();
+    fireEvent.click(
+      screen.getByRole("button", { name: /continue to spotlight picks/i }),
+    );
+
+    expect(
+      screen.getByRole("dialog", {
+        name: /this table is still alphabetical/i,
+      }),
+    ).toBeVisible();
+  });
+
+  it("warns about unsaved changes when browser storage is unavailable", async () => {
+    vi.spyOn(Storage.prototype, "setItem").mockImplementation(() => {
+      throw new Error("storage unavailable");
+    });
+
+    render(<PredictionForm teams={teams} onSubmit={vi.fn()} />);
+    fireEvent.change(screen.getByLabelText(/your display name/i), {
+      target: { value: "Alex" },
+    });
+
+    expect(
+      await screen.findByText(/this browser could not save a draft/i),
+    ).toBeVisible();
+    const beforeUnload = new Event("beforeunload", {
+      cancelable: true,
+    }) as BeforeUnloadEvent;
+    window.dispatchEvent(beforeUnload);
+    expect(beforeUnload.defaultPrevented).toBe(true);
+  });
+
   it("moves from table to spotlight to final review and emits all predictions", async () => {
+    const storageKey = predictionDraftStorageKey("2026-27");
     const result: PredictionSubmissionResult = {
       ok: true,
       entryId: "entry-123",
@@ -352,6 +526,7 @@ describe("PredictionForm", () => {
 
     render(
       <PredictionForm
+        seasonSlug="2026-27"
         teams={teams}
         onSubmit={onSubmit}
         onPendingChange={onPendingChange}
@@ -367,9 +542,25 @@ describe("PredictionForm", () => {
       screen.getByRole("button", { name: /continue to spotlight picks/i }),
     );
 
+    const alphabeticalWarning = screen.getByRole("dialog", {
+      name: /this table is still alphabetical/i,
+    });
+    expect(alphabeticalWarning).toHaveAccessibleDescription(
+      /only a blank slate, not last season’s table or a suggested prediction/i,
+    );
+    expect(
+      screen.queryByRole("heading", { name: /make your spotlight picks/i }),
+    ).not.toBeInTheDocument();
+    fireEvent.click(
+      within(alphabeticalWarning).getByRole("button", {
+        name: /yes, use a–z/i,
+      }),
+    );
+
     expect(
       screen.getByRole("heading", { name: /make your spotlight picks/i }),
     ).toBeVisible();
+    expect(window.localStorage.getItem(storageKey)).not.toBeNull();
     completeSpotlightPicks();
     fireEvent.click(
       screen.getByRole("button", { name: /review all predictions/i }),
@@ -432,6 +623,7 @@ describe("PredictionForm", () => {
     expect(onSuccess).toHaveBeenCalledWith(result, submitted);
     expect(onError).not.toHaveBeenCalled();
     expect(await screen.findByText(/you’re in, Vishal Doshi/i)).toBeVisible();
+    expect(window.localStorage.getItem(storageKey)).toBeNull();
     expect(
       screen.getByRole("link", { name: /view confirmation/i }),
     ).toHaveAttribute("href", "/entries/entry-123");
@@ -441,6 +633,7 @@ describe("PredictionForm", () => {
   });
 
   it("keeps a server rejection actionable in the review dialog", async () => {
+    const storageKey = predictionDraftStorageKey("2026-27");
     const onSubmit = vi.fn().mockResolvedValue({
       ok: false,
       message: "That display name has already submitted.",
@@ -448,15 +641,18 @@ describe("PredictionForm", () => {
     const onError = vi.fn();
 
     render(
-      <PredictionForm teams={teams} onSubmit={onSubmit} onError={onError} />,
+      <PredictionForm
+        seasonSlug="2026-27"
+        teams={teams}
+        onSubmit={onSubmit}
+        onError={onError}
+      />,
     );
 
     fireEvent.change(screen.getByLabelText(/your display name/i), {
       target: { value: "Alex" },
     });
-    fireEvent.click(
-      screen.getByRole("button", { name: /continue to spotlight picks/i }),
-    );
+    continueWithAlphabeticalPrediction();
     completeSpotlightPicks();
     fireEvent.click(
       screen.getByRole("button", { name: /review all predictions/i }),
@@ -477,6 +673,111 @@ describe("PredictionForm", () => {
     expect(
       within(dialog).getByRole("button", { name: /go back/i }),
     ).toBeEnabled();
+    expect(window.localStorage.getItem(storageKey)).not.toBeNull();
+  });
+
+  it("clears a browser draft after the server verifies permanent season closure", async () => {
+    const storageKey = predictionDraftStorageKey("2026-27");
+    const view = render(
+      <PredictionForm seasonSlug="2026-27" teams={teams} onSubmit={vi.fn()} />,
+    );
+
+    fireEvent.change(screen.getByLabelText(/your display name/i), {
+      target: { value: "Alex" },
+    });
+    await waitFor(() =>
+      expect(window.localStorage.getItem(storageKey)).not.toBeNull(),
+    );
+
+    view.rerender(
+      <PredictionForm
+        disabled
+        disabledReason="Predictions are permanently closed."
+        seasonSlug="2026-27"
+        teams={teams}
+        onSubmit={vi.fn()}
+      />,
+    );
+
+    await waitFor(() =>
+      expect(window.localStorage.getItem(storageKey)).toBeNull(),
+    );
+    expect(screen.getByLabelText(/your display name/i)).toHaveValue("");
+    expect(
+      screen.getByRole("button", { name: /continue to spotlight picks/i }),
+    ).toBeDisabled();
+  });
+
+  it("closes an open alphabetical warning when the season permanently closes", async () => {
+    const view = render(
+      <PredictionForm seasonSlug="2026-27" teams={teams} onSubmit={vi.fn()} />,
+    );
+
+    fireEvent.change(screen.getByLabelText(/your display name/i), {
+      target: { value: "Alex" },
+    });
+    fireEvent.click(
+      screen.getByRole("button", { name: /continue to spotlight picks/i }),
+    );
+    expect(
+      screen.getByRole("dialog", { name: /this table is still alphabetical/i }),
+    ).toBeVisible();
+
+    view.rerender(
+      <PredictionForm
+        disabled
+        disabledReason="Predictions are permanently closed."
+        seasonSlug="2026-27"
+        teams={teams}
+        onSubmit={vi.fn()}
+      />,
+    );
+
+    await waitFor(() =>
+      expect(
+        screen.queryByRole("dialog", {
+          name: /this table is still alphabetical/i,
+        }),
+      ).not.toBeInTheDocument(),
+    );
+    expect(
+      screen.getByRole("button", { name: /continue to spotlight picks/i }),
+    ).toBeDisabled();
+  });
+
+  it("closes an open final review when the season permanently closes", async () => {
+    const view = render(
+      <PredictionForm seasonSlug="2026-27" teams={teams} onSubmit={vi.fn()} />,
+    );
+
+    fireEvent.change(screen.getByLabelText(/your display name/i), {
+      target: { value: "Alex" },
+    });
+    continueWithAlphabeticalPrediction();
+    completeSpotlightPicks();
+    fireEvent.click(
+      screen.getByRole("button", { name: /review all predictions/i }),
+    );
+    expect(
+      screen.getByRole("dialog", { name: /review every prediction/i }),
+    ).toBeVisible();
+
+    view.rerender(
+      <PredictionForm
+        disabled
+        disabledReason="Predictions are permanently closed."
+        seasonSlug="2026-27"
+        teams={teams}
+        onSubmit={vi.fn()}
+      />,
+    );
+
+    await waitFor(() =>
+      expect(
+        screen.queryByRole("dialog", { name: /review every prediction/i }),
+      ).not.toBeInTheDocument(),
+    );
+    expect(screen.getByLabelText(/your display name/i)).toHaveValue("");
   });
 
   it("requires all seven categories and a complete Other player name", () => {
@@ -485,9 +786,7 @@ describe("PredictionForm", () => {
     fireEvent.change(screen.getByLabelText(/your display name/i), {
       target: { value: "Alex" },
     });
-    fireEvent.click(
-      screen.getByRole("button", { name: /continue to spotlight picks/i }),
-    );
+    continueWithAlphabeticalPrediction();
     fireEvent.click(
       screen.getByRole("button", { name: /review all predictions/i }),
     );
@@ -558,10 +857,108 @@ describe("PredictionForm", () => {
     ).toHaveValue("Liverpool");
   });
 
-  it("clears a catalog pick when that player leaves the available roster", async () => {
-    const { rerender } = render(
+  it("restores a season-keyed draft and its selected-player display metadata", async () => {
+    const seasonSlug = "2026-27";
+    const storageKey = predictionDraftStorageKey(seasonSlug);
+    const firstRender = render(
       <PredictionForm
-        players={playerFixtures}
+        seasonSlug={seasonSlug}
+        teams={teams}
+        onSubmit={vi.fn()}
+      />,
+    );
+
+    const arsenalHandle = screen.getByRole("button", {
+      name: /move arsenal.*arrow up or arrow down.*drag this handle/i,
+    });
+    fireEvent.keyDown(arsenalHandle, { code: "Space", key: " " });
+    fireEvent.keyDown(arsenalHandle, {
+      code: "ArrowDown",
+      key: "ArrowDown",
+    });
+    fireEvent.change(screen.getByLabelText(/your display name/i), {
+      target: { value: "  Alex   Smith  " },
+    });
+    fireEvent.click(
+      screen.getByRole("button", { name: /continue to spotlight picks/i }),
+    );
+
+    await waitFor(() =>
+      expect(screen.getByText(/search 2 players by name/i)).toBeVisible(),
+    );
+
+    const topScorerCard = getSpotlightCategory("top_scorer");
+    const topScorer = within(topScorerCard).getByRole("combobox", {
+      name: "Top scorer",
+    });
+    fireEvent.focus(topScorer);
+    fireEvent.change(topScorer, { target: { value: "salah" } });
+    fireEvent.click(
+      within(topScorerCard).getByRole("option", { name: "Mohamed Salah" }),
+    );
+
+    await waitFor(() =>
+      expect(
+        screen.getByText(/draft saved in this browser until you submit/i),
+      ).toBeVisible(),
+    );
+    expect(JSON.parse(window.localStorage.getItem(storageKey) ?? "{}")).toEqual(
+      expect.objectContaining({
+        seasonSlug,
+        version: 1,
+        spotlightPicks: expect.objectContaining({
+          top_scorer: {
+            assetPath: "/player-faces/mohamed-salah.png",
+            displayName: "Mohamed Salah",
+            kind: "player",
+            playerId: "mohamed-salah",
+          },
+        }),
+      }),
+    );
+
+    firstRender.unmount();
+    stubPlayerCatalogueFailure();
+    const restoredRender = render(
+      <PredictionForm
+        seasonSlug={seasonSlug}
+        teams={teams}
+        onSubmit={vi.fn()}
+      />,
+    );
+
+    expect(
+      await screen.findByRole("heading", {
+        name: /make your spotlight picks/i,
+      }),
+    ).toBeVisible();
+    expect(screen.getByText(/draft restored from this browser/i)).toBeVisible();
+    const restoredTopScorer = getSpotlightCategory("top_scorer");
+    expect(within(restoredTopScorer).getByRole("combobox")).toHaveValue(
+      "Mohamed Salah",
+    );
+    expect(
+      within(restoredTopScorer).getByText(/selected: Mohamed Salah/i),
+    ).toBeVisible();
+    expect(restoredTopScorer.querySelector("img")).toHaveAttribute(
+      "src",
+      expect.stringContaining("mohamed-salah.png"),
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: /back to table/i }));
+    expect(screen.getByLabelText(/your display name/i)).toHaveValue(
+      "Alex Smith",
+    );
+    expect(
+      restoredRender.container.querySelector("[data-position='2']"),
+    ).toHaveAttribute("data-team-id", "arsenal");
+  });
+
+  it("clears a stale restored player only after a successful catalogue load", async () => {
+    const seasonSlug = "2026-27";
+    const firstRender = render(
+      <PredictionForm
+        seasonSlug={seasonSlug}
         teams={teams}
         onSubmit={vi.fn()}
       />,
@@ -569,12 +966,17 @@ describe("PredictionForm", () => {
     fireEvent.change(screen.getByLabelText(/your display name/i), {
       target: { value: "Alex" },
     });
-    fireEvent.click(
-      screen.getByRole("button", { name: /continue to spotlight picks/i }),
+    continueWithAlphabeticalPrediction();
+    await waitFor(() =>
+      expect(screen.getByText(/search 2 players by name/i)).toBeVisible(),
     );
     const topScorerCard = getSpotlightCategory("top_scorer");
     fireEvent.focus(
       within(topScorerCard).getByRole("combobox", { name: "Top scorer" }),
+    );
+    fireEvent.change(
+      within(topScorerCard).getByRole("combobox", { name: "Top scorer" }),
+      { target: { value: "salah" } },
     );
     fireEvent.click(
       within(topScorerCard).getByRole("option", { name: "Mohamed Salah" }),
@@ -583,19 +985,271 @@ describe("PredictionForm", () => {
       "Mohamed Salah",
     );
 
-    rerender(
+    await waitFor(() =>
+      expect(
+        screen.getByText(/draft saved in this browser until you submit/i),
+      ).toBeVisible(),
+    );
+    firstRender.unmount();
+    stubPlayerCatalogue(playerFixtures.slice(1));
+    render(
       <PredictionForm
-        players={playerFixtures.slice(1)}
+        seasonSlug={seasonSlug}
         teams={teams}
         onSubmit={vi.fn()}
       />,
     );
 
-    await waitFor(() =>
-      expect(
-        within(getSpotlightCategory("top_scorer")).getByRole("combobox"),
-      ).toHaveValue(""),
+    expect(
+      await screen.findByText(/saved player selection is no longer/i),
+    ).toBeVisible();
+    expect(
+      within(getSpotlightCategory("top_scorer")).getByRole("combobox"),
+    ).toHaveValue("");
+    expect(
+      within(getSpotlightCategory("top_scorer")).queryByText(
+        /selected: Mohamed Salah/i,
+      ),
+    ).not.toBeInTheDocument();
+  });
+
+  it("keeps restored player metadata while the catalogue is unavailable", async () => {
+    const seasonSlug = "2026-27";
+    window.localStorage.setItem(
+      predictionDraftStorageKey(seasonSlug),
+      JSON.stringify({
+        orderedTeamIds: teams.map((team) => team.id),
+        participantName: "Alex",
+        savedAt: "2026-08-14T12:00:00.000Z",
+        seasonSlug,
+        spotlightPicks: {
+          top_scorer: {
+            assetPath: "/player-faces/mohamed-salah.png",
+            displayName: "Mohamed Salah",
+            kind: "player",
+            playerId: "mohamed-salah",
+          },
+        },
+        stage: "spotlight",
+        version: 1,
+      }),
     );
+    stubPlayerCatalogueFailure();
+
+    render(
+      <PredictionForm
+        seasonSlug={seasonSlug}
+        teams={teams}
+        onSubmit={vi.fn()}
+      />,
+    );
+
+    expect(
+      await screen.findByText(/player catalogue could not be loaded/i),
+    ).toBeVisible();
+    expect(
+      within(getSpotlightCategory("top_scorer")).getByRole("combobox"),
+    ).toHaveValue("Mohamed Salah");
+    expect(
+      within(getSpotlightCategory("top_scorer")).getByText(
+        /selected: Mohamed Salah/i,
+      ),
+    ).toBeVisible();
+  });
+
+  it("recovers the player catalogue after Retry succeeds", async () => {
+    const fetchMock = vi
+      .fn()
+      .mockRejectedValueOnce(new Error("offline"))
+      .mockResolvedValueOnce({
+        json: vi.fn().mockResolvedValue({
+          players: playerFixtures,
+          seasonSlug: "2026-27",
+        }),
+        ok: true,
+      });
+    vi.stubGlobal("fetch", fetchMock);
+
+    render(<PredictionForm teams={teams} onSubmit={vi.fn()} />);
+    fireEvent.change(screen.getByLabelText(/your display name/i), {
+      target: { value: "Alex" },
+    });
+    continueWithAlphabeticalPrediction();
+
+    expect(
+      await screen.findByText(/player catalogue could not be loaded/i),
+    ).toBeVisible();
+    fireEvent.click(
+      screen.getByRole("button", { name: /retry player catalogue/i }),
+    );
+
+    expect(await screen.findByText(/search 2 players by name/i)).toBeVisible();
+    expect(
+      screen.queryByText(/player catalogue could not be loaded/i),
+    ).not.toBeInTheDocument();
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+  });
+
+  it("keeps a validated destination draft when season and team set change together", async () => {
+    const destinationTeams = teams.map((team) => ({
+      ...team,
+      id: `next-${team.id}`,
+    }));
+    const destinationSlug = "2027-28";
+    window.localStorage.setItem(
+      predictionDraftStorageKey(destinationSlug),
+      JSON.stringify({
+        orderedTeamIds: [...destinationTeams].reverse().map((team) => team.id),
+        participantName: "Jamie",
+        savedAt: "2026-08-14T12:00:00.000Z",
+        seasonSlug: destinationSlug,
+        spotlightPicks: {
+          top_scorer: {
+            customPlayerName: "Next Season Scorer",
+            kind: "custom-player",
+          },
+        },
+        stage: "spotlight",
+        version: 1,
+      }),
+    );
+    stubPlayerCatalogue([], destinationSlug);
+
+    const view = render(
+      <PredictionForm seasonSlug="2026-27" teams={teams} onSubmit={vi.fn()} />,
+    );
+    view.rerender(
+      <PredictionForm
+        seasonSlug={destinationSlug}
+        teams={destinationTeams}
+        onSubmit={vi.fn()}
+      />,
+    );
+
+    expect(
+      await screen.findByRole("heading", {
+        name: /make your spotlight picks/i,
+      }),
+    ).toBeVisible();
+    expect(screen.getByText(/draft restored from this browser/i)).toBeVisible();
+    const scorerCard = within(getSpotlightCategory("top_scorer"));
+    expect(scorerCard.getByRole("combobox")).toHaveValue("Other player");
+    expect(scorerCard.getByLabelText("Player’s full name")).toHaveValue(
+      "Next Season Scorer",
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: /back to table/i }));
+    expect(screen.getByLabelText(/your display name/i)).toHaveValue("Jamie");
+    expect(view.container.querySelector("[data-position='1']")).toHaveAttribute(
+      "data-team-id",
+      destinationTeams.at(-1)?.id,
+    );
+  });
+
+  it("resets the draft and reloads the catalogue when the season changes without a remount", async () => {
+    const nextSeasonPlayer: PredictionPlayer = {
+      assetPath: null,
+      displayName: "Next Season Player",
+      firstName: "Next",
+      id: "next-season-player",
+      lastName: "Player",
+    };
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValueOnce({
+        json: vi.fn().mockResolvedValue({
+          players: playerFixtures,
+          seasonSlug: "2026-27",
+        }),
+        ok: true,
+      })
+      .mockResolvedValueOnce({
+        json: vi.fn().mockResolvedValue({
+          players: [nextSeasonPlayer],
+          seasonSlug: "2027-28",
+        }),
+        ok: true,
+      });
+    vi.stubGlobal("fetch", fetchMock);
+
+    const view = render(
+      <PredictionForm seasonSlug="2026-27" teams={teams} onSubmit={vi.fn()} />,
+    );
+    fireEvent.change(screen.getByLabelText(/your display name/i), {
+      target: { value: "Alex" },
+    });
+    continueWithAlphabeticalPrediction();
+    await screen.findByText(/search 2 players by name/i);
+
+    view.rerender(
+      <PredictionForm seasonSlug="2027-28" teams={teams} onSubmit={vi.fn()} />,
+    );
+
+    expect(await screen.findByLabelText(/your display name/i)).toHaveValue("");
+    expect(
+      window.localStorage.getItem(predictionDraftStorageKey("2027-28")),
+    ).toBeNull();
+
+    fireEvent.change(screen.getByLabelText(/your display name/i), {
+      target: { value: "Jamie" },
+    });
+    continueWithAlphabeticalPrediction();
+    await screen.findByText(/search 1 player by name/i);
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+  });
+
+  it("persists the complete seventh pick synchronously and restores it on immediate reload", async () => {
+    const seasonSlug = "2026-27";
+    const storageKey = predictionDraftStorageKey(seasonSlug);
+    const firstRender = render(
+      <PredictionForm
+        seasonSlug={seasonSlug}
+        teams={teams}
+        onSubmit={vi.fn()}
+      />,
+    );
+    fireEvent.change(screen.getByLabelText(/your display name/i), {
+      target: { value: "Alex" },
+    });
+    continueWithAlphabeticalPrediction();
+    completeSpotlightPicks();
+
+    const storedImmediately = JSON.parse(
+      window.localStorage.getItem(storageKey) ?? "{}",
+    ) as { spotlightPicks?: Record<string, unknown> };
+    expect(Object.keys(storedImmediately.spotlightPicks ?? {})).toHaveLength(7);
+    expect(storedImmediately.spotlightPicks).toEqual(
+      expect.objectContaining({
+        overrated_player: {
+          customPlayerName: "Antony Matheus  ",
+          kind: "custom-player",
+        },
+      }),
+    );
+
+    firstRender.unmount();
+    render(
+      <PredictionForm
+        seasonSlug={seasonSlug}
+        teams={teams}
+        onSubmit={vi.fn()}
+      />,
+    );
+
+    expect(
+      await screen.findByRole("heading", {
+        name: /make your spotlight picks/i,
+      }),
+    ).toBeVisible();
+    expect(screen.getByText(/draft restored from this browser/i)).toBeVisible();
+    expect(
+      screen.getByText(/7 of 7 spotlight categories started/i),
+    ).toBeVisible();
+    expect(
+      within(getSpotlightCategory("overrated_player")).getByLabelText(
+        "Player’s full name",
+      ),
+    ).toHaveValue("Antony Matheus  ");
   });
 
   it("uses a safe-area-aware sticky action at mobile widths", () => {
@@ -610,9 +1264,78 @@ describe("PredictionForm", () => {
     expect(stickyAction?.className).toContain("safe-area-inset-bottom");
     expect(reviewButton).toHaveClass("w-full", "min-h-12");
   });
+
+  it("hides the sticky review action while a selector popup is open", async () => {
+    render(<PredictionForm teams={teams} onSubmit={vi.fn()} />);
+    fireEvent.change(screen.getByLabelText(/your display name/i), {
+      target: { value: "Alex" },
+    });
+    continueWithAlphabeticalPrediction();
+    await screen.findByText(/search 2 players by name/i);
+
+    const reviewButton = screen.getByRole("button", {
+      name: /review all predictions/i,
+    });
+    const stickyAction = reviewButton.closest(".sticky");
+    const topScorerCard = within(getSpotlightCategory("top_scorer"));
+    const topAssisterCard = within(getSpotlightCategory("top_assister"));
+
+    fireEvent.click(
+      topScorerCard.getByRole("button", {
+        name: "Open Top scorer options",
+      }),
+    );
+    expect(stickyAction).toHaveClass("hidden");
+    expect(screen.getAllByRole("listbox")).toHaveLength(1);
+
+    fireEvent.click(
+      topAssisterCard.getByRole("button", {
+        name: "Open Top assister options",
+      }),
+    );
+    expect(stickyAction).toHaveClass("hidden");
+    expect(screen.getAllByRole("listbox")).toHaveLength(1);
+    expect(
+      topScorerCard.getByRole("combobox", { name: "Top scorer" }),
+    ).toHaveAttribute("aria-expanded", "false");
+
+    fireEvent.click(
+      topAssisterCard.getByRole("button", {
+        name: "Close Top assister options",
+      }),
+    );
+    expect(screen.queryByRole("listbox")).not.toBeInTheDocument();
+    expect(stickyAction).not.toHaveClass("hidden");
+  });
 });
 
 describe("SpotlightPredictionsForm", () => {
+  it("emits composable updates when successive choices share a stale render", () => {
+    const onChange = vi.fn();
+    render(
+      <SpotlightPredictionsForm
+        onChange={onChange}
+        picks={{}}
+        players={playerFixtures}
+        teams={teams}
+      />,
+    );
+
+    chooseClub("underdog_team", "Underdog team", "Arsenal");
+    chooseClub("overrated_team", "Overrated team", "Brentford");
+
+    let combinedPicks: SpotlightPicksDraft = {};
+    for (const [update] of onChange.mock.calls as Array<
+      [(current: SpotlightPicksDraft) => SpotlightPicksDraft]
+    >) {
+      combinedPicks = update(combinedPicks);
+    }
+    expect(combinedPicks).toEqual({
+      overrated_team: { kind: "team", teamId: "brentford" },
+      underdog_team: { kind: "team", teamId: "arsenal" },
+    });
+  });
+
   it("filters the player fixture by first or last name", () => {
     render(<SpotlightHarness />);
 
@@ -649,6 +1372,7 @@ describe("SpotlightPredictionsForm", () => {
     });
     combobox.focus();
     fireEvent.focus(combobox);
+    fireEvent.change(combobox, { target: { value: "sa" } });
 
     const options = within(topScorerCard).getAllByRole("option");
     expect(options).toHaveLength(3);
@@ -677,6 +1401,7 @@ describe("SpotlightPredictionsForm", () => {
       name: "Top scorer",
     });
     fireEvent.focus(combobox);
+    fireEvent.change(combobox, { target: { value: "saka" } });
     fireEvent.click(
       within(topScorerCard).getByRole("option", { name: "Bukayo Saka" }),
     );

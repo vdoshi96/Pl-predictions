@@ -13,55 +13,13 @@ export function getOpeningKickoff(): Date {
 }
 
 /**
- * The first league kickoff is a non-extendable submission ceiling. The owner
- * may still choose an earlier deadline, manually lock, or reveal early.
+ * The first league kickoff is the sole timed submission deadline. The legacy
+ * configured value remains in the database for compatibility but is ignored.
  */
 export function getEffectiveSubmissionDeadline(
-  configuredDeadline: Date | null,
   openingKickoff = getOpeningKickoff(),
 ): Date {
-  if (
-    configuredDeadline &&
-    configuredDeadline.getTime() < openingKickoff.getTime()
-  ) {
-    return new Date(configuredDeadline.getTime());
-  }
-
   return new Date(openingKickoff.getTime());
-}
-
-export function assertDeadlineNotAfterOpeningKickoff(
-  configuredDeadline: Date,
-  openingKickoff = getOpeningKickoff(),
-): void {
-  if (configuredDeadline.getTime() > openingKickoff.getTime()) {
-    throw new RangeError(
-      "The submission deadline cannot be after the Gameweek 1 opening kickoff.",
-    );
-  }
-}
-
-export function parseOptionalUtcDeadline(
-  value: string,
-  openingKickoff = getOpeningKickoff(),
-): Date | null {
-  const candidate = value.trim();
-  if (!candidate) return null;
-
-  if (!/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/u.test(candidate)) {
-    throw new RangeError(
-      "The submission deadline must be a UTC date and time.",
-    );
-  }
-
-  const normalized = `${candidate}:00.000Z`;
-  const parsed = new Date(normalized);
-  if (Number.isNaN(parsed.getTime()) || parsed.toISOString() !== normalized) {
-    throw new RangeError("The submission deadline must be a real UTC time.");
-  }
-
-  assertDeadlineNotAfterOpeningKickoff(parsed, openingKickoff);
-  return parsed.getTime() === openingKickoff.getTime() ? null : parsed;
 }
 
 export function hasSeasonStarted(

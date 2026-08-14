@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="generated-by" content="scripts/generate-docs-html.mjs" />
     <meta name="canonical-source" content="LOG.md" />
-    <meta name="canonical-source-sha256" content="5ab5cb57ee9929990328ff74b0ee07fa7c7df7650087df9af70c3cdf30a7c471" />
+    <meta name="canonical-source-sha256" content="233b12ee3aaf56696720b711702fdbf896d5434b3211a65c48d2363afe42b0c7" />
     <title>Session log</title>
     <style>
       :root { color-scheme: light dark; font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
@@ -41,7 +41,7 @@
     <main>
       <h1 id="session-log">Session log</h1>
 <h2 id="2026-08-14">2026-08-14</h2>
-<h3 id="august-13-roster-release-complete-closeout-cleanup-pending">August 13 roster release (complete; closeout cleanup pending)</h3>
+<h3 id="august-13-roster-release-and-repository-closeout-complete">August 13 roster release and repository closeout (complete)</h3>
 <ul>
 <li>Audited the existing <code>roster/2026-08-13-player-update</code> worktree at <code>7d1996ca5e11dd279fd36cc33d4f7269befd613f</code>. Its tracked tree was initially clean, it was one direct commit ahead of live <code>main</code>, and it incorrectly tracked <code>origin/main</code>; no remote feature branch or pull request existed.</li>
 <li>The owner selected the August 13 handoff as release authority with complete internal handoff-to-application reconciliation and no independent official-club or Premier League roster verification.</li>
@@ -59,8 +59,14 @@
 <li>Verified Ready production deployment <code>dpl_2CAJEZ3cXpm7NU6K972sN31bVBkz</code> at <a href="https://pl-predictions-835vjpg3z-vdoshi96s-projects.vercel.app">https://pl-predictions-835vjpg3z-vdoshi96s-projects.vercel.app</a> and read back <a href="https://pl-predictions-2026.vercel.app">https://pl-predictions-2026.vercel.app</a> as the same deployment ID.</li>
 <li>Proved the recovery stop gate in Neon project <code>young-leaf-03280061</code>: <code>main</code> is a root branch with parent <code>-</code>, the configured restore window is six hours, and the pre-seed capture at 2026-08-14 13:35:11.760453 UTC recorded WAL <code>0/45548C8</code> and the exact 20/587/587/0/580 baseline. A read-only time-travel query at 13:33:00 UTC returned that baseline. The Browse pane produced one transient signal-aborted error, but Query data succeeded; no restore was performed.</li>
 <li>Ran the supported production seed exactly once; it printed <code>Seeded 20 teams and 582 players for 2026/27 Premier League.</code> The post-seed capture at 2026-08-14 13:37:59.513827 UTC recorded WAL <code>0/4652E18</code>. Read-only verification found 20 teams; 599 total rows and 599 distinct IDs, external IDs, and slugs; 582 active; 17 inactive; 582 distinct active portrait paths; no null or missing club references; intact foreign-key and cross-season checks; zero inactive-player pick references; exact fixture parity; all expected inactive identities and moves; and zero active obsolete paths.</li>
-<li>Verified all 582 active portrait URLs as HTTP 200 valid PNGs and all 21 obsolete paths as HTTP 404. The final read-only smoke passed all five desktop/mobile Chromium and mobile WebKit projects, covering the representative addition, move, restored portrait, removal, Other-player silhouette, reflow, and browser/network/HTTP guards. Refreshed and visually inspected seven screenshots with manifest SHA-256 <code>6b5251c6fd96a70f5d32edc074101246303c76805deec1bf499ec382afee134d</code>; the exact deployment&#39;s bounded error, fatal, and HTTP 5xx queries returned no records.</li>
-<li>Marked the roster release complete and opened evidence-only closeout <a href="https://github.com/vdoshi96/Pl-predictions/pull/16">PR #16</a>. Its merge, final <code>main</code> synchronization, retained-handoff rehash, and completed branch/worktree cleanup remain; no merge SHA is claimed before it exists.</li>
+<li>Verified all 582 active portrait URLs as HTTP 200 with PNG content types and PNG signatures, and all 21 obsolete paths as HTTP 404. The final read-only smoke passed all five desktop/mobile Chromium and mobile WebKit projects, covering the representative addition, move, restored portrait, removal, Other-player silhouette, reflow, and browser/network/HTTP guards. Refreshed and visually inspected seven screenshots with manifest SHA-256 <code>6b5251c6fd96a70f5d32edc074101246303c76805deec1bf499ec382afee134d</code>; the exact deployment&#39;s bounded error, fatal, and HTTP 5xx queries returned no records.</li>
+<li>Merged evidence-only closeout <a href="https://github.com/vdoshi96/Pl-predictions/pull/16">PR #16</a> on 2026-08-14 at 13:58:28 UTC as merge commit <code>98210965bfa6d586ef595c33038761e80f45b765</code>. Verified its documentation-only production deployment <code>dpl_9bUTkvP7x3Sr55GPMLmDyyuGVMv3</code> (<code>mr5jtzypm</code>) became Ready and returned HTTP 200. The stable alias intentionally remained on the previously verified roster deployment; no alias mutation ran. Fast-forwarded local <code>main</code> to the evidence merge and proved exact equality with <code>origin/main</code> before cleanup.</li>
+<li>Independently rehashed the retained primary August 8 handoff: full manifest <code>29d8dc2efda79ae5cde906214b91402008d89dbde71adca97e837aeab15e7ee3</code>, substantive non-<code>.DS_Store</code> parity manifest <code>e3c5d7c6ea5c75725fa4d3518333cd171e37d8a8cb407ecfa9fac0047bab3c5a</code>, and symlink path/target manifest <code>4e800f7c8103c59463469dfb492bdaaf1785a5f3e762a5427fc53596f540d888</code>. Its worktree duplicate matched all substantive files and symlinks; only two Finder <code>.DS_Store</code> files differed byte-for-byte.</li>
+<li>Independently rehashed the retained primary August 13 handoff at full manifest <code>e1ee3b985b8e26799d0ec06632ebf9a1250ac1fab6e5749be0b4574a67aec83d</code>; its worktree duplicate was byte-identical. The existing original-algorithm manifest <code>f625470979c156e233300ec42924eb858255d902a456af1283a089ae41169630</code> remains valid.</li>
+<li>Moved the verified worktree handoff duplicates recoverably to <code>/Users/vishal/.Trash/premier-league-players-2026-08-08-worktree-duplicate-2026-08-14</code> and <code>/Users/vishal/.Trash/premier-league-players-2026-08-13-worktree-duplicate-2026-08-14</code>, then removed the completed feature worktree normally and pruned worktree metadata.</li>
+<li>Proved ancestry before deleting remote <code>roster/2026-08-13-player-update</code>, <code>vishal/august-13-player-catalogue-closeout</code>, <code>agent/dranx-brand-refresh</code>, and <code>agent/dranx-release-closeout</code>. Deleted local <code>roster/2026-08-13-player-update</code> and <code>vishal/august-13-player-catalogue-closeout</code>. One primary worktree remains.</li>
+<li>Moved superseded QA and hash-identical output screenshot duplicates recoverably to <code>/Users/vishal/.Trash/Pl-Predictions-superseded-QA-2026-08-14</code>. Retained the newest seven canonical screenshots under <code>docs/assets/qa/</code> and the current output report/results.</li>
+<li>Intentionally retained the unrelated untracked <code>Premier League 2026-27 PNG Assets/</code> folder out of scope.</li>
 </ul>
 <h2 id="2026-08-13">2026-08-13</h2>
 <h3 id="owner-handoff-creation-local-feature-branch">Owner handoff creation (local feature branch)</h3>
@@ -232,7 +238,7 @@
 <li>Next handoff: use <code>main</code> as the base for future pull requests. No GitHub access blocker remains for the current repository workflow.</li>
 </ul>
 
-      <p class="source">Generated deterministically from <a href="LOG.md">docs/context/LOG.md</a>. Canonical SHA-256: <code>5ab5cb57ee9929990328ff74b0ee07fa7c7df7650087df9af70c3cdf30a7c471</code>.</p>
+      <p class="source">Generated deterministically from <a href="LOG.md">docs/context/LOG.md</a>. Canonical SHA-256: <code>233b12ee3aaf56696720b711702fdbf896d5434b3211a65c48d2363afe42b0c7</code>.</p>
     </main>
   </body>
 </html>

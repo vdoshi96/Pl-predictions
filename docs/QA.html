@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="generated-by" content="scripts/generate-docs-html.mjs" />
     <meta name="canonical-source" content="QA.md" />
-    <meta name="canonical-source-sha256" content="6f578aa5adf3d56fde7aebd49d09572e492231c20f6b1445f49eb011528649fe" />
+    <meta name="canonical-source-sha256" content="d5f751e318ecfae406a11be09c3b3d1d01534a781e90c12af7a8e2fc17e1a03e" />
     <title>Quality assurance</title>
     <style>
       :root { color-scheme: light dark; font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
@@ -40,7 +40,7 @@
   <body>
     <main>
       <h1 id="quality-assurance">Quality assurance</h1>
-<p>Evidence date: 2026-08-14. The current evidence covers the completed August 13 roster/portrait release from local reconciliation through GitHub merge, production deployment, Neon recovery proof, one supported seed, and read-only production verification. The completed August 8 how-to, database-time countdown, retained test entry, and fixture-retirement evidence remains below as dated production history.</p>
+<p>Evidence date: 2026-08-14. The current evidence covers the completed August 13 roster/portrait release from local reconciliation through GitHub merge, production deployment, Neon recovery proof, one supported seed, read-only production verification, evidence closeout, and repository cleanup. The completed August 8 how-to, database-time countdown, retained test entry, and fixture-retirement evidence remains below as dated production history.</p>
 <h2 id="august-13-roster-refresh-completed-release-results">August 13 roster refresh: completed release results</h2>
 <table>
 <thead>
@@ -54,6 +54,11 @@
 <td>Repository/GitHub release</td>
 <td>Git, GitHub pull request, and available status checks</td>
 <td>Feature work began at <code>7d1996ca</code>, one direct commit ahead of the then-live <code>main</code> <code>38aa37ad</code>. GitHub <a href="https://github.com/vdoshi96/Pl-predictions/pull/15">PR #15</a> passed every available check and merged on 2026-08-14 at 07:08:09 UTC as merge commit <code>cc4129dbd1513675bb44424cb4c667694c74d120</code>.</td>
+</tr>
+<tr>
+<td>Evidence closeout merge</td>
+<td>GitHub PR #16, Vercel, and local/remote synchronization</td>
+<td>Evidence-only <a href="https://github.com/vdoshi96/Pl-predictions/pull/16">PR #16</a> merged on 2026-08-14 at 13:58:28 UTC as merge commit <code>98210965bfa6d586ef595c33038761e80f45b765</code>. Its documentation-only production deployment <code>dpl_9bUTkvP7x3Sr55GPMLmDyyuGVMv3</code> (<code>mr5jtzypm</code>) became Ready and returned HTTP 200; the stable alias intentionally remained on the verified roster deployment, with no alias mutation. Local <code>main</code> was fast-forwarded to and exactly matched <code>origin/main</code> before repository cleanup.</td>
 </tr>
 <tr>
 <td>Released roster/portrait state</td>
@@ -82,8 +87,8 @@
 </tr>
 <tr>
 <td>Exact private cleanup</td>
-<td>approved two-copy stale-artifact removal</td>
-<td>After the passing pre-cleanup gate, removed only <code>progress.json</code> and the two superseded mismatch reports from both August 13 copies. The retained copies are byte-identical: 613 files, 24,912,376 bytes, full manifest SHA-256 <code>f625470979c156e233300ec42924eb858255d902a456af1283a089ae41169630</code>.</td>
+<td>approved two-copy stale-artifact removal and rehash</td>
+<td>After the passing pre-cleanup gate, removed only <code>progress.json</code> and the two superseded mismatch reports from both August 13 copies. The original-algorithm manifest remains <code>f625470979c156e233300ec42924eb858255d902a456af1283a089ae41169630</code>; the final independent full manifest is <code>e1ee3b985b8e26799d0ec06632ebf9a1250ac1fab6e5749be0b4574a67aec83d</code>. The primary/worktree copies were byte-identical before the duplicate moved to Trash.</td>
 </tr>
 <tr>
 <td>Catalogue and safety coverage</td>
@@ -134,6 +139,11 @@
 <td>Production deployment logs</td>
 <td>exact deployment, bounded last-30-minute queries</td>
 <td>Error, fatal, and HTTP 5xx queries all returned no records.</td>
+</tr>
+<tr>
+<td>Final workspace state</td>
+<td>worktree, branch, QA, and private-handoff cleanup</td>
+<td>Passed ancestry and duplicate-content gates before cleanup. One primary worktree remains; completed local and remote branches are gone; exact worktree handoff duplicates and superseded QA were moved recoverably to Trash; the newest seven canonical screenshots and current output report/results remain. The unrelated untracked league-assets folder was retained out of scope.</td>
 </tr>
 </tbody></table>
 <h2 id="august-8-completed-production-release-historical">August 8 completed production release (historical)</h2>
@@ -254,19 +264,18 @@
 <li>The retained entry followed the same atomic write path as every participant: parent plus 20 table rows plus seven spotlight rows, or nothing.</li>
 <li>Alex/Jordan removal is a code cleanup, not a data deletion. No legitimate production submission was deleted.</li>
 <li>Public pre-reveal output continues to expose only the permitted table-leaderboard projection and complete-bracket count.</li>
-<li>The private handoffs remain untracked, ignored by exact root-anchored rules, excluded from generated documentation, and absent from the release diff. Acquisition scripts were not executed. The August 13 handoff was copied byte-for-byte into the primary repository, received only the approved final report/contact sheet and exact stale-artifact cleanup in both copies, and was reverified byte-identical afterward.</li>
+<li>The primary private handoffs remain untracked, ignored by exact root-anchored rules, excluded from generated documentation, and absent from the release diff. Acquisition scripts were not executed. Their verified worktree duplicates were moved recoverably to Trash before the completed worktree was removed.</li>
 <li>The four known moderate <code>npm</code> advisories remain confined to the pre-existing development-only <code>drizzle-kit</code> legacy <code>esbuild</code> chain. The production dependency closure excludes that chain, the feature adds no runtime version change, and the uninterrupted release checks passed; no breaking forced downgrade was applied.</li>
 </ul>
-<h2 id="august-13-roster-release-closeout-state">August 13 roster release closeout state</h2>
+<h2 id="august-13-repository-closeout-evidence">August 13 repository closeout evidence</h2>
 <ul>
-<li><input checked="" disabled="" type="checkbox"> Complete the read-only Git/worktree/GitHub audit and record the production pre-seed baseline.</li>
-<li><input checked="" disabled="" type="checkbox"> Record the owner-selected roster authority, internal-only verification boundary, and exact no-legacy compatibility decision.</li>
-<li><input checked="" disabled="" type="checkbox"> Pass the final complete local verification chain and visually inspect every added, restored, replaced, and renamed portrait.</li>
-<li><input checked="" disabled="" type="checkbox"> Push the feature branch under its own upstream, merge PR #15 only after every available check is green, and synchronize the tested merge into local <code>main</code>.</li>
-<li><input checked="" disabled="" type="checkbox"> Verify the exact merged production deployment and stable alias, prove the Neon recovery path, then run the approved production seed exactly once.</li>
-<li><input checked="" disabled="" type="checkbox"> Verify 582 active players, 17 inactive historical rows, 582 portrait paths, representative additions/removals/moves, Other player, historical references, every active portrait URL, and all obsolete-path 404s.</li>
-<li><input checked="" disabled="" type="checkbox"> Record the exact feature PR, merge SHA, deployment, recovery, seed, database, browser, image, visual, and log evidence.</li>
-<li><input disabled="" type="checkbox"> Merge evidence-only closeout <a href="https://github.com/vdoshi96/Pl-predictions/pull/16">PR #16</a>, synchronize final <code>main</code>, reverify retained handoff hashes, and remove completed branch/worktree state.</li>
+<li>Evidence-only <a href="https://github.com/vdoshi96/Pl-predictions/pull/16">PR #16</a> merged on 2026-08-14 at 13:58:28 UTC as <code>98210965bfa6d586ef595c33038761e80f45b765</code>. Local <code>main</code> was fast-forwarded and exactly matched <code>origin/main</code> before cleanup.</li>
+<li>The retained primary August 8 handoff has independent full manifest SHA-256 <code>29d8dc2efda79ae5cde906214b91402008d89dbde71adca97e837aeab15e7ee3</code>. Its substantive non-<code>.DS_Store</code> parity manifest is <code>e3c5d7c6ea5c75725fa4d3518333cd171e37d8a8cb407ecfa9fac0047bab3c5a</code>, and its symlink path/target manifest is <code>4e800f7c8103c59463469dfb492bdaaf1785a5f3e762a5427fc53596f540d888</code>. Primary and worktree substantive content plus symlinks matched; only two Finder <code>.DS_Store</code> files differed byte-for-byte.</li>
+<li>The retained primary August 13 handoff has independent full manifest SHA-256 <code>e1ee3b985b8e26799d0ec06632ebf9a1250ac1fab6e5749be0b4574a67aec83d</code>; the existing original-algorithm manifest <code>f625470979c156e233300ec42924eb858255d902a456af1283a089ae41169630</code> remains valid. Its worktree copy was byte-identical.</li>
+<li>The verified worktree duplicates moved recoverably to <code>/Users/vishal/.Trash/premier-league-players-2026-08-08-worktree-duplicate-2026-08-14</code> and <code>/Users/vishal/.Trash/premier-league-players-2026-08-13-worktree-duplicate-2026-08-14</code> before normal worktree removal and pruning.</li>
+<li>The superseded QA set and hash-identical output screenshot duplicates moved recoverably to <code>/Users/vishal/.Trash/Pl-Predictions-superseded-QA-2026-08-14</code>. The newest seven canonical screenshots remain under <code>docs/assets/qa/</code>, and the current output report/results remain retained.</li>
+<li>The local <code>roster/2026-08-13-player-update</code> and <code>vishal/august-13-player-catalogue-closeout</code> branches were deleted. Remote <code>roster/2026-08-13-player-update</code>, <code>vishal/august-13-player-catalogue-closeout</code>, <code>agent/dranx-brand-refresh</code>, and <code>agent/dranx-release-closeout</code> were deleted only after ancestry proof. One primary worktree remains.</li>
+<li>The unrelated untracked <code>Premier League 2026-27 PNG Assets/</code> folder remains intentionally retained and out of scope.</li>
 </ul>
 <h2 id="august-8-release-closeout-state-historical">August 8 release closeout state (historical)</h2>
 <ul>
@@ -278,7 +287,7 @@
 <li><input checked="" disabled="" type="checkbox"> Regenerate final HTML peers, publish this closeout through <code>main</code>, synchronize local and remote <code>main</code>, and remove completed branch state.</li>
 </ul>
 
-      <p class="source">Generated deterministically from <a href="QA.md">docs/QA.md</a>. Canonical SHA-256: <code>6f578aa5adf3d56fde7aebd49d09572e492231c20f6b1445f49eb011528649fe</code>.</p>
+      <p class="source">Generated deterministically from <a href="QA.md">docs/QA.md</a>. Canonical SHA-256: <code>d5f751e318ecfae406a11be09c3b3d1d01534a781e90c12af7a8e2fc17e1a03e</code>.</p>
     </main>
   </body>
 </html>

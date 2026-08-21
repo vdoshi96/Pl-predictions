@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="generated-by" content="scripts/generate-docs-html.mjs" />
     <meta name="canonical-source" content="QA.md" />
-    <meta name="canonical-source-sha256" content="a47c848609b7a283b5594e75bcece16313231e5eb6ceeb1d0150527545984037" />
+    <meta name="canonical-source-sha256" content="7c3758f1bfec7d6ba33a7a964def5bdb2f1a3b8af6485f6d60dae693ff124db4" />
     <title>Quality assurance</title>
     <style>
       :root { color-scheme: light dark; font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
@@ -40,6 +40,60 @@
   <body>
     <main>
       <h1 id="quality-assurance">Quality assurance</h1>
+<h2 id="august-21-administrator-paste-entry">August 21 administrator paste entry</h2>
+<p>This iteration adds guarded paste workflows for complete standings and reviewed spotlight result datasets. All database-backed verification uses the fail-closed isolated Neon wrapper. No production database, result pointer, prediction, or standings row was read or changed during implementation QA.</p>
+<table>
+<thead>
+<tr>
+<th>Scenario</th>
+<th>Evidence</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Standings parse, diff, and confirm</td>
+<td>Unit tests cover explicit and inferred positions, aliases, headers, numeric confidence, and complete-table validation. Component tests cover the preview, active-table diff, validated payload, success state, and disabled final-table state. The focused isolated Chromium journey parsed 20 rows, displayed 20 <code>OK</code> statuses, saved one provisional snapshot, rendered <code>/leaderboard</code>, and then restored the prior season state.</td>
+</tr>
+<tr>
+<td>Unknown-club blocking</td>
+<td>Parser and component tests retain the unknown line, label it clearly, report incomplete 20-club coverage, and keep <strong>Save pasted table</strong> disabled.</td>
+</tr>
+<tr>
+<td>Seed from submissions</td>
+<td>The isolated seed query returns distinct canonical subjects by dataset and excludes unresolved Other-player spellings. The desk test proves seeding adds only missing submitted subjects at zero while preserving edited rows.</td>
+</tr>
+<tr>
+<td>List paste and skipped lines</td>
+<td>Parser tests cover ranks, separators, integer and rating validation, reversed names, empty-line omission, missing metrics, and unknown names. The panel applies matched rows only and leaves unmatched or invalid lines visible for review.</td>
+</tr>
+<tr>
+<td>Combined review, attest, and publish</td>
+<td>Dialog and desk tests require the exact attestation, show the draft-versus-published diff and boundary warnings, save first, and publish the exact returned working snapshot with <code>coverageAttested: true</code>.</td>
+</tr>
+<tr>
+<td>Publish-failure recovery</td>
+<td>A desk test proves a successful save remains the recoverable clean working draft when the following publish transition returns an error.</td>
+</tr>
+<tr>
+<td>Alias-blocked review</td>
+<td>Dialog and desk tests keep confirmation disabled while a genuinely unresolved Other-player spelling remains, then permit review after the alias match is saved.</td>
+</tr>
+<tr>
+<td>Mobile reflow</td>
+<td>Desktop, 375-pixel, and 320-pixel local browser inspection passed for the standings panel, result-list panel, and a 15-row review dialog. The page had zero horizontal scroll; wide tables scrolled only inside their labelled containers; dialog and list scrolling kept the footer reachable; tested actions measured 44–48 pixels high; and the browser console reported zero errors.</td>
+</tr>
+<tr>
+<td>Isolated cleanup</td>
+<td>The new E2E test records the original season pointers, flags, accepted-through time, and update time; removes its manual snapshot, import run, run items, standings items, and audit; asserts zero residue; and verifies exact season-state restoration. Manual dialog QA used one complete synthetic bracket with 20 table rows and seven picks; its fixed QA parent was cascade-deleted, and read-back returned <code>{parents: 0, items: 0, picks: 0}</code>. The development-server aggregate limitation remains recorded honestly.</td>
+</tr>
+<tr>
+<td>Verification gates</td>
+<td>Documentation parity passed for the tracked project, catalogue verification passed at 580 players and 578 portraits, ESLint and strict TypeScript passed, 317 unit/component tests passed with 20 guarded skips, all 20 isolated Neon integration tests passed, and the normal production build passed. The isolated local-production browser harness passed eight pre-kickoff routes with 22 intentional project skips and three post-kickoff routes with two intentional skips.</td>
+</tr>
+<tr>
+<td>Aggregate boundary</td>
+<td>The literal <code>npm run test:e2e -- admin-paste-entry</code> argument is not forwarded to the first child script, so it launches the full development-server pre-kickoff matrix. That matrix hit the previously documented Next Fast Refresh, truncated-JSON, and router-initialization corruption and is not recorded as a pass. The focused journey and the equivalent full local-production browser matrices are green as recorded above.</td>
+</tr>
+</tbody></table>
 <h2 id="august-21-ui-and-catalogue-production-release">August 21 UI and catalogue production release</h2>
 <p>The clean implementation worktree started from verified GitHub <code>main</code>; the superseded unmerged UI branch was discarded before implementation. The August 20 import produces 580 player names, 578 verified portraits, and two intentional silhouette fallbacks. Its exact transition from August 18 is five additions, five removals, no intra-league moves, two position corrections, and two restored portraits for existing players. The handoff acquisition scripts were not executed. PR #21 released the UI and catalogue changes, and PR #22 released the pointer-completion and protected-preview smoke fixes.</p>
 <table>
@@ -448,7 +502,7 @@
 <li><input checked="" disabled="" type="checkbox"> Regenerate final HTML peers, publish this closeout through <code>main</code>, synchronize local and remote <code>main</code>, and remove completed branch state.</li>
 </ul>
 
-      <p class="source">Generated deterministically from <a href="QA.md">docs/QA.md</a>. Canonical SHA-256: <code>a47c848609b7a283b5594e75bcece16313231e5eb6ceeb1d0150527545984037</code>.</p>
+      <p class="source">Generated deterministically from <a href="QA.md">docs/QA.md</a>. Canonical SHA-256: <code>7c3758f1bfec7d6ba33a7a964def5bdb2f1a3b8af6485f6d60dae693ff124db4</code>.</p>
     </main>
   </body>
 </html>

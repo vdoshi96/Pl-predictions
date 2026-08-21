@@ -18,6 +18,7 @@ import {
   getSeasonTeams,
 } from "@/features/seasons/queries";
 import { ManualStandingsForm } from "@/features/standings/manual-standings-form";
+import { StandingsPastePanel } from "@/features/standings/standings-paste-panel";
 import { formatUtcDateTime } from "@/shared/format";
 
 import { AdminNav } from "../admin-nav";
@@ -209,6 +210,19 @@ export default async function AdminStandingsPage({
             confirmation as final.
           </p>
         ) : null}
+
+        <StandingsPastePanel
+          activeItems={activeItems}
+          disabled={Boolean(activeSnapshot?.isFinal)}
+          onSubmit={saveManualStandings}
+          teams={teams.map((team) => ({
+            displayName: team.displayName,
+            id: team.id,
+            shortName: team.shortName,
+            slug: team.slug,
+            sortName: team.sortName,
+          }))}
+        />
 
         {activeSnapshot?.isFinal ? (
           <p className="flex items-start gap-2 rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm leading-6 font-semibold text-amber-950">

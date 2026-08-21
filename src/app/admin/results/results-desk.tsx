@@ -7,6 +7,11 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { SearchablePredictionSelect } from "@/features/predictions/searchable-prediction-select";
 import {
+  evaluateCoverage,
+  findBoundaryTieWarnings,
+} from "@/features/results/boundary-ties";
+import { buildResultDiff } from "@/features/results/dataset-diff";
+import {
   RESULT_DATASET_BY_CATEGORY,
   SPOTLIGHT_RESULT_DATASETS,
   type SpotlightResultActionResult,
@@ -23,11 +28,14 @@ import {
   saveSpotlightResultDraft,
   undoFinalSpotlightResult,
 } from "./actions";
+import { PublishReviewDialog } from "./publish-review-dialog";
+import { ResultsPastePanel } from "./results-paste-panel";
 
 export type ResultDeskSubject = Readonly<{
   active?: boolean;
   id: string;
   label: string;
+  names: readonly string[];
 }>;
 
 type EditableResultRow = Readonly<{
@@ -62,6 +70,7 @@ export type ResultDeskDataset = Readonly<{
   dataset: SpotlightResultDataset;
   pinnedAliases: readonly ResultDeskSnapshotAlias[];
   pointers: ResultPointers;
+  publishedRows: readonly EditableResultRow[];
   rows: readonly EditableResultRow[];
   source: string;
   sourceReference: string | null;
@@ -82,6 +91,7 @@ type EditableDataset = {
   dirty: boolean;
   pinnedAliases: readonly ResultDeskSnapshotAlias[];
   pointers: ResultPointers;
+  publishedRows: readonly EditableResultRow[];
   rows: EditableResultRow[];
   source: string;
   sourceReference: string;
@@ -91,6 +101,7 @@ type ResultDeskProps = Readonly<{
   aliases: readonly ResultDeskAlias[];
   bracketCount: number;
   datasets: readonly ResultDeskDataset[];
+  pickedSubjects: Readonly<Record<SpotlightResultDataset, readonly string[]>>;
   players: readonly ResultDeskSubject[];
   publishReady: boolean;
   seasonName: string;
@@ -400,6 +411,7 @@ export function SpotlightResultsDesk({
   aliases,
   bracketCount,
   datasets: initialDatasets,
+  pickedSubjects,
   players,
   publishReady,
   seasonName,
@@ -441,16 +453,10 @@ export function SpotlightResultsDesk({
       ),
   );
   const [availablePlayers, setAvailablePlayers] = useState(() => [...players]);
-  const [coverageAttested, setCoverageAttested] = useState<
-    Record<SpotlightResultDataset, boolean>
-  >(
-    () =>
-      Object.fromEntries(
-        SPOTLIGHT_RESULT_DATASETS.map((dataset) => [dataset, false]),
-      ) as Record<SpotlightResultDataset, boolean>,
-  );
   const [busyKey, setBusyKey] = useState<string | null>(null);
   const [newResultOnlyName, setNewResultOnlyName] = useState("");
+  const [reviewDataset, setReviewDataset] =
+    useState<SpotlightResultDataset | null>(null);
   const [messages, setMessages] = useState<
     Record<string, SpotlightResultActionResult>
   >({});
@@ -462,12 +468,9 @@ export function SpotlightResultsDesk({
   function updateDataset(
     dataset: SpotlightResultDataset,
     patch: Partial<EditableDataset>,
-    options: { markDirty?: boolean; resetAttestation?: boolean } = {},
+    options: { markDirty?: boolean } = {},
   ) {
     const markDirty = options.markDirty ?? true;
-    if (options.resetAttestation ?? markDirty) {
-      setCoverageAttested((current) => ({ ...current, [dataset]: false }));
-    }
     setDatasets((current) => ({
       ...current,
       [dataset]: {
@@ -504,6 +507,132 @@ export function SpotlightResultsDesk({
     }).length;
   }
 
+  function unresolvedLiveAliasCountForDataset(dataset: SpotlightResultDataset) {
+    return aliasesForDataset(dataset).filter(
+      (alias) =>
+        !savedAliasPlayerIdByName.get(alias.normalizedCustomPlayerName),
+    ).length;
+  }
+
+  function labelBySubjectIdFor(dataset: SpotlightResultDataset) {
+    const subjects = dataset === "clean_sheets" ? teams : availablePlayers;
+    return new Map(
+      subjects.map((subject) => [subject.id, subject.label] as const),
+    );
+  }
+
+  function seedFromSubmissions(datasetName: SpotlightResultDataset) {
+    const dataset = datasets[datasetName];
+    const present = new Set(dataset.rows.map((row) => row.subjectId));
+    const additions = pickedSubjects[datasetName]
+      .filter((subjectId) => !present.has(subjectId))
+      .map((subjectId) => ({ metricValue: 0, subjectId }));
+    if (additions.length === 0) return;
+    updateDataset(datasetName, {
+      rows: [...dataset.rows, ...additions],
+    });
+  }
+
+  function applyPastedRows(
+    datasetName: SpotlightResultDataset,
+    incoming: readonly { metricValue: number; subjectId: string }[],
+  ) {
+    const dataset = datasets[datasetName];
+    const bySubject = new Map(
+      dataset.rows.map((row) => [row.subjectId, row.metricValue] as const),
+    );
+    for (const row of incoming) bySubject.set(row.subjectId, row.metricValue);
+    updateDataset(datasetName, {
+      rows: [...bySubject].map(([subjectId, metricValue]) => ({
+        metricValue,
+        subjectId,
+      })),
+    });
+  }
+
+  async function saveAndPublish(datasetName: SpotlightResultDataset) {
+    const dataset = datasets[datasetName];
+    const key = `${datasetName}:review-publish`;
+    let draftSaved = false;
+    setBusyKey(key);
+    try {
+      const saved = await saveSpotlightResultDraft({
+        capturedAt: fromUtcInputValue(dataset.capturedAt),
+        coveredThroughRank: dataset.coveredThroughRank,
+        dataset: datasetName,
+        expectedWorkingSnapshotId: dataset.pointers.workingSnapshotId,
+        rows: dataset.rows,
+        source: dataset.source,
+        sourceReference: dataset.sourceReference.trim() || null,
+      });
+      if (!saved.ok || !saved.snapshotId) {
+        setMessages((current) => ({ ...current, [datasetName]: saved }));
+        return;
+      }
+
+      const workingSnapshotId = saved.snapshotId;
+      draftSaved = true;
+      updateDataset(
+        datasetName,
+        {
+          dirty: false,
+          pinnedAliases: saved.pinnedAliases ?? [],
+          pointers: {
+            ...dataset.pointers,
+            workingSnapshotId,
+          },
+        },
+        { markDirty: false },
+      );
+
+      const published = await publishSpotlightResult({
+        activeSnapshotId: dataset.pointers.activeSnapshotId,
+        coverageAttested: true,
+        dataset: datasetName,
+        finalSnapshotId: dataset.pointers.finalSnapshotId,
+        workingSnapshotId,
+      });
+      if (published.ok) {
+        updateDataset(
+          datasetName,
+          {
+            activeSnapshot: {
+              capturedAt: fromUtcInputValue(dataset.capturedAt),
+              coveredThroughRank: dataset.coveredThroughRank ?? bracketCount,
+              id: workingSnapshotId,
+              itemCount: dataset.rows.length,
+              source: dataset.source,
+              sourceReference: dataset.sourceReference.trim() || null,
+            },
+            dirty: false,
+            pinnedAliases: saved.pinnedAliases ?? [],
+            pointers: {
+              ...dataset.pointers,
+              activeSnapshotId: workingSnapshotId,
+              workingSnapshotId,
+            },
+            publishedRows: [...dataset.rows],
+          },
+          { markDirty: false },
+        );
+      }
+      setMessages((current) => ({ ...current, [datasetName]: published }));
+    } catch {
+      setMessages((current) => ({
+        ...current,
+        [datasetName]: {
+          message: draftSaved
+            ? "The draft was saved, but publishing did not complete. Review it and try again."
+            : "Something went wrong. No changes were made.",
+          ok: false,
+        },
+      }));
+    } finally {
+      setBusyKey(null);
+      setReviewDataset(null);
+    }
+  }
+
   function markAliasChangePending(alias: ResultDeskAlias) {
     const affectedDatasets = new Set(
       alias.categories.flatMap((category) => {
@@ -518,7 +647,7 @@ export function SpotlightResultsDesk({
 
   async function runDatasetAction(
     datasetName: SpotlightResultDataset,
-    actionName: "finalize" | "publish" | "save" | "undo",
+    actionName: "finalize" | "save" | "undo",
   ) {
     const key = `${datasetName}:${actionName}`;
     const dataset = datasets[datasetName];
@@ -546,42 +675,17 @@ export function SpotlightResultsDesk({
                 workingSnapshotId: result.snapshotId,
               },
             },
-            { markDirty: false, resetAttestation: true },
+            { markDirty: false },
           );
         }
       } else {
         const pointerInput = { dataset: datasetName, ...dataset.pointers };
         result =
-          actionName === "publish"
-            ? await publishSpotlightResult({
-                ...pointerInput,
-                coverageAttested: coverageAttested[datasetName],
-              })
-            : actionName === "finalize"
-              ? await finalizeSpotlightResult(pointerInput)
-              : await undoFinalSpotlightResult(pointerInput);
+          actionName === "finalize"
+            ? await finalizeSpotlightResult(pointerInput)
+            : await undoFinalSpotlightResult(pointerInput);
         if (result.ok) {
-          if (actionName === "publish") {
-            updateDataset(
-              datasetName,
-              {
-                activeSnapshot: {
-                  capturedAt: fromUtcInputValue(dataset.capturedAt),
-                  coveredThroughRank:
-                    dataset.coveredThroughRank ?? bracketCount,
-                  id: dataset.pointers.workingSnapshotId!,
-                  itemCount: dataset.rows.length,
-                  source: dataset.source,
-                  sourceReference: dataset.sourceReference.trim() || null,
-                },
-                pointers: {
-                  ...dataset.pointers,
-                  activeSnapshotId: dataset.pointers.workingSnapshotId,
-                },
-              },
-              { markDirty: false, resetAttestation: true },
-            );
-          } else if (actionName === "finalize") {
+          if (actionName === "finalize") {
             updateDataset(
               datasetName,
               {
@@ -667,6 +771,7 @@ export function SpotlightResultsDesk({
                   active: false,
                   id: playerId,
                   label: `${alias.customPlayerName} — result only`,
+                  names: [alias.customPlayerName],
                 },
               ],
         );
@@ -713,6 +818,7 @@ export function SpotlightResultsDesk({
             active: false,
             id: playerId,
             label: `${displayName} — result only`,
+            names: [displayName],
           },
         ]);
         setNewResultOnlyName("");
@@ -734,16 +840,15 @@ export function SpotlightResultsDesk({
   function renderControls(datasetName: SpotlightResultDataset) {
     const dataset = datasets[datasetName];
     const finalized = Boolean(dataset.pointers.finalSnapshotId);
-    const publishBlocked =
+    const unchangedActiveDraft =
+      !dataset.dirty &&
+      dataset.pointers.workingSnapshotId !== null &&
+      dataset.pointers.activeSnapshotId === dataset.pointers.workingSnapshotId;
+    const reviewBlocked =
       !publishReady ||
       bracketCount < 1 ||
       dataset.coveredThroughRank !== bracketCount ||
-      unresolvedAliasCountForDataset(datasetName) > 0 ||
-      !coverageAttested[datasetName] ||
-      !dataset.pointers.workingSnapshotId ||
-      dataset.pointers.activeSnapshotId ===
-        dataset.pointers.workingSnapshotId ||
-      dataset.dirty ||
+      unchangedActiveDraft ||
       finalized;
     const message = messages[datasetName];
     return (
@@ -756,36 +861,11 @@ export function SpotlightResultsDesk({
           ) : null}
           {dataset.dirty ? (
             <span className="text-amber-700">
-              Save this draft before attesting or publishing it.
+              Unsaved changes will be saved before publication.
             </span>
           ) : null}
         </div>
         <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center sm:justify-end">
-          <label className="flex max-w-md items-start gap-2 rounded-xl bg-slate-50 p-3 text-xs leading-5 font-semibold text-slate-700">
-            <input
-              checked={coverageAttested[datasetName]}
-              className="mt-1 size-4 shrink-0 accent-emerald-600"
-              disabled={
-                Boolean(busyKey) ||
-                finalized ||
-                dataset.dirty ||
-                !dataset.pointers.workingSnapshotId
-              }
-              onChange={(event) =>
-                setCoverageAttested((current) => ({
-                  ...current,
-                  [datasetName]: event.target.checked,
-                }))
-              }
-              type="checkbox"
-            />
-            I attest that{" "}
-            {datasetName === "player_ratings"
-              ? "both the highest- and lowest-rated"
-              : "all"}{" "}
-            rows through rank {bracketCount || "N"}, including boundary ties,
-            are present in this exact draft.
-          </label>
           <Button
             className="w-full sm:w-auto"
             disabled={Boolean(busyKey) || finalized}
@@ -796,18 +876,10 @@ export function SpotlightResultsDesk({
           </Button>
           <Button
             className="w-full sm:w-auto"
-            disabled={Boolean(busyKey) || publishBlocked}
-            onClick={() => {
-              if (
-                window.confirm(
-                  "Publish this exact working snapshot as the provisional public result?",
-                )
-              ) {
-                void runDatasetAction(datasetName, "publish");
-              }
-            }}
+            disabled={Boolean(busyKey) || reviewBlocked}
+            onClick={() => setReviewDataset(datasetName)}
           >
-            Publish provisional
+            Review &amp; publish
           </Button>
         </div>
       </div>
@@ -946,6 +1018,7 @@ export function SpotlightResultsDesk({
         const frozen = Boolean(dataset.pointers.finalSnapshotId);
         const subjects =
           datasetName === "clean_sheets" ? teams : availablePlayers;
+        const coverage = evaluateCoverage(dataset.rows, bracketCount);
         return (
           <Card key={datasetName}>
             <CardContent className="grid gap-5">
@@ -970,6 +1043,31 @@ export function SpotlightResultsDesk({
                 rows={dataset.rows}
                 subjects={subjects}
                 title={DATASET_LABELS[datasetName]}
+              />
+              <p className="text-xs font-semibold text-slate-600" role="status">
+                {coverage.complete
+                  ? `Coverage complete through rank ${coverage.coveredThroughRank}.`
+                  : `Short by ${coverage.shortfall} row${coverage.shortfall === 1 ? "" : "s"} of rank ${bracketCount}.`}
+              </p>
+              <div className="flex flex-wrap items-center gap-2">
+                <Button
+                  disabled={frozen || !publishReady}
+                  onClick={() => seedFromSubmissions(datasetName)}
+                  size="sm"
+                  variant="secondary"
+                >
+                  Seed from submissions
+                </Button>
+              </div>
+              <ResultsPastePanel
+                datasetLabel={DATASET_LABELS[datasetName]}
+                disabled={frozen}
+                metricKind="integer"
+                onApply={(rows) => applyPastedRows(datasetName, rows)}
+                subjects={subjects.map((subject) => ({
+                  id: subject.id,
+                  names: subject.names,
+                }))}
               />
               {renderControls(datasetName)}
               {renderPublishedSnapshot(datasetName)}
@@ -1015,6 +1113,38 @@ export function SpotlightResultsDesk({
             rows={ratings.rows}
             subjects={availablePlayers}
             title="Overrated player ratings"
+          />
+          {(() => {
+            const coverage = evaluateCoverage(ratings.rows, bracketCount);
+            return (
+              <p className="text-xs font-semibold text-slate-600" role="status">
+                {coverage.complete
+                  ? `Coverage complete through rank ${coverage.coveredThroughRank}.`
+                  : `Short by ${coverage.shortfall} row${coverage.shortfall === 1 ? "" : "s"} of rank ${bracketCount}.`}
+              </p>
+            );
+          })()}
+          <div className="flex flex-wrap items-center gap-2">
+            <Button
+              disabled={
+                Boolean(ratings.pointers.finalSnapshotId) || !publishReady
+              }
+              onClick={() => seedFromSubmissions("player_ratings")}
+              size="sm"
+              variant="secondary"
+            >
+              Seed from submissions
+            </Button>
+          </div>
+          <ResultsPastePanel
+            datasetLabel={DATASET_LABELS.player_ratings}
+            disabled={Boolean(ratings.pointers.finalSnapshotId)}
+            metricKind="rating"
+            onApply={(rows) => applyPastedRows("player_ratings", rows)}
+            subjects={availablePlayers.map((subject) => ({
+              id: subject.id,
+              names: subject.names,
+            }))}
           />
           {renderControls("player_ratings")}
           {renderPublishedSnapshot("player_ratings")}
@@ -1161,6 +1291,43 @@ export function SpotlightResultsDesk({
           </div>
         </CardContent>
       </Card>
+      {reviewDataset ? (
+        <PublishReviewDialog
+          attestationSentence={`I attest that ${reviewDataset === "player_ratings" ? "both the highest- and lowest-rated" : "all"} rows through rank ${bracketCount || "N"}, including boundary ties, are present in this exact draft.`}
+          boundaryWarnings={[
+            ...findBoundaryTieWarnings(
+              datasets[reviewDataset].rows,
+              bracketCount,
+              "descending",
+            ),
+            ...(reviewDataset === "player_ratings"
+              ? findBoundaryTieWarnings(
+                  datasets[reviewDataset].rows,
+                  bracketCount,
+                  "ascending",
+                )
+              : []),
+          ]}
+          busy={busyKey === `${reviewDataset}:review-publish`}
+          coveredThroughRank={
+            evaluateCoverage(datasets[reviewDataset].rows, bracketCount)
+              .coveredThroughRank || null
+          }
+          datasetLabel={DATASET_LABELS[reviewDataset]}
+          diff={buildResultDiff({
+            direction: "descending",
+            draftRows: datasets[reviewDataset].rows,
+            labelById: labelBySubjectIdFor(reviewDataset),
+            publishedRows: datasets[reviewDataset].publishedRows,
+          })}
+          onCancel={() => setReviewDataset(null)}
+          onConfirm={() => void saveAndPublish(reviewDataset)}
+          requiredRank={bracketCount || null}
+          unresolvedAliasCount={unresolvedLiveAliasCountForDataset(
+            reviewDataset,
+          )}
+        />
+      ) : null}
     </div>
   );
 }

@@ -3,6 +3,7 @@ import {
   fireEvent,
   render,
   screen,
+  waitFor,
   within,
 } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
@@ -100,5 +101,31 @@ describe("SearchablePredictionSelect result limits", () => {
 
     expect(screen.queryByRole("listbox")).not.toBeInTheDocument();
     expect(onExpandedChange).toHaveBeenLastCalledWith(false);
+  });
+
+  it("commits a pointer choice before mobile scrolling can cancel click", async () => {
+    const onChange = vi.fn();
+    render(
+      <SearchablePredictionSelect
+        description="Choose a club"
+        emptyMessage="No matching club."
+        label="Most clean sheets"
+        onChange={onChange}
+        options={playerOptions.slice(0, 2)}
+        value={null}
+      />,
+    );
+
+    fireEvent.focus(
+      screen.getByRole("combobox", { name: "Most clean sheets" }),
+    );
+    const option = screen.getByRole("option", { name: "Player 01" });
+    fireEvent.mouseDown(option);
+
+    expect(onChange).toHaveBeenCalledWith("player-1");
+    fireEvent.mouseUp(option);
+    await waitFor(() =>
+      expect(screen.queryByRole("listbox")).not.toBeInTheDocument(),
+    );
   });
 });

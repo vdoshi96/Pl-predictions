@@ -1,7 +1,7 @@
 "use client";
 
 import * as Dialog from "@radix-ui/react-dialog";
-import { AlertCircle, Check, X } from "lucide-react";
+import { AlertCircle, X } from "lucide-react";
 
 import { PlayerMark } from "@/components/player-mark";
 import { TeamMark } from "@/components/team-mark";
@@ -21,6 +21,34 @@ export interface ReviewDialogProps {
   error?: string | null;
   onOpenChange: (open: boolean) => void;
   onConfirm: () => void;
+}
+
+function ReviewTeamRow({
+  position,
+  team,
+}: {
+  position: number;
+  team: PredictionTeam;
+}) {
+  return (
+    <li
+      value={position}
+      className="border-border bg-surface-lilac flex min-h-11 min-w-0 items-center gap-2.5 rounded-xl border px-2.5 py-1"
+    >
+      <span className="bg-brand grid size-7 shrink-0 place-items-center rounded-lg font-mono text-xs font-black text-white tabular-nums">
+        {position}
+      </span>
+      <TeamMark
+        name={team.displayName}
+        initials={team.shortName}
+        src={team.assetPath}
+        size="sm"
+      />
+      <span className="text-brand-strong min-w-0 grow text-sm leading-4 font-bold break-words">
+        {team.displayName}
+      </span>
+    </li>
+  );
 }
 
 export function ReviewDialog({
@@ -95,10 +123,10 @@ export function ReviewDialog({
               >
                 Spotlight picks
               </h2>
-              <div className="mt-2 grid gap-2 sm:grid-cols-2">
+              <div className="mt-2 grid gap-1.5 sm:grid-cols-2">
                 {spotlightPicks.map((pick) => (
                   <div
-                    className="border-border flex min-h-16 min-w-0 items-center gap-3 rounded-xl border bg-[#fcf9fd] p-2.5"
+                    className="border-border bg-surface-lilac flex min-h-12 min-w-0 items-center gap-2 rounded-xl border p-2"
                     data-category={pick.category}
                     key={pick.category}
                   >
@@ -107,17 +135,17 @@ export function ReviewDialog({
                         name={pick.displayName}
                         initials={pick.shortName}
                         src={pick.assetPath}
-                        size="md"
+                        size="sm"
                       />
                     ) : (
                       <PlayerMark
                         name={pick.displayName}
                         src={pick.assetPath}
-                        size="md"
+                        size="sm"
                       />
                     )}
                     <div className="min-w-0">
-                      <span className="text-[0.65rem] font-black tracking-wide text-[#8f0033] uppercase">
+                      <span className="text-rose-ink text-[0.65rem] font-black tracking-wide uppercase">
                         {pick.label}
                       </span>
                       <strong className="text-brand-strong mt-0.5 block text-sm leading-5 break-words">
@@ -130,45 +158,67 @@ export function ReviewDialog({
             </section>
 
             <section className="mt-5" aria-labelledby="table-review-heading">
-              <h2
-                id="table-review-heading"
-                className="text-brand-strong px-1 text-sm font-black"
-              >
-                Predicted table
-              </h2>
-              <ol
+              <div className="flex items-center justify-between gap-3 px-1">
+                <h2
+                  id="table-review-heading"
+                  className="text-brand-strong text-sm font-black"
+                >
+                  Predicted table
+                </h2>
+                <span className="text-xs font-semibold text-slate-500">
+                  Champion: {teams[0]?.displayName}
+                </span>
+              </div>
+              <div
                 aria-label="Prediction review, positions 1 through 20"
-                className="mt-2 grid gap-1.5"
+                role="group"
+                className="mt-2 grid gap-2"
               >
-                {teams.map((team, index) => {
-                  const position = index + 1;
+                <div>
+                  <p className="text-rose-ink mb-1 px-1 text-[0.65rem] font-black tracking-wide uppercase">
+                    Top 5
+                  </p>
+                  <ol className="grid gap-1">
+                    {teams.slice(0, 5).map((team, index) => (
+                      <ReviewTeamRow
+                        key={team.id}
+                        position={index + 1}
+                        team={team}
+                      />
+                    ))}
+                  </ol>
+                </div>
 
-                  return (
-                    <li
-                      key={team.id}
-                      value={position}
-                      className="border-border flex min-h-12 min-w-0 items-center gap-3 rounded-xl border bg-[#fcf9fd] px-2.5 py-1.5"
-                    >
-                      <span className="bg-brand grid size-8 shrink-0 place-items-center rounded-lg font-mono text-xs font-black text-white tabular-nums">
-                        {position}
-                      </span>
-                      <TeamMark
-                        name={team.displayName}
-                        initials={team.shortName}
-                        src={team.assetPath}
-                        size="sm"
+                <details className="border-border bg-surface-lilac rounded-xl border">
+                  <summary className="text-brand cursor-pointer px-3 py-2.5 text-sm font-black">
+                    Show all 20 clubs
+                  </summary>
+                  <ol className="grid gap-1 px-2 pb-2" start={6}>
+                    {teams.slice(5, 17).map((team, index) => (
+                      <ReviewTeamRow
+                        key={team.id}
+                        position={index + 6}
+                        team={team}
                       />
-                      <span className="text-brand-strong min-w-0 grow text-sm leading-4 font-bold break-words">
-                        {team.displayName}
-                      </span>
-                      <Check
-                        aria-hidden="true"
-                        className="size-4 shrink-0 text-[#08734f]"
+                    ))}
+                  </ol>
+                </details>
+
+                <div>
+                  <p className="text-rose-ink mb-1 px-1 text-[0.65rem] font-black tracking-wide uppercase">
+                    Bottom 3
+                  </p>
+                  <ol className="grid gap-1" start={18}>
+                    {teams.slice(17).map((team, index) => (
+                      <ReviewTeamRow
+                        key={team.id}
+                        position={index + 18}
+                        team={team}
                       />
-                    </li>
-                  );
-                })}
-              </ol>
+                    ))}
+                  </ol>
+                </div>
+              </div>
             </section>
           </div>
 

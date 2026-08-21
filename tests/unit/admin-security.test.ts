@@ -251,6 +251,15 @@ describe("administrator cookie lifecycle", () => {
     expect(cookieStore.set.mock.calls[0]?.[2]).toMatchObject({ secure: true });
   });
 
+  it("allows the explicit local HTTP E2E harness to use the cookie", async () => {
+    vi.stubEnv("NODE_ENV", "production");
+    vi.stubEnv("LOCAL_HTTP_E2E", "1");
+
+    await loginAdmin(ADMIN_USERNAME, ADMIN_PASSWORD);
+
+    expect(cookieStore.set.mock.calls[0]?.[2]).toMatchObject({ secure: false });
+  });
+
   it("does not create a cookie for an invalid credential", async () => {
     await expect(loginAdmin(ADMIN_USERNAME, "wrong-credential")).resolves.toBe(
       false,

@@ -155,7 +155,7 @@ test("320–430px reflow keeps private identifiers out of HTML and RSC", async (
   ).toBeVisible();
   await expect(page.locator(".countdown-flip")).toHaveCount(4);
   await expect(
-    page.getByRole("link", { name: "How to play", exact: true }),
+    page.getByRole("link", { name: "Rules", exact: true }),
   ).toBeVisible();
   await expectNoHorizontalOverflow(page);
 
@@ -348,13 +348,11 @@ test("320–430px reflow keeps private identifiers out of HTML and RSC", async (
     participantName,
   );
   await expect(restoredReview.locator("[data-category]")).toHaveCount(7);
-  await expect(
-    restoredReview
-      .getByRole("list", {
-        name: "Prediction review, positions 1 through 20",
-      })
-      .getByRole("listitem"),
-  ).toHaveCount(20);
+  const restoredReviewTable = restoredReview.getByRole("group", {
+    name: "Prediction review, positions 1 through 20",
+  });
+  await expect(restoredReviewTable.locator("li")).toHaveCount(20);
+  await expect(restoredReviewTable.getByRole("listitem")).toHaveCount(8);
   for (const playerName of customPlayerNames) {
     await expect(
       restoredReview.getByText(playerName, { exact: true }),

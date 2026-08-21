@@ -6,13 +6,12 @@ const navigation = [
   { href: "/", label: "Predict" },
   { href: "/leaderboard", label: "Table" },
   { href: "/spotlight", label: "Spotlight" },
-  { href: "/rules", label: "How to play" },
-  { href: "/admin", label: "Admin" },
+  { href: "/rules", label: "Rules" },
 ] as const;
 
 export function SiteHeader() {
   return (
-    <header className="bg-brand border-b border-white/15 text-white shadow-[0_10px_35px_-25px_rgba(55,0,60,0.9)]">
+    <header className="bg-brand border-b border-white/15 text-white">
       <div className="mx-auto flex w-full max-w-6xl flex-wrap items-center justify-between gap-x-4 gap-y-3 px-4 py-3 sm:flex-nowrap sm:px-6 lg:px-8">
         <Link
           href="/"
@@ -33,12 +32,12 @@ export function SiteHeader() {
           aria-label="Primary navigation"
           className="min-w-0 basis-full sm:basis-auto"
         >
-          <ul className="grid grid-cols-5 gap-0.5 sm:flex sm:items-center sm:justify-end sm:gap-1">
+          <ul className="flex items-center justify-between gap-0.5 sm:justify-end sm:gap-1">
             {navigation.map((item) => (
               <li key={item.href} className="min-w-0">
                 <Link
                   href={item.href}
-                  className="focus-visible:ring-accent-blue inline-flex min-h-12 w-full min-w-0 items-center justify-center rounded-xl px-0.5 text-center text-xs leading-4 font-bold text-white/80 transition-colors outline-none hover:bg-white/10 hover:text-white focus-visible:ring-2 motion-reduce:transition-none sm:w-auto sm:px-3 sm:text-sm"
+                  className="focus-visible:ring-accent-blue inline-flex min-h-12 min-w-0 items-center justify-center rounded-xl px-2 text-center text-xs leading-4 font-bold text-white/80 transition-colors outline-none hover:bg-white/10 hover:text-white focus-visible:ring-2 motion-reduce:transition-none sm:px-3 sm:text-sm"
                 >
                   {item.label}
                 </Link>

@@ -39,11 +39,11 @@ import { buildPlayerSeedValues } from "../../scripts/seed";
 const temporaryDirectories: string[] = [];
 const previousHandoffRoot = join(
   process.cwd(),
-  "premier-league-players-2026-08-08",
+  "premier-league-players-2026-08-18",
 );
 const currentHandoffRoot = join(
   process.cwd(),
-  "premier-league-players-2026-08-13",
+  "premier-league-players-2026-08-20",
 );
 const privateHandoffsAvailable =
   existsSync(previousHandoffRoot) && existsSync(currentHandoffRoot);
@@ -127,9 +127,10 @@ describe("normalized 2026/27 player catalogue", () => {
           existsSync(join(process.cwd(), "public", player.assetPath.slice(1))),
       ),
     ).toBe(true);
-    expect(fallbacks.map((player) => player.displayName).toSorted()).toEqual(
-      [],
-    );
+    expect(fallbacks.map((player) => player.displayName).toSorted()).toEqual([
+      "Luc De Fougerolles",
+      "Ryan McAidoo",
+    ]);
   });
 
   it("fully decodes the exact public portrait set with unique SHA-256 digests", async () => {
@@ -158,7 +159,7 @@ describe("normalized 2026/27 player catalogue", () => {
   }, 15_000);
 
   it.runIf(privateHandoffsAvailable)(
-    "matches the reviewed 12/17/4/7/10 handoff transition",
+    "matches the reviewed 5/5/0/2/0 handoff transition",
     async () => {
       const [previousSource, currentSource] = await Promise.all([
         readFile(
@@ -182,7 +183,8 @@ describe("normalized 2026/27 player catalogue", () => {
         currentPlayerCount: PREMIER_LEAGUE_2026_27_PLAYER_COUNT,
         movedCount: PLAYER_CATALOGUE_DELTA_EXPECTATIONS.movedCount,
         nameChangedCount: 0,
-        positionChangedCount: 0,
+        positionChangedCount:
+          PLAYER_CATALOGUE_DELTA_EXPECTATIONS.positionChangedCount,
         previousPlayerCount:
           PLAYER_CATALOGUE_DELTA_EXPECTATIONS.previousPlayerCount,
         removedCount: PLAYER_CATALOGUE_DELTA_EXPECTATIONS.removedCount,
@@ -215,7 +217,7 @@ describe("normalized 2026/27 player catalogue", () => {
 
     expect(rows).toHaveLength(PREMIER_LEAGUE_2026_27_PLAYER_COUNT);
     expect(rows.every((row) => row.isActive)).toBe(true);
-    expect(rows.filter((row) => row.assetPath === null)).toHaveLength(0);
+    expect(rows.filter((row) => row.assetPath === null)).toHaveLength(2);
     expect(rows.every((row) => row.teamId.startsWith("team:"))).toBe(true);
     expect(rows.find((row) => row.displayName === "Bukayo Saka")).toMatchObject(
       {
@@ -224,7 +226,7 @@ describe("normalized 2026/27 player catalogue", () => {
       },
     );
     expect(rows.find((row) => row.displayName === "Alysson")).toMatchObject({
-      assetPath: "/player-faces/aston_villa_alysson_alysson.png",
+      assetPath: "/player-faces/aston_villa_unknown_alysson.png",
       teamId: "team:aston-villa",
     });
     expect(
@@ -334,7 +336,7 @@ describe("player catalogue normalizer", () => {
 
     await expect(
       runPlayerCatalogueNormalizer("check", repository),
-    ).rejects.toThrow("tracked fixture is not the reviewed 2026-08-13 release");
+    ).rejects.toThrow("tracked fixture is not the reviewed 2026-08-20 release");
   }, 15_000);
 
   it("rejects a valid unique 192px portrait change in a clean clone", async () => {
@@ -357,7 +359,7 @@ describe("player catalogue normalizer", () => {
     await expect(
       runPlayerCatalogueNormalizer("check", repository),
     ).rejects.toThrow(
-      "published portraits are not the reviewed 2026-08-13 release",
+      "published portraits are not the reviewed 2026-08-20 release",
     );
   }, 15_000);
 
@@ -421,19 +423,22 @@ describe("player catalogue normalizer", () => {
 
   it("rejects missing, duplicate, and wrong portrait provenance IDs", async () => {
     const buildRows = () => {
-      const current = Array.from({ length: 582 }, (_, index) => ({
-        club_slug: "fc-arsenal",
-        fotmob_id: 200_000 + index,
-        image_filename: `current_${index}.png`,
-        image_found: "Yes",
-        image_source: "fotmob",
-        player_name: `Current Player ${index}`,
-        position: "MID",
-        tm_player_id: String(index + 1),
-      })) as Array<Record<string, unknown>>;
-      const previous = Array.from({ length: 587 }, (_, index) => {
-        const imageSource =
-          index < 570 ? "fotmob" : index < 580 ? "creative_commons" : "none";
+      const current = Array.from({ length: 580 }, (_, index) => {
+        const imageSource = index < 578 ? "fotmob" : "none";
+        return {
+          club_slug: "fc-arsenal",
+          fotmob_id: imageSource === "fotmob" ? 200_000 + index : "",
+          image_filename:
+            imageSource === "fotmob" ? `current_${index}.png` : "",
+          image_found: imageSource === "fotmob" ? "Yes" : "No",
+          image_source: imageSource,
+          player_name: `Current Player ${index}`,
+          position: "MID",
+          tm_player_id: String(index + 1),
+        };
+      }) as Array<Record<string, unknown>>;
+      const previous = Array.from({ length: 580 }, (_, index) => {
+        const imageSource = index < 577 ? "fotmob" : "none";
         return {
           club_slug: "fc-arsenal",
           fotmob_id: imageSource === "fotmob" ? 100_000 + index : "",
@@ -469,7 +474,7 @@ describe("player catalogue normalizer", () => {
         process.cwd(),
         process.cwd(),
       ),
-    ).rejects.toThrow("582 unique positive fotmob_id values");
+    ).rejects.toThrow("578 unique positive fotmob_id values");
 
     const duplicatePrevious = buildRows();
     duplicatePrevious.previous[1]!.fotmob_id =
@@ -481,7 +486,7 @@ describe("player catalogue normalizer", () => {
         process.cwd(),
         process.cwd(),
       ),
-    ).rejects.toThrow("570 unique positive fotmob_id values");
+    ).rejects.toThrow("577 unique positive fotmob_id values");
 
     const wrongSource = buildRows();
     wrongSource.current[0]!.image_source = "creative_commons";
@@ -493,17 +498,17 @@ describe("player catalogue normalizer", () => {
         process.cwd(),
         process.cwd(),
       ),
-    ).rejects.toThrow("exactly 582 fotmob portrait rows");
+    ).rejects.toThrow("reviewed 578/2 portrait provenance mix");
   });
 
   it("fails closed before mutation when write mode lacks the previous handoff", async () => {
     const repository = await createTemporaryDirectory("pl-player-write-pair-");
     await Promise.all([
       mkdir(
-        join(repository, "premier-league-players-2026-08-13/scripts/data"),
+        join(repository, "premier-league-players-2026-08-20/scripts/data"),
         { recursive: true },
       ),
-      mkdir(join(repository, "premier-league-players-2026-08-13/images"), {
+      mkdir(join(repository, "premier-league-players-2026-08-20/images"), {
         recursive: true,
       }),
       mkdir(join(repository, "src/data"), { recursive: true }),
@@ -515,7 +520,7 @@ describe("player catalogue normalizer", () => {
       writeFile(
         join(
           repository,
-          "premier-league-players-2026-08-13/scripts/data/players_final.json",
+          "premier-league-players-2026-08-20/scripts/data/players_final.json",
         ),
         "[]\n",
       ),
@@ -525,7 +530,7 @@ describe("player catalogue normalizer", () => {
 
     await expect(
       runPlayerCatalogueNormalizer("write", repository),
-    ).rejects.toThrow("requires the complete private 2026-08-08 handoff");
+    ).rejects.toThrow("requires the complete private 2026-08-18 handoff");
     await expect(readFile(fixturePath, "utf8")).resolves.toBe(
       "fixture sentinel\n",
     );
@@ -596,11 +601,11 @@ describe("player catalogue normalizer", () => {
       );
       const currentTarget = join(
         repository,
-        "premier-league-players-2026-08-13",
+        "premier-league-players-2026-08-20",
       );
       const previousTarget = join(
         repository,
-        "premier-league-players-2026-08-08",
+        "premier-league-players-2026-08-18",
       );
       await Promise.all([
         mkdir(join(currentTarget, "scripts/data"), { recursive: true }),

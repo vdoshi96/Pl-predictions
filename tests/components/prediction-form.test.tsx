@@ -279,7 +279,7 @@ describe("PredictionSorter", () => {
     expect(rows[19]).toHaveAttribute("data-position", "20");
     expect(touchActionElements).toHaveLength(20);
     const arsenalHandle = screen.getByRole("button", {
-      name: /move arsenal.*arrow up or arrow down.*drag this handle/i,
+      name: /move arsenal.*arrow keys.*page up or page down.*home or end.*drag this handle/i,
     });
     expect(arsenalHandle).toBeVisible();
     expect(arsenalHandle).not.toHaveAttribute("aria-describedby");
@@ -297,7 +297,7 @@ describe("PredictionSorter", () => {
     }
 
     for (const row of rows) {
-      expect(row).toHaveClass("min-h-16");
+      expect(row).toHaveClass("min-h-14");
       expect(row).not.toHaveClass("touch-none");
     }
 
@@ -423,7 +423,7 @@ describe("PredictionForm", () => {
 
     fireEvent.click(screen.getByRole("button", { name: /back to table/i }));
     const arsenalHandle = screen.getByRole("button", {
-      name: /move arsenal.*arrow up or arrow down.*drag this handle/i,
+      name: /move arsenal.*arrow keys.*page up or page down.*home or end.*drag this handle/i,
     });
     fireEvent.keyDown(arsenalHandle, { code: "ArrowDown", key: "ArrowDown" });
     fireEvent.click(
@@ -792,11 +792,15 @@ describe("PredictionForm", () => {
     );
 
     expect(screen.getByRole("alert")).toHaveTextContent(
-      "Choose all seven spotlight predictions and complete every Other player name.",
+      "7 of 7 spotlight predictions are still incomplete",
     );
     expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
-    for (const combobox of screen.getAllByRole("combobox")) {
-      expect(combobox).toHaveAttribute("aria-invalid", "true");
+    expect(screen.getAllByRole("combobox")[0]).toHaveAttribute(
+      "aria-invalid",
+      "true",
+    );
+    for (const combobox of screen.getAllByRole("combobox").slice(1)) {
+      expect(combobox).not.toHaveAttribute("aria-invalid", "true");
     }
 
     chooseOtherPlayer("top_scorer", "Top scorer", "A");
@@ -816,7 +820,7 @@ describe("PredictionForm", () => {
     );
 
     const arsenalHandle = screen.getByRole("button", {
-      name: /move arsenal.*arrow up or arrow down.*drag this handle/i,
+      name: /move arsenal.*arrow keys.*page up or page down.*home or end.*drag this handle/i,
     });
     fireEvent.keyDown(arsenalHandle, { code: "Space", key: " " });
     fireEvent.keyDown(arsenalHandle, {
@@ -869,7 +873,7 @@ describe("PredictionForm", () => {
     );
 
     const arsenalHandle = screen.getByRole("button", {
-      name: /move arsenal.*arrow up or arrow down.*drag this handle/i,
+      name: /move arsenal.*arrow keys.*page up or page down.*home or end.*drag this handle/i,
     });
     fireEvent.keyDown(arsenalHandle, { code: "Space", key: " " });
     fireEvent.keyDown(arsenalHandle, {
@@ -1198,7 +1202,7 @@ describe("PredictionForm", () => {
     expect(fetchMock).toHaveBeenCalledTimes(2);
   });
 
-  it("persists the complete seventh pick synchronously and restores it on immediate reload", async () => {
+  it("flushes the complete seventh pick on page exit and restores it on reload", async () => {
     const seasonSlug = "2026-27";
     const storageKey = predictionDraftStorageKey(seasonSlug);
     const firstRender = render(
@@ -1213,6 +1217,7 @@ describe("PredictionForm", () => {
     });
     continueWithAlphabeticalPrediction();
     completeSpotlightPicks();
+    window.dispatchEvent(new Event("pagehide"));
 
     const storedImmediately = JSON.parse(
       window.localStorage.getItem(storageKey) ?? "{}",
@@ -1424,18 +1429,9 @@ describe("shared site chrome", () => {
 
     expect(navigation).toBeVisible();
     expect(navigation).toHaveClass("basis-full", "sm:basis-auto");
-    expect(within(navigation).getByRole("list")).toHaveClass(
-      "grid",
-      "grid-cols-5",
-      "sm:flex",
-    );
+    expect(within(navigation).getByRole("list")).toHaveClass("flex");
     expect(predictLink).toHaveAttribute("href", "/");
-    expect(predictLink).toHaveClass(
-      "min-h-12",
-      "w-full",
-      "min-w-0",
-      "sm:w-auto",
-    );
+    expect(predictLink).toHaveClass("min-h-12", "min-w-0");
     expect(screen.getByRole("link", { name: /^table$/i })).toHaveAttribute(
       "href",
       "/leaderboard",
@@ -1444,9 +1440,11 @@ describe("shared site chrome", () => {
       "href",
       "/spotlight",
     );
-    expect(
-      screen.getByRole("link", { name: /^how to play$/i }),
-    ).toHaveAttribute("href", "/rules");
+    expect(screen.getByRole("link", { name: /^rules$/i })).toHaveAttribute(
+      "href",
+      "/rules",
+    );
+    expect(screen.queryByRole("link", { name: /^admin$/i })).toBeNull();
     expect(screen.getByText("2026/27 Premier League")).toBeVisible();
     expect(screen.getByText("Dranx Prediction League")).toBeVisible();
 

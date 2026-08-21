@@ -17,9 +17,9 @@ import { fileURLToPath, pathToFileURL } from "node:url";
 import sharp, { type Metadata } from "sharp";
 
 export const PLAYER_CATALOGUE_EXPECTATIONS = {
-  imageCount: 582,
-  missingImageCount: 0,
-  playerCount: 582,
+  imageCount: 578,
+  missingImageCount: 2,
+  playerCount: 580,
   requireAllSourceTeams: true,
 } as const;
 
@@ -32,34 +32,35 @@ export const PLAYER_PORTRAIT_EXPECTATIONS = {
 
 export const PLAYER_CATALOGUE_RELEASE_EXPECTATIONS = {
   fixtureSha256:
-    "2f0c3b083f43504c29242212c0a0e462c85818f5d8057de9309ea1031315cde9",
+    "d596bd88cf09d8e9d7971f345b87a520dd6caae639d17387efa3ee3b4788279e",
   portraitFingerprintSha256:
-    "b29f5b1496a73b924d39d1cd6e67c8e5b1b80c7dc649104c25a740b3e2a85785",
+    "6e233cd79a16ffad59c080752ea59a8c394e13b6e1c208b0a79496c17a50544c",
 } as const;
 
 const PREVIOUS_PLAYER_CATALOGUE_EXPECTATIONS = {
-  imageCount: 580,
-  missingImageCount: 7,
-  playerCount: 587,
+  imageCount: 577,
+  missingImageCount: 3,
+  playerCount: 580,
   requireAllSourceTeams: true,
 } as const;
 
 export const PLAYER_CATALOGUE_DELTA_EXPECTATIONS = {
-  addedCount: 12,
+  addedCount: 5,
   identitySha256: {
-    added: "1c9d2cb6a190928f112fc5f9794c4fd1424825ae4284642c8188593864aa839f",
-    moved: "7f6df782befb01279cc5a041ff5fef97e2dd3fa9f5448eff9a46bbf97a30c496",
-    removed: "a6e94f3b6522a3687091399c74dc0cfbeb94b7d95e6d0c6a441859205c45c37e",
+    added: "299aafbdb00b66ddab53ae9229f050ef605652b90b8acfc7721cfc49d74cde5c",
+    moved: "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+    removed: "7edb00f16fe3723cb4e8aee374c8bee56e85456d516c898a454e19de3a2c5524",
     replaced:
-      "432edbdc0c99c8b7f9f758c3517444fac5fa502f574ec3324b2e66377a4b8ad5",
+      "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
     restored:
-      "084f3803ff2dceffb5223af3a077e835f27f68293cf5b729ffa4f4299033cc92",
+      "b921331eae08b279286eeba495d04964bc69578106207f2031863a8f0189cca4",
   },
-  movedCount: 4,
-  previousPlayerCount: 587,
-  removedCount: 17,
-  replacedPortraitCount: 10,
-  restoredPortraitCount: 7,
+  movedCount: 0,
+  positionChangedCount: 2,
+  previousPlayerCount: 580,
+  removedCount: 5,
+  replacedPortraitCount: 0,
+  restoredPortraitCount: 2,
 } as const;
 
 export const SOURCE_TEAM_SLUG_MAP = {
@@ -703,27 +704,29 @@ function verifyDeltaProvenance(
   };
   const currentSourceCounts = countSources(currentRows);
   if (
-    currentSourceCounts.get("fotmob") !== 582 ||
-    currentSourceCounts.size !== 1
+    currentSourceCounts.get("fotmob") !== 578 ||
+    currentSourceCounts.get("none") !== 2 ||
+    currentSourceCounts.size !== 2
   ) {
-    fail("the current handoff must contain exactly 582 fotmob portrait rows.");
+    fail(
+      "the current handoff must preserve the reviewed 578/2 portrait provenance mix.",
+    );
   }
 
   const previousSourceCounts = countSources(previousRows);
   if (
-    previousSourceCounts.get("fotmob") !== 570 ||
-    previousSourceCounts.get("creative_commons") !== 10 ||
-    previousSourceCounts.get("none") !== 7 ||
-    previousSourceCounts.size !== 3
+    previousSourceCounts.get("fotmob") !== 577 ||
+    previousSourceCounts.get("none") !== 3 ||
+    previousSourceCounts.size !== 2
   ) {
     fail(
-      "the previous handoff must preserve the reviewed 570/10/7 portrait provenance mix.",
+      "the previous handoff must preserve the reviewed 577/3 portrait provenance mix.",
     );
   }
 
   for (const [rows, expectedCount, label] of [
-    [currentRows, 582, "current"] as const,
-    [previousRows, 570, "previous"] as const,
+    [currentRows, 578, "current"] as const,
+    [previousRows, 577, "previous"] as const,
   ]) {
     const fotmobIds = rows.flatMap((row) =>
       row.fotmobId === null ? [] : [row.fotmobId],
@@ -924,10 +927,10 @@ export async function verifyPlayerCatalogueDelta(
     summary.movedCount !== expected.movedCount ||
     summary.restoredPortraitCount !== expected.restoredPortraitCount ||
     summary.replacedPortraitCount !== expected.replacedPortraitCount ||
-    summary.positionChangedCount !== 0 ||
+    summary.positionChangedCount !== expected.positionChangedCount ||
     summary.nameChangedCount !== 0
   ) {
-    fail(`the handoff delta is not the reviewed 2026-08-13 transition.`);
+    fail(`the handoff delta is not the reviewed 2026-08-20 transition.`);
   }
 
   return summary;
@@ -1054,13 +1057,13 @@ export function verifyReviewedPlayerRelease(
     fileSha256(Buffer.from(serializedFixture, "utf8")) !==
     PLAYER_CATALOGUE_RELEASE_EXPECTATIONS.fixtureSha256
   ) {
-    fail("the tracked fixture is not the reviewed 2026-08-13 release.");
+    fail("the tracked fixture is not the reviewed 2026-08-20 release.");
   }
   if (
     playerPortraitFingerprintSha256(portraits) !==
     PLAYER_CATALOGUE_RELEASE_EXPECTATIONS.portraitFingerprintSha256
   ) {
-    fail("the published portraits are not the reviewed 2026-08-13 release.");
+    fail("the published portraits are not the reviewed 2026-08-20 release.");
   }
 }
 
@@ -1193,7 +1196,7 @@ export async function runPlayerCatalogueNormalizer(
   const repositoryRoot = resolve(repositoryDirectory);
   const sourceDirectory = join(
     repositoryRoot,
-    "premier-league-players-2026-08-13",
+    "premier-league-players-2026-08-20",
   );
   const sourceImageDirectory = join(sourceDirectory, "images");
   const sourceJsonPath = join(
@@ -1215,7 +1218,7 @@ export async function runPlayerCatalogueNormalizer(
   );
   const previousSourceDirectory = join(
     repositoryRoot,
-    "premier-league-players-2026-08-08",
+    "premier-league-players-2026-08-18",
   );
   const previousSourceImageDirectory = join(previousSourceDirectory, "images");
   const previousSourceJsonPath = join(
@@ -1243,7 +1246,7 @@ export async function runPlayerCatalogueNormalizer(
       pathExists(sourceImageDirectory),
     ]);
     if (sourceJsonExists !== sourceImagesExist) {
-      fail("the private 2026-08-13 source handoff is incomplete.");
+      fail("the private 2026-08-20 source handoff is incomplete.");
     }
 
     let delta: PlayerCatalogueDeltaSummary | null = null;
@@ -1259,7 +1262,7 @@ export async function runPlayerCatalogueNormalizer(
       );
       if (trackedFixture !== serializeFixture(sourcePlayers)) {
         fail(
-          "the private 2026-08-13 source handoff does not exactly match the tracked fixture.",
+          "the private 2026-08-20 source handoff does not exactly match the tracked fixture.",
         );
       }
       portraits = await verifyPlayerPortraits(
@@ -1273,11 +1276,11 @@ export async function runPlayerCatalogueNormalizer(
         pathExists(previousSourceImageDirectory),
       ]);
       if (previousJsonExists !== previousImagesExist) {
-        fail("the private 2026-08-08 source handoff is incomplete.");
+        fail("the private 2026-08-18 source handoff is incomplete.");
       }
       if (!previousJsonExists) {
         fail(
-          "the private 2026-08-08 handoff is required when the 2026-08-13 handoff is present.",
+          "the private 2026-08-18 handoff is required when the 2026-08-20 handoff is present.",
         );
       }
       const [previousJson, previousImageFileNames] = await Promise.all([
@@ -1322,10 +1325,10 @@ export async function runPlayerCatalogueNormalizer(
     pathExists(previousSourceImageDirectory),
   ]);
   if (!sourceJsonExists || !sourceImagesExist) {
-    fail("write mode requires the complete private 2026-08-13 handoff.");
+    fail("write mode requires the complete private 2026-08-20 handoff.");
   }
   if (!previousJsonExists || !previousImagesExist) {
-    fail("write mode requires the complete private 2026-08-08 handoff.");
+    fail("write mode requires the complete private 2026-08-18 handoff.");
   }
 
   const [

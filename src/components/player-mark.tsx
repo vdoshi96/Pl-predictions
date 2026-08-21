@@ -45,7 +45,7 @@ export function PlayerMark({
     <span
       {...accessibility}
       className={cn(
-        "ring-border bg-brand-soft text-brand relative inline-flex shrink-0 items-center justify-center overflow-hidden rounded-xl ring-1 ring-offset-1 ring-offset-white",
+        "ring-border bg-brand-soft text-brand relative inline-flex shrink-0 items-center justify-center overflow-hidden rounded-xl ring-1",
         sizeClasses[size],
         className,
       )}

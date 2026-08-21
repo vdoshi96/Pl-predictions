@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="generated-by" content="scripts/generate-docs-html.mjs" />
     <meta name="canonical-source" content="AGENTS.md" />
-    <meta name="canonical-source-sha256" content="91026919f024c324aa6555e2a68a0fe374fbba1e003f48885016e2df6519b0c5" />
+    <meta name="canonical-source-sha256" content="a8ccb1c629f7a75933b9df4db7bae1bfb54acd1b544162459b18b6c14a957045" />
     <title>This is NOT the Next.js you know</title>
     <style>
       :root { color-scheme: light dark; font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
@@ -46,7 +46,7 @@
 <h2 id="product-and-architecture">Product and architecture</h2>
 <p>Dranx Prediction League is a mobile-first friends game for the 2026/27 Premier League. A participant completes one immutable three-stage entry: enter a display name and order all 20 clubs, choose seven spotlight predictions, then review and submit. Before submission, a validated season-keyed browser draft preserves progress; an untouched deterministic A–Z table requires explicit acknowledgement. It is one Next.js 16 App Router application deployed on Vercel, with Vercel Marketplace Neon PostgreSQL accessed through Drizzle and the Neon HTTP driver. Public pages, authenticated administrator pages, server actions, the source-neutral standings import endpoint, and the manual results desk live in the same application.</p>
 <p>The seven spotlight categories are top scorer, top assister, most clean sheets, underdog team, overrated team, underdog player, and overrated player. Player categories use a searchable season catalogue plus an Other-player text fallback; most clean sheets and both team-opinion categories select clubs. The initial homepage HTML and RSC must not contain the player catalogue or portrait paths. Load the catalogue lazily on Stage 2 through the dynamic same-origin <code>/api/player-catalogue</code> route, SQL-filter active players for the current season, require at least two normalized search characters, display at most 20 matching rows, announce the total match count, enforce one open popup, and keep Other player available during loading, empty, and error states. There is no runtime football API client, production scraper, image hotlink, or Vercel Cron. Standings enter through the authenticated canonical importer or manual administrator form. Reviewed factual spotlight outcomes enter manually at <code>/admin/results</code> as <code>goals</code>, <code>assists</code>, <code>clean_sheets</code>, and shared <code>player_ratings</code> versions. The owner confirmed on 2026-08-14 that the required permissions for this player-catalogue workflow have been obtained, including acquisition, storage, redistribution, and production use. Owner-run acquisition may occur offline but must not run inside the deployed application.</p>
-<p>The 20 owner-provided club badge PNGs are the canonical local team marks; the original monograms remain rollback-only fallbacks for the first badge release. The owner-provided <code>premier-league-players-2026-08-13/</code> snapshot is the reviewed selector source: 582 players across the 20 clubs, with 582 supplied portrait PNGs and no remaining silhouette fallbacks in the catalogue. Keep Other player available for unavailable or newly added players. This roster import is not an outcome feed; do not infer the five pending result rankings from it or add runtime acquisition.</p>
+<p>The 20 owner-provided club badge PNGs are the canonical local team marks; the original monograms remain rollback-only fallbacks for the first badge release. The owner-provided <code>premier-league-players-2026-08-20/</code> snapshot is the current reviewed selector source: 580 players across the 20 clubs, with 578 supplied portrait PNGs and two intentional silhouette fallbacks for Ryan McAidoo and Luc De Fougerolles. Keep Other player available for unavailable or newly added players. This roster import is not an outcome feed; do not infer the five pending result rankings from it or add runtime acquisition.</p>
 <h2 id="important-paths">Important paths</h2>
 <ul>
 <li><code>src/app/</code> — public, administrator, and API routes.</li>
@@ -58,7 +58,7 @@
 <li><code>tests/</code> — unit/component, isolated Neon integration, and Playwright browser suites.</li>
 <li><code>docs/</code> — canonical architecture, research, QA, decisions, status, and generated HTML peers.</li>
 <li><code>public/team-marks/</code> — owner-provided club badge PNGs plus rollback-only monograms; do not add the separate Premier League logo/lion/ball assets or unapproved replacements.</li>
-<li><code>premier-league-players-2026-08-13/</code> — owner-provided raw roster and portrait handoff; never execute its acquisition scripts in the deployed app. The earlier <code>premier-league-players-2026-08-08/</code> folder remains provenance only.</li>
+<li><code>premier-league-players-2026-08-20/</code> — owner-provided current raw roster and portrait handoff; never execute its acquisition scripts in the deployed app. The August 18 handoff is the direct comparison baseline, and earlier folders remain provenance only.</li>
 <li><code>public/player-faces/</code> — imported local portraits; <code>PlayerMark</code> must fall back to the generic silhouette when an asset path is absent or an image fails.</li>
 </ul>
 <h2 id="commands">Commands</h2>
@@ -103,7 +103,7 @@ npm run docs:check
 <p>A change is complete only when relevant unit/component tests, isolated Neon integration tests, TypeScript, ESLint, formatting, documentation parity, production build, and desktop/mobile browser checks pass. Mobile QA must cover the three-stage flow, draft reload, intentional A–Z and reorder, the table leaderboard, the separate spotlight-accuracy page, 320–430px reflow, 56px touch handles, mouse/touch/keyboard reorder, searchable keyboard-accessible category selectors, the Other-player text path, manual results editing, fixed-deadline time-zone display, safe-area actions, long-name wrapping, and no horizontal overflow. Preserve exact cleanup evidence for any QA data.</p>
 <p>Keep canonical Markdown and generated HTML peers synchronized. Before finishing an iteration, correct stale status/QA documentation, push the feature branch, merge it to GitHub <code>main</code>, update local <code>main</code> to the same commit, and remove completed worktrees.</p>
 
-      <p class="source">Generated deterministically from <a href="AGENTS.md">AGENTS.md</a>. Canonical SHA-256: <code>91026919f024c324aa6555e2a68a0fe374fbba1e003f48885016e2df6519b0c5</code>.</p>
+      <p class="source">Generated deterministically from <a href="AGENTS.md">AGENTS.md</a>. Canonical SHA-256: <code>a8ccb1c629f7a75933b9df4db7bae1bfb54acd1b544162459b18b6c14a957045</code>.</p>
     </main>
   </body>
 </html>

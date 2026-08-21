@@ -1,5 +1,16 @@
 # Session log
 
+## 2026-08-21
+
+- Reset the superseded unmerged UI branch to verified `main`, deleted that local branch, and created `/private/tmp/pl-predictions-ui-report-remediation` on `vishal/ui-report-remediation`. Unrelated private handoffs and the Oxalpha report remain in the primary checkout.
+- Implemented the 20 UI-report findings, including compact mobile layout, viewport-contained selectors, debounced draft persistence with lifecycle flushing, expanded keyboard movement, stronger drag feedback, polite announcements, first-error spotlight validation, compact review and leaderboard layouts, one-second countdown alignment, viewport metadata, and reusable design tokens.
+- Normalized the owner-provided August 20 roster without executing acquisition scripts. Generated 580 selector rows and 578 verified 192-by-192 portraits, with intentional silhouette fallbacks for Ryan McAidoo and Luc De Fougerolles. Enforced exact source, identity-set, transition, release-fixture, and portrait-fingerprint checks against the August 18 baseline.
+- Passed formatting, ESLint, strict TypeScript, the full 264-passed/18-skipped unit and component suite, all 18 isolated Neon integration cases, the exact 580-player/578-portrait catalogue validator, and the Webpack production build.
+- Passed the production-server pre-kickoff matrix with 7 routed journeys and 13 intentional project skips across desktop/mobile Chromium, exact 320/430-pixel participant and administrator reflow, and mobile WebKit. Passed the fixed-clock post-kickoff matrix with 3 routed Chromium journeys and 2 intentional skips. The explicit `LOCAL_HTTP_E2E=1` harness permits local HTTP CSP, cookies, and fixed time only for this isolated production-build QA path; ordinary production builds retain secure-cookie, HTTPS-upgrade, and database-clock behavior.
+- Read back the final normal production build's `/rules` response as HTTP 200 with the expected CSP, including `upgrade-insecure-requests` and no development-only `unsafe-eval`.
+- Recaptured and visually inspected the three 390-by-844 mobile walkthrough images. Stage 3 now documents the compact top-5, collapsed-middle, and bottom-3 table review rather than duplicating the Stage 2 spotlight view.
+- Release, production seed, and production verification remain gated. No production data changed.
+
 ## 2026-08-14
 
 ### Adversarial-review remediation (production release complete; evidence closeout pending)

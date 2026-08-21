@@ -46,6 +46,16 @@ describe("isolated test clock", () => {
     ).toBeNull();
   });
 
+  it("allows a fixed production-build clock only in the isolated local E2E harness", () => {
+    expect(
+      resolveIsolatedTestNow({
+        ...isolatedEnvironment,
+        LOCAL_HTTP_E2E: "1",
+        NODE_ENV: "production",
+      }),
+    ).toEqual(new Date("2026-08-08T12:00:00.000Z"));
+  });
+
   it("ignores an override when the database identity is not the test target", () => {
     expect(
       resolveIsolatedTestNow({

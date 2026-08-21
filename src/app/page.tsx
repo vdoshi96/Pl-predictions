@@ -46,9 +46,9 @@ export default async function PredictionPage() {
   );
 
   return (
-    <main className="page-shell w-full flex-1 py-6 sm:py-10">
+    <main className="page-shell w-full flex-1 py-4 sm:py-10">
       <div className="mx-auto grid max-w-3xl gap-5 sm:gap-7">
-        <section className="brand-hero order-1 rounded-3xl px-5 py-5 text-white sm:px-8 sm:py-9">
+        <section className="brand-hero order-1 rounded-3xl px-5 py-4 text-white sm:px-8 sm:py-9">
           <div className="flex flex-wrap items-center gap-2">
             <Badge className="bg-accent text-brand ring-accent">
               {season.name}
@@ -57,16 +57,16 @@ export default async function PredictionPage() {
               {access.submissionsOpen ? "Open" : "Closed"}
             </Badge>
           </div>
-          <h1 className="mt-3 text-3xl leading-tight font-black tracking-[-0.04em] text-balance sm:mt-5 sm:text-5xl">
+          <h1 className="mt-3 text-2xl leading-tight font-black tracking-[-0.04em] text-balance sm:mt-5 sm:text-5xl">
             Build your 2026/27 Premier League table.
           </h1>
-          <p className="mt-3 max-w-2xl text-sm leading-6 text-white/75 sm:mt-4 sm:text-base sm:leading-7">
+          <p className="mt-2 max-w-2xl text-sm leading-5 text-white/75 sm:mt-4 sm:text-base sm:leading-7">
             Put all 20 clubs in your predicted finishing order, choose seven
             spotlight predictions, and lock in your Dranx Prediction League
             entry.
           </p>
 
-          <div className="mt-4 flex items-start gap-3 rounded-2xl border border-white/15 bg-white/8 p-3 backdrop-blur-sm sm:mt-6 sm:p-4">
+          <div className="mt-3 flex items-start gap-3 rounded-2xl border border-white/15 bg-white/8 p-3 sm:mt-6 sm:p-4">
             <CalendarClock
               aria-hidden="true"
               className="text-accent-blue mt-0.5 size-5 shrink-0"
@@ -77,7 +77,7 @@ export default async function PredictionPage() {
                   ? "Submissions open"
                   : "Submissions closed"}
               </p>
-              <p className="mt-1 text-xs leading-5 text-white/65">
+              <p className="mt-1 hidden text-xs leading-5 text-white/65 sm:block">
                 Submission deadline:{" "}
                 {formatUtcDateTime(access.submissionDeadline)} · Arsenal v
                 Coventry kickoff
@@ -125,7 +125,7 @@ export default async function PredictionPage() {
               ))}
             </div>
             <p className="flex items-center gap-2 text-xs font-semibold text-slate-500 sm:col-span-2">
-              <Check aria-hidden="true" className="size-4 text-[#08734f]" />
+              <Check aria-hidden="true" className="text-mint-ink size-4" />
               Exact full table: 100 points · spotlight accuracy stays separate.
             </p>
           </CardContent>

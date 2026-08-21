@@ -831,11 +831,11 @@ test("mobile journey preserves privacy and gives the owner full control", async 
   });
   await expect(review).toBeVisible();
   await expect(review.locator("[data-category]")).toHaveCount(7);
-  await expect(
-    review
-      .getByRole("list", { name: "Prediction review, positions 1 through 20" })
-      .getByRole("listitem"),
-  ).toHaveCount(20);
+  const reviewTable = review.getByRole("group", {
+    name: "Prediction review, positions 1 through 20",
+  });
+  await expect(reviewTable.locator("li")).toHaveCount(20);
+  await expect(reviewTable.getByRole("listitem")).toHaveCount(8);
   const reviewScroller = review.locator(".overflow-y-auto");
   await reviewScroller.evaluate((element) => {
     element.scrollTop = 0;
@@ -844,11 +844,22 @@ test("mobile journey preserves privacy and gives the owner full control", async 
     .poll(() => reviewScroller.evaluate((element) => element.scrollTop))
     .toBe(0);
   await expectNoHorizontalOverflow(page);
+  await reviewScroller.evaluate((scroller) => {
+    const table = scroller.querySelector<HTMLElement>(
+      '[aria-label="Prediction review, positions 1 through 20"]',
+    );
+    if (!table) throw new Error("Prediction review table is missing.");
+    scroller.scrollTop +=
+      table.getBoundingClientRect().top - scroller.getBoundingClientRect().top;
+  });
+  await expect(reviewTable.getByText("Top 5", { exact: true })).toBeVisible();
   await capturePlainEvidence(
     page,
     walkthroughScreenshotDirectory,
     "step-3-review-mobile.png",
   );
+  await reviewTable.getByText("Show all 20 clubs", { exact: true }).click();
+  await expect(reviewTable.getByRole("listitem")).toHaveCount(20);
 
   await review.getByRole("button", { name: "Submit prediction" }).click();
   await expect(page.getByText(`You’re in, ${qaName}.`)).toBeVisible();

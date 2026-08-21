@@ -86,7 +86,7 @@ export function TeamMark({
   return (
     <span
       className={cn(
-        "ring-border relative inline-flex shrink-0 items-center justify-center rounded-xl bg-white ring-1 ring-offset-1 ring-offset-white",
+        "ring-border relative inline-flex shrink-0 items-center justify-center rounded-xl bg-white ring-1",
         sizeClasses[size],
         className,
       )}

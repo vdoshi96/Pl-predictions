@@ -10,7 +10,7 @@ const walkthroughSteps = [
     callouts: [
       {
         label:
-          "Enter your display name first, then drag the six-dot handles or focus one and use the arrow keys.",
+          "Enter your display name first, then drag the handles or use Arrow, Page Up, Page Down, Home, and End.",
         marker: "1",
         position: { left: "86%", top: "52%" },
       },
@@ -50,10 +50,11 @@ const walkthroughSteps = [
     title: "Make seven spotlight picks",
   },
   {
-    alt: "Mobile final-review screen showing 20 clubs, seven spotlight picks, and the submit button.",
+    alt: "Mobile final-review screen showing a compact club summary, seven spotlight picks, and the submit button.",
     callouts: [
       {
-        label: "Confirm the review shows 20 clubs and seven spotlight picks.",
+        label:
+          "Confirm the champion, seven spotlight picks, and table summary; expand the middle positions if needed.",
         marker: "1",
         position: { left: "57%", top: "3%" },
       },
@@ -129,7 +130,7 @@ export function HowToPlay() {
                   ))}
                 </div>
                 <CardContent className="flex flex-col">
-                  <p className="text-xs font-black tracking-[0.12em] text-[#8f0033] uppercase">
+                  <p className="text-rose-ink text-xs font-black tracking-[0.12em] uppercase">
                     Step {walkthrough.step} of 3
                   </p>
                   <h3 className="text-brand-strong mt-1 text-xl font-black tracking-tight">

@@ -563,12 +563,12 @@ test("320–430px admin result and deadline controls reflow without writes", asy
   await expect(
     page.getByText("Reveal and close first", { exact: true }),
   ).toBeVisible();
-  const publishButtons = page.getByRole("button", {
-    name: "Publish provisional",
+  const reviewButtons = page.getByRole("button", {
+    name: "Review & publish",
   });
-  await expect(publishButtons).toHaveCount(4);
-  for (const publishButton of await publishButtons.all()) {
-    await expect(publishButton).toBeDisabled();
+  await expect(reviewButtons).toHaveCount(4);
+  for (const reviewButton of await reviewButtons.all()) {
+    await expect(reviewButton).toBeDisabled();
   }
 
   const topScorerResults = page

@@ -1,6 +1,6 @@
 # Sources
 
-External-source notes were checked on 2026-08-08. The August 13 handoff authority and release boundary were updated on 2026-08-14.
+External-source notes were checked on 2026-08-08. The current owner handoff and application-import boundary were updated on 2026-08-21.
 
 ## Product authority
 
@@ -12,19 +12,22 @@ External-source notes were checked on 2026-08-08. The August 13 handoff authorit
 - Current spotlight-predictions brief: one three-stage immutable entry containing the 20-club table and seven required categories; searchable first/last-name player selectors with Other-player fallback; clubs for most clean sheets; local player portraits and club crests with visual fallbacks; public rules and spotlight pages; and administrator deletion. The owner-supplied raw login password is operational secret input and is intentionally not copied into repository documentation.
 - Current identity direction: user-facing name **Dranx Prediction League**; Premier-League-inspired palette using official purple `#37003c` with cyan `#05f0ff`, green `#00ff87`, and pink `#ff2882` accents; original Dranx mark; operational `pl-predictions` identifiers unchanged.
 - Current club-asset direction: the project owner supplied a folder containing one transparent PNG badge for each of the 20 verified clubs and explicitly directed their use. The same folder's Premier League logo/lion/ball/composite files are outside that team-mark replacement and are not used.
-- Current player-asset direction: the reviewed selector snapshot is `premier-league-players-2026-08-13/`. Other player remains available for unavailable or newly added players. The 2026-08-08 folder remains provenance only.
+- Current player-asset direction: the reviewed selector snapshot is `premier-league-players-2026-08-20/`. Other player remains available for unavailable or newly added players. The August 18 folder is its direct comparison baseline, and earlier folders remain provenance only.
 - Current how-to direction: use screenshots captured from the current verified mobile flow at 390 × 844 pixels. The current sources were staged before a reversible isolated submission and created no production entry. The three source captures live under `public/how-to-play/`; their numbered overlays and matching callout text are first-party application documentation rather than a third-party data source.
 
 ## Owner-provided player snapshot source card
 
-- Local handoff: `premier-league-players-2026-08-13/`; its `README.txt` records snapshot date 2026-08-13, 582 players across the application's 20 clubs, and 582 supplied PNGs.
-- Roster authority: the owner selected this dated handoff for the release. The handoff, normalized fixture, tracked application fixture, and portrait inventory are reconciled internally; this release does not claim independent verification against official club or Premier League roster pages.
-- Release delta: relative to August 8, the active fixture has 12 additions, 17 removals, and four intra-league moves. The selected asset transition removes 17 obsolete portrait paths and applies four club-move renames without legacy copies.
+- Local handoff: `premier-league-players-2026-08-20/`; its `README.txt` records snapshot date 2026-08-20, 580 players across the application's 20 clubs, and 578 supplied PNGs. Accessed locally on 2026-08-21.
+- Source type and status: private owner-provided handoff, imported and used for the current repository fixture. The application does not treat this source as an instruction or execute its acquisition scripts.
+- Contents and relevance: normalized names, club membership, primary positions, identity fields, reviewed portrait mappings, and portrait PNGs for participant selectors. It is relevant only to selector identities and local presentation assets.
+- Roster authority: the owner selected this dated handoff for the update. The handoff, normalized fixture, tracked application fixture, and portrait inventory are reconciled internally; this update does not claim independent verification against official club or Premier League roster pages.
+- Update delta: relative to August 18, the active fixture has five additions, five removals, no intra-league club moves, two position corrections, and two restored portraits for existing players. Ryan McAidoo and Luc De Fougerolles have no verified image and intentionally retain null asset paths.
 - Handoff provenance: the local README identifies Transfermarkt 2026 first-team squad pages as the roster source and FotMob CDN portraits for every catalogued player. For this repository, the operative provenance is the project owner's local handoff, selected roster, and 2026-08-14 permission confirmation; this record does not claim original ownership of third-party material.
 - Application use: roster rows are imported into the season catalogue and reviewed portraits are copied to local `/player-faces/` paths. `PlayerMark` uses its generic silhouette when an asset path is absent or an image fails.
 - Runtime boundary: the deployed application does not execute the handoff's acquisition scripts, call those upstream sources, scrape player pages, or hotlink portraits. Other player covers unavailable or newly added players.
 - Outcome boundary: this is a selector identity and portrait snapshot, not a goals, assists, clean-sheets, or player-rating result feed. Offline work may acquire those outcomes, but reviewed facts enter only through the authenticated manual results desk.
-- Production boundary: the August 13 application was merged through PR #15, deployed, and seeded once through the approved sequence after a six-hour Neon restore window and read-only just-before-seed time-travel result were proven. The live catalogue now has 599 total rows, 582 active players, 17 preserved inactive rows, and 582 distinct active portrait paths. This release state does not change the no-runtime-acquisition boundary.
+- Decision and follow-up: use the August 20 rows and 578 verified portraits as the current repository fixture, preserve two runtime silhouette fallbacks, and do not retain names removed from the owner-selected roster as active selector options. Releasing the fixture and changing production rows require the normal deployment gate and explicit approval for the supported production seed.
+- Production boundary: production still has the verified August 13 state: 599 total rows, 582 active players, 17 preserved inactive rows, and 582 distinct active portrait paths. No August 20 production seed has run. This state does not change the no-runtime-acquisition boundary.
 
 ## Season sources and permission disposition
 
@@ -45,7 +48,7 @@ FotMob's official terms, the Premier League logo portal, and the Premier League 
 - The owner clarified that spotlight accuracy never changes the table leaderboard. The table maximum remains 100. Let `N` be the current number of active, nondeleted season brackets. Accuracy points are `max(0, N + 1 - outcome rank)`. Overall accuracy excludes pending categories. A resolved zero-point result still counts as available. Equal overall scores share a competition rank. Category sorts use outcome rank from low to high and put pending entries last.
 - Team expectation data is internal: average each club's predicted position across the remaining valid submissions, then compare it with the active validated standings. Underdog is average prediction minus actual position; overrated is the inverse.
 - The requested player-opinion metric is FotMob average season rating, descending for underdog and ascending for overrated. The owner may acquire it through an authorized offline workflow. There is no runtime FotMob client, scraper, scheduled job, or stored provider credential.
-- The owner has supplied the dated 582-player selector catalogue and 582 portrait PNGs. The handoff does not include reviewed top-scorer, assists, clean-sheets, or player-rating rankings. Do not infer or fabricate these results.
+- The owner has supplied the dated 580-player selector catalogue and 578 portrait PNGs. The handoff does not include reviewed top-scorer, assists, clean-sheets, or player-rating rankings. Do not infer or fabricate these results.
 - `/admin/results` is the approved reviewed-entry path. It presents five owner-facing tables backed by immutable versions of goals, assists, club clean sheets, and one shared player-ratings dataset. Saving seals facts and exact Other-name aliases into a working snapshot; publication, finalization, and final-status undo use exact compare-and-swap pointers and atomic audits. Missing datasets or unresolved aliases remain pending, and no provider acquisition is built into this workflow.
 
 ## Technical authority

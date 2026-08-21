@@ -442,12 +442,12 @@ test("post-kickoff table and spotlight rankings stay split at desktop and mobile
   await expect(
     exactEntry.getByLabel("Predicted champion: Arsenal"),
   ).toBeVisible();
-  await expect(
-    exactEntry
-      .getByLabel("Predicted champion: Arsenal")
-      .getByRole("img", { name: "Arsenal club mark" }),
-  ).toBeVisible();
-  await expect(exactEntry.getByText("On track · 1st")).toBeVisible();
+  const arsenalCrest = exactEntry
+    .getByLabel("Predicted champion: Arsenal")
+    .locator("img");
+  await expect(arsenalCrest).toBeVisible();
+  await expect(arsenalCrest).toHaveAttribute("src", /arsenal/u);
+  await expect(exactEntry.getByText(/On track/u)).toHaveCount(0);
 
   const swappedEntry = page.getByLabel(`${swappedName} leaderboard entry`);
   await expect(swappedEntry.getByLabel("Rank 2")).toHaveText("2");
@@ -455,12 +455,12 @@ test("post-kickoff table and spotlight rankings stay split at desktop and mobile
   await expect(
     swappedEntry.getByLabel("Predicted champion: Aston Villa"),
   ).toBeVisible();
-  await expect(
-    swappedEntry
-      .getByLabel("Predicted champion: Aston Villa")
-      .getByRole("img", { name: "Aston Villa club mark" }),
-  ).toBeVisible();
-  await expect(swappedEntry.getByText("Off track · 2nd")).toBeVisible();
+  const astonVillaCrest = swappedEntry
+    .getByLabel("Predicted champion: Aston Villa")
+    .locator("img");
+  await expect(astonVillaCrest).toBeVisible();
+  await expect(astonVillaCrest).toHaveAttribute("src", /aston-villa/u);
+  await expect(swappedEntry.getByText(/Off track/u)).toHaveCount(0);
   await expect(swappedEntry.locator("details")).toHaveCount(0);
 
   await expectNoHorizontalOverflow(page);

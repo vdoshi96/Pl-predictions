@@ -120,7 +120,7 @@ export default function RulesPage() {
         <Card id="spotlight-scoring">
           <CardContent>
             <div className="flex items-start gap-3">
-              <span className="grid size-11 shrink-0 place-items-center rounded-xl bg-[#ffe3ef] text-[#8f0033]">
+              <span className="bg-rose-soft text-rose-ink grid size-11 shrink-0 place-items-center rounded-xl">
                 <Sparkles aria-hidden="true" className="size-5" />
               </span>
               <div>
@@ -139,7 +139,7 @@ export default function RulesPage() {
             <div className="mt-4 grid gap-2 sm:grid-cols-2">
               {spotlightRules.map(([label, description]) => (
                 <div
-                  className="border-border rounded-xl border bg-[#fcf9fd] p-3"
+                  className="border-border bg-surface-lilac rounded-xl border p-3"
                   key={label}
                 >
                   <h3 className="text-brand-strong text-sm font-black">
@@ -152,7 +152,7 @@ export default function RulesPage() {
               ))}
             </div>
             <Link
-              className="bg-brand text-accent focus-visible:ring-accent-blue mt-4 inline-flex min-h-11 items-center rounded-xl px-4 text-sm font-black outline-none hover:bg-[#4b0b50] focus-visible:ring-2"
+              className="bg-brand text-accent focus-visible:ring-accent-blue hover:bg-brand-hover mt-4 inline-flex min-h-11 items-center rounded-xl px-4 text-sm font-black outline-none focus-visible:ring-2"
               href="/spotlight"
             >
               Open spotlight accuracy
@@ -162,7 +162,7 @@ export default function RulesPage() {
 
         <Card>
           <CardContent className="grid gap-4 sm:grid-cols-[auto_1fr]">
-            <span className="text-brand grid size-11 place-items-center rounded-xl bg-[#dffcff]">
+            <span className="bg-sky-soft text-brand grid size-11 place-items-center rounded-xl">
               <Calculator aria-hidden="true" className="size-5" />
             </span>
             <div>

@@ -1,7 +1,7 @@
 "use client";
 
 import { move } from "@dnd-kit/helpers";
-import { Accessibility } from "@dnd-kit/dom";
+import { Accessibility, PointerActivationConstraints } from "@dnd-kit/dom";
 import {
   DragDropProvider,
   PointerSensor,
@@ -11,7 +11,7 @@ import {
 } from "@dnd-kit/react";
 import { useSortable } from "@dnd-kit/react/sortable";
 import { GripVertical, RotateCcw } from "lucide-react";
-import { useId, useMemo, useRef, useState } from "react";
+import { memo, useCallback, useId, useMemo, useRef, useState } from "react";
 
 import { TeamMark } from "@/components/team-mark";
 import { Button } from "@/components/ui/button";
@@ -71,10 +71,13 @@ interface SortableTeamRowProps {
   count: number;
   disabled: boolean;
   positionKind: "predicted" | "actual";
-  onKeyboardMove: (teamId: string, direction: -1 | 1) => void;
+  onKeyboardMove: (
+    teamId: string,
+    destination: -5 | -1 | 1 | 5 | "start" | "end",
+  ) => void;
 }
 
-function SortableTeamRow({
+const SortableTeamRow = memo(function SortableTeamRow({
   team,
   index,
   count,
@@ -103,18 +106,19 @@ function SortableTeamRow({
       data-team-id={team.id}
       data-position={position}
       className={cn(
-        "group relative flex min-h-16 w-full min-w-0 items-center gap-3 rounded-2xl border bg-white py-2 pr-2 pl-3 shadow-[0_10px_26px_-24px_rgba(55,0,60,0.65)] transition-[border-color,box-shadow,opacity,transform] duration-150 motion-reduce:transition-none",
+        "group relative flex min-h-14 w-full min-w-0 items-center gap-2 rounded-xl border bg-white pr-1 pl-2 transition-[border-color,box-shadow,opacity,transform] duration-150 motion-reduce:transition-none",
         position === 11
           ? "border-border border-t-accent-blue mt-2 border-t-4"
           : "border-border",
-        isDropTarget && "border-accent ring-2 ring-[#d8ffeb]",
-        isDragging && "border-accent z-10 scale-[1.01] opacity-85 shadow-xl",
+        isDropTarget &&
+          "border-accent before:bg-accent before:absolute before:inset-x-2 before:-top-1 before:h-1 before:rounded-full",
+        isDragging && "border-accent z-10 scale-[1.03] opacity-100 shadow-xl",
       )}
     >
       <span
         aria-label={`${positionKind === "predicted" ? "Predicted" : "Actual"} position ${position}`}
         className={cn(
-          "grid size-9 shrink-0 place-items-center rounded-xl font-mono text-sm font-black tabular-nums",
+          "grid size-8 shrink-0 place-items-center rounded-lg font-mono text-xs font-black tabular-nums",
           position <= 10 ? "bg-brand text-white" : "bg-brand-soft text-brand",
         )}
       >
@@ -125,7 +129,7 @@ function SortableTeamRow({
         name={team.displayName}
         initials={team.shortName}
         src={team.assetPath}
-        size="md"
+        size="sm"
       />
 
       <span className="text-brand-strong min-w-0 grow text-sm leading-4 font-bold break-words sm:truncate sm:text-base sm:leading-5">
@@ -136,15 +140,27 @@ function SortableTeamRow({
         ref={handleRef}
         type="button"
         disabled={disabled}
-        aria-label={`Move ${team.displayName}, currently ${positionKind} position ${position} of ${count}. Use Arrow Up or Arrow Down to move one place, or drag this handle.`}
+        aria-label={`Move ${team.displayName}, currently ${positionKind} position ${position} of ${count}. Use Arrow keys to move one place, Page Up or Page Down to move five places, Home or End to jump, or drag this handle.`}
         onKeyDown={(event) => {
-          const direction =
-            event.key === "ArrowUp" ? -1 : event.key === "ArrowDown" ? 1 : null;
-          if (direction === null || disabled) return;
+          const destination =
+            event.key === "ArrowUp"
+              ? -1
+              : event.key === "ArrowDown"
+                ? 1
+                : event.key === "PageUp"
+                  ? -5
+                  : event.key === "PageDown"
+                    ? 5
+                    : event.key === "Home"
+                      ? "start"
+                      : event.key === "End"
+                        ? "end"
+                        : null;
+          if (destination === null || disabled) return;
 
           event.preventDefault();
           event.stopPropagation();
-          onKeyboardMove(team.id, direction);
+          onKeyboardMove(team.id, destination);
         }}
         className="border-border bg-brand-soft text-brand hover:border-accent-lilac hover:text-brand-strong focus-visible:ring-accent-blue inline-flex size-14 shrink-0 touch-none items-center justify-center rounded-xl border outline-none select-none hover:bg-white focus-visible:ring-2 focus-visible:ring-offset-2 active:cursor-grabbing disabled:cursor-not-allowed disabled:opacity-45 motion-reduce:transition-none sm:cursor-grab"
       >
@@ -156,7 +172,13 @@ function SortableTeamRow({
       </button>
     </li>
   );
-}
+});
+
+const pointerSensor = PointerSensor.configure({
+  activationConstraints: [
+    new PointerActivationConstraints.Distance({ value: 6 }),
+  ],
+});
 
 export function PredictionSorter({
   teams,
@@ -182,32 +204,39 @@ export function PredictionSorter({
   );
   const isAlphabetical = ordersMatch(teams, alphabeticalTeams);
 
-  function handleKeyboardMove(teamId: string, direction: -1 | 1) {
-    const currentIndex = teams.findIndex((team) => team.id === teamId);
-    if (currentIndex < 0) return;
+  const handleKeyboardMove = useCallback(
+    (teamId: string, destination: -5 | -1 | 1 | 5 | "start" | "end") => {
+      const currentIndex = teams.findIndex((team) => team.id === teamId);
+      if (currentIndex < 0) return;
 
-    const nextIndex = Math.min(
-      teams.length - 1,
-      Math.max(0, currentIndex + direction),
-    );
-    const source = teams[currentIndex];
-    if (!source) return;
+      const requestedIndex =
+        destination === "start"
+          ? 0
+          : destination === "end"
+            ? teams.length - 1
+            : currentIndex + destination;
+      const nextIndex = Math.min(teams.length - 1, Math.max(0, requestedIndex));
+      const source = teams[currentIndex];
+      if (!source) return;
 
-    if (nextIndex === currentIndex) {
+      if (nextIndex === currentIndex) {
+        setAnnouncement(
+          `${source.displayName} is already at position ${currentIndex + 1} of ${teams.length}.`,
+        );
+        return;
+      }
+
+      const nextTeams = [...teams];
+      nextTeams.splice(currentIndex, 1);
+      nextTeams.splice(nextIndex, 0, source);
+      onChange(nextTeams);
+      navigator.vibrate?.(8);
       setAnnouncement(
-        `${source.displayName} is already at position ${currentIndex + 1} of ${teams.length}.`,
+        `${source.displayName} moved to position ${nextIndex + 1} of ${teams.length}.`,
       );
-      return;
-    }
-
-    const nextTeams = [...teams];
-    nextTeams.splice(currentIndex, 1);
-    nextTeams.splice(nextIndex, 0, source);
-    onChange(nextTeams);
-    setAnnouncement(
-      `${source.displayName} moved to position ${nextIndex + 1} of ${teams.length}.`,
-    );
-  }
+    },
+    [onChange, teams],
+  );
 
   function handleDragStart(event: DragStartEvent) {
     const source = teamForId(teams, event.operation.source?.id);
@@ -217,6 +246,7 @@ export function PredictionSorter({
     startOrderRef.current = [...teams];
     dragOrderRef.current = [...teams];
     lastAnnouncedPositionRef.current = position;
+    navigator.vibrate?.(10);
     setAnnouncement(
       `Dragging ${source.displayName}, position ${position} of ${teams.length}. Move the pointer to choose a new position.`,
     );
@@ -235,6 +265,7 @@ export function PredictionSorter({
     if (!ordersMatch(currentDragOrder, nextTeams)) {
       dragOrderRef.current = nextTeams;
       onChange(nextTeams);
+      navigator.vibrate?.(8);
     }
 
     if (
@@ -306,7 +337,7 @@ export function PredictionSorter({
               : "Your predicted table"}
           </h2>
           <p className="text-muted mt-1 text-sm leading-5">
-            Drag the large handle, or focus it and press Arrow Up or Arrow Down.
+            Drag the handle, or use Arrow, Page Up, Page Down, Home, and End.
           </p>
         </div>
         <Button
@@ -324,7 +355,7 @@ export function PredictionSorter({
       <p
         className="sr-only"
         role="status"
-        aria-live="assertive"
+        aria-live="polite"
         aria-atomic="true"
       >
         {announcement}
@@ -334,13 +365,13 @@ export function PredictionSorter({
         plugins={(defaultPlugins) =>
           defaultPlugins.filter((plugin) => plugin !== Accessibility)
         }
-        sensors={[PointerSensor]}
+        sensors={[pointerSensor]}
         onDragStart={handleDragStart}
         onDragOver={handleDragOver}
         onDragEnd={handleDragEnd}
       >
         <ol
-          className="grid min-w-0 gap-2"
+          className="grid min-w-0 gap-1.5"
           aria-label={`Premier League ${positionKind} positions`}
         >
           {teams.map((team, index) => (

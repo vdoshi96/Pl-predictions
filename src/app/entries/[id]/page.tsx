@@ -22,11 +22,11 @@ export async function generateMetadata({
 }
 
 const tierPresentation = {
-  exact: { label: "Exact", className: "bg-[#ddffef] text-[#075d42]" },
-  "within-three": { label: "Within 3", className: "bg-[#dffcff] text-brand" },
+  exact: { label: "Exact", className: "bg-mint text-mint-ink" },
+  "within-three": { label: "Within 3", className: "bg-sky-soft text-brand" },
   "correct-half": {
     label: "Correct half",
-    className: "bg-[#ffe3ef] text-[#8f0033]",
+    className: "bg-rose-soft text-rose-ink",
   },
   miss: { label: "No points", className: "bg-slate-100 text-slate-700" },
 } as const;

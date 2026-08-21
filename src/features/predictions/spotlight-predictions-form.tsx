@@ -64,23 +64,33 @@ function normalizedCustomNameKey(value: string) {
 }
 
 export function spotlightPicksAreComplete(picks: SpotlightPicksDraft): boolean {
-  return PREDICTION_CATEGORY_DEFINITIONS.every((definition) => {
+  return spotlightIncompleteCategories(picks).length === 0;
+}
+
+export function spotlightIncompleteCategories(
+  picks: SpotlightPicksDraft,
+): PredictionCategory[] {
+  return PREDICTION_CATEGORY_DEFINITIONS.flatMap((definition) => {
     const pick = picks[definition.category];
-    if (!pick) return false;
+    if (!pick) return [definition.category];
 
     if (definition.subject === "team") {
-      return pick.kind === "team" && Boolean(pick.teamId);
+      return pick.kind === "team" && Boolean(pick.teamId)
+        ? []
+        : [definition.category];
     }
 
     if (pick.kind === "player") {
-      return Boolean(pick.playerId && pick.displayName.trim());
+      return pick.playerId && pick.displayName.trim()
+        ? []
+        : [definition.category];
     }
-    return (
-      pick.kind === "custom-player" &&
+    return pick.kind === "custom-player" &&
       normalizedCustomName(pick.customPlayerName).length >= 2 &&
       normalizedCustomName(pick.customPlayerName).length <= 120 &&
       normalizedCustomNameKey(pick.customPlayerName).length <= 120
-    );
+      ? []
+      : [definition.category];
   });
 }
 
@@ -165,7 +175,8 @@ export function buildSpotlightReviewItems(
 
 export interface SpotlightPredictionsFormProps {
   disabled?: boolean;
-  invalid?: boolean;
+  invalidCategory?: PredictionCategory | null;
+  invalidCount?: number;
   onChange: (
     update: (currentPicks: SpotlightPicksDraft) => SpotlightPicksDraft,
   ) => void;
@@ -180,7 +191,8 @@ export interface SpotlightPredictionsFormProps {
 
 export function SpotlightPredictionsForm({
   disabled = false,
-  invalid = false,
+  invalidCategory = null,
+  invalidCount = 0,
   onChange,
   onSelectorExpandedChange,
   picks,
@@ -233,13 +245,13 @@ export function SpotlightPredictionsForm({
 
   return (
     <section aria-labelledby="spotlight-picks-heading" className="grid gap-4">
-      <Card className="border-accent-lilac/30 overflow-visible bg-[#fcf9fd]">
+      <Card className="border-accent-lilac/30 bg-surface-lilac overflow-visible">
         <CardContent className="flex items-start gap-3">
           <span className="bg-brand text-accent grid size-11 shrink-0 place-items-center rounded-xl">
             <Sparkles aria-hidden="true" className="size-5" />
           </span>
           <div>
-            <p className="text-xs font-black tracking-[0.12em] text-[#8f0033] uppercase">
+            <p className="text-rose-ink text-xs font-black tracking-[0.12em] uppercase">
               Step 2 of 3
             </p>
             <h2
@@ -258,6 +270,19 @@ export function SpotlightPredictionsForm({
         </CardContent>
       </Card>
 
+      {invalidCount > 0 ? (
+        <p
+          className="border-danger/25 bg-danger-soft text-danger rounded-xl border p-3 text-sm leading-5 font-bold outline-none"
+          data-spotlight-validation-summary="true"
+          role="alert"
+          tabIndex={-1}
+        >
+          {invalidCount} of 7 spotlight prediction
+          {invalidCount === 1 ? " is" : "s are"} still incomplete. Complete the
+          highlighted choice to continue.
+        </p>
+      ) : null}
+
       <div className="grid gap-3 sm:grid-cols-2">
         {PREDICTION_CATEGORY_DEFINITIONS.map((definition) => {
           const pick = picks[definition.category];
@@ -273,13 +298,7 @@ export function SpotlightPredictionsForm({
               : null;
           const otherValue =
             pick?.kind === "custom-player" ? pick.customPlayerName : "";
-          const pickInvalid =
-            invalid &&
-            (!pick ||
-              (pick.kind === "custom-player" &&
-                (normalizedCustomName(pick.customPlayerName).length < 2 ||
-                  normalizedCustomNameKey(pick.customPlayerName).length >
-                    120)));
+          const pickInvalid = invalidCategory === definition.category;
 
           return (
             <Card

@@ -1,5 +1,11 @@
 # Decisions
 
+## 2026-08-21: August 20 player catalogue and UI-report remediation
+
+Use the owner-provided `premier-league-players-2026-08-20/` handoff as the current repository selector source. Normalize all 580 players and copy its 578 verified portraits. Keep null asset paths for Ryan McAidoo and Luc De Fougerolles so `PlayerMark` renders the generic silhouette. Relative to August 18, require exact parity for five additions, five removals, no intra-league moves, two position corrections, and two restored portraits for existing players. Do not run handoff acquisition scripts, infer result facts, hotlink images, or change production data during normalization. Production release and the supported seed remain separate owner-gated operations.
+
+Implement all 20 findings from the owner-provided Oxalpha UI report as one mobile-first density and interaction pass. Keep the repository's 56-pixel move-handle requirement while reducing row chrome around it. Debounce local draft writes and flush on page exit, keep player pickers in the mobile viewport, add Home, End, Page Up, and Page Down movement, announce reorders politely, highlight only the first incomplete spotlight category, collapse the review table's middle positions, compact the public header and leaderboard, align countdown updates to one-second boundaries, export a safe-area viewport, and use named design tokens for repeated colors. Preserve the existing privacy, atomicity, lazy-catalogue, and no-runtime-acquisition boundaries.
+
 ## 2026-08-14: Browser-local drafts and intentional A–Z acknowledgement
 
 Persist an in-progress entry only in versioned, season-keyed browser `localStorage`. The draft contains the display name, exact ordered current-team IDs, stage, partial typed picks, and selected-player display metadata. Restore only after hydration and only when the current 20-team permutation and category shapes validate. Keep restored player IDs through catalogue loading or failure; a successful current-season catalogue response is the only client event that may prove one stale. Clear storage only after successful atomic submission or server-verified permanent closure. Validation, network, and server failures retain it; use `beforeunload` only when storage itself is unavailable.

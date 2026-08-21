@@ -2,9 +2,9 @@ import { Clock3, EyeOff, Medal, Sparkles, Trophy, Users } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
 
+import { TeamMark } from "@/components/team-mark";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
-import { ChampionPick } from "@/features/leaderboard/champion-pick";
 import { LeaderboardEntryLink } from "@/features/leaderboard/entry-link";
 import { getLeaderboardView } from "@/features/leaderboard/queries";
 import { formatUtcDateTime } from "@/shared/format";
@@ -50,6 +50,9 @@ export default async function LeaderboardPage() {
             </div>
           </div>
           <div className="mt-6 flex flex-wrap items-center gap-3 text-xs font-semibold text-white/75">
+            <span className="inline-flex items-center rounded-full bg-white/10 px-3 py-2">
+              Table points · maximum 100
+            </span>
             <span className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-2">
               <Users aria-hidden="true" className="text-accent size-4" />
               {view.entries.length}{" "}
@@ -145,9 +148,9 @@ export default async function LeaderboardPage() {
                 key={entry.id}
                 role="article"
               >
-                <CardContent className="grid grid-cols-[auto_1fr_auto] items-center gap-3 sm:grid-cols-[4rem_1fr_6rem]">
+                <CardContent className="grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-2.5 py-3">
                   <span
-                    className="bg-brand grid size-11 place-items-center rounded-xl text-lg font-black text-white"
+                    className="bg-brand grid size-10 place-items-center rounded-xl text-base font-black text-white"
                     aria-label={`Rank ${entry.rank}`}
                   >
                     {entry.rank}
@@ -157,49 +160,36 @@ export default async function LeaderboardPage() {
                       entryId={entry.id}
                       participantName={entry.participantName}
                     />
-                    <span className="mt-1 block text-xs text-slate-500">
+                    <span className="mt-0.5 block text-xs text-slate-500">
                       {formatUtcDateTime(entry.createdAt)}
                     </span>
-                    <span className="mt-1 block text-xs font-semibold text-slate-600">
-                      Table score · maximum 100
+                    <span
+                      aria-label={`Predicted champion: ${entry.champion.displayName}`}
+                      className="text-brand mt-1 inline-flex min-w-0 items-center gap-1.5 text-xs font-bold"
+                    >
+                      <TeamMark
+                        decorative
+                        initials={entry.champion.shortName}
+                        name={entry.champion.displayName}
+                        size="sm"
+                        src={entry.champion.assetPath}
+                      />
+                      <span className="truncate">
+                        {entry.champion.displayName}
+                      </span>
+                    </span>
+                    <span className="mt-1 block text-[0.68rem] leading-4 font-semibold text-slate-500">
+                      {entry.exactCount} exact · {entry.withinThreeCount} within
+                      3 · {entry.correctHalfCount} same half
                     </span>
                   </div>
                   <div className="text-right">
-                    <strong className="block text-2xl font-black text-[#c80047] tabular-nums">
+                    <strong className="text-rose-score block text-2xl font-black tabular-nums">
                       {entry.totalScore}
                     </strong>
                     <span className="text-[0.68rem] font-bold tracking-wide text-slate-500 uppercase">
                       table points
                     </span>
-                  </div>
-                  <div className="col-span-3 grid min-w-0 gap-2 sm:col-span-2 sm:col-start-2 sm:grid-cols-[minmax(0,1fr)_18rem]">
-                    <ChampionPick champion={entry.champion} />
-                    <dl className="grid grid-cols-3 gap-1.5">
-                      <div className="rounded-lg bg-[#ddffef] p-2 text-center">
-                        <dt className="text-[0.64rem] font-bold text-[#075d42] uppercase">
-                          Exact
-                        </dt>
-                        <dd className="font-black text-[#064c37]">
-                          {entry.exactCount}
-                        </dd>
-                      </div>
-                      <div className="rounded-lg bg-[#dffcff] p-2 text-center">
-                        <dt className="text-brand text-[0.64rem] font-bold uppercase">
-                          Within 3
-                        </dt>
-                        <dd className="text-brand-strong font-black">
-                          {entry.withinThreeCount}
-                        </dd>
-                      </div>
-                      <div className="rounded-lg bg-slate-100 p-2 text-center">
-                        <dt className="text-[0.64rem] font-bold text-slate-600 uppercase">
-                          Half
-                        </dt>
-                        <dd className="font-black text-slate-800">
-                          {entry.correctHalfCount}
-                        </dd>
-                      </div>
-                    </dl>
                   </div>
                 </CardContent>
               </Card>
@@ -213,7 +203,7 @@ export default async function LeaderboardPage() {
                 key={entry.publicKey}
                 role="article"
               >
-                <CardContent className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 py-3 sm:grid-cols-[minmax(0,1fr)_minmax(15rem,auto)_5rem]">
+                <CardContent className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 py-3">
                   <div className="min-w-0">
                     {view.predictionsRevealed && entry.id ? (
                       <LeaderboardEntryLink
@@ -228,13 +218,24 @@ export default async function LeaderboardPage() {
                     <span className="mt-0.5 block text-xs text-slate-500">
                       Submitted {formatUtcDateTime(entry.createdAt)}
                     </span>
+                    <span
+                      aria-label={`Predicted champion: ${entry.champion.displayName}`}
+                      className="text-brand mt-1 inline-flex min-w-0 items-center gap-1.5 text-xs font-bold"
+                    >
+                      <TeamMark
+                        decorative
+                        initials={entry.champion.shortName}
+                        name={entry.champion.displayName}
+                        size="sm"
+                        src={entry.champion.assetPath}
+                      />
+                      <span className="truncate">
+                        {entry.champion.displayName}
+                      </span>
+                    </span>
                   </div>
-                  <ChampionPick
-                    champion={entry.champion}
-                    className="col-span-2 row-start-2 sm:col-span-1 sm:col-start-2 sm:row-start-1"
-                  />
-                  <div className="col-start-2 row-start-1 text-right sm:col-start-3">
-                    <strong className="block text-2xl font-black text-[#c80047] tabular-nums">
+                  <div className="text-right">
+                    <strong className="text-rose-score block text-2xl font-black tabular-nums">
                       {entry.totalScore}
                     </strong>
                     <span className="text-[0.68rem] font-bold tracking-wide text-slate-500 uppercase">

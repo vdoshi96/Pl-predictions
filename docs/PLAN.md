@@ -1,13 +1,23 @@
 # Implementation plan
 
-1. Provision and link Vercel plus Neon, verify current sources, and record decisions.
-2. Bootstrap project memory, scaffold the strict Next.js application, and add deterministic documentation parity.
-3. Create the Drizzle schema, committed migration, idempotent 2026/27 seed, and source-neutral standings importer.
-4. Implement the accessible prediction sorter, review, atomic submission, receipt confirmation, deadline, and reveal rules.
-5. Implement derived leaderboard scoring, comparison pages, admin session/settings/submissions/manual standings/final controls, and import history.
-6. Add security headers, server validation, same-origin checks, honeypot, safe errors, and focused audit logging.
-7. Run format, lint, type, unit, integration, build, Playwright, dependency audit, responsive visual inspection, and production smoke tests.
-8. Generate current documentation HTML and QA evidence, create the private GitHub repository, merge the feature branch to `main`, deploy production, and leave local/remote state synchronized.
+## August 20 catalogue and Oxalpha UI remediation (local verification complete; release gated)
+
+1. Start from verified GitHub `main` in a new worktree and discard the superseded unmerged UI branch, while preserving unrelated private handoffs and report files in the primary checkout.
+2. Implement the 20 report findings across mobile density, drag and keyboard interaction, selector containment, validation focus, review length, navigation, leaderboard presentation, countdown timing, viewport metadata, design tokens, and render/write performance.
+3. Normalize the owner-selected August 20 handoff into 580 player names and 578 verified local portraits, retain silhouette fallbacks for Ryan McAidoo and Luc De Fougerolles, and enforce the exact August 18-to-August 20 transition fingerprint.
+4. Regenerate the three mobile how-to screenshots from the current flow, synchronize every Markdown/HTML pair, and run formatting, lint, TypeScript, unit/component, isolated integration, production build, and desktop/mobile browser checks.
+5. Keep production data unchanged until the owner explicitly approves the supported seed. Treat branch push, merge, production deployment, database seed, read-only production verification, local-main synchronization, and completed-worktree removal as the gated release sequence.
+
+Items 1–4 are complete. Item 5 remains intentionally gated: the branch is locally verified, but it has not been pushed or merged, and production has not been deployed or seeded from the August 20 fixture.
+
+6. Provision and link Vercel plus Neon, verify current sources, and record decisions.
+7. Bootstrap project memory, scaffold the strict Next.js application, and add deterministic documentation parity.
+8. Create the Drizzle schema, committed migration, idempotent 2026/27 seed, and source-neutral standings importer.
+9. Implement the accessible prediction sorter, review, atomic submission, receipt confirmation, deadline, and reveal rules.
+10. Implement derived leaderboard scoring, comparison pages, admin session/settings/submissions/manual standings/final controls, and import history.
+11. Add security headers, server validation, same-origin checks, honeypot, safe errors, and focused audit logging.
+12. Run format, lint, type, unit, integration, build, Playwright, dependency audit, responsive visual inspection, and production smoke tests.
+13. Generate current documentation HTML and QA evidence, create the private GitHub repository, merge the feature branch to `main`, deploy production, and leave local/remote state synchronized.
 
 Core implementation work proceeds autonomously. The only accepted blockers are an external consent/login step or missing project-owner direction for additional third-party artwork; the existing owner-provided club set uses the documented initials fallback if a local image fails.
 

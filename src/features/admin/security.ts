@@ -470,7 +470,9 @@ export function verifyAdminSessionToken(
 function adminCookieOptions(expires: Date) {
   return {
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
+    secure:
+      process.env.NODE_ENV === "production" &&
+      process.env.LOCAL_HTTP_E2E !== "1",
     sameSite: "strict" as const,
     path: "/",
     expires,

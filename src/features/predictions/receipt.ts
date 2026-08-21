@@ -6,6 +6,12 @@ import { cookies } from "next/headers";
 const RECEIPT_COOKIE = "pl_prediction_receipt";
 const RECEIPT_MAX_AGE_SECONDS = 60 * 60 * 24 * 400;
 
+function shouldUseSecureCookies() {
+  return (
+    process.env.NODE_ENV === "production" && process.env.LOCAL_HTTP_E2E !== "1"
+  );
+}
+
 export function createReceiptToken() {
   return randomBytes(32).toString("base64url");
 }
@@ -21,7 +27,7 @@ export async function setReceiptCookie(predictionId: string, token: string) {
     maxAge: RECEIPT_MAX_AGE_SECONDS,
     path: "/entries",
     sameSite: "strict",
-    secure: process.env.NODE_ENV === "production",
+    secure: shouldUseSecureCookies(),
   });
 }
 

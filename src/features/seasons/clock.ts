@@ -6,6 +6,7 @@ import { assertIsolatedDatabaseEnvironment } from "../../../scripts/test-databas
 
 type ClockEnvironment = {
   DATABASE_URL?: string;
+  LOCAL_HTTP_E2E?: string;
   NODE_ENV?: string;
   PL_PREDICTIONS_ISOLATED_TEST_DATABASE?: string;
   PL_PREDICTIONS_PRODUCTION_DATABASE_IDENTITY_SHA256?: string;
@@ -25,13 +26,15 @@ function hasVerifiedIsolatedDatabase(environment: ClockEnvironment): boolean {
 /**
  * Returns a fixed clock only when the fail-closed test-database wrapper has
  * verified that DATABASE_URL points at the isolated test target. Production
- * always uses PostgreSQL's live wall clock, even if test variables are set.
+ * always uses PostgreSQL's live wall clock unless the explicit local HTTP E2E
+ * harness flag accompanies that isolated-database attestation.
  */
 export function resolveIsolatedTestNow(
   environment: ClockEnvironment = process.env,
 ): Date | null {
   if (
-    environment.NODE_ENV === "production" ||
+    (environment.NODE_ENV === "production" &&
+      environment.LOCAL_HTTP_E2E !== "1") ||
     !environment.PL_PREDICTIONS_ISOLATED_TEST_DATABASE?.trim() ||
     !hasVerifiedIsolatedDatabase(environment)
   ) {

@@ -59,8 +59,16 @@ export function SubmissionCountdown({
     }
 
     updateCountdown();
-    const intervalId = window.setInterval(updateCountdown, 250);
-    return () => window.clearInterval(intervalId);
+    const boundaryDelay = 1_000 - (performance.now() % 1_000);
+    let intervalId: number | undefined;
+    const timeoutId = window.setTimeout(() => {
+      updateCountdown();
+      intervalId = window.setInterval(updateCountdown, 1_000);
+    }, boundaryDelay);
+    return () => {
+      window.clearTimeout(timeoutId);
+      if (intervalId !== undefined) window.clearInterval(intervalId);
+    };
   }, [initialRemaining]);
 
   useEffect(() => {
@@ -81,12 +89,9 @@ export function SubmissionCountdown({
 
   return (
     <div className="mt-3" data-testid="submission-countdown">
-      <div className="mb-1.5 flex items-center justify-between gap-3">
+      <div className="mb-1.5 flex items-center gap-3">
         <span className="text-[0.68rem] font-black tracking-[0.12em] text-white/75 uppercase">
           Locks in
-        </span>
-        <span className="text-[0.65rem] font-semibold text-white/55">
-          DD&nbsp;·&nbsp;HH&nbsp;·&nbsp;MM&nbsp;·&nbsp;SS
         </span>
       </div>
       <time

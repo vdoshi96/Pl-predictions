@@ -29,7 +29,7 @@ export function SpotlightPickGrid({
     <div className={cn("grid gap-2 sm:grid-cols-2 lg:grid-cols-3", className)}>
       {picks.map((pick) => (
         <div
-          className="border-border flex min-h-16 min-w-0 items-center gap-2.5 rounded-xl border bg-[#fcf9fd] p-2.5"
+          className="border-border bg-surface-lilac flex min-h-16 min-w-0 items-center gap-2.5 rounded-xl border p-2.5"
           data-category={pick.category}
           key={pick.category}
         >
@@ -48,7 +48,7 @@ export function SpotlightPickGrid({
             />
           )}
           <div className="min-w-0 grow">
-            <span className="block text-[0.6rem] leading-4 font-black tracking-wide text-[#8f0033] uppercase">
+            <span className="text-rose-ink block text-[0.6rem] leading-4 font-black tracking-wide uppercase">
               {pick.label}
             </span>
             <strong className="text-brand-strong block text-xs leading-4 break-words">

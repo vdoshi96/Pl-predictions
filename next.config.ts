@@ -1,5 +1,8 @@
 import type { NextConfig } from "next";
 
+const isProductionBuild = process.env.NODE_ENV === "production";
+const isLocalHttpE2E = process.env.LOCAL_HTTP_E2E === "1";
+
 const contentSecurityPolicy = [
   "default-src 'self'",
   "base-uri 'self'",
@@ -9,9 +12,9 @@ const contentSecurityPolicy = [
   "frame-ancestors 'none'",
   "img-src 'self' data:",
   "object-src 'none'",
-  `script-src 'self' 'unsafe-inline'${process.env.NODE_ENV === "production" ? "" : " 'unsafe-eval'"}`,
+  `script-src 'self' 'unsafe-inline'${isProductionBuild ? "" : " 'unsafe-eval'"}`,
   "style-src 'self' 'unsafe-inline'",
-  ...(process.env.NODE_ENV === "production"
+  ...(isProductionBuild && !isLocalHttpE2E
     ? ["upgrade-insecure-requests"]
     : []),
 ].join("; ");

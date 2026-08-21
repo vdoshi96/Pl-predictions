@@ -41,7 +41,7 @@ describe("HowToPlay", () => {
     ).toBeVisible();
     expect(screen.getByText(/Complete all seven categories/iu)).toBeVisible();
     expect(
-      screen.getByText(/Confirm the review shows 20 clubs/iu),
+      screen.getByText(/Confirm the champion, seven spotlight picks/iu),
     ).toBeVisible();
   });
 });

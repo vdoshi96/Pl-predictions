@@ -170,6 +170,17 @@ export function SearchablePredictionSelect({
     }
   }
 
+  function commitValueFromPointer(nextValue: Exclude<SelectValue, null>) {
+    onChange(nextValue);
+  }
+
+  function finishPointerSelection(nextValue: Exclude<SelectValue, null>) {
+    window.setTimeout(() => {
+      closePicker();
+      if (nextValue === "other") otherInputRef.current?.focus();
+    }, 100);
+  }
+
   function handleKeyDown(event: KeyboardEvent<HTMLInputElement>) {
     if (disabled) return;
 
@@ -244,7 +255,7 @@ export function SearchablePredictionSelect({
           aria-invalid={invalid}
           autoComplete="off"
           className={cn(
-            "text-brand-strong min-h-12 w-full rounded-xl border bg-white pr-11 pl-10 text-base outline-none placeholder:text-slate-400 focus:ring-2 focus:ring-[#dffcff] disabled:cursor-not-allowed disabled:bg-slate-100",
+            "text-brand-strong focus:ring-sky-soft min-h-12 w-full rounded-xl border bg-white pr-11 pl-10 text-base outline-none placeholder:text-slate-400 focus:ring-2 disabled:cursor-not-allowed disabled:bg-slate-100",
             invalid
               ? "border-red-400"
               : "border-border focus:border-accent-lilac",
@@ -260,7 +271,11 @@ export function SearchablePredictionSelect({
             setQuery(event.target.value);
             setActiveIndex(0);
           }}
-          onFocus={openPicker}
+          onFocus={(event) => {
+            const input = event.currentTarget;
+            input.scrollIntoView?.({ block: "center" });
+            openPicker();
+          }}
           onKeyDown={handleKeyDown}
           placeholder="Search by name…"
           type="text"
@@ -290,7 +305,7 @@ export function SearchablePredictionSelect({
           id={listboxId}
           role="listbox"
           aria-label={`${label} options`}
-          className="border-border absolute inset-x-0 top-[calc(100%+0.35rem)] z-30 max-h-72 overflow-y-auto overscroll-contain rounded-xl border bg-white p-1.5 shadow-2xl"
+          className="border-border fixed inset-x-2 bottom-[max(0.5rem,env(safe-area-inset-bottom))] z-40 max-h-[min(22rem,52dvh)] overflow-y-auto overscroll-contain rounded-2xl border bg-white p-1.5 shadow-2xl sm:absolute sm:inset-x-0 sm:top-[calc(100%+0.35rem)] sm:bottom-auto sm:z-30 sm:max-h-72 sm:rounded-xl"
         >
           {queryReady && matchingOptions.length > filteredOptions.length ? (
             <p className="px-3 py-2 text-xs font-bold text-slate-500">
@@ -316,7 +331,11 @@ export function SearchablePredictionSelect({
                   ? "bg-brand-soft text-brand-strong"
                   : "hover:bg-slate-50",
               )}
-              onMouseDown={(event) => event.preventDefault()}
+              onMouseDown={(event) => {
+                event.preventDefault();
+                commitValueFromPointer(option.id);
+              }}
+              onMouseUp={() => finishPointerSelection(option.id)}
               onMouseEnter={() => setActiveIndex(index)}
               onClick={() => selectValue(option.id)}
             >
@@ -327,7 +346,7 @@ export function SearchablePredictionSelect({
               {value === option.id ? (
                 <Check
                   aria-hidden="true"
-                  className="size-4 shrink-0 text-[#08734f]"
+                  className="text-mint-ink size-4 shrink-0"
                 />
               ) : null}
             </button>
@@ -345,7 +364,11 @@ export function SearchablePredictionSelect({
                   ? "bg-brand-soft text-brand-strong"
                   : "text-brand hover:bg-slate-50",
               )}
-              onMouseDown={(event) => event.preventDefault()}
+              onMouseDown={(event) => {
+                event.preventDefault();
+                commitValueFromPointer("other");
+              }}
+              onMouseUp={() => finishPointerSelection("other")}
               onMouseEnter={() => setActiveIndex(filteredOptions.length)}
               onClick={() => selectValue("other")}
             >
@@ -353,7 +376,7 @@ export function SearchablePredictionSelect({
               {value === "other" ? (
                 <Check
                   aria-hidden="true"
-                  className="ml-auto size-4 text-[#08734f]"
+                  className="text-mint-ink ml-auto size-4"
                 />
               ) : null}
             </button>
@@ -377,7 +400,7 @@ export function SearchablePredictionSelect({
       ) : null}
 
       {value === "other" ? (
-        <div className="mt-3 rounded-xl bg-[#fcf9fd] p-3 ring-1 ring-[#eadfed]">
+        <div className="bg-surface-lilac ring-surface-lilac-border mt-3 rounded-xl p-3 ring-1">
           <label
             htmlFor={otherInputId}
             className="text-brand-strong text-xs font-black"
@@ -388,7 +411,7 @@ export function SearchablePredictionSelect({
             ref={otherInputRef}
             id={otherInputId}
             className={cn(
-              "text-brand-strong mt-1.5 min-h-12 w-full rounded-xl border bg-white px-3.5 text-base outline-none placeholder:text-slate-400 focus:ring-2 focus:ring-[#dffcff]",
+              "text-brand-strong focus:ring-sky-soft mt-1.5 min-h-12 w-full rounded-xl border bg-white px-3.5 text-base outline-none placeholder:text-slate-400 focus:ring-2",
               invalid
                 ? "border-red-400"
                 : "border-border focus:border-accent-lilac",

@@ -319,7 +319,7 @@ export default async function SpotlightPage({
                           </span>
                         </div>
                         <div className="text-right">
-                          <strong className="block text-2xl font-black text-[#c80047] tabular-nums">
+                          <strong className="text-rose-score block text-2xl font-black tabular-nums">
                             {displayedScore}
                           </strong>
                           <span className="text-[0.65rem] font-bold tracking-wide text-slate-500 uppercase">

@@ -21,7 +21,7 @@ export const ROSTER_TRANSITION_PLAYER_PICKS = [
     category: "underdog_player",
     label: "Underdog player",
     option: "Alysson",
-    portraitPath: "/player-faces/aston_villa_alysson_alysson.png",
+    portraitPath: "/player-faces/aston_villa_unknown_alysson.png",
     search: "Alysson",
   },
 ] as const;

@@ -19,6 +19,18 @@
   --danger-soft: #fde8e8;
   --warning: #8a5a00;
   --warning-soft: #fff2cc;
+  --mint: #ddffef;
+  --mint-ink: #075d42;
+  --mint-ink-strong: #064c37;
+  --sky-soft: #dffcff;
+  --rose-ink: #8f0033;
+  --rose-score: #c80047;
+  --rose-soft: #ffe3ef;
+  --surface-lilac: #fcf9fd;
+  --surface-lilac-border: #eadfed;
+  --accent-pressed: #00dc75;
+  --brand-pressed: #e8d9eb;
+  --brand-hover: #4b0b50;
   --shadow: 0 22px 70px rgb(55 0 60 / 12%);
 }
 
@@ -41,6 +53,18 @@
   --color-danger-soft: var(--danger-soft);
   --color-warning: var(--warning);
   --color-warning-soft: var(--warning-soft);
+  --color-mint: var(--mint);
+  --color-mint-ink: var(--mint-ink);
+  --color-mint-ink-strong: var(--mint-ink-strong);
+  --color-sky-soft: var(--sky-soft);
+  --color-rose-ink: var(--rose-ink);
+  --color-rose-score: var(--rose-score);
+  --color-rose-soft: var(--rose-soft);
+  --color-surface-lilac: var(--surface-lilac);
+  --color-surface-lilac-border: var(--surface-lilac-border);
+  --color-accent-pressed: var(--accent-pressed);
+  --color-brand-pressed: var(--brand-pressed);
+  --color-brand-hover: var(--brand-hover);
   --font-sans: "Avenir Next", "Segoe UI", Helvetica, Arial, sans-serif;
   --font-mono: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
 }

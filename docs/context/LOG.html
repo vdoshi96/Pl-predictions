@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="generated-by" content="scripts/generate-docs-html.mjs" />
     <meta name="canonical-source" content="LOG.md" />
-    <meta name="canonical-source-sha256" content="bcedacee8add2a54efee1b2ce9184ce3a64434564ea0d0c54eb4aecb5f75a87f" />
+    <meta name="canonical-source-sha256" content="7fcf2f5339724adf41c142409832c788491f83b3760194878b2a4f81871f9e47" />
     <title>Session log</title>
     <style>
       :root { color-scheme: light dark; font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
@@ -49,7 +49,12 @@
 <li>Passed the production-server pre-kickoff matrix with 7 routed journeys and 13 intentional project skips across desktop/mobile Chromium, exact 320/430-pixel participant and administrator reflow, and mobile WebKit. Passed the fixed-clock post-kickoff matrix with 3 routed Chromium journeys and 2 intentional skips. The explicit <code>LOCAL_HTTP_E2E=1</code> harness permits local HTTP CSP, cookies, and fixed time only for this isolated production-build QA path; ordinary production builds retain secure-cookie, HTTPS-upgrade, and database-clock behavior.</li>
 <li>Read back the final normal production build&#39;s <code>/rules</code> response as HTTP 200 with the expected CSP, including <code>upgrade-insecure-requests</code> and no development-only <code>unsafe-eval</code>.</li>
 <li>Recaptured and visually inspected the three 390-by-844 mobile walkthrough images. Stage 3 now documents the compact top-5, collapsed-middle, and bottom-3 table review rather than duplicating the Stage 2 spotlight view.</li>
-<li>Release, production seed, and production verification remain gated. No production data changed.</li>
+<li>Published the implementation through <a href="https://github.com/vdoshi96/Pl-predictions/pull/21">PR #21</a>, merged as <code>a033f3613f57c37720e2f0db51ada63965a4783c</code>, and deployed it before the database change. Captured a read-only pre-seed marker at 2026-08-21 15:51:21 UTC and WAL <code>0/9675540</code>, then ran the approved supported production seed exactly once.</li>
+<li>The seed produced 580 active players, 33 preserved inactive rows, 578 portrait paths, and the two expected silhouettes. Prediction aggregates stayed at 11 parents, 220 table rows, and 77 spotlight picks; lock/reveal, standings, result, and audit state did not change.</li>
+<li>The first production smoke exposed a pointer-completion regression and a stale compact-review assertion. Fixed both through <a href="https://github.com/vdoshi96/Pl-predictions/pull/22">PR #22</a>, added support for the existing Vercel automation bypass on protected previews, and kept the CSP exception limited to Vercel&#39;s injected preview-comments script.</li>
+<li>PR #22 merged as <code>947118f5304271b5ae2a824329080b83d4d80723</code>. Vercel deployment <code>dpl_J3We57iVsWDMbKSFkoCDTi62mhCz</code> became Ready at <a href="https://pl-predictions-9z25e3j3o-vdoshi96s-projects.vercel.app">its immutable URL</a> and passed stable-alias deployment-ID read-back.</li>
+<li>Passed the final anonymous read-only smoke in all five browser projects. Verified all 578 portrait URLs as valid PNG responses, the live 580-player catalogue and representative August 20 additions, unchanged post-smoke database aggregates, and zero bounded error, fatal, or HTTP 500 log records.</li>
+<li>Replaced the seven retained production screenshots, preserved the four current isolated-state captures, visually inspected the complete 11-image set, and recorded manifest SHA-256 <code>ce86bcde91820a97a11d08529ef6a592c9a3b03657a5c5e683f1999399fc2ce6</code>.</li>
 </ul>
 <h2 id="2026-08-14">2026-08-14</h2>
 <h3 id="adversarial-review-remediation-production-release-complete-evidence-closeout-pending">Adversarial-review remediation (production release complete; evidence closeout pending)</h3>
@@ -269,7 +274,7 @@
 <li>Next handoff: use <code>main</code> as the base for future pull requests. No GitHub access blocker remains for the current repository workflow.</li>
 </ul>
 
-      <p class="source">Generated deterministically from <a href="LOG.md">docs/context/LOG.md</a>. Canonical SHA-256: <code>bcedacee8add2a54efee1b2ce9184ce3a64434564ea0d0c54eb4aecb5f75a87f</code>.</p>
+      <p class="source">Generated deterministically from <a href="LOG.md">docs/context/LOG.md</a>. Canonical SHA-256: <code>7fcf2f5339724adf41c142409832c788491f83b3760194878b2a4f81871f9e47</code>.</p>
     </main>
   </body>
 </html>

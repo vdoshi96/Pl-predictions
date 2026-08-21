@@ -1,6 +1,6 @@
 # Implementation plan
 
-## August 20 catalogue and Oxalpha UI remediation (local verification complete; release gated)
+## August 20 catalogue and Oxalpha UI remediation (release complete; repository closeout pending)
 
 1. Start from verified GitHub `main` in a new worktree and discard the superseded unmerged UI branch, while preserving unrelated private handoffs and report files in the primary checkout.
 2. Implement the 20 report findings across mobile density, drag and keyboard interaction, selector containment, validation focus, review length, navigation, leaderboard presentation, countdown timing, viewport metadata, design tokens, and render/write performance.
@@ -8,7 +8,7 @@
 4. Regenerate the three mobile how-to screenshots from the current flow, synchronize every Markdown/HTML pair, and run formatting, lint, TypeScript, unit/component, isolated integration, production build, and desktop/mobile browser checks.
 5. Keep production data unchanged until the owner explicitly approves the supported seed. Treat branch push, merge, production deployment, database seed, read-only production verification, local-main synchronization, and completed-worktree removal as the gated release sequence.
 
-Items 1–4 are complete. Item 5 remains intentionally gated: the branch is locally verified, but it has not been pushed or merged, and production has not been deployed or seeded from the August 20 fixture.
+Items 1–5 are complete through production verification. PR #21 released the UI and catalogue changes, PR #22 released the pointer-selection and protected-preview smoke fixes, deployment `dpl_J3We57iVsWDMbKSFkoCDTi62mhCz` owns the stable alias, and the approved production seed ran exactly once. The remaining closeout work is documentation/evidence merge, local-main synchronization, and completed-worktree and branch cleanup.
 
 6. Provision and link Vercel plus Neon, verify current sources, and record decisions.
 7. Bootstrap project memory, scaffold the strict Next.js application, and add deterministic documentation parity.

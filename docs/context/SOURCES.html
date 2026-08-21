@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="generated-by" content="scripts/generate-docs-html.mjs" />
     <meta name="canonical-source" content="SOURCES.md" />
-    <meta name="canonical-source-sha256" content="8e12c635880de20235a249cec43c1d50df8efc1c24a4a288df33ebad81e1cae8" />
+    <meta name="canonical-source-sha256" content="3c4f4186313a1435be26aaa210c90f1bb35de28d4cd5dcc1b0e163c6153642f6" />
     <title>Sources</title>
     <style>
       :root { color-scheme: light dark; font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
@@ -65,8 +65,8 @@
 <li>Application use: roster rows are imported into the season catalogue and reviewed portraits are copied to local <code>/player-faces/</code> paths. <code>PlayerMark</code> uses its generic silhouette when an asset path is absent or an image fails.</li>
 <li>Runtime boundary: the deployed application does not execute the handoff&#39;s acquisition scripts, call those upstream sources, scrape player pages, or hotlink portraits. Other player covers unavailable or newly added players.</li>
 <li>Outcome boundary: this is a selector identity and portrait snapshot, not a goals, assists, clean-sheets, or player-rating result feed. Offline work may acquire those outcomes, but reviewed facts enter only through the authenticated manual results desk.</li>
-<li>Decision and follow-up: use the August 20 rows and 578 verified portraits as the current repository fixture, preserve two runtime silhouette fallbacks, and do not retain names removed from the owner-selected roster as active selector options. Releasing the fixture and changing production rows require the normal deployment gate and explicit approval for the supported production seed.</li>
-<li>Production boundary: production still has the verified August 13 state: 599 total rows, 582 active players, 17 preserved inactive rows, and 582 distinct active portrait paths. No August 20 production seed has run. This state does not change the no-runtime-acquisition boundary.</li>
+<li>Decision and follow-up: use the August 20 rows and 578 verified portraits as the current repository and production fixture, preserve two runtime silhouette fallbacks, and do not retain names removed from the owner-selected roster as active selector options. The normal deployment gate and explicit approval for one supported production seed completed on 2026-08-21.</li>
+<li>Production boundary: production has 613 total player rows, 580 active players, 33 preserved inactive rows, 578 active portrait paths, and two null portrait paths for the documented silhouettes. This state does not change the no-runtime-acquisition boundary.</li>
 </ul>
 <h2 id="season-sources-and-permission-disposition">Season sources and permission disposition</h2>
 <ul>
@@ -93,7 +93,7 @@
 <p>Current official Next.js, React, Node.js/Vercel runtime, Tailwind CSS, dnd-kit, Neon, Drizzle, Vercel Marketplace/Git integration, Vercel Authentication, and GitHub documentation informed the pinned stack and deployment flow. Exact links, decisions, caveats, rejected alternatives, and failure behavior are recorded in <code>docs/RESEARCH.md</code>.</p>
 <p>Implementation and current checked-out behavior remain authoritative when a historical note differs.</p>
 
-      <p class="source">Generated deterministically from <a href="SOURCES.md">docs/context/SOURCES.md</a>. Canonical SHA-256: <code>8e12c635880de20235a249cec43c1d50df8efc1c24a4a288df33ebad81e1cae8</code>.</p>
+      <p class="source">Generated deterministically from <a href="SOURCES.md">docs/context/SOURCES.md</a>. Canonical SHA-256: <code>3c4f4186313a1435be26aaa210c90f1bb35de28d4cd5dcc1b0e163c6153642f6</code>.</p>
     </main>
   </body>
 </html>

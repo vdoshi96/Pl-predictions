@@ -53,6 +53,13 @@ const snapshotIds = {
   player_ratings: "00000000-0000-4000-8000-000000000012",
 } as const;
 
+const pickedSubjects = {
+  assists: [],
+  clean_sheets: [],
+  goals: [playerC],
+  player_ratings: [playerC],
+} as const;
+
 const datasets: ResultDeskDataset[] = [
   {
     activeSnapshot: null,
@@ -60,6 +67,7 @@ const datasets: ResultDeskDataset[] = [
     coveredThroughRank: 2,
     dataset: "goals" as const,
     pinnedAliases: [],
+    publishedRows: [],
     pointers: {
       activeSnapshotId: null,
       finalSnapshotId: null,
@@ -78,6 +86,7 @@ const datasets: ResultDeskDataset[] = [
     coveredThroughRank: 2,
     dataset: "assists" as const,
     pinnedAliases: [],
+    publishedRows: [],
     pointers: {
       activeSnapshotId: null,
       finalSnapshotId: null,
@@ -96,6 +105,7 @@ const datasets: ResultDeskDataset[] = [
     coveredThroughRank: 2,
     dataset: "clean_sheets" as const,
     pinnedAliases: [],
+    publishedRows: [],
     pointers: {
       activeSnapshotId: null,
       finalSnapshotId: null,
@@ -114,6 +124,7 @@ const datasets: ResultDeskDataset[] = [
     coveredThroughRank: 2,
     dataset: "player_ratings" as const,
     pinnedAliases: [],
+    publishedRows: [],
     pointers: {
       activeSnapshotId: null,
       finalSnapshotId: null,
@@ -141,16 +152,32 @@ function renderDesk(datasetInput = datasets) {
       ]}
       bracketCount={2}
       datasets={datasetInput}
+      pickedSubjects={pickedSubjects}
       players={[
-        { active: true, id: playerA, label: "Alice — ARS" },
-        { active: true, id: playerB, label: "Bea — LIV" },
-        { active: false, id: playerC, label: "Casey — CHE" },
+        {
+          active: true,
+          id: playerA,
+          label: "Alice — ARS",
+          names: ["Alice"],
+        },
+        {
+          active: true,
+          id: playerB,
+          label: "Bea — LIV",
+          names: ["Bea"],
+        },
+        {
+          active: false,
+          id: playerC,
+          label: "Casey — CHE",
+          names: ["Casey"],
+        },
       ]}
       publishReady
       seasonName="2026/27 Premier League"
       teams={[
-        { id: teamA, label: "Arsenal" },
-        { id: teamB, label: "Liverpool" },
+        { id: teamA, label: "Arsenal", names: ["Arsenal"] },
+        { id: teamB, label: "Liverpool", names: ["Liverpool"] },
       ]}
     />,
   );
@@ -250,11 +277,26 @@ describe("SpotlightResultsDesk", () => {
     );
   });
 
-  it("keeps publishing blocked until an Other spelling is actually saved", async () => {
+  it("keeps review confirmation blocked until an Other spelling is saved", async () => {
     renderDesk();
+    const goalsHeading = screen.getByRole("heading", {
+      level: 2,
+      name: "Top scorer",
+    });
+    const goalsCard = goalsHeading.closest(".rounded-2xl");
+    expect(goalsCard).not.toBeNull();
+    const goals = within(goalsCard as HTMLElement);
+    fireEvent.click(
+      goals.getByRole("button", { name: "Review & publish" }),
+    );
+    let dialog = screen.getByRole("dialog", {
+      name: "Review and publish Top scorer",
+    });
+    fireEvent.click(within(dialog).getByRole("checkbox"));
     expect(
-      screen.getAllByRole("button", { name: "Publish provisional" })[0],
+      within(dialog).getByRole("button", { name: "Publish provisional" }),
     ).toBeDisabled();
+    fireEvent.click(within(dialog).getByRole("button", { name: "Cancel" }));
 
     const aliasSelect = screen.getByRole("combobox", {
       name: "Catalogue match",
@@ -264,23 +306,24 @@ describe("SpotlightResultsDesk", () => {
     fireEvent.click(
       screen.getByRole("option", { name: /Casey — CHE \(inactive\)/ }),
     );
-    expect(
-      screen.getAllByRole("button", { name: "Publish provisional" })[0],
-    ).toBeDisabled();
 
     fireEvent.click(screen.getByRole("button", { name: "Save match" }));
     await waitFor(() => expect(saveAlias).toHaveBeenCalledTimes(1));
-    expect(
-      screen.getAllByRole("button", { name: "Publish provisional" })[0],
-    ).toBeDisabled();
-    fireEvent.click(screen.getAllByRole("button", { name: "Save draft" })[0]!);
-    await waitFor(() => expect(saveDraft).toHaveBeenCalledTimes(1));
-    fireEvent.click(screen.getAllByRole("checkbox")[0]!);
-    await waitFor(() =>
-      expect(
-        screen.getAllByRole("button", { name: "Publish provisional" })[0],
-      ).toBeEnabled(),
+    fireEvent.click(
+      goals.getByRole("button", { name: "Review & publish" }),
     );
+    dialog = screen.getByRole("dialog", {
+      name: "Review and publish Top scorer",
+    });
+    fireEvent.click(within(dialog).getByRole("checkbox"));
+    expect(
+      within(dialog).getByRole("button", { name: "Publish provisional" }),
+    ).toBeEnabled();
+    fireEvent.click(
+      within(dialog).getByRole("button", { name: "Publish provisional" }),
+    );
+    await waitFor(() => expect(saveDraft).toHaveBeenCalledTimes(1));
+    await waitFor(() => expect(publish).toHaveBeenCalledTimes(1));
   });
 
   it("binds finalization to the displayed active snapshot, not a newer working draft", () => {
@@ -325,48 +368,125 @@ describe("SpotlightResultsDesk", () => {
     const cleanSheetsCard = cleanSheetsHeading.closest(".rounded-2xl");
     expect(cleanSheetsCard).not.toBeNull();
     const controls = within(cleanSheetsCard as HTMLElement);
-    fireEvent.click(controls.getByRole("checkbox"));
     fireEvent.click(
-      controls.getByRole("button", { name: "Publish provisional" }),
+      controls.getByRole("button", { name: "Review & publish" }),
+    );
+    const dialog = screen.getByRole("dialog", {
+      name: "Review and publish Most clean sheets",
+    });
+    fireEvent.click(within(dialog).getByRole("checkbox"));
+    fireEvent.click(
+      within(dialog).getByRole("button", { name: "Publish provisional" }),
     );
 
     await waitFor(() => expect(publish).toHaveBeenCalledTimes(1));
-    expect(controls.getByRole("checkbox")).not.toBeChecked();
     expect(
-      controls.getByRole("button", { name: "Publish provisional" }),
+      controls.getByRole("button", { name: "Review & publish" }),
     ).toBeDisabled();
   });
 
-  it("uses aliases returned by the saved snapshot instead of stale local assumptions", async () => {
+  it("publishes the exact snapshot returned by the combined save", async () => {
+    const returnedSnapshotId = "00000000-0000-4000-8000-000000000099";
     saveDraft.mockResolvedValueOnce({
-      message: "Draft saved from current database aliases.",
+      message: "Draft saved.",
       ok: true,
-      pinnedAliases: [
-        {
-          normalizedCustomPlayerName: "new striker",
-          playerId: playerA,
-        },
-      ],
-      snapshotId: snapshotIds.goals,
+      pinnedAliases: [],
+      snapshotId: returnedSnapshotId,
     });
     renderDesk();
-    const aliasSelect = screen.getByRole("combobox", {
-      name: "Catalogue match",
+    const cleanSheetsHeading = screen.getByRole("heading", {
+      level: 2,
+      name: "Most clean sheets",
     });
-    fireEvent.focus(aliasSelect);
-    fireEvent.change(aliasSelect, { target: { value: "Casey" } });
+    const cleanSheetsCard = cleanSheetsHeading.closest(".rounded-2xl");
+    expect(cleanSheetsCard).not.toBeNull();
     fireEvent.click(
-      screen.getByRole("option", { name: /Casey — CHE \(inactive\)/ }),
+      within(cleanSheetsCard as HTMLElement).getByRole("button", {
+        name: "Review & publish",
+      }),
     );
-    fireEvent.click(screen.getByRole("button", { name: "Save match" }));
-    await waitFor(() => expect(saveAlias).toHaveBeenCalledTimes(1));
-    fireEvent.click(screen.getAllByRole("button", { name: "Save draft" })[0]!);
-    await waitFor(() => expect(saveDraft).toHaveBeenCalledTimes(1));
-    fireEvent.click(screen.getAllByRole("checkbox")[0]!);
+    const dialog = screen.getByRole("dialog", {
+      name: "Review and publish Most clean sheets",
+    });
+    fireEvent.click(within(dialog).getByRole("checkbox"));
+    fireEvent.click(
+      within(dialog).getByRole("button", { name: "Publish provisional" }),
+    );
+
+    await waitFor(() => expect(publish).toHaveBeenCalledTimes(1));
+    expect(publish).toHaveBeenCalledWith(
+      expect.objectContaining({
+        coverageAttested: true,
+        workingSnapshotId: returnedSnapshotId,
+      }),
+    );
+  });
+
+  it("seeds only missing submitted subjects and preserves existing rows", () => {
+    renderDesk();
+    const goalsHeading = screen.getByRole("heading", {
+      level: 2,
+      name: "Top scorer",
+    });
+    const goalsCard = goalsHeading.closest(".rounded-2xl");
+    expect(goalsCard).not.toBeNull();
+    const goals = within(goalsCard as HTMLElement);
+
+    fireEvent.click(
+      goals.getByRole("button", { name: "Seed from submissions" }),
+    );
 
     expect(
-      screen.getAllByRole("button", { name: "Publish provisional" })[0],
-    ).toBeDisabled();
+      goals.getByRole("spinbutton", {
+        name: /Top scorer Goals for Casey/,
+      }),
+    ).toHaveValue(0);
+    expect(
+      goals.getByRole("spinbutton", {
+        name: /Top scorer Goals for Alice/,
+      }),
+    ).toHaveValue(20);
+  });
+
+  it("keeps a saved draft recoverable when combined publishing fails", async () => {
+    const returnedSnapshotId = "00000000-0000-4000-8000-000000000097";
+    saveDraft.mockResolvedValueOnce({
+      message: "Draft saved.",
+      ok: true,
+      pinnedAliases: [],
+      snapshotId: returnedSnapshotId,
+    });
+    publish.mockResolvedValueOnce({
+      message: "Coverage incomplete.",
+      ok: false,
+    });
+    renderDesk();
+    const cleanSheetsHeading = screen.getByRole("heading", {
+      level: 2,
+      name: "Most clean sheets",
+    });
+    const cleanSheetsCard = cleanSheetsHeading.closest(".rounded-2xl");
+    expect(cleanSheetsCard).not.toBeNull();
+    const cleanSheets = within(cleanSheetsCard as HTMLElement);
+    fireEvent.click(
+      cleanSheets.getByRole("button", { name: "Review & publish" }),
+    );
+    const dialog = screen.getByRole("dialog", {
+      name: "Review and publish Most clean sheets",
+    });
+    fireEvent.click(within(dialog).getByRole("checkbox"));
+    fireEvent.click(
+      within(dialog).getByRole("button", { name: "Publish provisional" }),
+    );
+
+    expect(await screen.findByText("Coverage incomplete.")).toBeVisible();
+    expect(saveDraft).toHaveBeenCalledTimes(1);
+    expect(publish).toHaveBeenCalledWith(
+      expect.objectContaining({ workingSnapshotId: returnedSnapshotId }),
+    );
+    expect(
+      cleanSheets.getByRole("button", { name: "Review & publish" }),
+    ).toBeEnabled();
   });
 
   it("can create and match a genuinely new inactive result-only player", async () => {

@@ -23,6 +23,7 @@ import {
   isSpotlightResultDataset,
   SPOTLIGHT_RESULT_DATASETS,
 } from "@/features/results";
+import { getPickedSubjectsByDataset } from "@/features/results/seed-queries";
 import {
   getActiveSeasonContext,
   getSeasonTeams,
@@ -51,12 +52,14 @@ export default async function AdminResultsPage() {
     [bracketCountRow],
     customPicks,
     aliases,
+    pickedSubjects,
   ] = await Promise.all([
     db
       .select({
         displayName: players.displayName,
         id: players.id,
         isActive: players.isActive,
+        sortName: players.sortName,
         teamId: players.teamId,
       })
       .from(players)
@@ -98,6 +101,7 @@ export default async function AdminResultsPage() {
       })
       .from(spotlightResultAliases)
       .where(eq(spotlightResultAliases.seasonId, season.id)),
+    getPickedSubjectsByDataset(season.id),
   ]);
 
   const stateByDataset = new Map(
@@ -203,6 +207,15 @@ export default async function AdminResultsPage() {
           finalSnapshotId: state?.finalSnapshotId ?? null,
           workingSnapshotId: state?.workingSnapshotId ?? null,
         },
+        publishedRows: state?.activeSnapshotId
+          ? itemRows.flatMap((item) => {
+              if (item.snapshotId !== state.activeSnapshotId) return [];
+              const subjectId = item.playerId ?? item.teamId;
+              return subjectId
+                ? [{ metricValue: item.metricValue, subjectId }]
+                : [];
+            })
+          : [],
         rows: editorSnapshotId
           ? itemRows.flatMap((item) => {
               if (item.snapshotId !== editorSnapshotId) return [];
@@ -284,18 +297,21 @@ export default async function AdminResultsPage() {
           aliases={resultAliases}
           bracketCount={bracketCount}
           datasets={datasets}
+          pickedSubjects={pickedSubjects}
           players={seasonPlayers.map((player) => ({
             active: player.isActive,
             id: player.id,
             label: player.teamId
               ? `${player.displayName} — ${teamById.get(player.teamId)?.shortName ?? "Unknown club"}`
               : player.displayName,
+            names: [player.displayName, player.sortName],
           }))}
           publishReady={access.predictionsRevealed && !access.submissionsOpen}
           seasonName={season.name}
           teams={seasonTeams.map((team) => ({
             id: team.id,
             label: team.displayName,
+            names: [team.displayName, team.shortName, team.sortName],
           }))}
         />
       </div>

@@ -170,11 +170,8 @@ export function SearchablePredictionSelect({
     }
   }
 
-  function commitValueFromPointer(nextValue: Exclude<SelectValue, null>) {
+  function selectValueFromPointer(nextValue: Exclude<SelectValue, null>) {
     onChange(nextValue);
-  }
-
-  function finishPointerSelection(nextValue: Exclude<SelectValue, null>) {
     window.setTimeout(() => {
       closePicker();
       if (nextValue === "other") otherInputRef.current?.focus();
@@ -333,9 +330,8 @@ export function SearchablePredictionSelect({
               )}
               onMouseDown={(event) => {
                 event.preventDefault();
-                commitValueFromPointer(option.id);
+                selectValueFromPointer(option.id);
               }}
-              onMouseUp={() => finishPointerSelection(option.id)}
               onMouseEnter={() => setActiveIndex(index)}
               onClick={() => selectValue(option.id)}
             >
@@ -366,9 +362,8 @@ export function SearchablePredictionSelect({
               )}
               onMouseDown={(event) => {
                 event.preventDefault();
-                commitValueFromPointer("other");
+                selectValueFromPointer("other");
               }}
-              onMouseUp={() => finishPointerSelection("other")}
               onMouseEnter={() => setActiveIndex(filteredOptions.length)}
               onClick={() => selectValue("other")}
             >

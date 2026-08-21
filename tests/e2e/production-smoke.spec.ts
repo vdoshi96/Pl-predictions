@@ -99,12 +99,20 @@ test("production public routes are mobile-safe and healthy", async ({
   const networkErrors: string[] = [];
   const unexpectedMutationRequests: string[] = [];
   const productionOrigin = new URL(process.env.PLAYWRIGHT_BASE_URL!).origin;
+  const isBlockedVercelPreviewToolbar = (text: string) =>
+    Boolean(process.env.VERCEL_AUTOMATION_BYPASS_SECRET) &&
+    /vercel\.live\/_next-live\/feedback\/feedback\.js/iu.test(text) &&
+    /Content Security Policy/iu.test(text);
   const isCanceledWebKitAdminPrefetch = (text: string) =>
     testInfo.project.name === "mobile-webkit" &&
     /\/admin\?_rsc=\S+ due to access control checks\.$/u.test(text);
   page.on("console", (message) => {
     const text = message.text();
-    if (message.type() === "error" && !isCanceledWebKitAdminPrefetch(text)) {
+    if (
+      message.type() === "error" &&
+      !isCanceledWebKitAdminPrefetch(text) &&
+      !isBlockedVercelPreviewToolbar(text)
+    ) {
       browserErrors.push(text);
     }
   });
@@ -307,12 +315,15 @@ test("production public routes are mobile-safe and healthy", async ({
     });
     await expect(customPlayerFallback.locator("img")).toHaveCount(0);
     await expect(customPlayerFallback.locator("svg")).toBeVisible();
+    const reviewTable = reviewDialog.getByRole("group", {
+      name: "Prediction review, positions 1 through 20",
+    });
+    await expect(reviewTable.locator("li")).toHaveCount(20);
+    await expect(reviewTable.getByRole("listitem")).toHaveCount(8);
+    await reviewTable.getByText("Show all 20 clubs", { exact: true }).click();
+    await expect(reviewTable.getByRole("listitem")).toHaveCount(20);
     await expectClubMarksLoaded(
-      reviewDialog
-        .getByRole("list", {
-          name: "Prediction review, positions 1 through 20",
-        })
-        .getByRole("img", { name: / club mark$/u }),
+      reviewTable.getByRole("img", { name: / club mark$/u }),
     );
     const reviewScroller = reviewDialog.locator(".overflow-y-auto");
     await reviewScroller.evaluate((element) => {

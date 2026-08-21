@@ -4,6 +4,8 @@ import { resolvePlaywrightExecutionMode } from "./tests/test-environment-safety"
 
 const executionMode = resolvePlaywrightExecutionMode(process.env);
 const isProductionWriteSmoke = executionMode === "remote-write";
+const vercelAutomationBypassSecret =
+  process.env.VERCEL_AUTOMATION_BYPASS_SECRET?.trim();
 const projects = [
   {
     name: "chromium",
@@ -70,6 +72,12 @@ export default defineConfig({
     baseURL:
       process.env.PLAYWRIGHT_BASE_URL?.replace(/\/$/u, "") ??
       "http://127.0.0.1:3100",
+    extraHTTPHeaders: vercelAutomationBypassSecret
+      ? {
+          "x-vercel-protection-bypass": vercelAutomationBypassSecret,
+          "x-vercel-set-bypass-cookie": "true",
+        }
+      : undefined,
     screenshot: isProductionWriteSmoke ? "off" : "only-on-failure",
     trace: isProductionWriteSmoke ? "off" : "retain-on-failure",
     video: "off",

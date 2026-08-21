@@ -26,8 +26,8 @@ External-source notes were checked on 2026-08-08. The current owner handoff and 
 - Application use: roster rows are imported into the season catalogue and reviewed portraits are copied to local `/player-faces/` paths. `PlayerMark` uses its generic silhouette when an asset path is absent or an image fails.
 - Runtime boundary: the deployed application does not execute the handoff's acquisition scripts, call those upstream sources, scrape player pages, or hotlink portraits. Other player covers unavailable or newly added players.
 - Outcome boundary: this is a selector identity and portrait snapshot, not a goals, assists, clean-sheets, or player-rating result feed. Offline work may acquire those outcomes, but reviewed facts enter only through the authenticated manual results desk.
-- Decision and follow-up: use the August 20 rows and 578 verified portraits as the current repository fixture, preserve two runtime silhouette fallbacks, and do not retain names removed from the owner-selected roster as active selector options. Releasing the fixture and changing production rows require the normal deployment gate and explicit approval for the supported production seed.
-- Production boundary: production still has the verified August 13 state: 599 total rows, 582 active players, 17 preserved inactive rows, and 582 distinct active portrait paths. No August 20 production seed has run. This state does not change the no-runtime-acquisition boundary.
+- Decision and follow-up: use the August 20 rows and 578 verified portraits as the current repository and production fixture, preserve two runtime silhouette fallbacks, and do not retain names removed from the owner-selected roster as active selector options. The normal deployment gate and explicit approval for one supported production seed completed on 2026-08-21.
+- Production boundary: production has 613 total player rows, 580 active players, 33 preserved inactive rows, 578 active portrait paths, and two null portrait paths for the documented silhouettes. This state does not change the no-runtime-acquisition boundary.
 
 ## Season sources and permission disposition
 

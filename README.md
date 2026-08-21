@@ -6,7 +6,7 @@ Production: [https://pl-predictions-2026.vercel.app](https://pl-predictions-2026
 
 GitHub: [https://github.com/vdoshi96/Pl-predictions](https://github.com/vdoshi96/Pl-predictions)
 
-Deployment status: production is public and Ready at the stable alias above. The adversarial-review remediation shipped through GitHub [PR #19](https://github.com/vdoshi96/Pl-predictions/pull/19), merged on 2026-08-14 as `9cdad64c285fb66f96d9e11a0b71780008b05160`. Vercel deployment `dpl_2evvhgizD4spM9QfXKNhvHLEBrgG` is Ready at [https://pl-predictions-msrzm2z84-vdoshi96s-projects.vercel.app](https://pl-predictions-msrzm2z84-vdoshi96s-projects.vercel.app), reports that exact merge SHA, and owns the stable alias after an explicit alias update and deployment-ID read-back. Vercel Authentication is set to `preview`, so retained preview deployments still require owner sign-in while production remains anonymously accessible. The five-project read-only production smoke, exact-deployment log checks, current visual evidence, and historical releases are recorded in [docs/QA.md](docs/QA.md).
+Deployment status: production is public and Ready at the stable alias above. The UI-report and August 20 catalogue release shipped through GitHub [PR #21](https://github.com/vdoshi96/Pl-predictions/pull/21), followed by selector and protected-preview smoke fixes in [PR #22](https://github.com/vdoshi96/Pl-predictions/pull/22). PR #22 merged on 2026-08-21 as `947118f5304271b5ae2a824329080b83d4d80723`. Vercel deployment `dpl_J3We57iVsWDMbKSFkoCDTi62mhCz` is Ready at [its immutable URL](https://pl-predictions-9z25e3j3o-vdoshi96s-projects.vercel.app) and owns the stable alias after an explicit alias update and deployment-ID read-back. Vercel Authentication remains enabled for previews; the automated preview smoke uses the project's existing automation bypass without weakening protection. Production remains anonymously accessible. The five-project read-only production smoke, full portrait check, exact-deployment log checks, current visual evidence, and historical releases are recorded in [docs/QA.md](docs/QA.md).
 
 ## Brand and local assets
 
@@ -18,7 +18,7 @@ The owner also supplied the dated `premier-league-players-2026-08-20/` roster sn
 
 On 2026-08-14 the owner confirmed that the required permissions for this player-catalogue workflow have been obtained, including acquisition, storage, redistribution, and production use. Owner-run FotMob or Transfermarkt acquisition may therefore run offline and produce a reviewed snapshot. This permission disposition removes the former source-specific licence gate; it does not change the deployed application's no-runtime-fetch, no-scrape, no-hotlink, no-football-API, and no-Cron boundary.
 
-The August 20 fixture is wired into the repository but is not yet a production database claim. Production retains the previously verified August 13 state until the updated application is released and the owner explicitly approves the supported seed. The August 13 fixture was released through GitHub [PR #15](https://github.com/vdoshi96/Pl-predictions/pull/15), merged at `cc4129dbd1513675bb44424cb4c667694c74d120`, deployed, and seeded through the supported production command exactly once. That production verification found 599 player rows: 582 active catalogue players with 582 distinct local portrait paths and 17 preserved inactive rows.
+The August 20 fixture is the current production catalogue. After the exact application deployment became Ready, the owner-approved supported seed ran once and printed `Seeded 20 teams and 580 players for 2026/27 Premier League.` Read-only verification found 613 total player rows: 580 active, 33 preserved inactive, 578 active local portrait paths, and the two expected silhouette fallbacks. All 578 portrait URLs returned valid PNG responses, and the live catalogue returned all 580 names.
 
 Evidence-only closeout [PR #16](https://github.com/vdoshi96/Pl-predictions/pull/16) merged on 2026-08-14 at 13:58:28 UTC as `98210965bfa6d586ef595c33038761e80f45b765`. Local `main` was fast-forwarded to and exactly matched `origin/main` at that commit before cleanup. The completed feature worktree and branches were removed, leaving one primary worktree. Primary private handoffs and the newest QA evidence remain; verified duplicate worktree handoffs and superseded QA evidence were moved recoverably to Trash. The unrelated untracked `Premier League 2026-27 PNG Assets/` folder remains intentionally retained and out of scope.
 
@@ -33,7 +33,7 @@ Evidence-only closeout [PR #16](https://github.com/vdoshi96/Pl-predictions/pull/
 | Roster authority     | Owner-selected snapshot; internally reconciled, not independently official-site verified                              |
 | Application boundary | Reviewed roster import and local portrait serving only; no runtime fetch, scrape, or hotlink                          |
 | Result-data boundary | This snapshot supplies selector identities and portraits, not goals, assists, clean sheets, or season-rating outcomes |
-| Production state     | Pending release and approved seed; production still has the verified August 13 catalogue                              |
+| Production state     | Released and seeded once; 580 active players, 578 portraits, and two silhouette fallbacks                             |
 
 ## Product behavior
 

@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="generated-by" content="scripts/generate-docs-html.mjs" />
     <meta name="canonical-source" content="QA.md" />
-    <meta name="canonical-source-sha256" content="7c3758f1bfec7d6ba33a7a964def5bdb2f1a3b8af6485f6d60dae693ff124db4" />
+    <meta name="canonical-source-sha256" content="1029232a71bbc9f40294cba9ef8bf946bd7c330fdcdb916fd2584d9e8c3c116d" />
     <title>Quality assurance</title>
     <style>
       :root { color-scheme: light dark; font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
@@ -92,6 +92,10 @@
 <tr>
 <td>Aggregate boundary</td>
 <td>The literal <code>npm run test:e2e -- admin-paste-entry</code> argument is not forwarded to the first child script, so it launches the full development-server pre-kickoff matrix. That matrix hit the previously documented Next Fast Refresh, truncated-JSON, and router-initialization corruption and is not recorded as a pass. The focused journey and the equivalent full local-production browser matrices are green as recorded above.</td>
+</tr>
+<tr>
+<td>Repository integration</td>
+<td><a href="https://github.com/vdoshi96/Pl-predictions/pull/24">PR #24</a> passed its Vercel preview checks and merged as <code>0a5ad854fe522993ff668ce06ffa94a4c9c0fed8</code>. This is repository and preview evidence only; no production database action or production behavior verification occurred for this iteration.</td>
 </tr>
 </tbody></table>
 <h2 id="august-21-ui-and-catalogue-production-release">August 21 UI and catalogue production release</h2>
@@ -502,7 +506,7 @@
 <li><input checked="" disabled="" type="checkbox"> Regenerate final HTML peers, publish this closeout through <code>main</code>, synchronize local and remote <code>main</code>, and remove completed branch state.</li>
 </ul>
 
-      <p class="source">Generated deterministically from <a href="QA.md">docs/QA.md</a>. Canonical SHA-256: <code>7c3758f1bfec7d6ba33a7a964def5bdb2f1a3b8af6485f6d60dae693ff124db4</code>.</p>
+      <p class="source">Generated deterministically from <a href="QA.md">docs/QA.md</a>. Canonical SHA-256: <code>1029232a71bbc9f40294cba9ef8bf946bd7c330fdcdb916fd2584d9e8c3c116d</code>.</p>
     </main>
   </body>
 </html>

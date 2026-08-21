@@ -307,12 +307,15 @@ test("production public routes are mobile-safe and healthy", async ({
     });
     await expect(customPlayerFallback.locator("img")).toHaveCount(0);
     await expect(customPlayerFallback.locator("svg")).toBeVisible();
+    const reviewTable = reviewDialog.getByRole("group", {
+      name: "Prediction review, positions 1 through 20",
+    });
+    await expect(reviewTable.locator("li")).toHaveCount(20);
+    await expect(reviewTable.getByRole("listitem")).toHaveCount(8);
+    await reviewTable.getByText("Show all 20 clubs", { exact: true }).click();
+    await expect(reviewTable.getByRole("listitem")).toHaveCount(20);
     await expectClubMarksLoaded(
-      reviewDialog
-        .getByRole("list", {
-          name: "Prediction review, positions 1 through 20",
-        })
-        .getByRole("img", { name: / club mark$/u }),
+      reviewTable.getByRole("img", { name: / club mark$/u }),
     );
     const reviewScroller = reviewDialog.locator(".overflow-y-auto");
     await reviewScroller.evaluate((element) => {

@@ -188,12 +188,14 @@ describe.runIf(enabled)("getPickedSubjectsByDataset", () => {
 
   it("excludes Other-player spellings that have no resolved player id", async () => {
     const predictionId = randomUUID();
-    await getDb().insert(predictions).values({
-      id: predictionId,
-      normalizedParticipantName: `seed other ${predictionId.slice(0, 8)}`,
-      participantName: `Seed Other ${predictionId.slice(0, 8)}`,
-      seasonId,
-    });
+    await getDb()
+      .insert(predictions)
+      .values({
+        id: predictionId,
+        normalizedParticipantName: `seed other ${predictionId.slice(0, 8)}`,
+        participantName: `Seed Other ${predictionId.slice(0, 8)}`,
+        seasonId,
+      });
     await getDb().insert(predictionCategoryPicks).values({
       category: "top_scorer",
       customPlayerName: "Zlatan",

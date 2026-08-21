@@ -8,10 +8,7 @@ export type PasteSubject = Readonly<{
 export type ListMetricKind = "integer" | "rating";
 
 export type ParsedListRowStatus =
-  | "matched"
-  | "ambiguous"
-  | "no-match"
-  | "bad-metric";
+  "matched" | "ambiguous" | "no-match" | "bad-metric";
 
 export type ParsedListRow = Readonly<{
   candidateLabels: readonly string[];
@@ -97,9 +94,8 @@ export function parsePastedResultList({
     if (!line) continue;
     const withoutRank = line.replace(RANK_PREFIX, "");
     const metricMatch = METRIC_SUFFIX.exec(withoutRank);
-    const name = (metricMatch
-      ? withoutRank.slice(0, metricMatch.index)
-      : withoutRank
+    const name = (
+      metricMatch ? withoutRank.slice(0, metricMatch.index) : withoutRank
     )
       .replace(/[\s—–\-:]+$/, "")
       .trim();

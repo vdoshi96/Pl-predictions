@@ -286,9 +286,7 @@ describe("SpotlightResultsDesk", () => {
     const goalsCard = goalsHeading.closest(".rounded-2xl");
     expect(goalsCard).not.toBeNull();
     const goals = within(goalsCard as HTMLElement);
-    fireEvent.click(
-      goals.getByRole("button", { name: "Review & publish" }),
-    );
+    fireEvent.click(goals.getByRole("button", { name: "Review & publish" }));
     let dialog = screen.getByRole("dialog", {
       name: "Review and publish Top scorer",
     });
@@ -309,9 +307,7 @@ describe("SpotlightResultsDesk", () => {
 
     fireEvent.click(screen.getByRole("button", { name: "Save match" }));
     await waitFor(() => expect(saveAlias).toHaveBeenCalledTimes(1));
-    fireEvent.click(
-      goals.getByRole("button", { name: "Review & publish" }),
-    );
+    fireEvent.click(goals.getByRole("button", { name: "Review & publish" }));
     dialog = screen.getByRole("dialog", {
       name: "Review and publish Top scorer",
     });
@@ -368,9 +364,7 @@ describe("SpotlightResultsDesk", () => {
     const cleanSheetsCard = cleanSheetsHeading.closest(".rounded-2xl");
     expect(cleanSheetsCard).not.toBeNull();
     const controls = within(cleanSheetsCard as HTMLElement);
-    fireEvent.click(
-      controls.getByRole("button", { name: "Review & publish" }),
-    );
+    fireEvent.click(controls.getByRole("button", { name: "Review & publish" }));
     const dialog = screen.getByRole("dialog", {
       name: "Review and publish Most clean sheets",
     });

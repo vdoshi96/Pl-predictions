@@ -9,9 +9,9 @@ const rows = (values: number[]) =>
 
 describe("findBoundaryTieWarnings", () => {
   it("returns no warnings when no tie straddles the boundary", () => {
-    expect(
-      findBoundaryTieWarnings(rows([9, 8, 7]), 2, "descending"),
-    ).toEqual([]);
+    expect(findBoundaryTieWarnings(rows([9, 8, 7]), 2, "descending")).toEqual(
+      [],
+    );
   });
 
   it("warns when a tie group spans rank N", () => {
@@ -39,9 +39,9 @@ describe("findBoundaryTieWarnings", () => {
   });
 
   it("does not warn when the tie sits fully inside the covered range", () => {
-    expect(
-      findBoundaryTieWarnings(rows([9, 9, 7]), 3, "descending"),
-    ).toEqual([]);
+    expect(findBoundaryTieWarnings(rows([9, 9, 7]), 3, "descending")).toEqual(
+      [],
+    );
   });
 });
 

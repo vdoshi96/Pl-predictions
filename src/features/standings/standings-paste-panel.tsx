@@ -34,9 +34,7 @@ export type StandingsPastePanelProps = Readonly<{
     teamSlug?: string;
   }[];
   disabled: boolean;
-  onSubmit: (
-    payload: ManualStandingsPayload,
-  ) => Promise<ManualStandingsResult>;
+  onSubmit: (payload: ManualStandingsPayload) => Promise<ManualStandingsResult>;
   teams: readonly StandingsPasteTeam[];
 }>;
 
@@ -116,7 +114,9 @@ export function StandingsPastePanel({
     if (newItems.length !== teams.length) {
       list.push(`Parsed ${newItems.length} of 20 clubs.`);
     }
-    if (new Set(newItems.map((item) => item.teamSlug)).size !== newItems.length) {
+    if (
+      new Set(newItems.map((item) => item.teamSlug)).size !== newItems.length
+    ) {
       list.push("Each club may appear only once.");
     }
     if (
@@ -211,8 +211,8 @@ export function StandingsPastePanel({
           ) : null}
           {diff ? (
             <p className="text-sm font-semibold text-slate-700" role="status">
-              {diff.movedCount} of {diff.rows.length} rows differ from the active
-              table.
+              {diff.movedCount} of {diff.rows.length} rows differ from the
+              active table.
               {diff.missingTeams.length > 0
                 ? ` Missing from paste: ${diff.missingTeams.length}.`
                 : ""}
@@ -242,9 +242,7 @@ export function StandingsPastePanel({
               <tbody className="divide-y divide-slate-100">
                 {parsed.rows.map((row) => (
                   <tr key={row.rawLine}>
-                    <td className="px-3 py-2">
-                      {row.actualPosition ?? "—"}
-                    </td>
+                    <td className="px-3 py-2">{row.actualPosition ?? "—"}</td>
                     <td className="px-3 py-2">{row.teamLabel ?? "—"}</td>
                     <td className="px-3 py-2">{row.playedGames ?? "—"}</td>
                     <td className="px-3 py-2">{row.leaguePoints ?? "—"}</td>

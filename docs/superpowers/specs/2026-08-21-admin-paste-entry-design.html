@@ -1,0 +1,250 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="generated-by" content="scripts/generate-docs-html.mjs" />
+    <meta name="canonical-source" content="2026-08-21-admin-paste-entry-design.md" />
+    <meta name="canonical-source-sha256" content="58e283399f348da7560a6b9bed4a1f8a66c736c194cf488e4da32bd1277ce0c9" />
+    <title>Admin Paste Entry: Standings Tables and Spotlight Result Lists</title>
+    <style>
+      :root { color-scheme: light dark; font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+      body { margin: 0; background: #f5f5f0; color: #18201c; }
+      main { box-sizing: border-box; width: min(100% - 2rem, 880px); margin: 2rem auto; padding: clamp(1.25rem, 4vw, 3rem); background: #fff; border: 1px solid #d9ddd8; border-radius: 1rem; box-shadow: 0 18px 60px rgb(22 31 26 / 8%); }
+      h1, h2, h3 { line-height: 1.15; color: #102d22; }
+      h1 { font-size: clamp(2rem, 5vw, 3.25rem); letter-spacing: -.04em; }
+      h2 { margin-top: 2.5rem; padding-top: 1rem; border-top: 1px solid #e2e6e2; }
+      p, li { line-height: 1.7; }
+      a { color: #087854; text-underline-offset: .2em; }
+      code { padding: .12rem .35rem; border-radius: .3rem; background: #edf1ed; font-size: .92em; }
+      pre { overflow-x: auto; padding: 1rem; border-radius: .65rem; background: #111a16; color: #edf8f2; }
+      pre code { padding: 0; background: transparent; }
+      table { display: block; overflow-x: auto; width: 100%; border-collapse: collapse; }
+      th, td { padding: .65rem .8rem; border: 1px solid #d9ddd8; text-align: left; vertical-align: top; }
+      th { background: #edf4ef; }
+      img { max-width: 100%; height: auto; border-radius: .75rem; }
+      blockquote { margin-left: 0; padding-left: 1rem; border-left: .25rem solid #1b9a6c; color: #49564f; }
+      .source { margin-top: 3rem; padding-top: 1rem; border-top: 1px solid #d9ddd8; color: #627069; font-size: .85rem; }
+      @media (prefers-color-scheme: dark) {
+        body { background: #0e1512; color: #e5ebe7; }
+        main { background: #16201b; border-color: #34423a; }
+        h1, h2, h3 { color: #f2fff8; }
+        h2, .source { border-color: #34423a; }
+        a { color: #58ddb0; }
+        code, th { background: #24322b; }
+        th, td { border-color: #3b4b42; }
+        blockquote { color: #b5c2bb; }
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1 id="admin-paste-entry-standings-tables-and-spotlight-result-lists">Admin Paste Entry: Standings Tables and Spotlight Result Lists</h1>
+<ul>
+<li><strong>Date:</strong> 2026-08-21</li>
+<li><strong>Status:</strong> Approved concept, awaiting implementation</li>
+<li><strong>Owner decisions locked during brainstorming:</strong> text paste only (no AI/vision APIs), manual &quot;seed from submissions&quot; button, combined save+attest+publish confirm, diff review before every publish.</li>
+</ul>
+<h2 id="1-problem">1. Problem</h2>
+<p>The owner has no football-data API keys. Today every update is manual:</p>
+<ul>
+<li><code>/admin/standings</code> requires re-ordering 20 clubs by hand each matchweek.</li>
+<li><code>/admin/results</code> requires adding spotlight result rows one searchable-select at a time, across four dataset cards, followed by a save → attest → publish → finalize ceremony per dataset.</li>
+</ul>
+<p>This makes weekly upkeep slow and error-prone. The scoring engine itself is correct and fully derived; only the input UX needs improvement.</p>
+<h2 id="2-goals">2. Goals</h2>
+<ol>
+<li>The owner can copy a league table from any website and paste it into <code>/admin/standings</code>; the parser fills a validated preview, shows a diff against the active snapshot, and publishes through the existing atomic snapshot path.</li>
+<li>The owner can seed each spotlight dataset from the union of all submitted picks with one button, then update values by pasting list text (e.g. <code>Haaland 27</code>).</li>
+<li>Publishing a spotlight dataset becomes one combined confirm dialog (diff + attestation + save + publish) instead of three separate steps.</li>
+<li>Every new paste overrides the previous data by moving the existing active-snapshot pointer; history is preserved for audit.</li>
+</ol>
+<h2 id="3-non-goals">3. Non-goals</h2>
+<ul>
+<li>No AI/vision/OCR integration, no external HTTP data clients, no scrapers, no new runtime dependencies.</li>
+<li>No change to scoring formulas, coverage rules, snapshot immutability/sealing, CAS pointer transitions, or audit behavior.</li>
+<li>No public-facing changes; this is admin-surface only.</li>
+<li>No automatic scheduling/cron.</li>
+</ul>
+<h2 id="4-current-architecture-the-design-plugs-into">4. Current architecture the design plugs into</h2>
+<table>
+<thead>
+<tr>
+<th>Concern</th>
+<th>Existing code</th>
+<th>Reused as-is</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Standings save</td>
+<td><code>saveManualStandings</code> (<code>src/app/admin/standings/actions.ts</code>) accepts <code>{ matchweek, standings: [{ teamSlug, actualPosition, playedGames, leaguePoints }] }</code> and routes through <code>importCanonicalStandings</code> (duplicate detection, atomic replace, failure preserves last table)</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td>Standings validation</td>
+<td><code>createStandingsItemsSchema</code> (<code>src/features/standings/validation.ts</code>): exactly 20 unique known slugs, positions 1–20 unique, played 0–38 nullable, points −100…114 nullable</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td>Team identity</td>
+<td><code>PREMIER_LEAGUE_2026_27_TEAMS</code> (<code>src/data/teams.ts</code>): <code>displayName</code>, <code>shortName</code>, <code>slug</code>, <code>sortName</code></td>
+<td>Yes</td>
+</tr>
+<tr>
+<td>Spotlight draft save</td>
+<td><code>saveSpotlightResultDraft</code> action takes rows <code>[{ subjectId, metricValue }]</code>, metadata, <code>expectedWorkingSnapshotId</code> (CAS)</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td>Spotlight publish</td>
+<td><code>publishSpotlightResult</code> requires <code>coverageAttested: true</code>, working snapshot saved, exact-N coverage incl. boundary ties, aliases resolved, reveal+close done</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td>Coverage semantics</td>
+<td><code>coveredThroughRank === bracketCount N</code>; ties at rank N must be fully present; applies descending for goals/assists/clean sheets/underdog player and ascending for overrated player over the shared ratings list</td>
+<td>Unchanged</td>
+</tr>
+<tr>
+<td>Alias resolution</td>
+<td>Other-player spellings must be matched to catalogue players before publish (<code>spotlightResultAliases</code>)</td>
+<td>Unchanged</td>
+</tr>
+</tbody></table>
+<h2 id="5-feature-a-standings-paste-import">5. Feature A — Standings paste import</h2>
+<h3 id="51-ux-flow">5.1 UX flow</h3>
+<ol>
+<li>New collapsible &quot;Paste table&quot; panel on <code>/admin/standings</code> above the manual form.</li>
+<li>Owner pastes multi-line table text and clicks Parse.</li>
+<li>Parser output renders as an editable preview table (position, club, played, points) with per-row status: matched / low-confidence numbers / unknown club.</li>
+<li>Below it, a diff against the active snapshot: position movement arrows, played/points changes, and counts of added/missing clubs.</li>
+<li>Confirm is disabled until: all 20 clubs matched exactly once, positions form a 1–20 permutation, and no row is in error state. Low-confidence played/points cells may be left null (schema allows nulls) but are highlighted.</li>
+<li>Confirm calls the existing <code>saveManualStandings</code> action with the parsed payload. Matchweek stays a separate manual field (rarely present in pasted text).</li>
+</ol>
+<h3 id="52-parsing-rules">5.2 Parsing rules</h3>
+<ul>
+<li>Split input into lines; ignore empty lines and obvious header/footer lines (lines containing no club-name match and either no integers or only column labels like <code>P W D L GD Pts</code>).</li>
+<li>Per line: extract integers and the remaining alphabetic tokens; the alphabetic run(s) are candidate club names.</li>
+<li>Club matching order: exact normalized <code>displayName</code> → <code>shortName</code> → <code>sortName</code> → curated alias table → word-window fallback.<ul>
+<li>Normalization: lowercase, Unicode NFKC, strip diacritics and punctuation, <code>&amp;</code> → <code>and</code>, collapse whitespace.</li>
+<li>Curated alias table (in <code>src/data</code>, derived strictly from the active 20-club set): <code>Spurs</code>→tottenham-hotspur, <code>Man Utd</code>→manchester-united, <code>Nottm Forest</code>→nottingham-forest, <code>Brighton</code>→brighton-and-hove-albion, <code>Villa</code>→aston-villa, etc. Aliases never override an exact match of another club&#39;s canonical name; a token matching no active club is an error, never a guess.</li>
+</ul>
+</li>
+<li>Position: use a leading integer if present; otherwise infer from row order. If explicit positions exist they must be exactly 1–20 unique, else parse fails with the offending lines listed.</li>
+<li>Played/points classification:<ul>
+<li>If a header line was detected, map integer columns by header token (<code>P</code>/<code>Pl</code>→played, <code>Pts</code>→points, <code>GD</code> ignored).</li>
+<li>Without a header, apply the heuristic first-integer-after-name = played, last-integer = points, and mark those cells <strong>low-confidence</strong> in the preview.</li>
+<li>Any leftover unexplained integers mark the line low-confidence rather than failing the parse.</li>
+</ul>
+</li>
+<li>Numbers tolerate thousands separators, en/em dashes, and trailing footnotes.</li>
+</ul>
+<h3 id="53-edge-cases">5.3 Edge cases</h3>
+<table>
+<thead>
+<tr>
+<th>Case</th>
+<th>Behavior</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Unknown club token (&quot;Bayern Munich&quot;)</td>
+<td>Row flagged unknown; confirm blocked; message lists unparsed lines verbatim</td>
+</tr>
+<tr>
+<td>Ambiguous token matching two canonical names</td>
+<td>Parse fails for that line; owner edits text or uses manual form</td>
+</tr>
+<tr>
+<td>Duplicate club or missing club</td>
+<td>Confirm blocked with explicit missing/duplicate list (mirrors server-side zod messages)</td>
+</tr>
+<tr>
+<td>Positions absent entirely</td>
+<td>Inferred from order; still validated as a permutation before confirm</td>
+</tr>
+<tr>
+<td>All-zero played table</td>
+<td>Allowed to save (preseason guard downstream treats it as not-started); preview shows a warning that scoring stays inactive</td>
+</tr>
+<tr>
+<td>Pasting while active snapshot is final</td>
+<td>Panel disabled with note to undo final first (consistent with existing form behavior)</td>
+</tr>
+<tr>
+<td>Garbage input / empty paste</td>
+<td>Parse produces zero rows; friendly error; nothing submitted</td>
+</tr>
+</tbody></table>
+<h2 id="6-feature-b-results-desk-upgrades">6. Feature B — Results desk upgrades</h2>
+<h3 id="61-seed-from-submissions">6.1 Seed from submissions</h3>
+<ul>
+<li>Per-dataset button <strong>Seed from submissions</strong>, enabled once predictions are revealed (<code>publishReady</code> gate already computed on the page).</li>
+<li>New admin query (server): union of distinct subject IDs picked for the categories mapping to the dataset (invert <code>RESULT_DATASET_BY_CATEGORY</code>): top_scorer→goals, top_assister→assists, most_clean_sheets→clean_sheets (team IDs), underdog_player + overrated_player→player_ratings (player IDs).</li>
+<li>Seeding merges subjects not already present as rows with metric 0; existing rows and edits are preserved; marks the draft dirty.</li>
+<li>Other-player spellings are <strong>not</strong> seeded (no subject ID until matched); the alias panel continues to govern them.</li>
+<li>Disabled when the dataset is finalized. Pressing seed resets the attestation checkbox (same as any edit).</li>
+</ul>
+<h3 id="62-paste-list-text">6.2 Paste list text</h3>
+<ul>
+<li>Per-dataset &quot;Paste list&quot; textarea (hidden for finalized datasets).</li>
+<li>Line grammar (tolerant): optional leading rank integer, subject name, trailing metric number. Examples: <code>1 Haaland 27</code>, <code>Haaland — 27</code>, <code>Salah 7.852</code>.</li>
+<li>Metric validation mirrors the editor: nonnegative integers for goals/assists/clean sheets; 0–10 with ≤3 decimals for ratings.</li>
+<li>Name matching against season players (or teams for clean sheets) using the same normalization as 5.2 plus <code>sortName</code> reversal (<code>Aarons, Max</code> → also try <code>Max Aarons</code>).<ul>
+<li>Zero matches: row flagged; one-click offer to create a result-only player via the existing <code>createStandaloneSpotlightResultOnlyPlayer</code> action, or skip the line.</li>
+<li>Multiple matches (homonyms): flagged ambiguous; owner resolves via the existing searchable select for that row.</li>
+</ul>
+</li>
+<li>Parsed rows merge into the editor (update metric when subject exists, append otherwise). Rows can always be removed manually afterwards.</li>
+</ul>
+<h3 id="63-ratings-lists-longer-than-n">6.3 Ratings lists longer than N</h3>
+<ul>
+<li>Long pastes are desirable: the shared <code>player_ratings</code> list drives underdog player (descending) <strong>and</strong> overrated player (ascending), so deep lists improve lowest-rated accuracy.</li>
+<li>No cap is enforced on row count; however the publish gate still demands complete coverage through rank N in both directions, so the UI shows live coverage indicators: &quot;complete through rank N ✓&quot; or &quot;rank N boundary incomplete: ties at value X missing players …&quot;.</li>
+</ul>
+<h3 id="64-boundary-tie-surfacing">6.4 Boundary-tie surfacing</h3>
+<ul>
+<li>The editor already ranks rows client-side. Extend the ranking display to detect tie groups whose membership straddles rank N (descending datasets) or rank N ascending (overrated view) and render an amber warning naming the tied value and count.</li>
+<li>This is advisory; <code>assertPublishableCoverage</code> remains the enforcing authority server-side.</li>
+</ul>
+<h3 id="65-combined-save-attest-publish-dialog">6.5 Combined save + attest + publish dialog</h3>
+<ul>
+<li>Replace the current save button + checkbox + publish button cluster with one primary action: <strong>Review &amp; publish</strong> (plus a secondary plain &quot;Save draft&quot; for work-in-progress).</li>
+<li>Dialog contents: full diff vs the currently published active snapshot (rank/value/added/removed per subject), unresolved-alias warnings if any, and the existing attestation sentence with an &quot;I attest&quot; confirmation control.</li>
+<li>On confirm, the client sequentially calls the existing <code>saveSpotlightResultDraft</code> then <code>publishSpotlightResult</code> with the returned working snapshot ID and <code>coverageAttested: true</code>.<ul>
+<li>If publish fails after save succeeded, the draft remains saved — a safe recovery state; the dialog reports the publish error and keeps state consistent (dirty=false, attestation reset).</li>
+</ul>
+</li>
+<li>Finalize/undo keep their existing dedicated buttons and confirms; unchanged.</li>
+</ul>
+<h3 id="66-diff-before-publish-content">6.6 Diff-before-publish content</h3>
+<p>For each dataset, compared against the currently published active snapshot (or &quot;nothing published yet&quot;):</p>
+<ul>
+<li>Per-subject rows: old rank/value → new rank/value, with movement arrows.</li>
+<li>Added / removed subjects sections.</li>
+<li>Boundary tie warnings (6.4).</li>
+<li>Metadata summary: source, captured-at, covered-through-rank vs required N.</li>
+</ul>
+<h2 id="7-constraints-honored">7. Constraints honored</h2>
+<ul>
+<li>All mutations remain behind <code>requireAdminMutation</code> (signed session + same-origin); no new endpoints.</li>
+<li>Snapshots stay immutable and sealed; pointers move via existing CAS transitions; audit records unchanged.</li>
+<li>Import/save failures preserve the last accepted data (existing guarantee reused, not reimplemented).</li>
+<li>No secrets, keys, or external services introduced.</li>
+<li>Canonical docs parity: after implementation, run <code>npm run docs:generate</code> so this spec gains its HTML peer and <code>npm run docs:check</code> passes.</li>
+</ul>
+<h2 id="8-testing-strategy">8. Testing strategy</h2>
+<ul>
+<li><strong>Unit:</strong> standings parser (header/no-header/garbage/alias/ambiguity/permutation cases), list parser grammar variants, name normalization/matching, boundary-tie detector, coverage indicator logic.</li>
+<li><strong>Component:</strong> paste panels (disabled states, error rendering), combined dialog (attestation gating, sequential action calls, publish-failure recovery state), seed button merge semantics.</li>
+<li><strong>Integration (isolated Neon via <code>TEST_DATABASE_URL</code>/<code>TEST_DATABASE_NAME</code>):</strong> seeded payload through real <code>saveManualStandings</code> → snapshot active; combined save+publish against real actions including alias-blocked publish; seed query correctness against fixture picks.</li>
+<li><strong>E2E (Playwright):</strong> owner journey — paste table → diff → confirm → leaderboard reflects new table; seed → paste ratings → review &amp; publish with attestation → spotlight page updates.</li>
+<li>Mobile QA per repo definition of done (320–430px reflow, touch targets) since these are admin forms used on phones too.</li>
+</ul>
+<h2 id="9-open-questions">9. Open questions</h2>
+<p>None blocking. Implementation-time defaults chosen conservatively (documented above): low-confidence number cells become null rather than guessed values; alias table lives in <code>src/data</code> next to team fixtures.</p>
+
+      <p class="source">Generated deterministically from <a href="2026-08-21-admin-paste-entry-design.md">docs/superpowers/specs/2026-08-21-admin-paste-entry-design.md</a>. Canonical SHA-256: <code>58e283399f348da7560a6b9bed4a1f8a66c736c194cf488e4da32bd1277ce0c9</code>.</p>
+    </main>
+  </body>
+</html>

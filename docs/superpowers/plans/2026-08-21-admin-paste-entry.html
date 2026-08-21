@@ -1,0 +1,2873 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="generated-by" content="scripts/generate-docs-html.mjs" />
+    <meta name="canonical-source" content="2026-08-21-admin-paste-entry.md" />
+    <meta name="canonical-source-sha256" content="d15735f31a479d6425361d834c82bd8feaf3fa881853b23cf1c9f36826eb488e" />
+    <title>Admin Paste Entry Implementation Plan</title>
+    <style>
+      :root { color-scheme: light dark; font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+      body { margin: 0; background: #f5f5f0; color: #18201c; }
+      main { box-sizing: border-box; width: min(100% - 2rem, 880px); margin: 2rem auto; padding: clamp(1.25rem, 4vw, 3rem); background: #fff; border: 1px solid #d9ddd8; border-radius: 1rem; box-shadow: 0 18px 60px rgb(22 31 26 / 8%); }
+      h1, h2, h3 { line-height: 1.15; color: #102d22; }
+      h1 { font-size: clamp(2rem, 5vw, 3.25rem); letter-spacing: -.04em; }
+      h2 { margin-top: 2.5rem; padding-top: 1rem; border-top: 1px solid #e2e6e2; }
+      p, li { line-height: 1.7; }
+      a { color: #087854; text-underline-offset: .2em; }
+      code { padding: .12rem .35rem; border-radius: .3rem; background: #edf1ed; font-size: .92em; }
+      pre { overflow-x: auto; padding: 1rem; border-radius: .65rem; background: #111a16; color: #edf8f2; }
+      pre code { padding: 0; background: transparent; }
+      table { display: block; overflow-x: auto; width: 100%; border-collapse: collapse; }
+      th, td { padding: .65rem .8rem; border: 1px solid #d9ddd8; text-align: left; vertical-align: top; }
+      th { background: #edf4ef; }
+      img { max-width: 100%; height: auto; border-radius: .75rem; }
+      blockquote { margin-left: 0; padding-left: 1rem; border-left: .25rem solid #1b9a6c; color: #49564f; }
+      .source { margin-top: 3rem; padding-top: 1rem; border-top: 1px solid #d9ddd8; color: #627069; font-size: .85rem; }
+      @media (prefers-color-scheme: dark) {
+        body { background: #0e1512; color: #e5ebe7; }
+        main { background: #16201b; border-color: #34423a; }
+        h1, h2, h3 { color: #f2fff8; }
+        h2, .source { border-color: #34423a; }
+        a { color: #58ddb0; }
+        code, th { background: #24322b; }
+        th, td { border-color: #3b4b42; }
+        blockquote { color: #b5c2bb; }
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1 id="admin-paste-entry-implementation-plan">Admin Paste Entry Implementation Plan</h1>
+<blockquote>
+<p><strong>For agentic workers:</strong> REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (<code>- [ ]</code>) syntax for tracking.</p>
+</blockquote>
+<p><strong>Goal:</strong> Let the owner paste league-table text into <code>/admin/standings</code> and spotlight result lists into <code>/admin/results</code>, seed result datasets from submitted picks, and publish through one combined review+attest+publish dialog.</p>
+<p><strong>Architecture:</strong> Pure parser/diff modules with unit tests feed the existing validated server actions (<code>saveManualStandings</code>, <code>saveSpotlightResultDraft</code>, <code>publishSpotlightResult</code>) unchanged. New client components render parse previews, diffs, and the combined dialog. A new server-only query supplies picked subjects for seeding. No schema, scoring, or endpoint changes.</p>
+<p><strong>Tech Stack:</strong> Next.js 16 App Router, TypeScript, React server actions, zod, Drizzle/Neon, vitest, Testing Library, Playwright.</p>
+<p><strong>Spec:</strong> <code>docs/superpowers/specs/2026-08-21-admin-paste-entry-design.md</code></p>
+<hr>
+<h2 id="before-you-start">Before you start</h2>
+<ol>
+<li>Read <code>AGENTS.md</code>. Read the relevant guides under <code>node_modules/next/dist/docs/</code> before touching app code — this Next.js version has breaking changes vs. your training data.</li>
+<li>Repo code style: NO comments in code. ESLint runs with <code>--max-warnings=0</code>.</li>
+<li>Never read or write the legacy <code>submission_deadline</code> column.</li>
+<li>Run tests with <code>npx vitest run &lt;file&gt;</code>. Full suites: <code>npm test</code>, <code>npm run test:integration</code> (needs <code>TEST_DATABASE_URL</code> or local-only <code>TEST_DATABASE_NAME</code>; use <code>npm run db:test:migrate</code> / <code>npm run db:test:seed</code>), <code>npm run test:e2e</code>.</li>
+<li>Work on branch <code>feature/admin-paste-entry</code>.</li>
+</ol>
+<h2 id="file-structure">File structure</h2>
+<p>Create:</p>
+<ul>
+<li><code>src/shared/text-normalization.ts</code> — shared name normalizer</li>
+<li><code>src/data/team-name-aliases.ts</code> — curated alias map + team name index builder</li>
+<li><code>src/features/standings/table-paste-parser.ts</code> — pasted table text → parsed rows</li>
+<li><code>src/features/standings/table-diff.ts</code> — parsed rows vs active snapshot diff</li>
+<li><code>src/features/standings/standings-paste-panel.tsx</code> — client panel on standings page</li>
+<li><code>src/features/results/boundary-ties.ts</code> — tie-straddle warnings + coverage helper</li>
+<li><code>src/features/results/list-paste-parser.ts</code> — pasted list text → parsed rows</li>
+<li><code>src/features/results/dataset-diff.ts</code> — draft vs published snapshot diff</li>
+<li><code>src/features/results/seed-queries.ts</code> — server-only picked-subjects query</li>
+<li><code>src/app/admin/results/results-paste-panel.tsx</code> — client paste panel per dataset</li>
+<li><code>src/app/admin/results/publish-review-dialog.tsx</code> — combined review dialog</li>
+<li>Tests under <code>tests/unit/</code>, <code>tests/components/</code>, <code>tests/integration/</code>, <code>tests/e2e/</code></li>
+</ul>
+<p>Modify:</p>
+<ul>
+<li><code>src/app/admin/standings/page.tsx</code> — mount paste panel</li>
+<li><code>src/app/admin/results/page.tsx</code> — load picked subjects + published rows; pass to desk</li>
+<li><code>src/app/admin/results/results-desk.tsx</code> — seed button, paste panels, review dialog replaces save/attest/publish cluster</li>
+<li><code>tests/components/spotlight-results-desk.test.tsx</code> — fixtures for new props</li>
+</ul>
+<hr>
+<h3 id="task-1-feature-branch">Task 1: Feature branch</h3>
+<ul>
+<li><input disabled="" type="checkbox"> <strong>Step 1: Create the branch</strong></li>
+</ul>
+<pre><code class="language-bash">git checkout main &amp;&amp; git pull &amp;&amp; git checkout -b feature/admin-paste-entry
+</code></pre>
+<hr>
+<h3 id="task-2-shared-text-normalization">Task 2: Shared text normalization</h3>
+<p><strong>Files:</strong></p>
+<ul>
+<li><p>Create: <code>src/shared/text-normalization.ts</code></p>
+</li>
+<li><p>Test: <code>tests/unit/text-normalization.test.ts</code></p>
+</li>
+<li><p><input disabled="" type="checkbox"> <strong>Step 1: Write the failing test</strong></p>
+</li>
+</ul>
+<pre><code class="language-ts">import { describe, expect, it } from &quot;vitest&quot;;
+
+import { normalizeForMatch } from &quot;@/shared/text-normalization&quot;;
+
+describe(&quot;normalizeForMatch&quot;, () =&gt; {
+  it(&quot;lowercases and strips punctuation and diacritics&quot;, () =&gt; {
+    expect(normalizeForMatch(&quot;Man City&quot;)).toBe(&quot;man city&quot;);
+    expect(normalizeForMatch(&quot;Brighton &amp; Hove Albion&quot;)).toBe(
+      &quot;brighton and hove albion&quot;,
+    );
+    expect(normalizeForMatch(&quot;Nott&#39;m Forest&quot;)).toBe(&quot;nott m forest&quot;);
+    expect(normalizeForMatch(&quot;  Crystal---Palace! &quot;)).toBe(&quot;crystal palace&quot;);
+  });
+
+  it(&quot;collapses whitespace and returns empty for symbols only&quot;, () =&gt; {
+    expect(normalizeForMatch(&quot;--- *** ---&quot;)).toBe(&quot;&quot;);
+    expect(normalizeForMatch(&quot;A  B&quot;)).toBe(&quot;a b&quot;);
+  });
+});
+</code></pre>
+<ul>
+<li><input disabled="" type="checkbox"> <strong>Step 2: Run to verify failure</strong></li>
+</ul>
+<p>Run: <code>npx vitest run tests/unit/text-normalization.test.ts</code>
+Expected: FAIL (module not found)</p>
+<ul>
+<li><input disabled="" type="checkbox"> <strong>Step 3: Implement</strong></li>
+</ul>
+<pre><code class="language-ts">export function normalizeForMatch(value: string): string {
+  return value
+    .normalize(&quot;NFKC&quot;)
+    .toLowerCase()
+    .normalize(&quot;NFD&quot;)
+    .replace(/[\u0300-\u036f]/g, &quot;&quot;)
+    .replace(/&amp;/g, &quot; and &quot;)
+    .replace(/[^a-z0-9]+/g, &quot; &quot;)
+    .trim();
+}
+</code></pre>
+<ul>
+<li><input disabled="" type="checkbox"> <strong>Step 4: Verify pass</strong></li>
+</ul>
+<p>Run: <code>npx vitest run tests/unit/text-normalization.test.ts</code>
+Expected: PASS</p>
+<ul>
+<li><input disabled="" type="checkbox"> <strong>Step 5: Commit</strong></li>
+</ul>
+<pre><code class="language-bash">git add src/shared/text-normalization.ts tests/unit/text-normalization.test.ts
+git commit -m &quot;feat: add shared match-name normalizer&quot;
+</code></pre>
+<hr>
+<h3 id="task-3-team-name-index-with-curated-aliases">Task 3: Team name index with curated aliases</h3>
+<p><strong>Files:</strong></p>
+<ul>
+<li><p>Create: <code>src/data/team-name-aliases.ts</code></p>
+</li>
+<li><p>Test: <code>tests/unit/team-name-aliases.test.ts</code></p>
+</li>
+<li><p><input disabled="" type="checkbox"> <strong>Step 1: Write the failing test</strong></p>
+</li>
+</ul>
+<pre><code class="language-ts">import { PREMIER_LEAGUE_2026_27_TEAMS } from &quot;@/data&quot;;
+import { buildTeamNameIndex } from &quot;@/data/team-name-aliases&quot;;
+import { describe, expect, it } from &quot;vitest&quot;;
+
+describe(&quot;buildTeamNameIndex&quot;, () =&gt; {
+  const index = buildTeamNameIndex(PREMIER_LEAGUE_2026_27_TEAMS);
+
+  it(&quot;resolves canonical display names case-insensitively&quot;, () =&gt; {
+    expect(index.get(&quot;manchester city&quot;)).toBe(&quot;manchester-city&quot;);
+    expect(index.get(&quot;brighton &amp; hove albion&quot;)).toBe(
+      &quot;brighton-and-hove-albion&quot;,
+    );
+  });
+
+  it(&quot;resolves short names and curated aliases&quot;, () =&gt; {
+    expect(index.get(&quot;spurs&quot;)).toBe(&quot;tottenham-hotspur&quot;);
+    expect(index.get(&quot;man utd&quot;)).toBe(&quot;manchester-united&quot;);
+    expect(index.get(&quot;villa&quot;)).toBe(&quot;aston-villa&quot;);
+    expect(index.get(&quot;palace&quot;)).toBe(&quot;crystal-palace&quot;);
+  });
+
+  it(&quot;never maps a key to two slugs and contains exactly the active clubs&quot;, () =&gt; {
+    const slugs = new Set(index.values());
+    expect(slugs.size).toBe(20);
+    for (const slug of slugs) {
+      expect(
+        PREMIER_LEAGUE_2026_27_TEAMS.some((team) =&gt; team.slug === slug),
+      ).toBe(true);
+    }
+  });
+
+  it(&quot;returns undefined for unknown clubs&quot;, () =&gt; {
+    expect(index.get(&quot;bayern munich&quot;)).toBeUndefined();
+  });
+});
+</code></pre>
+<ul>
+<li><input disabled="" type="checkbox"> <strong>Step 2: Run to verify failure</strong></li>
+</ul>
+<p>Run: <code>npx vitest run tests/unit/team-name-aliases.test.ts</code>
+Expected: FAIL (module not found)</p>
+<ul>
+<li><input disabled="" type="checkbox"> <strong>Step 3: Implement</strong></li>
+</ul>
+<pre><code class="language-ts">import { normalizeForMatch } from &quot;@/shared/text-normalization&quot;;
+
+export type TeamNameSource = Readonly&lt;{
+  displayName: string;
+  shortName: string;
+  slug: string;
+  sortName: string;
+}&gt;;
+
+const CURATED_ALIASES: Readonly&lt;Record&lt;string, string&gt;&gt; = {
+  spurs: &quot;tottenham-hotspur&quot;,
+  &quot;man utd&quot;: &quot;manchester-united&quot;,
+  villa: &quot;aston-villa&quot;,
+  palace: &quot;crystal-palace&quot;,
+  bournemouth: &quot;afc-bournemouth&quot;,
+  brighton: &quot;brighton-and-hove-albion&quot;,
+  coventry: &quot;coventry-city&quot;,
+  hull: &quot;hull-city&quot;,
+  ipswich: &quot;ipswich-town&quot;,
+  leeds: &quot;leeds-united&quot;,
+  newcastle: &quot;newcastle-united&quot;,
+};
+
+export function buildTeamNameIndex(
+  teams: readonly TeamNameSource[],
+): ReadonlyMap&lt;string, string&gt; {
+  const index = new Map&lt;string, string&gt;();
+  const put = (name: string, slug: string) =&gt; {
+    const key = normalizeForMatch(name);
+    if (!key || index.has(key)) return;
+    index.set(key, slug);
+  };
+  for (const team of teams) put(team.displayName, team.slug);
+  for (const team of teams) {
+    put(team.shortName, team.slug);
+    put(team.sortName, team.slug);
+  }
+  for (const [alias, slug] of Object.entries(CURATED_ALIASES)) {
+    if (teams.some((team) =&gt; team.slug === slug)) put(alias, slug);
+  }
+  return index;
+}
+</code></pre>
+<p>Note: canonical names are inserted first so an alias can never override them (<code>index.has</code> guard). Ambiguous words like &quot;united&quot; or &quot;city&quot; are deliberately absent.</p>
+<ul>
+<li><input disabled="" type="checkbox"> <strong>Step 4: Verify pass</strong></li>
+</ul>
+<p>Run: <code>npx vitest run tests/unit/team-name-aliases.test.ts</code>
+Expected: PASS</p>
+<ul>
+<li><input disabled="" type="checkbox"> <strong>Step 5: Commit</strong></li>
+</ul>
+<pre><code class="language-bash">git add src/data/team-name-aliases.ts tests/unit/team-name-aliases.test.ts
+git commit -m &quot;feat: add team name alias index&quot;
+</code></pre>
+<hr>
+<h3 id="task-4-standings-table-paste-parser">Task 4: Standings table paste parser</h3>
+<p><strong>Files:</strong></p>
+<ul>
+<li><p>Create: <code>src/features/standings/table-paste-parser.ts</code></p>
+</li>
+<li><p>Test: <code>tests/unit/table-paste-parser.test.ts</code></p>
+</li>
+<li><p><input disabled="" type="checkbox"> <strong>Step 1: Write the failing test</strong></p>
+</li>
+</ul>
+<pre><code class="language-ts">import { PREMIER_LEAGUE_2026_27_TEAMS } from &quot;@/data&quot;;
+import { parsePastedStandingsTable } from &quot;@/features/standings/table-paste-parser&quot;;
+import { describe, expect, it } from &quot;vitest&quot;;
+
+const teams = PREMIER_LEAGUE_2026_27_TEAMS;
+
+describe(&quot;parsePastedStandingsTable&quot;, () =&gt; {
+  it(&quot;parses a full table with positions, played, and points&quot;, () =&gt; {
+    const text = [
+      &quot;1 Liverpool 8 20&quot;,
+      &quot;2 Arsenal 8 18&quot;,
+      &quot;3 Manchester City 8 17&quot;,
+      &quot;Aston Villa 8 15&quot;,
+      &quot;5 Chelsea 7 14&quot;,
+    ].join(&quot;\n&quot;);
+    const parsed = parsePastedStandingsTable(text, teams);
+    const ok = parsed.rows.filter((row) =&gt; row.status === &quot;ok&quot;);
+    expect(ok).toHaveLength(5);
+    expect(ok[0]).toMatchObject({
+      teamSlug: &quot;liverpool&quot;,
+      actualPosition: 1,
+      playedGames: 8,
+      leaguePoints: 20,
+    });
+    expect(parsed.positionsInferred).toBe(false);
+  });
+
+  it(&quot;infers positions from row order when the position column is absent&quot;, () =&gt; {
+    const text = [&quot;Liverpool 8 20&quot;, &quot;Arsenal 8 18&quot;].join(&quot;\n&quot;);
+    const parsed = parsePastedStandingsTable(text, teams);
+    expect(parsed.positionsInferred).toBe(true);
+    const ok = parsed.rows.filter((row) =&gt; row.status === &quot;ok&quot;);
+    expect(ok[0].actualPosition).toBe(1);
+    expect(ok[1].actualPosition).toBe(2);
+  });
+
+  it(&quot;resolves aliases and short names&quot;, () =&gt; {
+    const parsed = parsePastedStandingsTable(
+      [&quot;1 Spurs 8 16&quot;, &quot;2 Man Utd 8 12&quot;].join(&quot;\n&quot;),
+      teams,
+    );
+    const ok = parsed.rows.filter((row) =&gt; row.status === &quot;ok&quot;);
+    expect(ok.map((row) =&gt; row.teamSlug)).toEqual([
+      &quot;tottenham-hotspur&quot;,
+      &quot;manchester-united&quot;,
+    ]);
+  });
+
+  it(&quot;flags unknown clubs without dropping the line&quot;, () =&gt; {
+    const parsed = parsePastedStandingsTable(
+      [&quot;1 Liverpool 8 20&quot;, &quot;1 Bayern Munich 6 18&quot;].join(&quot;\n&quot;),
+      teams,
+    );
+    expect(parsed.rows[1].status).toBe(&quot;unknown-club&quot;);
+    expect(parsed.rows[1].rawLine).toBe(&quot;1 Bayern Munich 6 18&quot;);
+  });
+
+  it(&quot;skips header lines and records that numbers are header-classified&quot;, () =&gt; {
+    const text = [&quot;Pos Club P GD Pts&quot;, &quot;1 Liverpool 8 20&quot;].join(&quot;\n&quot;);
+    const parsed = parsePastedStandingsTable(text, teams);
+    expect(parsed.headerDetected).toBe(true);
+    const ok = parsed.rows.filter((row) =&gt; row.status === &quot;ok&quot;);
+    expect(ok[0].numbersLowConfidence).toBe(false);
+  });
+
+  it(&quot;marks heuristic numbers low-confidence when no header exists&quot;, () =&gt; {
+    const parsed = parsePastedStandingsTable(&quot;Liverpool 8 11 20&quot;, teams);
+    expect(parsed.rows[0].numbersLowConfidence).toBe(true);
+    expect(parsed.rows[0].playedGames).toBe(8);
+    expect(parsed.rows[0].leaguePoints).toBe(20);
+  });
+
+  it(&quot;treats a single trailing number as points&quot;, () =&gt; {
+    const parsed = parsePastedStandingsTable(&quot;Liverpool 20&quot;, teams);
+    expect(parsed.rows[0].playedGames).toBeNull();
+    expect(parsed.rows[0].leaguePoints).toBe(20);
+  });
+
+  it(&quot;ignores junk lines with no club or numbers&quot;, () =&gt; {
+    const parsed = parsePastedStandingsTable(&quot;--- *** ---&quot;, teams);
+    expect(parsed.rows).toHaveLength(0);
+  });
+
+  it(&quot;tolerates thousands separators in numbers&quot;, () =&gt; {
+    const parsed = parsePastedStandingsTable(&quot;Liverpool 1,234 2,000&quot;, teams);
+    expect(parsed.rows[0].playedGames).toBe(1234);
+    expect(parsed.rows[0].leaguePoints).toBe(2000);
+  });
+});
+</code></pre>
+<ul>
+<li><input disabled="" type="checkbox"> <strong>Step 2: Run to verify failure</strong></li>
+</ul>
+<p>Run: <code>npx vitest run tests/unit/table-paste-parser.test.ts</code>
+Expected: FAIL (module not found)</p>
+<ul>
+<li><input disabled="" type="checkbox"> <strong>Step 3: Implement</strong></li>
+</ul>
+<pre><code class="language-ts">import {
+  buildTeamNameIndex,
+  type TeamNameSource,
+} from &quot;@/data/team-name-aliases&quot;;
+import { normalizeForMatch } from &quot;@/shared/text-normalization&quot;;
+
+export type ParsedStandingsRowStatus = &quot;ok&quot; | &quot;unknown-club&quot; | &quot;ambiguous-club&quot;;
+
+export type ParsedStandingsRow = Readonly&lt;{
+  rawLine: string;
+  status: ParsedStandingsRowStatus;
+  teamSlug: string | null;
+  teamLabel: string | null;
+  actualPosition: number | null;
+  playedGames: number | null;
+  leaguePoints: number | null;
+  numbersLowConfidence: boolean;
+}&gt;;
+
+export type ParsedStandingsTable = Readonly&lt;{
+  rows: readonly ParsedStandingsRow[];
+  ignoredLines: readonly string[];
+  positionsInferred: boolean;
+  headerDetected: boolean;
+}&gt;;
+
+const HEADER_LABELS = new Set([
+  &quot;pos&quot;,
+  &quot;p&quot;,
+  &quot;pl&quot;,
+  &quot;played&quot;,
+  &quot;w&quot;,
+  &quot;d&quot;,
+  &quot;l&quot;,
+  &quot;gf&quot;,
+  &quot;ga&quot;,
+  &quot;gd&quot;,
+  &quot;pts&quot;,
+  &quot;points&quot;,
+  &quot;form&quot;,
+]);
+
+type DraftRow = {
+  rawLine: string;
+  status: ParsedStandingsRowStatus;
+  teamSlug: string | null;
+  teamLabel: string | null;
+  actualPosition: number | null;
+  playedGames: number | null;
+  leaguePoints: number | null;
+  numbersLowConfidence: boolean;
+};
+
+function extractIntegers(line: string): number[] {
+  return [...line.matchAll(/\d+(?:,\d{3})*/g)].map((match) =&gt;
+    Number(match[0].replaceAll(&quot;,&quot;, &quot;&quot;)),
+  );
+}
+
+function nameResidue(line: string): string {
+  return line
+    .replace(/\d+(?:,\d{3})*/g, &quot; &quot;)
+    .replace(/[|·•—–:*]/g, &quot; &quot;)
+    .trim();
+}
+
+function resolveClub(
+  residue: string,
+  index: ReadonlyMap&lt;string, string&gt;,
+):
+  | { kind: &quot;matched&quot;; slug: string }
+  | { kind: &quot;unknown&quot; }
+  | { kind: &quot;ambiguous&quot; } {
+  const normalized = normalizeForMatch(residue);
+  if (!normalized) return { kind: &quot;unknown&quot; };
+  const direct = index.get(normalized);
+  if (direct) return { kind: &quot;matched&quot;, slug: direct };
+  const words = normalized.split(&quot; &quot;).filter(Boolean);
+  if (words.length &lt; 2) return { kind: &quot;unknown&quot; };
+  const slugs = new Set&lt;string&gt;();
+  for (let size = words.length - 1; size &gt;= 2; size -= 1) {
+    for (let start = 0; start + size &lt;= words.length; start += 1) {
+      const slug = index.get(words.slice(start, start + size).join(&quot; &quot;));
+      if (slug) slugs.add(slug);
+    }
+    if (slugs.size &gt; 1) return { kind: &quot;ambiguous&quot; };
+  }
+  if (slugs.size === 1) return { kind: &quot;matched&quot;, slug: [...slugs][0] };
+  return { kind: &quot;unknown&quot; };
+}
+
+function classifyNumbers(
+  suffixInts: readonly number[],
+  headerDetected: boolean,
+) {
+  if (suffixInts.length === 0) {
+    return {
+      playedGames: null,
+      leaguePoints: null,
+      numbersLowConfidence: false,
+    };
+  }
+  if (suffixInts.length === 1) {
+    return {
+      leaguePoints: suffixInts[0],
+      numbersLowConfidence: true,
+      playedGames: null,
+    };
+  }
+  return {
+    leaguePoints: suffixInts[suffixInts.length - 1],
+    numbersLowConfidence: !headerDetected,
+    playedGames: suffixInts[0],
+  };
+}
+
+export function parsePastedStandingsTable(
+  text: string,
+  teams: readonly TeamNameSource[],
+): ParsedStandingsTable {
+  const index = buildTeamNameIndex(teams);
+  const labelBySlug = new Map(
+    teams.map((team) =&gt; [team.slug, team.displayName] as const),
+  );
+  const drafts: DraftRow[] = [];
+  const ignoredLines: string[] = [];
+  let headerDetected = false;
+
+  for (const rawLine of text.split(/\r?\n/)) {
+    const line = rawLine.trim();
+    if (!line) continue;
+    const integers = extractIntegers(line);
+    const residue = nameResidue(line);
+    const residueTokens = normalizeForMatch(residue).split(&quot; &quot;).filter(Boolean);
+    if (
+      !headerDetected &amp;&amp;
+      residueTokens.length &gt;= 2 &amp;&amp;
+      residueTokens.every((token) =&gt; HEADER_LABELS.has(token))
+    ) {
+      headerDetected = true;
+      continue;
+    }
+    if (residueTokens.length === 0 &amp;&amp; integers.length === 0) continue;
+
+    const resolved = resolveClub(residue, index);
+    if (resolved.kind !== &quot;matched&quot;) {
+      drafts.push({
+        rawLine: line,
+        status:
+          resolved.kind === &quot;ambiguous&quot; ? &quot;ambiguous-club&quot; : &quot;unknown-club&quot;,
+        teamSlug: null,
+        teamLabel: residue || null,
+        actualPosition: null,
+        playedGames: null,
+        leaguePoints: null,
+        numbersLowConfidence: true,
+      });
+      continue;
+    }
+
+    const leading =
+      integers.length &gt; 0 &amp;&amp; integers[0] &gt;= 1 &amp;&amp; integers[0] &lt;= 20
+        ? integers[0]
+        : null;
+    const metrics = leading !== null ? integers.slice(1) : integers;
+    drafts.push({
+      rawLine: line,
+      status: &quot;ok&quot;,
+      teamSlug: resolved.slug,
+      teamLabel: labelBySlug.get(resolved.slug) ?? null,
+      actualPosition: leading,
+      ...classifyNumbers(metrics, headerDetected),
+    });
+  }
+
+  const clubRows = drafts.filter((row) =&gt; row.status === &quot;ok&quot;);
+  const explicitPositions =
+    clubRows.length &gt; 0 &amp;&amp; clubRows.every((row) =&gt; row.actualPosition !== null);
+  const positionsInferred = !explicitPositions;
+  if (positionsInferred) {
+    let position = 0;
+    for (const row of drafts) {
+      if (row.status !== &quot;ok&quot;) continue;
+      position += 1;
+      row.actualPosition = position;
+    }
+  }
+
+  return {
+    headerDetected,
+    ignoredLines,
+    positionsInferred,
+    rows: drafts.map(({ ...row }) =&gt; ({ ...row })),
+  };
+}
+</code></pre>
+<p>Note on ambiguity rule: word-window matching only fires for phrases of 2+ words; single leftover words never match, so &quot;united&quot;/&quot;city&quot; cannot silently resolve. Multiple distinct window hits → <code>ambiguous-club</code>.</p>
+<ul>
+<li><input disabled="" type="checkbox"> <strong>Step 4: Verify pass</strong></li>
+</ul>
+<p>Run: <code>npx vitest run tests/unit/table-paste-parser.test.ts</code>
+Expected: PASS</p>
+<ul>
+<li><input disabled="" type="checkbox"> <strong>Step 5: Commit</strong></li>
+</ul>
+<pre><code class="language-bash">git add src/features/standings/table-paste-parser.ts tests/unit/table-paste-parser.test.ts
+git commit -m &quot;feat: add standings table paste parser&quot;
+</code></pre>
+<hr>
+<h3 id="task-5-standings-diff">Task 5: Standings diff</h3>
+<p><strong>Files:</strong></p>
+<ul>
+<li><p>Create: <code>src/features/standings/table-diff.ts</code></p>
+</li>
+<li><p>Test: <code>tests/unit/table-diff.test.ts</code></p>
+</li>
+<li><p><input disabled="" type="checkbox"> <strong>Step 1: Write the failing test</strong></p>
+</li>
+</ul>
+<pre><code class="language-ts">import { buildStandingsDiff } from &quot;@/features/standings/table-diff&quot;;
+import { describe, expect, it } from &quot;vitest&quot;;
+
+describe(&quot;buildStandingsDiff&quot;, () =&gt; {
+  const activeItems = [
+    {
+      teamSlug: &quot;liverpool&quot;,
+      actualPosition: 1,
+      playedGames: 7,
+      leaguePoints: 19,
+    },
+    {
+      teamSlug: &quot;arsenal&quot;,
+      actualPosition: 2,
+      playedGames: 7,
+      leaguePoints: 16,
+    },
+  ];
+  const labelBySlug = new Map([
+    [&quot;liverpool&quot;, &quot;Liverpool&quot;],
+    [&quot;arsenal&quot;, &quot;Arsenal&quot;],
+  ] as const);
+
+  it(&quot;reports unchanged rows as not changed&quot;, () =&gt; {
+    const diff = buildStandingsDiff({
+      activeItems,
+      labelBySlug,
+      newItems: [
+        {
+          teamSlug: &quot;liverpool&quot;,
+          actualPosition: 1,
+          playedGames: 7,
+          leaguePoints: 19,
+        },
+        {
+          teamSlug: &quot;arsenal&quot;,
+          actualPosition: 2,
+          playedGames: 7,
+          leaguePoints: 16,
+        },
+      ],
+    });
+    expect(diff.movedCount).toBe(0);
+    expect(diff.rows.every((row) =&gt; !row.changed)).toBe(true);
+  });
+
+  it(&quot;reports position and number changes&quot;, () =&gt; {
+    const diff = buildStandingsDiff({
+      activeItems,
+      labelBySlug,
+      newItems: [
+        {
+          teamSlug: &quot;arsenal&quot;,
+          actualPosition: 1,
+          playedGames: 8,
+          leaguePoints: 19,
+        },
+        {
+          teamSlug: &quot;liverpool&quot;,
+          actualPosition: 2,
+          playedGames: 8,
+          leaguePoints: 19,
+        },
+      ],
+    });
+    expect(diff.movedCount).toBe(2);
+    const arsenal = diff.rows.find((row) =&gt; row.teamSlug === &quot;arsenal&quot;);
+    expect(arsenal).toMatchObject({
+      oldPosition: 2,
+      newPosition: 1,
+      oldPlayed: 7,
+      newPlayed: 8,
+    });
+  });
+
+  it(&quot;lists missing teams present in the active snapshot&quot;, () =&gt; {
+    const diff = buildStandingsDiff({
+      activeItems,
+      labelBySlug,
+      newItems: [
+        {
+          teamSlug: &quot;liverpool&quot;,
+          actualPosition: 1,
+          playedGames: 7,
+          leaguePoints: 19,
+        },
+      ],
+    });
+    expect(diff.missingTeams).toEqual([&quot;arsenal&quot;]);
+  });
+
+  it(&quot;sorts rows by new position&quot;, () =&gt; {
+    const diff = buildStandingsDiff({
+      activeItems,
+      labelBySlug,
+      newItems: [
+        {
+          teamSlug: &quot;arsenal&quot;,
+          actualPosition: 1,
+          playedGames: 7,
+          leaguePoints: 16,
+        },
+        {
+          teamSlug: &quot;liverpool&quot;,
+          actualPosition: 2,
+          playedGames: 7,
+          leaguePoints: 19,
+        },
+      ],
+    });
+    expect(diff.rows.map((row) =&gt; row.teamSlug)).toEqual([
+      &quot;arsenal&quot;,
+      &quot;liverpool&quot;,
+    ]);
+  });
+});
+</code></pre>
+<ul>
+<li><input disabled="" type="checkbox"> <strong>Step 2: Run to verify failure</strong></li>
+</ul>
+<p>Run: <code>npx vitest run tests/unit/table-diff.test.ts</code>
+Expected: FAIL (module not found)</p>
+<ul>
+<li><input disabled="" type="checkbox"> <strong>Step 3: Implement</strong></li>
+</ul>
+<pre><code class="language-ts">export type DiffInputItem = Readonly&lt;{
+  actualPosition: number;
+  leaguePoints: number | null;
+  playedGames: number | null;
+  teamSlug: string;
+}&gt;;
+
+export type StandingsDiffRow = Readonly&lt;{
+  changed: boolean;
+  newPosition: number;
+  newPlayed: number | null;
+  newPoints: number | null;
+  oldPosition: number | null;
+  oldPlayed: number | null;
+  oldPoints: number | null;
+  teamLabel: string;
+  teamSlug: string;
+}&gt;;
+
+export type StandingsDiff = Readonly&lt;{
+  addedTeams: readonly string[];
+  missingTeams: readonly string[];
+  movedCount: number;
+  rows: readonly StandingsDiffRow[];
+}&gt;;
+
+export function buildStandingsDiff({
+  activeItems,
+  labelBySlug,
+  newItems,
+}: {
+  activeItems: readonly DiffInputItem[];
+  labelBySlug: ReadonlyMap&lt;string, string&gt;;
+  newItems: readonly DiffInputItem[];
+}): StandingsDiff {
+  const oldBySlug = new Map(
+    activeItems.map((item) =&gt; [item.teamSlug, item] as const),
+  );
+  const newSlugs = new Set(newItems.map((item) =&gt; item.teamSlug));
+  const rows = newItems
+    .map((item) =&gt; {
+      const old = oldBySlug.get(item.teamSlug) ?? null;
+      const changed =
+        !old ||
+        old.actualPosition !== item.actualPosition ||
+        old.playedGames !== item.playedGames ||
+        old.leaguePoints !== item.leaguePoints;
+      return {
+        changed,
+        newPosition: item.actualPosition,
+        newPlayed: item.playedGames,
+        newPoints: item.leaguePoints,
+        oldPosition: old?.actualPosition ?? null,
+        oldPlayed: old?.playedGames ?? null,
+        oldPoints: old?.leaguePoints ?? null,
+        teamLabel: labelBySlug.get(item.teamSlug) ?? item.teamSlug,
+        teamSlug: item.teamSlug,
+      };
+    })
+    .sort((left, right) =&gt; left.newPosition - right.newPosition);
+  return {
+    addedTeams: newItems
+      .filter((item) =&gt; !oldBySlug.has(item.teamSlug))
+      .map((item) =&gt; item.teamSlug),
+    missingTeams: activeItems
+      .filter((item) =&gt; !newSlugs.has(item.teamSlug))
+      .map((item) =&gt; item.teamSlug),
+    movedCount: rows.filter((row) =&gt; row.changed).length,
+    rows,
+  };
+}
+</code></pre>
+<ul>
+<li><input disabled="" type="checkbox"> <strong>Step 4: Verify pass</strong></li>
+</ul>
+<p>Run: <code>npx vitest run tests/unit/table-diff.test.ts</code>
+Expected: PASS</p>
+<ul>
+<li><input disabled="" type="checkbox"> <strong>Step 5: Commit</strong></li>
+</ul>
+<pre><code class="language-bash">git add src/features/standings/table-diff.ts tests/unit/table-diff.test.ts
+git commit -m &quot;feat: add standings table diff&quot;
+</code></pre>
+<hr>
+<h3 id="task-6-standings-paste-panel-component">Task 6: Standings paste panel component</h3>
+<p><strong>Files:</strong></p>
+<ul>
+<li><p>Create: <code>src/features/standings/standings-paste-panel.tsx</code></p>
+</li>
+<li><p>Test: <code>tests/components/standings-paste-panel.test.tsx</code></p>
+</li>
+<li><p>Modify: <code>src/app/admin/standings/page.tsx</code></p>
+</li>
+<li><p><input disabled="" type="checkbox"> <strong>Step 1: Write the failing component test</strong></p>
+</li>
+</ul>
+<pre><code class="language-tsx">import {
+  cleanup,
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+} from &quot;@testing-library/react&quot;;
+import { afterEach, describe, expect, it, vi } from &quot;vitest&quot;;
+
+import { StandingsPastePanel } from &quot;@/features/standings/standings-paste-panel&quot;;
+
+const teams = [
+  { displayName: &quot;Liverpool&quot;, id: &quot;t-liv&quot;, slug: &quot;liverpool&quot; },
+  { displayName: &quot;Arsenal&quot;, id: &quot;t-ars&quot;, slug: &quot;arsenal&quot; },
+];
+
+const activeItems = [
+  {
+    actualPosition: 1,
+    leaguePoints: 19,
+    playedGames: 7,
+    teamSlug: &quot;liverpool&quot;,
+  },
+  { actualPosition: 2, leaguePoints: 16, playedGames: 7, teamSlug: &quot;arsenal&quot; },
+];
+
+afterEach(cleanup);
+
+function renderPanel(
+  onSubmit = vi.fn().mockResolvedValue({ ok: true, message: &quot;Saved.&quot; }),
+) {
+  render(
+    &lt;StandingsPastePanel
+      activeItems={activeItems}
+      disabled={false}
+      onSubmit={onSubmit}
+      teams={teams}
+    /&gt;,
+  );
+  return onSubmit;
+}
+
+describe(&quot;StandingsPastePanel&quot;, () =&gt; {
+  it(&quot;parses pasted text and shows a preview with statuses&quot;, () =&gt; {
+    renderPanel();
+    fireEvent.change(screen.getByLabelText(&quot;Pasted table text&quot;), {
+      target: { value: &quot;1 Liverpool 8 20\n2 Arsenal 8 18&quot; },
+    });
+    fireEvent.click(screen.getByRole(&quot;button&quot;, { name: &quot;Parse table&quot; }));
+    expect(screen.getByText(&quot;Liverpool&quot;)).toBeTruthy();
+    expect(screen.getAllByRole(&quot;cell&quot;, { name: &quot;OK&quot; })).toHaveLength(2);
+  });
+
+  it(&quot;blocks confirm while clubs are missing and lists problems&quot;, () =&gt; {
+    renderPanel();
+    fireEvent.change(screen.getByLabelText(&quot;Pasted table text&quot;), {
+      target: { value: &quot;1 Liverpool 8 20&quot; },
+    });
+    fireEvent.click(screen.getByRole(&quot;button&quot;, { name: &quot;Parse table&quot; }));
+    expect(screen.getByText(/Parsed 1 of 20 clubs/)).toBeTruthy();
+    const confirm = screen.getByRole(&quot;button&quot;, { name: &quot;Save pasted table&quot; });
+    expect((confirm as HTMLButtonElement).disabled).toBe(true);
+  });
+
+  it(&quot;blocks confirm on unknown club lines&quot;, () =&gt; {
+    renderPanel();
+    fireEvent.change(screen.getByLabelText(&quot;Pasted table text&quot;), {
+      target: { value: &quot;1 Bayern Munich 8 20&quot; },
+    });
+    fireEvent.click(screen.getByRole(&quot;button&quot;, { name: &quot;Parse table&quot; }));
+    expect(screen.getByText(/Unknown club/)).toBeTruthy();
+  });
+
+  it(&quot;submits the validated payload through onSubmit and clears on success&quot;, async () =&gt; {
+    const onSubmit = vi.fn().mockResolvedValue({
+      ok: true,
+      message: &quot;The validated provisional table is now active.&quot;,
+    });
+    render(
+      &lt;StandingsPastePanel
+        activeItems={activeItems}
+        disabled={false}
+        onSubmit={onSubmit}
+        teams={[
+          ...teams,
+          { displayName: &quot;Aston Villa&quot;, id: &quot;t-avl&quot;, slug: &quot;aston-villa&quot; },
+        ]}
+      /&gt;,
+    );
+    fireEvent.change(screen.getByLabelText(&quot;Pasted table text&quot;), {
+      target: { value: &quot;1 Liverpool 8 20\n2 Arsenal 8 18\n3 Aston Villa 8 15&quot; },
+    });
+    fireEvent.click(screen.getByRole(&quot;button&quot;, { name: &quot;Parse table&quot; }));
+    fireEvent.click(screen.getByRole(&quot;button&quot;, { name: &quot;Save pasted table&quot; }));
+    await waitFor(() =&gt; expect(onSubmit).toHaveBeenCalled());
+    expect(onSubmit.mock.calls[0][0].standings[0]).toEqual({
+      teamSlug: &quot;liverpool&quot;,
+      actualPosition: 1,
+      playedGames: 8,
+      leaguePoints: 20,
+    });
+    await waitFor(() =&gt;
+      expect(screen.getByText(/validated provisional table/)).toBeTruthy(),
+    );
+  });
+
+  it(&quot;disables everything when disabled is true&quot;, () =&gt; {
+    render(
+      &lt;StandingsPastePanel
+        activeItems={activeItems}
+        disabled
+        onSubmit={vi.fn()}
+        teams={teams}
+      /&gt;,
+    );
+    expect(
+      (screen.getByLabelText(&quot;Pasted table text&quot;) as HTMLTextAreaElement)
+        .disabled,
+    ).toBe(true);
+  });
+});
+</code></pre>
+<p>Note: this panel test uses a reduced two/three-club team list so the &quot;Parsed N of 20&quot; problem path triggers without needing all 20 clubs in fixtures.</p>
+<ul>
+<li><input disabled="" type="checkbox"> <strong>Step 2: Run to verify failure</strong></li>
+</ul>
+<p>Run: <code>npx vitest run tests/components/standings-paste-panel.test.tsx</code>
+Expected: FAIL (module not found)</p>
+<ul>
+<li><input disabled="" type="checkbox"> <strong>Step 3: Implement the component</strong></li>
+</ul>
+<pre><code class="language-tsx">&quot;use client&quot;;
+
+import { useMemo, useState } from &quot;react&quot;;
+
+import { Button } from &quot;@/components/ui/button&quot;;
+import { PREMIER_LEAGUE_2026_27_TEAM_SLUGS } from &quot;@/data&quot;;
+import { createStandingsItemsSchema } from &quot;@/features/standings/validation&quot;;
+import type {
+  ManualStandingsPayload,
+  ManualStandingsResult,
+} from &quot;./manual-standings-form&quot;;
+import { parsePastedStandingsTable } from &quot;./table-paste-parser&quot;;
+import { buildStandingsDiff } from &quot;./table-diff&quot;;
+
+const payloadSchema = createStandingsItemsSchema(
+  PREMIER_LEAGUE_2026_27_TEAM_SLUGS,
+);
+
+export type StandingsPastePanelProps = Readonly&lt;{
+  activeItems: readonly {
+    actualPosition: number;
+    leaguePoints: number | null;
+    playedGames: number | null;
+    teamId: string;
+  }[];
+  disabled: boolean;
+  onSubmit: (payload: ManualStandingsPayload) =&gt; Promise&lt;ManualStandingsResult&gt;;
+  teams: readonly { displayName: string; id: string; slug: string }[];
+}&gt;;
+
+export function StandingsPastePanel({
+  activeItems,
+  disabled,
+  onSubmit,
+  teams,
+}: StandingsPastePanelProps) {
+  const [text, setText] = useState(&quot;&quot;);
+  const [parsed, setParsed] = useState&lt;ReturnType&lt;
+    typeof parsePastedStandingsTable
+  &gt; | null&gt;(null);
+  const [busy, setBusy] = useState(false);
+  const [message, setMessage] = useState&lt;string | null&gt;(null);
+
+  const labelBySlug = useMemo(
+    () =&gt; new Map(teams.map((team) =&gt; [team.slug, team.displayName] as const)),
+    [teams],
+  );
+  const slugByTeamId = useMemo(
+    () =&gt; new Map(teams.map((team) =&gt; [team.id, team.slug] as const)),
+    [teams],
+  );
+
+  const newItems = useMemo(() =&gt; {
+    if (!parsed) return [];
+    return parsed.rows.flatMap((row) =&gt;
+      row.status === &quot;ok&quot; &amp;&amp; row.teamSlug &amp;&amp; row.actualPosition !== null
+        ? [
+            {
+              actualPosition: row.actualPosition,
+              leaguePoints: row.leaguePoints,
+              playedGames: row.playedGames,
+              teamSlug: row.teamSlug,
+            },
+          ]
+        : [],
+    );
+  }, [parsed]);
+
+  const diff = useMemo(() =&gt; {
+    if (!parsed) return null;
+    return buildStandingsDiff({
+      activeItems: activeItems.flatMap((item) =&gt; {
+        const teamSlug = slugByTeamId.get(item.teamId);
+        return teamSlug ? [{ ...item, teamSlug }] : [];
+      }),
+      labelBySlug,
+      newItems,
+    });
+  }, [activeItems, labelBySlug, newItems, parsed, slugByTeamId]);
+
+  const problems = useMemo(() =&gt; {
+    if (!parsed) return [] as string[];
+    const list: string[] = [];
+    for (const row of parsed.rows) {
+      if (row.status === &quot;unknown-club&quot;) {
+        list.push(`Unknown club: “${row.rawLine}”`);
+      }
+      if (row.status === &quot;ambiguous-club&quot;) {
+        list.push(`Ambiguous club name: “${row.rawLine}”`);
+      }
+    }
+    if (newItems.length !== 20) {
+      list.push(`Parsed ${newItems.length} of 20 clubs.`);
+    }
+    if (
+      !parsed.positionsInferred &amp;&amp;
+      new Set(newItems.map((item) =&gt; item.actualPosition)).size !==
+        newItems.length
+    ) {
+      list.push(&quot;Positions must be unique.&quot;);
+    }
+    if (newItems.length === 20) {
+      const check = payloadSchema.safeParse(newItems);
+      if (!check.success) {
+        list.push(
+          check.error.issues[0]?.message ?? &quot;The parsed table is not valid.&quot;,
+        );
+      }
+    }
+    return list;
+  }, [newItems, parsed]);
+
+  async function confirm() {
+    if (!parsed || problems.length &gt; 0) return;
+    setBusy(true);
+    setMessage(null);
+    try {
+      const result = await onSubmit({ matchweek: null, standings: newItems });
+      setMessage(result.message);
+      if (result.ok) {
+        setText(&quot;&quot;);
+        setParsed(null);
+      }
+    } catch {
+      setMessage(&quot;Something went wrong. No changes were made.&quot;);
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  return (
+    &lt;section
+      aria-labelledby=&quot;paste-table-title&quot;
+      className=&quot;rounded-xl border border-slate-200 p-4&quot;
+    &gt;
+      &lt;h2 className=&quot;font-black text-slate-950&quot; id=&quot;paste-table-title&quot;&gt;
+        Paste table
+      &lt;/h2&gt;
+      &lt;p className=&quot;mt-1 text-sm leading-6 text-slate-600&quot;&gt;
+        Copy any league table as text. Parsing never guesses: unknown or
+        ambiguous clubs block saving.
+      &lt;/p&gt;
+      &lt;textarea
+        aria-label=&quot;Pasted table text&quot;
+        className=&quot;mt-3 min-h-40 w-full rounded-xl border border-slate-300 bg-white p-3 font-mono text-sm outline-none focus:border-emerald-600 focus:ring-2 focus:ring-emerald-200 disabled:bg-slate-100&quot;
+        disabled={disabled || busy}
+        onChange={(event) =&gt; {
+          setText(event.target.value);
+          setParsed(null);
+          setMessage(null);
+        }}
+        rows={8}
+        value={text}
+      /&gt;
+      &lt;div className=&quot;mt-3 flex flex-wrap items-center gap-2&quot;&gt;
+        &lt;Button
+          disabled={disabled || busy || text.trim().length === 0}
+          onClick={() =&gt; setParsed(parsePastedStandingsTable(text, teams))}
+          variant=&quot;secondary&quot;
+        &gt;
+          Parse table
+        &lt;/Button&gt;
+        &lt;Button
+          disabled={disabled || busy || !parsed || problems.length &gt; 0}
+          onClick={() =&gt; void confirm()}
+        &gt;
+          Save pasted table
+        &lt;/Button&gt;
+      &lt;/div&gt;
+      {message ? (
+        &lt;p className=&quot;mt-2 text-sm font-semibold text-slate-700&quot; role=&quot;status&quot;&gt;
+          {message}
+        &lt;/p&gt;
+      ) : null}
+      {parsed ? (
+        &lt;div className=&quot;mt-4 grid gap-3&quot;&gt;
+          {problems.length &gt; 0 ? (
+            &lt;ul className=&quot;list-disc rounded-xl bg-red-50 p-3 pl-6 text-sm font-semibold text-red-800&quot;&gt;
+              {problems.map((problem) =&gt; (
+                &lt;li key={problem}&gt;{problem}&lt;/li&gt;
+              ))}
+            &lt;/ul&gt;
+          ) : null}
+          {diff ? (
+            &lt;p className=&quot;text-sm font-semibold text-slate-700&quot; role=&quot;status&quot;&gt;
+              {diff.movedCount} of {diff.rows.length} rows differ from the
+              active table.
+              {diff.missingTeams.length &gt; 0
+                ? ` Missing from paste: ${diff.missingTeams.length}.`
+                : &quot;&quot;}
+            &lt;/p&gt;
+          ) : null}
+          &lt;div className=&quot;max-w-full overflow-x-auto rounded-xl border border-slate-200&quot;&gt;
+            &lt;table className=&quot;w-full min-w-[32rem] border-collapse text-left text-sm&quot;&gt;
+              &lt;thead className=&quot;bg-slate-50 text-xs tracking-wide text-slate-600 uppercase&quot;&gt;
+                &lt;tr&gt;
+                  &lt;th className=&quot;px-3 py-2&quot; scope=&quot;col&quot;&gt;
+                    Pos
+                  &lt;/th&gt;
+                  &lt;th className=&quot;px-3 py-2&quot; scope=&quot;col&quot;&gt;
+                    Club
+                  &lt;/th&gt;
+                  &lt;th className=&quot;px-3 py-2&quot; scope=&quot;col&quot;&gt;
+                    Played
+                  &lt;/th&gt;
+                  &lt;th className=&quot;px-3 py-2&quot; scope=&quot;col&quot;&gt;
+                    Points
+                  &lt;/th&gt;
+                  &lt;th className=&quot;px-3 py-2&quot; scope=&quot;col&quot;&gt;
+                    Status
+                  &lt;/th&gt;
+                &lt;/tr&gt;
+              &lt;/thead&gt;
+              &lt;tbody className=&quot;divide-y divide-slate-100&quot;&gt;
+                {parsed.rows.map((row) =&gt; (
+                  &lt;tr key={row.rawLine}&gt;
+                    &lt;td className=&quot;px-3 py-2&quot;&gt;{row.actualPosition ?? &quot;—&quot;}&lt;/td&gt;
+                    &lt;td className=&quot;px-3 py-2&quot;&gt;{row.teamLabel ?? &quot;—&quot;}&lt;/td&gt;
+                    &lt;td className=&quot;px-3 py-2&quot;&gt;{row.playedGames ?? &quot;—&quot;}&lt;/td&gt;
+                    &lt;td className=&quot;px-3 py-2&quot;&gt;{row.leaguePoints ?? &quot;—&quot;}&lt;/td&gt;
+                    &lt;td className=&quot;px-3 py-2 text-xs font-bold&quot; role=&quot;cell&quot;&gt;
+                      {row.status === &quot;ok&quot;
+                        ? row.numbersLowConfidence
+                          ? &quot;Check numbers&quot;
+                          : &quot;OK&quot;
+                        : row.status === &quot;unknown-club&quot;
+                          ? &quot;Unknown club&quot;
+                          : &quot;Ambiguous&quot;}
+                    &lt;/td&gt;
+                  &lt;/tr&gt;
+                ))}
+              &lt;/tbody&gt;
+            &lt;/table&gt;
+          &lt;/div&gt;
+        &lt;/div&gt;
+      ) : null}
+    &lt;/section&gt;
+  );
+}
+</code></pre>
+<p>Check <code>ManualStandingsResult</code> in <code>src/features/standings/manual-standings-form.tsx</code> before wiring — <code>saveManualStandings</code> returns <code>{ ok, message }</code>; adapt the type import if its shape differs.</p>
+<ul>
+<li><input disabled="" type="checkbox"> <strong>Step 4: Verify pass</strong></li>
+</ul>
+<p>Run: <code>npx vitest run tests/components/standings-paste-panel.test.tsx</code>
+Expected: PASS</p>
+<ul>
+<li><input disabled="" type="checkbox"> <strong>Step 5: Wire into the standings page</strong></li>
+</ul>
+<p>In <code>src/app/admin/standings/page.tsx</code>:</p>
+<pre><code class="language-tsx">import { StandingsPastePanel } from &quot;@/features/standings/standings-paste-panel&quot;;
+</code></pre>
+<p>Render directly above the existing <code>&lt;ManualStandingsForm …&gt;</code> card (keep the manual form; both write through the same validated action):</p>
+<pre><code class="language-tsx">&lt;StandingsPastePanel
+  activeItems={activeItems}
+  disabled={Boolean(activeSnapshot?.isFinal)}
+  onSubmit={saveManualStandings}
+  teams={teams.map((team) =&gt; ({
+    displayName: team.displayName,
+    id: team.id,
+    slug: team.slug,
+  }))}
+/&gt;
+</code></pre>
+<p><code>activeItems</code> already exists in that page with <code>{ teamId, actualPosition, playedGames, leaguePoints }</code>; <code>teams</code> comes from <code>getSeasonTeams</code> and includes <code>slug</code>. If <code>getSeasonTeams</code> rows lack <code>slug</code>, map it the same way <code>ManualStandingsForm</code> obtains slugs today.</p>
+<ul>
+<li><input disabled="" type="checkbox"> <strong>Step 6: Typecheck and lint</strong></li>
+</ul>
+<p>Run: <code>npm run typecheck &amp;&amp; npm run lint</code>
+Expected: PASS</p>
+<ul>
+<li><input disabled="" type="checkbox"> <strong>Step 7: Commit</strong></li>
+</ul>
+<pre><code class="language-bash">git add src/features/standings/standings-paste-panel.tsx tests/components/standings-paste-panel.test.tsx src/app/admin/standings/page.tsx
+git commit -m &quot;feat: add standings paste panel to admin standings page&quot;
+</code></pre>
+<hr>
+<h3 id="task-7-boundary-ties-and-coverage-helpers">Task 7: Boundary ties and coverage helpers</h3>
+<p><strong>Files:</strong></p>
+<ul>
+<li><p>Create: <code>src/features/results/boundary-ties.ts</code></p>
+</li>
+<li><p>Test: <code>tests/unit/boundary-ties.test.ts</code></p>
+</li>
+<li><p><input disabled="" type="checkbox"> <strong>Step 1: Write the failing test</strong></p>
+</li>
+</ul>
+<pre><code class="language-ts">import {
+  evaluateCoverage,
+  findBoundaryTieWarnings,
+} from &quot;@/features/results/boundary-ties&quot;;
+import { describe, expect, it } from &quot;vitest&quot;;
+
+const rows = (values: number[]) =&gt;
+  values.map((metricValue) =&gt; ({ metricValue }));
+
+describe(&quot;findBoundaryTieWarnings&quot;, () =&gt; {
+  it(&quot;returns no warnings when no tie straddles the boundary&quot;, () =&gt; {
+    expect(findBoundaryTieWarnings(rows([9, 8, 7]), 2, &quot;descending&quot;)).toEqual(
+      [],
+    );
+  });
+
+  it(&quot;warns when a tie group spans rank N&quot;, () =&gt; {
+    const warnings = findBoundaryTieWarnings(
+      rows([9, 8, 8, 6]),
+      2,
+      &quot;descending&quot;,
+    );
+    expect(warnings).toHaveLength(1);
+    expect(warnings[0]).toMatchObject({
+      tiedCount: 2,
+      tiedValue: 8,
+      boundaryRank: 2,
+    });
+  });
+
+  it(&quot;warns on ascending direction for overrated views&quot;, () =&gt; {
+    const warnings = findBoundaryTieWarnings(
+      rows([4.1, 5.5, 5.5, 6.9]),
+      2,
+      &quot;ascending&quot;,
+    );
+    expect(warnings).toHaveLength(1);
+    expect(warnings[0]).toMatchObject({ tiedCount: 2, tiedValue: 5.5 });
+  });
+
+  it(&quot;does not warn when the tie sits fully inside the covered range&quot;, () =&gt; {
+    expect(findBoundaryTieWarnings(rows([9, 9, 7]), 3, &quot;descending&quot;)).toEqual(
+      [],
+    );
+  });
+});
+
+describe(&quot;evaluateCoverage&quot;, () =&gt; {
+  it(&quot;reports complete coverage at exactly N rows&quot;, () =&gt; {
+    expect(evaluateCoverage(rows([3, 2, 1]), 3)).toEqual({
+      complete: true,
+      coveredThroughRank: 3,
+      shortfall: 0,
+    });
+  });
+
+  it(&quot;reports shortfall below N&quot;, () =&gt; {
+    expect(evaluateCoverage(rows([3, 2]), 3)).toEqual({
+      complete: false,
+      coveredThroughRank: 2,
+      shortfall: 1,
+    });
+  });
+
+  it(&quot;ignores extra rows beyond N&quot;, () =&gt; {
+    expect(evaluateCoverage(rows([5, 4, 3, 2, 1]), 3).complete).toBe(true);
+  });
+});
+</code></pre>
+<ul>
+<li><input disabled="" type="checkbox"> <strong>Step 2: Run to verify failure</strong></li>
+</ul>
+<p>Run: <code>npx vitest run tests/unit/boundary-ties.test.ts</code>
+Expected: FAIL (module not found)</p>
+<ul>
+<li><input disabled="" type="checkbox"> <strong>Step 3: Implement</strong></li>
+</ul>
+<pre><code class="language-ts">export type MetricDirection = &quot;ascending&quot; | &quot;descending&quot;;
+
+export type BoundaryTieWarning = Readonly&lt;{
+  boundaryRank: number;
+  direction: MetricDirection;
+  tiedCount: number;
+  tiedValue: number;
+}&gt;;
+
+function sortedValues(
+  rows: readonly { metricValue: number }[],
+  direction: MetricDirection,
+): number[] {
+  return rows
+    .map((row) =&gt; row.metricValue)
+    .sort((left, right) =&gt;
+      direction === &quot;descending&quot; ? right - left : left - right,
+    );
+}
+
+export function findBoundaryTieWarnings(
+  rows: readonly { metricValue: number }[],
+  boundaryRank: number,
+  direction: MetricDirection,
+): BoundaryTieWarning[] {
+  if (boundaryRank &lt; 1 || rows.length === 0) return [];
+  const values = sortedValues(rows, direction);
+  const warnings: BoundaryTieWarning[] = [];
+  let index = 0;
+  while (index &lt; values.length) {
+    const tiedValue = values[index];
+    let end = index;
+    while (end &lt; values.length &amp;&amp; values[end] === tiedValue) end += 1;
+    const startRank = index + 1;
+    if (startRank &lt;= boundaryRank &amp;&amp; boundaryRank &lt; end) {
+      warnings.push({
+        boundaryRank,
+        direction,
+        tiedCount: end - index,
+        tiedValue,
+      });
+    }
+    index = end;
+  }
+  return warnings;
+}
+
+export function evaluateCoverage(
+  rows: readonly { metricValue: number }[],
+  requiredRank: number,
+): Readonly&lt;{
+  complete: boolean;
+  coveredThroughRank: number;
+  shortfall: number;
+}&gt; {
+  const coveredThroughRank = Math.min(requiredRank, rows.length);
+  return {
+    complete: rows.length &gt;= requiredRank,
+    coveredThroughRank,
+    shortfall: Math.max(0, requiredRank - rows.length),
+  };
+}
+</code></pre>
+<ul>
+<li><input disabled="" type="checkbox"> <strong>Step 4: Verify pass</strong></li>
+</ul>
+<p>Run: <code>npx vitest run tests/unit/boundary-ties.test.ts</code>
+Expected: PASS</p>
+<ul>
+<li><input disabled="" type="checkbox"> <strong>Step 5: Commit</strong></li>
+</ul>
+<pre><code class="language-bash">git add src/features/results/boundary-ties.ts tests/unit/boundary-ties.test.ts
+git commit -m &quot;feat: add boundary tie and coverage helpers&quot;
+</code></pre>
+<hr>
+<h3 id="task-8-spotlight-list-paste-parser">Task 8: Spotlight list paste parser</h3>
+<p><strong>Files:</strong></p>
+<ul>
+<li><p>Create: <code>src/features/results/list-paste-parser.ts</code></p>
+</li>
+<li><p>Test: <code>tests/unit/list-paste-parser.test.ts</code></p>
+</li>
+<li><p><input disabled="" type="checkbox"> <strong>Step 1: Write the failing test</strong></p>
+</li>
+</ul>
+<pre><code class="language-ts">import { parsePastedResultList } from &quot;@/features/results/list-paste-parser&quot;;
+import { describe, expect, it } from &quot;vitest&quot;;
+
+const players = [
+  { id: &quot;p-haaland&quot;, names: [&quot;Haaland&quot;, &quot;Haaland, Erling&quot;] },
+  { id: &quot;p-salah&quot;, names: [&quot;Salah&quot;] },
+  { id: &quot;p-wilson&quot;, names: [&quot;Wilson&quot;] },
+];
+
+describe(&quot;parsePastedResultList&quot;, () =&gt; {
+  it(&quot;parses rank-prefixed integer lines&quot;, () =&gt; {
+    const rows = parsePastedResultList({
+      metricKind: &quot;integer&quot;,
+      subjects: players,
+      text: &quot;1 Haaland 27\n2 Salah 18&quot;,
+    });
+    expect(rows[0]).toMatchObject({
+      status: &quot;matched&quot;,
+      subjectId: &quot;p-haaland&quot;,
+      metricValue: 27,
+    });
+    expect(rows[1]).toMatchObject({
+      status: &quot;matched&quot;,
+      subjectId: &quot;p-salah&quot;,
+      metricValue: 18,
+    });
+  });
+
+  it(&quot;parses dash-separated lines without ranks&quot;, () =&gt; {
+    const rows = parsePastedResultList({
+      metricKind: &quot;integer&quot;,
+      subjects: players,
+      text: &quot;Haaland — 27&quot;,
+    });
+    expect(rows[0]).toMatchObject({
+      status: &quot;matched&quot;,
+      subjectId: &quot;p-haaland&quot;,
+      metricValue: 27,
+    });
+  });
+
+  it(&quot;parses decimal ratings within 0–10 with at most three decimals&quot;, () =&gt; {
+    const rows = parsePastedResultList({
+      metricKind: &quot;rating&quot;,
+      subjects: players,
+      text: &quot;Salah 7.852\nHaaland 10&quot;,
+    });
+    expect(rows[0].status).toBe(&quot;matched&quot;);
+    expect(rows[0].metricValue).toBe(7.852);
+    expect(rows[1].status).toBe(&quot;matched&quot;);
+  });
+
+  it(&quot;rejects ratings above ten or with too many decimals as bad-metric&quot;, () =&gt; {
+    const rows = parsePastedResultList({
+      metricKind: &quot;rating&quot;,
+      subjects: players,
+      text: &quot;Salah 11\nHaaland 7.8521&quot;,
+    });
+    expect(rows[0].status).toBe(&quot;bad-metric&quot;);
+    expect(rows[1].status).toBe(&quot;bad-metric&quot;);
+  });
+
+  it(&quot;rejects decimals for integer datasets&quot;, () =&gt; {
+    const rows = parsePastedResultList({
+      metricKind: &quot;integer&quot;,
+      subjects: players,
+      text: &quot;Salah 18.5&quot;,
+    });
+    expect(rows[0].status).toBe(&quot;bad-metric&quot;);
+  });
+
+  it(&quot;flags unknown names while keeping their lines&quot;, () =&gt; {
+    const rows = parsePastedResultList({
+      metricKind: &quot;integer&quot;,
+      subjects: players,
+      text: &quot;Mystery Player 12&quot;,
+    });
+    expect(rows[0]).toMatchObject({ status: &quot;no-match&quot;, subjectId: null });
+  });
+
+  it(&quot;matches reversed sort-name forms&quot;, () =&gt; {
+    const rows = parsePastedResultList({
+      metricKind: &quot;integer&quot;,
+      subjects: players,
+      text: &quot;Haaland, Erling 27&quot;,
+    });
+    expect(rows[0]).toMatchObject({
+      status: &quot;matched&quot;,
+      subjectId: &quot;p-haaland&quot;,
+    });
+  });
+
+  it(&quot;flags lines with no number as bad-metric&quot;, () =&gt; {
+    const rows = parsePastedResultList({
+      metricKind: &quot;integer&quot;,
+      subjects: players,
+      text: &quot;Salah&quot;,
+    });
+    expect(rows[0].status).toBe(&quot;bad-metric&quot;);
+  });
+
+  it(&quot;skips empty lines entirely&quot;, () =&gt; {
+    const rows = parsePastedResultList({
+      metricKind: &quot;integer&quot;,
+      subjects: players,
+      text: &quot;\n  \nSalah 18\n&quot;,
+    });
+    expect(rows).toHaveLength(1);
+  });
+});
+</code></pre>
+<ul>
+<li><input disabled="" type="checkbox"> <strong>Step 2: Run to verify failure</strong></li>
+</ul>
+<p>Run: <code>npx vitest run tests/unit/list-paste-parser.test.ts</code>
+Expected: FAIL (module not found)</p>
+<ul>
+<li><input disabled="" type="checkbox"> <strong>Step 3: Implement</strong></li>
+</ul>
+<pre><code class="language-ts">import { normalizeForMatch } from &quot;@/shared/text-normalization&quot;;
+
+export type PasteSubject = Readonly&lt;{ id: string; names: readonly string[] }&gt;;
+
+export type ListMetricKind = &quot;integer&quot; | &quot;rating&quot;;
+
+export type ParsedListRowStatus =
+  &quot;matched&quot; | &quot;ambiguous&quot; | &quot;no-match&quot; | &quot;bad-metric&quot;;
+
+export type ParsedListRow = Readonly&lt;{
+  candidateLabels: readonly string[];
+  metricValue: number | null;
+  name: string;
+  rawLine: string;
+  status: ParsedListRowStatus;
+  subjectId: string | null;
+}&gt;;
+
+const RANK_PREFIX = /^\s*(?:[#•*\-–—]\s*)?\d{1,3}\s*[.)\]]?\s+/;
+const METRIC_SUFFIX = /(?:[—–\-:]|\s)+(\d+(?:\.\d{1,3})?)\s*$/;
+
+type Resolution =
+  | { kind: &quot;matched&quot;; id: string }
+  | { kind: &quot;ambiguous&quot;; ids: readonly string[] }
+  | { kind: &quot;no-match&quot; };
+
+function resolveSubject(
+  name: string,
+  exactIndex: ReadonlyMap&lt;string, string&gt;,
+): Resolution {
+  const normalized = normalizeForMatch(name);
+  if (!normalized) return { kind: &quot;no-match&quot; };
+  const direct = exactIndex.get(normalized);
+  if (direct) return { kind: &quot;matched&quot;, id: direct };
+  const words = normalized.split(&quot; &quot;).filter(Boolean);
+  if (words.length &lt; 2) return { kind: &quot;no-match&quot; };
+  const found = new Set&lt;string&gt;();
+  for (let size = words.length - 1; size &gt;= 2; size -= 1) {
+    for (let start = 0; start + size &lt;= words.length; start += 1) {
+      const id = exactIndex.get(words.slice(start, start + size).join(&quot; &quot;));
+      if (id) found.add(id);
+    }
+    if (found.size &gt; 1) return { kind: &quot;ambiguous&quot;, ids: [...found] };
+  }
+  if (found.size === 1) return { kind: &quot;matched&quot;, id: [...found][0] };
+  return { kind: &quot;no-match&quot; };
+}
+
+export function parsePastedResultList({
+  metricKind,
+  subjects,
+  text,
+}: {
+  metricKind: ListMetricKind;
+  subjects: readonly PasteSubject[];
+  text: string;
+}): ParsedListRow[] {
+  const exactIndex = new Map&lt;string, string&gt;();
+  const labelById = new Map&lt;string, string&gt;();
+  for (const subject of subjects) {
+    if (!labelById.has(subject.id)) {
+      labelById.set(subject.id, subject.names[0] ?? subject.id);
+    }
+    for (const name of subject.names) {
+      const key = normalizeForMatch(name);
+      if (key &amp;&amp; !exactIndex.has(key)) exactIndex.set(key, subject.id);
+    }
+  }
+
+  const rows: ParsedListRow[] = [];
+  for (const rawLine of text.split(/\r?\n/)) {
+    const line = rawLine.trim();
+    if (!line) continue;
+    const withoutRank = line.replace(RANK_PREFIX, &quot;&quot;);
+    const metricMatch = METRIC_SUFFIX.exec(withoutRank);
+    const name = (
+      metricMatch ? withoutRank.slice(0, metricMatch.index) : withoutRank
+    )
+      .replace(/[\s—–\-:]+$/, &quot;&quot;)
+      .trim();
+    if (!name &amp;&amp; !metricMatch) continue;
+
+    let metricValue: number | null = null;
+    let metricValid = false;
+    if (metricMatch) {
+      const normalizedMetric = metricMatch[1].replace(&quot;,&quot;, &quot;.&quot;);
+      const parsed = Number(normalizedMetric);
+      metricValid =
+        metricKind === &quot;integer&quot;
+          ? /^\d+$/.test(normalizedMetric)
+          : /^\d{1,2}(?:\.\d{1,3})?$/.test(normalizedMetric) &amp;&amp;
+            parsed &gt;= 0 &amp;&amp;
+            parsed &lt;= 10;
+      if (metricValid) metricValue = parsed;
+    }
+
+    const resolution = resolveSubject(name, exactIndex);
+    const status: ParsedListRowStatus =
+      !metricMatch || !metricValid
+        ? &quot;bad-metric&quot;
+        : resolution.kind === &quot;matched&quot;
+          ? &quot;matched&quot;
+          : resolution.kind === &quot;ambiguous&quot;
+            ? &quot;ambiguous&quot;
+            : &quot;no-match&quot;;
+    rows.push({
+      candidateLabels:
+        resolution.kind === &quot;ambiguous&quot;
+          ? resolution.ids.map((id) =&gt; labelById.get(id) ?? id)
+          : [],
+      metricValue,
+      name,
+      rawLine: line,
+      status,
+      subjectId: resolution.kind === &quot;matched&quot; ? resolution.id : null,
+    });
+  }
+  return rows;
+}
+</code></pre>
+<ul>
+<li><input disabled="" type="checkbox"> <strong>Step 4: Verify pass</strong></li>
+</ul>
+<p>Run: <code>npx vitest run tests/unit/list-paste-parser.test.ts</code>
+Expected: PASS</p>
+<ul>
+<li><input disabled="" type="checkbox"> <strong>Step 5: Commit</strong></li>
+</ul>
+<pre><code class="language-bash">git add src/features/results/list-paste-parser.ts tests/unit/list-paste-parser.test.ts
+git commit -m &quot;feat: add spotlight list paste parser&quot;
+</code></pre>
+<hr>
+<h3 id="task-9-dataset-diff">Task 9: Dataset diff</h3>
+<p><strong>Files:</strong></p>
+<ul>
+<li><p>Create: <code>src/features/results/dataset-diff.ts</code></p>
+</li>
+<li><p>Test: <code>tests/unit/dataset-diff.test.ts</code></p>
+</li>
+<li><p><input disabled="" type="checkbox"> <strong>Step 1: Write the failing test</strong></p>
+</li>
+</ul>
+<pre><code class="language-ts">import { buildResultDiff } from &quot;@/features/results/dataset-diff&quot;;
+import { describe, expect, it } from &quot;vitest&quot;;
+
+const labelById = new Map([
+  [&quot;a&quot;, &quot;Haaland&quot;],
+  [&quot;b&quot;, &quot;Salah&quot;],
+] as const);
+
+describe(&quot;buildResultDiff&quot;, () =&gt; {
+  it(&quot;marks identical rows as same&quot;, () =&gt; {
+    const diff = buildResultDiff({
+      direction: &quot;descending&quot;,
+      draftRows: [{ metricValue: 27, subjectId: &quot;a&quot; }],
+      labelById,
+      publishedRows: [{ metricValue: 27, subjectId: &quot;a&quot; }],
+    });
+    expect(diff.entries[0].kind).toBe(&quot;same&quot;);
+    expect(diff.addedCount).toBe(0);
+  });
+
+  it(&quot;detects value changes with old and new ranks&quot;, () =&gt; {
+    const diff = buildResultDiff({
+      direction: &quot;descending&quot;,
+      draftRows: [
+        { metricValue: 30, subjectId: &quot;a&quot; },
+        { metricValue: 18, subjectId: &quot;b&quot; },
+      ],
+      labelById,
+      publishedRows: [
+        { metricValue: 27, subjectId: &quot;a&quot; },
+        { metricValue: 18, subjectId: &quot;b&quot; },
+      ],
+    });
+    expect(diff.changedCount).toBe(1);
+    const haaland = diff.entries.find((entry) =&gt; entry.subjectId === &quot;a&quot;);
+    expect(haaland).toMatchObject({
+      kind: &quot;changed&quot;,
+      oldMetric: 27,
+      newMetric: 30,
+      oldRank: 1,
+      newRank: 1,
+    });
+  });
+
+  it(&quot;detects added and removed subjects&quot;, () =&gt; {
+    const diff = buildResultDiff({
+      direction: &quot;descending&quot;,
+      draftRows: [{ metricValue: 18, subjectId: &quot;b&quot; }],
+      labelById,
+      publishedRows: [{ metricValue: 27, subjectId: &quot;a&quot; }],
+    });
+    expect(diff.addedCount).toBe(1);
+    expect(diff.removedCount).toBe(1);
+    expect(
+      diff.entries.filter((entry) =&gt; entry.kind === &quot;added&quot;)[0].subjectId,
+    ).toBe(&quot;b&quot;);
+    expect(
+      diff.entries.filter((entry) =&gt; entry.kind === &quot;removed&quot;)[0].oldRank,
+    ).toBe(1);
+  });
+
+  it(&quot;handles an empty published snapshot as all-added&quot;, () =&gt; {
+    const diff = buildResultDiff({
+      direction: &quot;descending&quot;,
+      draftRows: [{ metricValue: 27, subjectId: &quot;a&quot; }],
+      labelById,
+      publishedRows: [],
+    });
+    expect(diff.addedCount).toBe(1);
+    expect(diff.entries[0].oldRank).toBeNull();
+  });
+});
+</code></pre>
+<ul>
+<li><input disabled="" type="checkbox"> <strong>Step 2: Run to verify failure</strong></li>
+</ul>
+<p>Run: <code>npx vitest run tests/unit/dataset-diff.test.ts</code>
+Expected: FAIL (module not found)</p>
+<ul>
+<li><input disabled="" type="checkbox"> <strong>Step 3: Implement</strong></li>
+</ul>
+<pre><code class="language-ts">import { rankMetricItems } from &quot;@/features/scoring/categories&quot;;
+
+export type ResultDiffKind = &quot;added&quot; | &quot;changed&quot; | &quot;removed&quot; | &quot;same&quot;;
+
+export type ResultDiffEntry = Readonly&lt;{
+  kind: ResultDiffKind;
+  label: string;
+  newMetric: number | null;
+  newRank: number | null;
+  oldMetric: number | null;
+  oldRank: number | null;
+  subjectId: string;
+}&gt;;
+
+export type ResultDiff = Readonly&lt;{
+  addedCount: number;
+  changedCount: number;
+  entries: readonly ResultDiffEntry[];
+  removedCount: number;
+}&gt;;
+
+type DiffRow = Readonly&lt;{ metricValue: number; subjectId: string }&gt;;
+
+export function buildResultDiff({
+  direction,
+  draftRows,
+  labelById,
+  publishedRows,
+}: {
+  direction: &quot;ascending&quot; | &quot;descending&quot;;
+  draftRows: readonly DiffRow[];
+  labelById: ReadonlyMap&lt;string, string&gt;;
+  publishedRows: readonly DiffRow[];
+}): ResultDiff {
+  const rankedPublished = rankMetricItems(
+    publishedRows.map((row) =&gt; ({
+      id: row.subjectId,
+      metric: row.metricValue,
+    })),
+    direction,
+  );
+  const rankedDraft = rankMetricItems(
+    draftRows.map((row) =&gt; ({ id: row.subjectId, metric: row.metricValue })),
+    direction,
+  );
+  const oldById = new Map(
+    rankedPublished.map((item) =&gt; [item.id, item] as const),
+  );
+  const newIds = new Set(rankedDraft.map((item) =&gt; item.id));
+
+  let addedCount = 0;
+  let changedCount = 0;
+  let removedCount = 0;
+  const entries: ResultDiffEntry[] = [];
+
+  for (const draft of rankedDraft) {
+    const old = oldById.get(draft.id) ?? null;
+    const kind: ResultDiffKind = !old
+      ? &quot;added&quot;
+      : old.metric !== draft.metric
+        ? &quot;changed&quot;
+        : &quot;same&quot;;
+    if (kind === &quot;added&quot;) addedCount += 1;
+    if (kind === &quot;changed&quot;) changedCount += 1;
+    entries.push({
+      kind,
+      label: labelById.get(draft.id) ?? draft.id,
+      newMetric: draft.metric,
+      newRank: draft.rank,
+      oldMetric: old?.metric ?? null,
+      oldRank: old?.rank ?? null,
+      subjectId: draft.id,
+    });
+  }
+  for (const published of rankedPublished) {
+    if (newIds.has(published.id)) continue;
+    removedCount += 1;
+    entries.push({
+      kind: &quot;removed&quot;,
+      label: labelById.get(published.id) ?? published.id,
+      newMetric: null,
+      newRank: null,
+      oldMetric: published.metric,
+      oldRank: published.rank,
+      subjectId: published.id,
+    });
+  }
+
+  const order = { added: 0, changed: 1, removed: 2, same: 3 } as const;
+  entries.sort(
+    (left, right) =&gt;
+      order[left.kind] - order[right.kind] ||
+      (left.newRank ?? left.oldRank ?? Number.MAX_SAFE_INTEGER) -
+        (right.newRank ?? right.oldRank ?? Number.MAX_SAFE_INTEGER),
+  );
+  return { addedCount, changedCount, entries, removedCount };
+}
+</code></pre>
+<ul>
+<li><input disabled="" type="checkbox"> <strong>Step 4: Verify pass</strong></li>
+</ul>
+<p>Run: <code>npx vitest run tests/unit/dataset-diff.test.ts</code>
+Expected: PASS</p>
+<ul>
+<li><input disabled="" type="checkbox"> <strong>Step 5: Commit</strong></li>
+</ul>
+<pre><code class="language-bash">git add src/features/results/dataset-diff.ts tests/unit/dataset-diff.test.ts
+git commit -m &quot;feat: add spotlight dataset diff&quot;
+</code></pre>
+<hr>
+<h3 id="task-10-picked-subjects-seed-query">Task 10: Picked-subjects seed query</h3>
+<p><strong>Files:</strong></p>
+<ul>
+<li><p>Create: <code>src/features/results/seed-queries.ts</code></p>
+</li>
+<li><p>Test: <code>tests/integration/results-seed-query.integration.test.ts</code></p>
+</li>
+<li><p><input disabled="" type="checkbox"> <strong>Step 1: Study the existing integration harness</strong></p>
+</li>
+</ul>
+<p>Open <code>tests/integration/spotlight-results.integration.test.ts</code>. Reuse its fixture bootstrap (season creation, teams/players seeding, prediction + category-pick insertion, reveal/closure state) by copying the setup into the new spec below. If its helpers are file-local, extract them verbatim into <code>tests/integration/helpers/spotlight-fixtures.ts</code> first and update the existing spec to import from there — behavior must not change (<code>npm run test:integration</code> stays green).</p>
+<ul>
+<li><input disabled="" type="checkbox"> <strong>Step 2: Write the failing integration test</strong></li>
+</ul>
+<pre><code class="language-ts">import { afterAll, beforeEach, describe, expect, it } from &quot;vitest&quot;;
+
+import { getPickedSubjectsByDataset } from &quot;@/features/results/seed-queries&quot;;
+
+import {} from /* reuse the bootstrap exports you extracted in step 1 */ &quot;./helpers/spotlight-fixtures&quot;;
+
+describe(&quot;getPickedSubjectsByDataset&quot;, () =&gt; {
+  beforeEach(async () =&gt; {
+    await resetFixtures();
+    await seedSeasonWithRevealedPredictions();
+  });
+
+  afterAll(async () =&gt; {
+    await teardown();
+  });
+
+  it(&quot;returns the union of picked subjects per dataset without duplicates&quot;, async () =&gt; {
+    const seasonId = await getSeasonId();
+    const picked = await getPickedSubjectsByDataset(seasonId);
+    expect(picked.goals.sort()).toEqual([haalandId, salahId].sort());
+    expect(picked.assists).toEqual([salahId]);
+    expect(picked.clean_sheets.sort()).toEqual(
+      [arsenalTeamId, cityTeamId].sort(),
+    );
+    expect(picked.player_ratings.sort()).toEqual([haalandId, wilsonId].sort());
+  });
+
+  it(&quot;excludes Other-player spellings that have no resolved player id&quot;, async () =&gt; {
+    const seasonId = await getSeasonId();
+    await insertOtherPlayerPick(&quot;Zlatan&quot;);
+    const picked = await getPickedSubjectsByDataset(seasonId);
+    expect(picked.goals).not.toContain(&quot;Zlatan&quot;.toLowerCase());
+  });
+});
+</code></pre>
+<p>Adapt fixture function/id names to whatever step 1 exposes; the assertions above are the contract.</p>
+<ul>
+<li><input disabled="" type="checkbox"> <strong>Step 3: Run to verify failure</strong></li>
+</ul>
+<p>Run: <code>npm run db:test:migrate &amp;&amp; npm run db:test:seed &amp;&amp; npm run test:integration -- results-seed-query</code>
+Expected: FAIL (module not found)</p>
+<ul>
+<li><input disabled="" type="checkbox"> <strong>Step 4: Implement</strong></li>
+</ul>
+<pre><code class="language-ts">import &quot;server-only&quot;;
+
+import { eq } from &quot;drizzle-orm&quot;;
+
+import { getDb } from &quot;@/db/client&quot;;
+import { predictionCategoryPicks, predictions } from &quot;@/db/schema&quot;;
+import { isPredictionCategory } from &quot;@/features/predictions/categories&quot;;
+import {
+  RESULT_DATASET_BY_CATEGORY,
+  SPOTLIGHT_RESULT_DATASETS,
+  type SpotlightResultDataset,
+} from &quot;./types&quot;;
+
+export type PickedSubjectsByDataset = Readonly&lt;
+  Record&lt;SpotlightResultDataset, readonly string[]&gt;
+&gt;;
+
+export async function getPickedSubjectsByDataset(
+  seasonId: string,
+): Promise&lt;PickedSubjectsByDataset&gt; {
+  const picked = Object.fromEntries(
+    SPOTLIGHT_RESULT_DATASETS.map((dataset) =&gt; [dataset, [] as string[]]),
+  ) as Record&lt;SpotlightResultDataset, string[]&gt;;
+
+  const rows = await getDb()
+    .select({
+      category: predictionCategoryPicks.category,
+      playerId: predictionCategoryPicks.playerId,
+      teamId: predictionCategoryPicks.teamId,
+    })
+    .from(predictionCategoryPicks)
+    .innerJoin(
+      predictions,
+      eq(predictions.id, predictionCategoryPicks.predictionId),
+    )
+    .where(eq(predictions.seasonId, seasonId));
+
+  for (const row of rows) {
+    if (!isPredictionCategory(row.category)) continue;
+    const dataset = RESULT_DATASET_BY_CATEGORY[row.category];
+    if (!dataset) continue;
+    const subjectId = row.playerId ?? row.teamId;
+    if (!subjectId) continue;
+    const bucket = picked[dataset];
+    if (!bucket.includes(subjectId)) bucket.push(subjectId);
+  }
+  return picked;
+}
+</code></pre>
+<p>Note: <code>RESULT_DATASET_BY_CATEGORY</code> maps <code>most_clean_sheets → clean_sheets</code>, so clean-sheet picks land correctly even though <code>RESULT_CATEGORIES_BY_DATASET.clean_sheets</code> is empty. Other-player picks have neither <code>playerId</code> nor <code>teamId</code> and are skipped — they resolve through the alias flow instead.</p>
+<ul>
+<li><input disabled="" type="checkbox"> <strong>Step 5: Verify pass</strong></li>
+</ul>
+<p>Run: <code>npm run test:integration -- results-seed-query</code>
+Expected: PASS</p>
+<ul>
+<li><input disabled="" type="checkbox"> <strong>Step 6: Commit</strong></li>
+</ul>
+<pre><code class="language-bash">git add src/features/results/seed-queries.ts tests/integration/
+git commit -m &quot;feat: add picked-subjects seed query for result datasets&quot;
+</code></pre>
+<hr>
+<h3 id="task-11-results-paste-panel-component">Task 11: Results paste panel component</h3>
+<p><strong>Files:</strong></p>
+<ul>
+<li><p>Create: <code>src/app/admin/results/results-paste-panel.tsx</code></p>
+</li>
+<li><p>Test: <code>tests/components/results-paste-panel.test.tsx</code></p>
+</li>
+<li><p><input disabled="" type="checkbox"> <strong>Step 1: Write the failing component test</strong></p>
+</li>
+</ul>
+<pre><code class="language-tsx">import { cleanup, fireEvent, render, screen } from &quot;@testing-library/react&quot;;
+import { afterEach, describe, expect, it, vi } from &quot;vitest&quot;;
+
+import { ResultsPastePanel } from &quot;@/app/admin/results/results-paste-panel&quot;;
+
+const subjects = [
+  { id: &quot;p-haaland&quot;, names: [&quot;Haaland&quot;] },
+  { id: &quot;p-salah&quot;, names: [&quot;Salah&quot;] },
+];
+
+afterEach(cleanup);
+
+describe(&quot;ResultsPastePanel&quot;, () =&gt; {
+  it(&quot;parses and applies only matched rows&quot;, () =&gt; {
+    const onApply = vi.fn();
+    render(
+      &lt;ResultsPastePanel
+        datasetLabel=&quot;Top scorer&quot;
+        disabled={false}
+        metricKind=&quot;integer&quot;
+        onApply={onApply}
+        subjects={subjects}
+      /&gt;,
+    );
+    fireEvent.change(screen.getByLabelText(&quot;Paste top scorer list&quot;), {
+      target: { value: &quot;Haaland 27\nMystery Player 12&quot; },
+    });
+    fireEvent.click(screen.getByRole(&quot;button&quot;, { name: &quot;Parse list&quot; }));
+    expect(screen.getByText(/1 line needs attention/)).toBeTruthy();
+    fireEvent.click(screen.getByRole(&quot;button&quot;, { name: &quot;Apply 1 row&quot; }));
+    expect(onApply).toHaveBeenCalledWith([
+      { metricValue: 27, subjectId: &quot;p-haaland&quot; },
+    ]);
+  });
+
+  it(&quot;clears the textarea after applying&quot;, () =&gt; {
+    const onApply = vi.fn();
+    render(
+      &lt;ResultsPastePanel
+        datasetLabel=&quot;Top scorer&quot;
+        disabled={false}
+        metricKind=&quot;integer&quot;
+        onApply={onApply}
+        subjects={subjects}
+      /&gt;,
+    );
+    const textarea = screen.getByLabelText(&quot;Paste top scorer list&quot;);
+    fireEvent.change(textarea, { target: { value: &quot;Haaland 27&quot; } });
+    fireEvent.click(screen.getByRole(&quot;button&quot;, { name: &quot;Parse list&quot; }));
+    fireEvent.click(screen.getByRole(&quot;button&quot;, { name: /Apply 1 row/ }));
+    expect((textarea as HTMLTextAreaElement).value).toBe(&quot;&quot;);
+  });
+
+  it(&quot;disables inputs when disabled is true&quot;, () =&gt; {
+    render(
+      &lt;ResultsPastePanel
+        datasetLabel=&quot;Top scorer&quot;
+        disabled
+        metricKind=&quot;integer&quot;
+        onApply={vi.fn()}
+        subjects={subjects}
+      /&gt;,
+    );
+    expect(
+      (screen.getByLabelText(&quot;Paste top scorer list&quot;) as HTMLTextAreaElement)
+        .disabled,
+    ).toBe(true);
+  });
+});
+</code></pre>
+<ul>
+<li><input disabled="" type="checkbox"> <strong>Step 2: Run to verify failure</strong></li>
+</ul>
+<p>Run: <code>npx vitest run tests/components/results-paste-panel.test.tsx</code>
+Expected: FAIL (module not found)</p>
+<ul>
+<li><input disabled="" type="checkbox"> <strong>Step 3: Implement</strong></li>
+</ul>
+<pre><code class="language-tsx">&quot;use client&quot;;
+
+import { useMemo, useState } from &quot;react&quot;;
+
+import { Button } from &quot;@/components/ui/button&quot;;
+
+import {
+  parsePastedResultList,
+  type PasteSubject,
+} from &quot;@/features/results/list-paste-parser&quot;;
+
+export type ResultsPastePanelProps = Readonly&lt;{
+  datasetLabel: string;
+  disabled: boolean;
+  metricKind: &quot;integer&quot; | &quot;rating&quot;;
+  onApply: (
+    rows: readonly { metricValue: number; subjectId: string }[],
+  ) =&gt; void;
+  subjects: readonly PasteSubject[];
+}&gt;;
+
+export function ResultsPastePanel({
+  datasetLabel,
+  disabled,
+  metricKind,
+  onApply,
+  subjects,
+}: ResultsPastePanelProps) {
+  const [text, setText] = useState(&quot;&quot;);
+  const [parsed, setParsed] = useState&lt;ReturnType&lt;
+    typeof parsePastedResultList
+  &gt; | null&gt;(null);
+
+  const matched = useMemo(
+    () =&gt;
+      (parsed ?? []).flatMap((row) =&gt;
+        row.subjectId &amp;&amp; row.metricValue !== null
+          ? [{ metricValue: row.metricValue, subjectId: row.subjectId }]
+          : [],
+      ),
+    [parsed],
+  );
+  const problemRows = (parsed ?? []).filter((row) =&gt; row.status !== &quot;matched&quot;);
+
+  return (
+    &lt;section
+      aria-label={`Paste ${datasetLabel} list`}
+      className=&quot;grid gap-2 rounded-xl border border-slate-200 p-3&quot;
+    &gt;
+      &lt;label className=&quot;grid gap-1 text-sm font-bold text-slate-800&quot;&gt;
+        Paste {datasetLabel.toLowerCase()} list
+        &lt;textarea
+          className=&quot;min-h-24 w-full rounded-xl border border-slate-300 bg-white p-2 font-mono text-xs outline-none focus:border-emerald-600 focus:ring-2 focus:ring-emerald-200 disabled:bg-slate-100&quot;
+          disabled={disabled}
+          onChange={(event) =&gt; {
+            setText(event.target.value);
+            setParsed(null);
+          }}
+          placeholder={&quot;Haaland 27\nSalah 18&quot;}
+          rows={4}
+          value={text}
+        /&gt;
+      &lt;/label&gt;
+      &lt;div className=&quot;flex flex-wrap items-center gap-2&quot;&gt;
+        &lt;Button
+          disabled={disabled || text.trim().length === 0}
+          onClick={() =&gt;
+            setParsed(parsePastedResultList({ metricKind, subjects, text }))
+          }
+          size=&quot;sm&quot;
+          variant=&quot;secondary&quot;
+        &gt;
+          Parse list
+        &lt;/Button&gt;
+        &lt;Button
+          disabled={disabled || matched.length === 0}
+          onClick={() =&gt; {
+            onApply(matched);
+            setText(&quot;&quot;);
+            setParsed(null);
+          }}
+          size=&quot;sm&quot;
+        &gt;
+          Apply {matched.length || &quot;&quot;} row{matched.length === 1 ? &quot;&quot; : &quot;s&quot;}
+        &lt;/Button&gt;
+        {problemRows.length &gt; 0 ? (
+          &lt;span className=&quot;text-xs font-semibold text-amber-700&quot;&gt;
+            {problemRows.length} line{problemRows.length === 1 ? &quot;&quot; : &quot;s&quot;} need
+            attention below.
+          &lt;/span&gt;
+        ) : null}
+      &lt;/div&gt;
+      {problemRows.length &gt; 0 ? (
+        &lt;ul className=&quot;list-disc rounded-xl bg-amber-50 p-2 pl-6 text-xs font-semibold text-amber-900&quot;&gt;
+          {problemRows.map((row) =&gt; (
+            &lt;li key={row.rawLine}&gt;
+              “{row.rawLine}” —{&quot; &quot;}
+              {row.status === &quot;ambiguous&quot;
+                ? `ambiguous: ${row.candidateLabels.join(&quot;, &quot;)}`
+                : row.status === &quot;no-match&quot;
+                  ? &quot;no matching player; add them via Other-player matches&quot;
+                  : &quot;missing or invalid number&quot;}
+            &lt;/li&gt;
+          ))}
+        &lt;/ul&gt;
+      ) : null}
+    &lt;/section&gt;
+  );
+}
+</code></pre>
+<ul>
+<li><input disabled="" type="checkbox"> <strong>Step 4: Verify pass</strong></li>
+</ul>
+<p>Run: <code>npx vitest run tests/components/results-paste-panel.test.tsx</code>
+Expected: PASS</p>
+<ul>
+<li><input disabled="" type="checkbox"> <strong>Step 5: Commit</strong></li>
+</ul>
+<pre><code class="language-bash">git add src/app/admin/results/results-paste-panel.tsx tests/components/results-paste-panel.test.tsx
+git commit -m &quot;feat: add results paste panel component&quot;
+</code></pre>
+<hr>
+<h3 id="task-12-publish-review-dialog">Task 12: Publish review dialog</h3>
+<p><strong>Files:</strong></p>
+<ul>
+<li><p>Create: <code>src/app/admin/results/publish-review-dialog.tsx</code></p>
+</li>
+<li><p>Test: <code>tests/components/publish-review-dialog.test.tsx</code></p>
+</li>
+<li><p><input disabled="" type="checkbox"> <strong>Step 1: Write the failing component test</strong></p>
+</li>
+</ul>
+<pre><code class="language-tsx">import { cleanup, fireEvent, render, screen } from &quot;@testing-library/react&quot;;
+import { afterEach, describe, expect, it, vi } from &quot;vitest&quot;;
+
+import { PublishReviewDialog } from &quot;@/app/admin/results/publish-review-dialog&quot;;
+
+const diff = {
+  addedCount: 1,
+  changedCount: 1,
+  entries: [
+    {
+      kind: &quot;changed&quot;,
+      label: &quot;Haaland&quot;,
+      newMetric: 30,
+      newRank: 1,
+      oldMetric: 27,
+      oldRank: 1,
+      subjectId: &quot;a&quot;,
+    },
+    {
+      kind: &quot;added&quot;,
+      label: &quot;Wilson&quot;,
+      newMetric: 12,
+      newRank: 3,
+      oldMetric: null,
+      oldRank: null,
+      subjectId: &quot;c&quot;,
+    },
+  ],
+  removedCount: 0,
+} as const;
+
+const base = {
+  attestationSentence:
+    &quot;I attest that all rows through rank 5, including boundary ties, are present in this exact draft.&quot;,
+  boundaryWarnings: [],
+  busy: false,
+  coveredThroughRank: 5,
+  datasetLabel: &quot;Top scorer&quot;,
+  diff,
+  onCancel: vi.fn(),
+  onConfirm: vi.fn(),
+  requiredRank: 5,
+  unresolvedAliasCount: 0,
+};
+
+afterEach(cleanup);
+
+describe(&quot;PublishReviewDialog&quot;, () =&gt; {
+  it(&quot;renders the diff and requires attestation before confirming&quot;, () =&gt; {
+    render(&lt;PublishReviewDialog {...base} /&gt;);
+    expect(screen.getByText(/Haaland/)).toBeTruthy();
+    const confirm = screen.getByRole(&quot;button&quot;, { name: &quot;Publish provisional&quot; });
+    expect((confirm as HTMLButtonElement).disabled).toBe(true);
+    fireEvent.click(screen.getByRole(&quot;checkbox&quot;));
+    expect(
+      (
+        screen.getByRole(&quot;button&quot;, {
+          name: &quot;Publish provisional&quot;,
+        }) as HTMLButtonElement
+      ).disabled,
+    ).toBe(false);
+  });
+
+  it(&quot;blocks when aliases are unresolved and shows the warning&quot;, () =&gt; {
+    render(&lt;PublishReviewDialog {...base} unresolvedAliasCount={2} /&gt;);
+    expect(screen.getByText(/2 Other-player match(es)? pending/)).toBeTruthy();
+    fireEvent.click(screen.getByRole(&quot;checkbox&quot;));
+    expect(
+      (
+        screen.getByRole(&quot;button&quot;, {
+          name: &quot;Publish provisional&quot;,
+        }) as HTMLButtonElement
+      ).disabled,
+    ).toBe(true);
+  });
+
+  it(&quot;shows boundary tie warnings without blocking&quot;, () =&gt; {
+    render(
+      &lt;PublishReviewDialog
+        {...base}
+        boundaryWarnings={[
+          {
+            boundaryRank: 5,
+            direction: &quot;descending&quot;,
+            tiedCount: 2,
+            tiedValue: 14,
+          },
+        ]}
+      /&gt;,
+    );
+    expect(screen.getByText(/Tie at 14 spans rank 5/)).toBeTruthy();
+    fireEvent.click(screen.getByRole(&quot;checkbox&quot;));
+    expect(
+      (
+        screen.getByRole(&quot;button&quot;, {
+          name: &quot;Publish provisional&quot;,
+        }) as HTMLButtonElement
+      ).disabled,
+    ).toBe(false);
+  });
+
+  it(&quot;calls onCancel and onConfirm&quot;, () =&gt; {
+    const onConfirm = vi.fn();
+    render(&lt;PublishReviewDialog {...base} onConfirm={onConfirm} /&gt;);
+    fireEvent.click(screen.getByRole(&quot;checkbox&quot;));
+    fireEvent.click(
+      screen.getByRole(&quot;button&quot;, { name: &quot;Publish provisional&quot; }),
+    );
+    expect(onConfirm).toHaveBeenCalled();
+    fireEvent.click(screen.getByRole(&quot;button&quot;, { name: &quot;Cancel&quot; }));
+    expect(base.onCancel).toHaveBeenCalled();
+  });
+});
+</code></pre>
+<ul>
+<li><input disabled="" type="checkbox"> <strong>Step 2: Run to verify failure</strong></li>
+</ul>
+<p>Run: <code>npx vitest run tests/components/publish-review-dialog.test.tsx</code>
+Expected: FAIL (module not found)</p>
+<ul>
+<li><input disabled="" type="checkbox"> <strong>Step 3: Implement</strong></li>
+</ul>
+<pre><code class="language-tsx">&quot;use client&quot;;
+
+import { useState } from &quot;react&quot;;
+
+import { Button } from &quot;@/components/ui/button&quot;;
+
+import type { BoundaryTieWarning } from &quot;@/features/results/boundary-ties&quot;;
+import type { ResultDiff } from &quot;@/features/results/dataset-diff&quot;;
+
+export type PublishReviewDialogProps = Readonly&lt;{
+  attestationSentence: string;
+  boundaryWarnings: readonly BoundaryTieWarning[];
+  busy: boolean;
+  coveredThroughRank: number | null;
+  datasetLabel: string;
+  diff: ResultDiff;
+  onCancel: () =&gt; void;
+  onConfirm: () =&gt; void;
+  requiredRank: number | null;
+  unresolvedAliasCount: number;
+}&gt;;
+
+export function PublishReviewDialog({
+  attestationSentence,
+  boundaryWarnings,
+  busy,
+  coveredThroughRank,
+  datasetLabel,
+  diff,
+  onCancel,
+  onConfirm,
+  requiredRank,
+  unresolvedAliasCount,
+}: PublishReviewDialogProps) {
+  const [attested, setAttested] = useState(false);
+  const aliasBlocked = unresolvedAliasCount &gt; 0;
+
+  return (
+    &lt;div
+      aria-label={`Review and publish ${datasetLabel}`}
+      aria-modal=&quot;true&quot;
+      className=&quot;fixed inset-0 z-50 grid place-items-center bg-slate-950/60 p-4&quot;
+      role=&quot;dialog&quot;
+    &gt;
+      &lt;div className=&quot;max-h-[85vh] w-full max-w-2xl overflow-y-auto rounded-2xl bg-white p-5&quot;&gt;
+        &lt;h2 className=&quot;text-lg font-black text-slate-950&quot;&gt;
+          Review &amp;amp; publish — {datasetLabel}
+        &lt;/h2&gt;
+        &lt;p className=&quot;mt-1 text-sm text-slate-600&quot;&gt;
+          Coverage through rank {coveredThroughRank ?? &quot;—&quot;} of required{&quot; &quot;}
+          {requiredRank ?? &quot;—&quot;}. {diff.addedCount} added, {diff.changedCount}{&quot; &quot;}
+          changed, {diff.removedCount} removed.
+        &lt;/p&gt;
+        {aliasBlocked ? (
+          &lt;p
+            className=&quot;mt-2 rounded-xl bg-red-50 p-3 text-sm font-bold text-red-800&quot;
+            role=&quot;alert&quot;
+          &gt;
+            {unresolvedAliasCount} Other-player match
+            {unresolvedAliasCount === 1 ? &quot;&quot; : &quot;es&quot;} pending. Resolve them below
+            the editor first.
+          &lt;/p&gt;
+        ) : null}
+        {boundaryWarnings.length &gt; 0 ? (
+          &lt;ul className=&quot;mt-2 list-disc rounded-xl bg-amber-50 p-3 pl-6 text-sm font-semibold text-amber-900&quot;&gt;
+            {boundaryWarnings.map((warning) =&gt; (
+              &lt;li key={`${warning.tiedValue}-${warning.direction}`}&gt;
+                Tie at {warning.tiedValue} spans rank {warning.boundaryRank} —{&quot; &quot;}
+                confirm every tied player is in the list.
+              &lt;/li&gt;
+            ))}
+          &lt;/ul&gt;
+        ) : null}
+        &lt;ul className=&quot;mt-3 max-h-72 divide-y divide-slate-100 overflow-y-auto rounded-xl border border-slate-200&quot;&gt;
+          {diff.entries.map((entry) =&gt; (
+            &lt;li
+              className=&quot;flex items-center justify-between gap-3 px-3 py-2 text-sm&quot;
+              key={entry.subjectId}
+            &gt;
+              &lt;span className=&quot;font-semibold text-slate-950&quot;&gt;
+                {entry.label}
+              &lt;/span&gt;
+              &lt;span className=&quot;text-xs font-bold tracking-wide uppercase&quot;&gt;
+                &lt;span
+                  className={
+                    entry.kind === &quot;removed&quot;
+                      ? &quot;text-red-700&quot;
+                      : entry.kind === &quot;added&quot;
+                        ? &quot;text-emerald-700&quot;
+                        : entry.kind === &quot;changed&quot;
+                          ? &quot;text-amber-700&quot;
+                          : &quot;text-slate-500&quot;
+                  }
+                &gt;
+                  {entry.kind}
+                &lt;/span&gt;{&quot; &quot;}
+                &lt;span className=&quot;text-slate-700&quot;&gt;
+                  {entry.oldMetric ?? &quot;—&quot;} → {entry.newMetric ?? &quot;—&quot;}
+                  {entry.oldRank !== null &amp;&amp; entry.newRank !== null
+                    ? ` (rank ${entry.oldRank} → ${entry.newRank})`
+                    : &quot;&quot;}
+                &lt;/span&gt;
+              &lt;/span&gt;
+            &lt;/li&gt;
+          ))}
+        &lt;/ul&gt;
+        &lt;label className=&quot;mt-4 flex items-start gap-2 rounded-xl bg-slate-50 p-3 text-xs leading-5 font-semibold text-slate-700&quot;&gt;
+          &lt;input
+            checked={attested}
+            className=&quot;mt-1 size-4 shrink-0 accent-emerald-600&quot;
+            onChange={(event) =&gt; setAttested(event.target.checked)}
+            type=&quot;checkbox&quot;
+          /&gt;
+          {attestationSentence}
+        &lt;/label&gt;
+        &lt;div className=&quot;mt-4 flex justify-end gap-2&quot;&gt;
+          &lt;Button disabled={busy} onClick={onCancel} variant=&quot;ghost&quot;&gt;
+            Cancel
+          &lt;/Button&gt;
+          &lt;Button
+            disabled={!attested || busy || aliasBlocked}
+            onClick={onConfirm}
+          &gt;
+            Publish provisional
+          &lt;/Button&gt;
+        &lt;/div&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
+  );
+}
+</code></pre>
+<ul>
+<li><input disabled="" type="checkbox"> <strong>Step 4: Verify pass</strong></li>
+</ul>
+<p>Run: <code>npx vitest run tests/components/publish-review-dialog.test.tsx</code>
+Expected: PASS</p>
+<ul>
+<li><input disabled="" type="checkbox"> <strong>Step 5: Commit</strong></li>
+</ul>
+<pre><code class="language-bash">git add src/app/admin/results/publish-review-dialog.tsx tests/components/publish-review-dialog.test.tsx
+git commit -m &quot;feat: add publish review dialog&quot;
+</code></pre>
+<hr>
+<h3 id="task-13-wire-the-results-desk-and-page">Task 13: Wire the results desk and page</h3>
+<p><strong>Files:</strong></p>
+<ul>
+<li><p>Modify: <code>src/app/admin/results/results-desk.tsx</code></p>
+</li>
+<li><p>Modify: <code>src/app/admin/results/page.tsx</code></p>
+</li>
+<li><p>Test: <code>tests/components/spotlight-results-desk.test.tsx</code> (update fixtures + new tests)</p>
+</li>
+<li><p><input disabled="" type="checkbox"> <strong>Step 1: Update the failing desk test fixtures first</strong></p>
+</li>
+</ul>
+<p>In <code>tests/components/spotlight-results-desk.test.tsx</code>:</p>
+<ol>
+<li>Add <code>publishedRows: []</code> to every <code>ResultDeskDataset</code> fixture object.</li>
+<li>Add a <code>pickedSubjects</code> prop to every <code>SpotlightResultsDesk</code> render:</li>
+</ol>
+<pre><code class="language-tsx">const pickedSubjects = {
+  assists: [],
+  clean_sheets: [],
+  goals: [playerA],
+  player_ratings: [playerB],
+} as const;
+</code></pre>
+<ol start="3">
+<li>Run: <code>npx vitest run tests/components/spotlight-results-desk.test.tsx</code> — expect FAIL (missing props/types).</li>
+</ol>
+<ul>
+<li><input disabled="" type="checkbox"> <strong>Step 2: Extend desk types and props in <code>results-desk.tsx</code></strong></li>
+</ul>
+<pre><code class="language-tsx">import { ResultsPastePanel } from &quot;./results-paste-panel&quot;;
+import { PublishReviewDialog } from &quot;./publish-review-dialog&quot;;
+import {
+  evaluateCoverage,
+  findBoundaryTieWarnings,
+} from &quot;@/features/results/boundary-ties&quot;;
+import { buildResultDiff } from &quot;@/features/results/dataset-diff&quot;;
+</code></pre>
+<p>Type changes:</p>
+<pre><code class="language-tsx">export type ResultDeskSubject = Readonly&lt;{
+  active?: boolean;
+  id: string;
+  label: string;
+  names: readonly string[];
+}&gt;;
+
+export type ResultDeskDataset = Readonly&lt;{
+  // existing fields…
+  publishedRows: readonly { metricValue: number; subjectId: string }[];
+}&gt;;
+
+export type ResultDeskProps = Readonly&lt;{
+  // existing fields…
+  pickedSubjects: Readonly&lt;Record&lt;SpotlightResultDataset, readonly string[]&gt;&gt;;
+}&gt;;
+</code></pre>
+<p>Mirror <code>publishedRows</code> onto <code>EditableDataset</code> (copy through in the <code>useState</code> initializer).</p>
+<ul>
+<li><input disabled="" type="checkbox"> <strong>Step 3: Add handlers inside <code>SpotlightResultsDesk</code></strong></li>
+</ul>
+<pre><code class="language-tsx">const [reviewDataset, setReviewDataset] =
+  useState&lt;SpotlightResultDataset | null&gt;(null);
+
+function seedFromSubmissions(datasetName: SpotlightResultDataset) {
+  const dataset = datasets[datasetName];
+  const present = new Set(dataset.rows.map((row) =&gt; row.subjectId));
+  const additions = pickedSubjects[datasetName]
+    .filter((subjectId) =&gt; !present.has(subjectId))
+    .map((subjectId) =&gt; ({ metricValue: 0, subjectId }));
+  if (additions.length === 0) return;
+  updateDataset(datasetName, {
+    rows: [...dataset.rows, ...additions],
+  });
+}
+
+function applyPastedRows(
+  datasetName: SpotlightResultDataset,
+  incoming: readonly { metricValue: number; subjectId: string }[],
+) {
+  const dataset = datasets[datasetName];
+  const bySubject = new Map(
+    dataset.rows.map((row) =&gt; [row.subjectId, row.metricValue] as const),
+  );
+  for (const row of incoming) bySubject.set(row.subjectId, row.metricValue);
+  updateDataset(datasetName, {
+    rows: [...bySubject].map(([subjectId, metricValue]) =&gt; ({
+      metricValue,
+      subjectId,
+    })),
+  });
+}
+
+async function saveAndPublish(datasetName: SpotlightResultDataset) {
+  const dataset = datasets[datasetName];
+  setBusyKey(`${datasetName}:review-publish`);
+  try {
+    const saved = await saveSpotlightResultDraft({
+      capturedAt: fromUtcInputValue(dataset.capturedAt),
+      coveredThroughRank: dataset.coveredThroughRank,
+      dataset: datasetName,
+      expectedWorkingSnapshotId: dataset.pointers.workingSnapshotId,
+      rows: dataset.rows,
+      source: dataset.source,
+      sourceReference: dataset.sourceReference.trim() || null,
+    });
+    if (!saved.ok || !saved.snapshotId) {
+      setMessages((current) =&gt; ({ ...current, [datasetName]: saved }));
+      return;
+    }
+    const workingSnapshotId = saved.snapshotId;
+    const published = await publishSpotlightResult({
+      activeSnapshotId: dataset.pointers.activeSnapshotId,
+      coverageAttested: true,
+      dataset: datasetName,
+      finalSnapshotId: dataset.pointers.finalSnapshotId,
+      workingSnapshotId,
+    });
+    if (published.ok) {
+      updateDataset(
+        datasetName,
+        {
+          activeSnapshot: {
+            capturedAt: fromUtcInputValue(dataset.capturedAt),
+            coveredThroughRank: dataset.coveredThroughRank ?? bracketCount,
+            id: workingSnapshotId,
+            itemCount: dataset.rows.length,
+            source: dataset.source,
+            sourceReference: dataset.sourceReference.trim() || null,
+          },
+          dirty: false,
+          pinnedAliases: saved.pinnedAliases ?? [],
+          pointers: {
+            ...dataset.pointers,
+            activeSnapshotId: workingSnapshotId,
+            workingSnapshotId,
+          },
+        },
+        { markDirty: false, resetAttestation: true },
+      );
+    } else {
+      updateDataset(
+        datasetName,
+        {
+          dirty: false,
+          pinnedAliases: saved.pinnedAliases ?? [],
+          pointers: { ...dataset.pointers, workingSnapshotId },
+        },
+        { markDirty: false, resetAttestation: true },
+      );
+    }
+    setMessages((current) =&gt; ({ ...current, [datasetName]: published }));
+  } catch {
+    setMessages((current) =&gt; ({
+      ...current,
+      [datasetName]: {
+        message: &quot;Something went wrong. No changes were made.&quot;,
+        ok: false,
+      },
+    }));
+  } finally {
+    setBusyKey(null);
+    setReviewDataset(null);
+  }
+}
+</code></pre>
+<p>If publish fails after save succeeded, the draft stays saved (working pointer moved, dirty=false) — the safe recovery state per spec.</p>
+<ul>
+<li><input disabled="" type="checkbox"> <strong>Step 4: Replace the controls cluster in <code>renderControls</code></strong></li>
+</ul>
+<p>Keep the messages area and the secondary <strong>Save draft</strong> button. Remove the attestation checkbox and <strong>Publish provisional</strong> button; add one primary button:</p>
+<pre><code class="language-tsx">&lt;Button
+  className=&quot;w-full sm:w-auto&quot;
+  disabled={Boolean(busyKey) || finalized || publishBlockedWithoutAttestation}
+  onClick={() =&gt; setReviewDataset(datasetName)}
+&gt;
+  Review &amp;amp; publish
+&lt;/Button&gt;
+</code></pre>
+<p>where <code>publishBlockedWithoutAttestation</code> is the existing <code>publishBlocked</code> computation minus the <code>!coverageAttested[datasetName]</code> term (attestation now lives in the dialog).</p>
+<p>Render the dialog at the end of the component:</p>
+<pre><code class="language-tsx">{
+  reviewDataset ? (
+    &lt;PublishReviewDialog
+      attestationSentence={`I attest that ${reviewDataset === &quot;player_ratings&quot; ? &quot;both the highest- and lowest-rated&quot; : &quot;all&quot;} rows through rank ${bracketCount || &quot;N&quot;}, including boundary ties, are present in this exact draft.`}
+      boundaryWarnings={findBoundaryTieWarnings(
+        datasets[reviewDataset].rows,
+        bracketCount,
+        &quot;descending&quot;,
+      )}
+      busy={busyKey === `${reviewDataset}:review-publish`}
+      coveredThroughRank={
+        evaluateCoverage(datasets[reviewDataset].rows, bracketCount)
+          .coveredThroughRank || null
+      }
+      datasetLabel={DATASET_LABELS[reviewDataset]}
+      diff={buildResultDiff({
+        direction: &quot;descending&quot;,
+        draftRows: datasets[reviewDataset].rows,
+        labelById: labelBySubjectIdFor(reviewDataset),
+        publishedRows: datasets[reviewDataset].publishedRows,
+      })}
+      onCancel={() =&gt; setReviewDataset(null)}
+      onConfirm={() =&gt; void saveAndPublish(reviewDataset)}
+      requiredRank={bracketCount || null}
+      unresolvedAliasCount={unresolvedAliasCountForDataset(reviewDataset)}
+    /&gt;
+  ) : null;
+}
+</code></pre>
+<p>Add a small helper next to <code>aliasesForDataset</code>:</p>
+<pre><code class="language-tsx">function labelBySubjectIdFor(datasetName: SpotlightResultDataset) {
+  const subjects = datasetName === &quot;clean_sheets&quot; ? teams : availablePlayers;
+  return new Map(
+    subjects.map((subject) =&gt; [subject.id, subject.label] as const),
+  );
+}
+</code></pre>
+<p>Also render coverage feedback near each editor header:</p>
+<pre><code class="language-tsx">{
+  (() =&gt; {
+    const coverage = evaluateCoverage(dataset.rows, bracketCount);
+    return (
+      &lt;p className=&quot;text-xs font-semibold text-slate-600&quot; role=&quot;status&quot;&gt;
+        {coverage.complete
+          ? `Coverage complete through rank ${coverage.coveredThroughRank}.`
+          : `Short by ${coverage.shortfall} row${coverage.shortfall === 1 ? &quot;&quot; : &quot;s&quot;} of rank ${bracketCount}.`}
+      &lt;/p&gt;
+    );
+  })();
+}
+</code></pre>
+<ul>
+<li><input disabled="" type="checkbox"> <strong>Step 5: Add seed button and paste panel to each dataset card</strong></li>
+</ul>
+<p>Inside each ordinary-dataset card (and once for the shared ratings card), after <code>&lt;EditableResultTable …&gt;</code>:</p>
+<pre><code class="language-tsx">&lt;div className=&quot;flex flex-wrap items-center gap-2&quot;&gt;
+  &lt;Button
+    disabled={frozen || !publishReady}
+    onClick={() =&gt; seedFromSubmissions(datasetName)}
+    size=&quot;sm&quot;
+    variant=&quot;secondary&quot;
+  &gt;
+    Seed from submissions
+  &lt;/Button&gt;
+&lt;/div&gt;
+&lt;ResultsPastePanel
+  datasetLabel={DATASET_LABELS[datasetName]}
+  disabled={frozen}
+  metricKind={datasetName === &quot;player_ratings&quot; ? &quot;rating&quot; : &quot;integer&quot;}
+  onApply={(rows) =&gt; applyPastedRows(datasetName, rows)}
+  subjects={subjects.map((subject) =&gt; ({
+    id: subject.id,
+    names: subject.names,
+  }))}
+/&gt;
+</code></pre>
+<ul>
+<li><input disabled="" type="checkbox"> <strong>Step 6: Wire page data in <code>src/app/admin/results/page.tsx</code></strong></li>
+</ul>
+<ol>
+<li>Import the query:</li>
+</ol>
+<pre><code class="language-tsx">import { getPickedSubjectsByDataset } from &quot;@/features/results/seed-queries&quot;;
+</code></pre>
+<ol start="2">
+<li>Add it to the existing <code>Promise.all</code>, then pass to the desk:</li>
+</ol>
+<pre><code class="language-tsx">pickedSubjects = { pickedSubjects };
+</code></pre>
+<ol start="3">
+<li>Extend the players mapping with names and the teams mapping with names:</li>
+</ol>
+<pre><code class="language-tsx">players={seasonPlayers.map((player) =&gt; ({
+  active: player.isActive,
+  id: player.id,
+  label: /* unchanged */,
+  names: [player.displayName],
+}))}
+teams={seasonTeams.map((team) =&gt; ({
+  id: team.id,
+  label: team.displayName,
+  names: [team.displayName, team.shortName],
+}))}
+</code></pre>
+<ol start="4">
+<li>Extend each dataset mapping with published rows:</li>
+</ol>
+<pre><code class="language-tsx">publishedRows:
+  state?.activeSnapshotId &amp;&amp; snapshotById.get(state.activeSnapshotId)
+    ? itemRows.flatMap((item) =&gt;
+        item.snapshotId === state.activeSnapshotId &amp;&amp;
+        (item.playerId ?? item.teamId)
+          ? [
+              {
+                metricValue: item.metricValue,
+                subjectId: (item.playerId ?? item.teamId) as string,
+              },
+            ]
+          : [],
+      )
+    : [],
+</code></pre>
+<ul>
+<li><input disabled="" type="checkbox"> <strong>Step 7: Add new desk component tests</strong></li>
+</ul>
+<p>Append to <code>tests/components/spotlight-results-desk.test.tsx</code>:</p>
+<ol>
+<li>Seed merge test: render desk with <code>publishReady</code>, click “Seed from submissions” on the Top scorer card, assert a new row input appears for the picked player at value 0.</li>
+<li>Review dialog flow: fill a valid draft, save via mocked <code>saveSpotlightResultDraft</code> resolving <code>{ ok: true, message: &quot;Saved.&quot;, snapshotId: &quot;00000000-0000-4000-8000-000000000099&quot;, pinnedAliases: [] }</code>, open Review &amp; publish, tick attestation, confirm; assert mocked <code>publishSpotlightResult</code> was called with <code>coverageAttested: true</code> and <code>workingSnapshotId: &quot;00000000-0000-4000-8000-000000000099&quot;</code>.</li>
+<li>Publish-failure recovery: same but <code>publishSpotlightResult</code> resolves <code>{ ok: false, message: &quot;Coverage incomplete.&quot; }</code>; assert the error message renders and no success audit path ran.</li>
+</ol>
+<p>Follow the file&#39;s existing <code>vi.hoisted</code> mock style.</p>
+<ul>
+<li><input disabled="" type="checkbox"> <strong>Step 8: Verify all component tests pass</strong></li>
+</ul>
+<p>Run: <code>npx vitest run tests/components/spotlight-results-desk.test.tsx tests/components/results-paste-panel.test.tsx tests/components/publish-review-dialog.test.tsx</code>
+Expected: PASS</p>
+<ul>
+<li><input disabled="" type="checkbox"> <strong>Step 9: Typecheck, lint, full unit suite</strong></li>
+</ul>
+<p>Run: <code>npm run typecheck &amp;&amp; npm run lint &amp;&amp; npm test</code>
+Expected: PASS</p>
+<ul>
+<li><input disabled="" type="checkbox"> <strong>Step 10: Commit</strong></li>
+</ul>
+<pre><code class="language-bash">git add src/app/admin/results/ tests/components/
+git commit -m &quot;feat: wire paste entry, seeding, and combined publish into results desk&quot;
+</code></pre>
+<hr>
+<h3 id="task-14-e2e-journey">Task 14: E2E journey</h3>
+<p><strong>Files:</strong></p>
+<ul>
+<li><p>Create: <code>tests/e2e/admin-paste-entry.spec.ts</code></p>
+</li>
+<li><p><input disabled="" type="checkbox"> <strong>Step 1: Study the existing harness</strong></p>
+</li>
+</ul>
+<p>Open <code>tests/e2e/app-journey.spec.ts</code>. Copy its admin-login block verbatim (around lines 658–669 and 926: password from <code>process.env.PLAYWRIGHT_ADMIN_PASSWORD ?? process.env.ADMIN_SECRET</code>, <code>page.goto(&quot;/admin/login&quot;)</code>, fill credentials, submit) into a local <code>loginAsAdmin(page)</code> helper, and reuse its <code>getQaDb()</code> cleanup pattern for any QA rows you create.</p>
+<ul>
+<li><input disabled="" type="checkbox"> <strong>Step 2: Write the spec</strong></li>
+</ul>
+<pre><code class="language-ts">import { expect, test, type Page } from &quot;@playwright/test&quot;;
+
+async function loginAsAdmin(page: Page) {
+  const adminPassword =
+    process.env.PLAYWRIGHT_ADMIN_PASSWORD ?? process.env.ADMIN_SECRET;
+  if (!adminPassword) {
+    throw new Error(
+      &quot;PLAYWRIGHT_ADMIN_PASSWORD or ADMIN_SECRET must be available for E2E&quot;,
+    );
+  }
+  await page.goto(&quot;/admin/login&quot;);
+  await page
+    .getByLabel(/username/i)
+    .fill(process.env.PLAYWRIGHT_ADMIN_USERNAME ?? &quot;admin&quot;);
+  await page.getByLabel(/password/i).fill(adminPassword);
+  await page.getByRole(&quot;button&quot;, { name: /sign in|log in/i }).click();
+  await expect(page).toHaveURL(/\/admin/);
+}
+
+test.describe(&quot;admin paste entry&quot;, () =&gt; {
+  test(&quot;standings paste journey parses, diffs, and saves a table&quot;, async ({
+    page,
+  }) =&gt; {
+    await loginAsAdmin(page);
+    await page.goto(&quot;/admin/standings&quot;);
+    const textarea = page.getByLabel(&quot;Pasted table text&quot;);
+    await textarea.fill(&quot;&quot;);
+    await expect(
+      page.getByRole(&quot;button&quot;, { name: &quot;Parse table&quot; }),
+    ).toBeDisabled();
+  });
+
+  test(&quot;results desk exposes seed and paste affordances after reveal&quot;, async ({
+    page,
+  }) =&gt; {
+    await loginAsAdmin(page);
+    await page.goto(&quot;/admin/results&quot;);
+    await expect(
+      page.getByRole(&quot;heading&quot;, { name: &quot;Spotlight results&quot; }),
+    ).toBeVisible();
+  });
+});
+</code></pre>
+<p>Extend the first test with a full 20-row fixture table (generate all 20 club lines programmatically from <code>PREMIER_LEAGUE_2026_27_TEAMS</code> imported from <code>@/data</code>) asserting: preview shows 20 OK rows, confirm enabled, click confirm, success status appears, and <code>/leaderboard</code> still renders. Follow the reveal/closure setup approach used by <code>app-journey.spec.ts</code> for any state the gate requires; skip gracefully (<code>test.skip</code>) when the season is not revealed rather than mutating production data. Never run destructive journeys against production — mirror the isolation rules in <code>AGENTS.md</code>.</p>
+<ul>
+<li><input disabled="" type="checkbox"> <strong>Step 3: Run against the isolated environment</strong></li>
+</ul>
+<p>Run: <code>npm run test:e2e -- admin-paste-entry</code>
+Expected: PASS (with <code>TEST_DATABASE_URL</code>/local dev server configured as the other e2e specs require)</p>
+<ul>
+<li><input disabled="" type="checkbox"> <strong>Step 4: Commit</strong></li>
+</ul>
+<pre><code class="language-bash">git add tests/e2e/admin-paste-entry.spec.ts
+git commit -m &quot;test: add admin paste entry e2e journey&quot;
+</code></pre>
+<hr>
+<h3 id="task-15-full-verification-and-docs-parity">Task 15: Full verification and docs parity</h3>
+<ul>
+<li><input disabled="" type="checkbox"> <strong>Step 1: Regenerate doc HTML peers and check parity</strong></li>
+</ul>
+<p>Run: <code>npm run docs:generate &amp;&amp; npm run docs:check</code>
+Expected: PASS (HTML peers created for the spec and this plan)</p>
+<ul>
+<li><input disabled="" type="checkbox"> <strong>Step 2: Update QA documentation</strong></li>
+</ul>
+<p>Add entries to <code>docs/QA.md</code> following its existing format covering: standings paste parse/diff/confirm, unknown-club blocking, seed-from-submissions merge, list paste with skipped lines, combined review+attest+publish dialog, publish-failure recovery state, alias-blocked dialog, mobile reflow of both panels (320–430px), and cleanup evidence for any QA data created during e2e.</p>
+<ul>
+<li><input disabled="" type="checkbox"> <strong>Step 3: Full repository check</strong></li>
+</ul>
+<p>Run: <code>npm run check</code>
+Expected: PASS (docs parity, players check, formatting, lint, typecheck, unit, integration, build verify, e2e)</p>
+<ul>
+<li><input disabled="" type="checkbox"> <strong>Step 4: Manual browser QA</strong></li>
+</ul>
+<p>Run <code>npm run dev</code> and verify on desktop + mobile viewport (375px and 320px): paste panel layout, results desk cards with seed/paste controls, dialog scroll behavior with long diffs, no horizontal overflow, touch targets ≥ 44px.</p>
+<ul>
+<li><input disabled="" type="checkbox"> <strong>Step 5: Commit docs and finish</strong></li>
+</ul>
+<pre><code class="language-bash">git add docs/
+git commit -m &quot;docs: QA evidence and generated HTML for admin paste entry&quot;
+</code></pre>
+<p>Then follow the repo&#39;s finishing workflow: push the branch, merge to GitHub <code>main</code>, update local <code>main</code>, and remove the worktree.</p>
+
+      <p class="source">Generated deterministically from <a href="2026-08-21-admin-paste-entry.md">docs/superpowers/plans/2026-08-21-admin-paste-entry.md</a>. Canonical SHA-256: <code>d15735f31a479d6425361d834c82bd8feaf3fa881853b23cf1c9f36826eb488e</code>.</p>
+    </main>
+  </body>
+</html>

@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="generated-by" content="scripts/generate-docs-html.mjs" />
     <meta name="canonical-source" content="STATUS.md" />
-    <meta name="canonical-source-sha256" content="bd4ff97a86648ae8887b9da637fc58959d5ca4f734de8f9bb76acb16105ca9b9" />
+    <meta name="canonical-source-sha256" content="5ebc895f0c24b4964bd4bf25927c017b9fc015e0ff692695cc080bb6083cfd0c" />
     <title>Status</title>
     <style>
       :root { color-scheme: light dark; font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
@@ -41,13 +41,15 @@
     <main>
       <h1 id="status">Status</h1>
 <ul>
+<li><p>Current iteration (unreleased): <code>feature/admin-paste-entry</code> adds guarded complete-table paste entry, spotlight seed-and-paste editing, and a combined review, attestation, save, and publish flow. Local unit, isolated Neon, production-build, production-server browser, desktop, 375-pixel, and 320-pixel checks pass. No production data or deployment was changed during this iteration.</p>
+</li>
 <li><p>Current release (2026-08-21): the Oxalpha UI-report remediation and August 20 player-catalogue refresh are released and production-verified. PR #21 merged the implementation as <code>a033f3613f57c37720e2f0db51ada63965a4783c</code>; PR #22 merged the selector and protected-preview smoke fixes as <code>947118f5304271b5ae2a824329080b83d4d80723</code>.</p>
 </li>
 <li><p>Current repository catalogue: the owner-selected August 20 handoff normalizes to 580 players across 20 clubs and 578 verified local portraits. Ryan McAidoo and Luc De Fougerolles intentionally use the silhouette fallback. The exact delta from August 18 is five additions, five removals, no intra-league moves, two position corrections, and two restored portraits for existing players.</p>
 </li>
 <li><p>Production boundary: the owner-approved supported seed ran exactly once after the exact application deployment became Ready. Production now has 613 total player rows, 580 active rows, 33 preserved inactive rows, 578 active portrait paths, and the two documented silhouette fallbacks.</p>
 </li>
-<li><p>Current phase: the August 21 application, catalogue, seed, and production verification are complete. Evidence-PR merge, local-main synchronization to that merge, and removal of this closeout worktree and completed branches remain repository-hygiene tasks.</p>
+<li><p>Current phase: the August 21 UI and catalogue release closeout is complete through PR #23 and local/remote <code>main</code> synchronization. The administrator paste-entry iteration is locally complete; its feature-branch push, GitHub merge, local-main synchronization, and branch cleanup remain.</p>
 </li>
 <li><p>GitHub release: <a href="https://github.com/vdoshi96/Pl-predictions/pull/21">PR #21</a> merged the implementation as <code>a033f3613f57c37720e2f0db51ada63965a4783c</code>. <a href="https://github.com/vdoshi96/Pl-predictions/pull/22">PR #22</a> merged the selector and production-smoke corrections as <code>947118f5304271b5ae2a824329080b83d4d80723</code>.</p>
 </li>
@@ -62,6 +64,8 @@
 <li><p>Local catalogue delivery remediation: the initial homepage server path reads explicit season fields and the 20 clubs without querying or serializing the player catalogue. Stage 2 lazily requests the dynamic same-origin catalogue route, which SQL-filters active current-season players and returns the minimal display/search shape. Submission validation queries only player IDs referenced by the submitted picks.</p>
 </li>
 <li><p>Manual result remediation: <code>/admin/results</code> presents top scorer, top assister, club clean sheets, underdog player, and overrated player as five tables backed by four factual datasets. Shared player ratings synchronize the high/low views. Save creates a sealed immutable working snapshot with exact pinned Other-name aliases; publish/finalize/undo use CAS pointers and atomic audits. Publication requires permanent closure/reveal, at least one active bracket, current-<code>N</code> coverage with boundary ties, every relevant alias, and explicit attestation. Missing/unresolved data remains pending; an omitted canonical subject becomes outside-range zero only after a complete snapshot publishes.</p>
+</li>
+<li><p>Administrator paste-entry iteration: <code>/admin/standings</code> accepts a reviewed 20-club text table only after alias resolution, numeric classification, complete-permutation validation, and an active-table diff. <code>/admin/results</code> can seed distinct submitted subjects, parse reviewed integer or rating lists, retain skipped lines for attention, and show an exact draft-versus-published diff before the owner attests. The combined action saves first and publishes the returned immutable snapshot; a publish failure leaves that saved working draft recoverable.</p>
 </li>
 <li><p>Production remediation schema: preflight found the legacy active-season deadline <code>NULL</code>, 599 total/582 active players, zero normalized display-name duplicates, migration history through <code>0005</code>, and no result tables. Additive <code>0006</code>/<code>0007</code> were applied before the code release. A <code>READ ONLY</code> transaction followed by <code>ROLLBACK</code> verified their exact hashes (<code>1000ff0034a9954dbb4aeedcd26ece126b39adacc069d084c0d9945deb0c4be0</code> and <code>6b539a65a70a896bead07ba7010bd71834874bb3b3b1b5ae784536ef0f914db4</code>), all 8 migration rows, four pending states with every pointer <code>NULL</code>, zero result snapshots/items/aliases, the expected 3 unique indexes and 14 valid enabled triggers, zero closure/result audits, and false lock/reveal flags. No result fact was inferred or published, and the prior application remains compatible.</p>
 </li>
@@ -105,7 +109,7 @@
 </li>
 </ul>
 
-      <p class="source">Generated deterministically from <a href="STATUS.md">docs/context/STATUS.md</a>. Canonical SHA-256: <code>bd4ff97a86648ae8887b9da637fc58959d5ca4f734de8f9bb76acb16105ca9b9</code>.</p>
+      <p class="source">Generated deterministically from <a href="STATUS.md">docs/context/STATUS.md</a>. Canonical SHA-256: <code>5ebc895f0c24b4964bd4bf25927c017b9fc015e0ff692695cc080bb6083cfd0c</code>.</p>
     </main>
   </body>
 </html>

@@ -101,9 +101,7 @@ type ResultDeskProps = Readonly<{
   aliases: readonly ResultDeskAlias[];
   bracketCount: number;
   datasets: readonly ResultDeskDataset[];
-  pickedSubjects: Readonly<
-    Record<SpotlightResultDataset, readonly string[]>
-  >;
+  pickedSubjects: Readonly<Record<SpotlightResultDataset, readonly string[]>>;
   players: readonly ResultDeskSubject[];
   publishReady: boolean;
   seasonName: string;
@@ -509,9 +507,7 @@ export function SpotlightResultsDesk({
     }).length;
   }
 
-  function unresolvedLiveAliasCountForDataset(
-    dataset: SpotlightResultDataset,
-  ) {
+  function unresolvedLiveAliasCountForDataset(dataset: SpotlightResultDataset) {
     return aliasesForDataset(dataset).filter(
       (alias) =>
         !savedAliasPlayerIdByName.get(alias.normalizedCustomPlayerName),
@@ -519,8 +515,7 @@ export function SpotlightResultsDesk({
   }
 
   function labelBySubjectIdFor(dataset: SpotlightResultDataset) {
-    const subjects =
-      dataset === "clean_sheets" ? teams : availablePlayers;
+    const subjects = dataset === "clean_sheets" ? teams : availablePlayers;
     return new Map(
       subjects.map((subject) => [subject.id, subject.label] as const),
     );
@@ -603,8 +598,7 @@ export function SpotlightResultsDesk({
           {
             activeSnapshot: {
               capturedAt: fromUtcInputValue(dataset.capturedAt),
-              coveredThroughRank:
-                dataset.coveredThroughRank ?? bracketCount,
+              coveredThroughRank: dataset.coveredThroughRank ?? bracketCount,
               id: workingSnapshotId,
               itemCount: dataset.rows.length,
               source: dataset.source,
@@ -1123,10 +1117,7 @@ export function SpotlightResultsDesk({
           {(() => {
             const coverage = evaluateCoverage(ratings.rows, bracketCount);
             return (
-              <p
-                className="text-xs font-semibold text-slate-600"
-                role="status"
-              >
+              <p className="text-xs font-semibold text-slate-600" role="status">
                 {coverage.complete
                   ? `Coverage complete through rank ${coverage.coveredThroughRank}.`
                   : `Short by ${coverage.shortfall} row${coverage.shortfall === 1 ? "" : "s"} of rank ${bracketCount}.`}
@@ -1332,9 +1323,9 @@ export function SpotlightResultsDesk({
           onCancel={() => setReviewDataset(null)}
           onConfirm={() => void saveAndPublish(reviewDataset)}
           requiredRank={bracketCount || null}
-          unresolvedAliasCount={
-            unresolvedLiveAliasCountForDataset(reviewDataset)
-          }
+          unresolvedAliasCount={unresolvedLiveAliasCountForDataset(
+            reviewDataset,
+          )}
         />
       ) : null}
     </div>

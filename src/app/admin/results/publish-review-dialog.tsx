@@ -46,7 +46,7 @@ export function PublishReviewDialog({
           Review &amp; publish — {datasetLabel}
         </h2>
         <p className="mt-1 text-sm text-slate-600">
-          Coverage through rank {coveredThroughRank ?? "—"} of required {" "}
+          Coverage through rank {coveredThroughRank ?? "—"} of required{" "}
           {requiredRank ?? "—"}. {diff.addedCount} added, {diff.changedCount}{" "}
           changed, {diff.removedCount} removed.
         </p>
@@ -56,8 +56,8 @@ export function PublishReviewDialog({
             role="alert"
           >
             {unresolvedAliasCount} Other-player match
-            {unresolvedAliasCount === 1 ? "" : "es"} pending. Resolve them
-            below the editor first.
+            {unresolvedAliasCount === 1 ? "" : "es"} pending. Resolve them below
+            the editor first.
           </p>
         ) : null}
         {boundaryWarnings.length > 0 ? (

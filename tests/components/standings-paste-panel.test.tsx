@@ -53,9 +53,9 @@ describe("StandingsPastePanel", () => {
     });
     fireEvent.click(screen.getByRole("button", { name: "Parse table" }));
     expect(screen.getByText("Liverpool")).toBeTruthy();
-    expect(
-      screen.getAllByRole("cell", { name: "Check numbers" }),
-    ).toHaveLength(2);
+    expect(screen.getAllByRole("cell", { name: "Check numbers" })).toHaveLength(
+      2,
+    );
   });
 
   it("blocks confirm while clubs are missing and lists problems", () => {
@@ -106,9 +106,7 @@ describe("StandingsPastePanel", () => {
       },
     });
     fireEvent.click(screen.getByRole("button", { name: "Parse table" }));
-    fireEvent.click(
-      screen.getByRole("button", { name: "Save pasted table" }),
-    );
+    fireEvent.click(screen.getByRole("button", { name: "Save pasted table" }));
     await waitFor(() => expect(onSubmit).toHaveBeenCalled());
     expect(onSubmit.mock.calls[0][0].standings[0]).toEqual({
       teamSlug: "liverpool",

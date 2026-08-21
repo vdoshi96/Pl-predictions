@@ -4,10 +4,7 @@ import {
 } from "@/data/team-name-aliases";
 import { normalizeForMatch } from "@/shared/text-normalization";
 
-export type ParsedStandingsRowStatus =
-  | "ok"
-  | "unknown-club"
-  | "ambiguous-club";
+export type ParsedStandingsRowStatus = "ok" | "unknown-club" | "ambiguous-club";
 
 export type ParsedStandingsRow = Readonly<{
   rawLine: string;

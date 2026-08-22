@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="generated-by" content="scripts/generate-docs-html.mjs" />
     <meta name="canonical-source" content="QA.md" />
-    <meta name="canonical-source-sha256" content="45ac9ab6f86ec0c8e70bf233fd9889191e909f108f85e72bb06303db256a8439" />
+    <meta name="canonical-source-sha256" content="edf9138c473b52f871d909b59c72acc975dfef8b965ba429032e4ed7a94dac59" />
     <title>Quality assurance</title>
     <style>
       :root { color-scheme: light dark; font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
@@ -90,7 +90,9 @@
 <td><a href="https://github.com/vdoshi96/Pl-predictions/pull/28">PR #28</a> merged as <code>a49d0e8f0ebe44c5fc2373d22685e9954254b33c</code>. Vercel deployment <code>dpl_Ag5fn9u1gwQvj2Mi7Wdgy4sSkq7J</code> became Ready, and deployment-ID read-back proved the stable <a href="https://pl-predictions-2026.vercel.app">production alias</a> resolved to it. The final anonymous smoke passed desktop Chromium, 390-pixel mobile Chromium, exact 320/430-pixel Chromium reflow, and mobile WebKit against the naturally revealed season state. It verified the 20-club season table, public Spotlight rankings, current walkthrough images, administrator login, responsive containment, loaded local imagery, zero browser/network/HTTP errors, and only read-only same-origin methods.</td>
 </tr>
 </tbody></table>
-<p>The local production server printed React&#39;s <code>The destination stream closed early</code> cancellation message when browser navigation intentionally abandoned an in-flight dynamic response. No routed journey, response-status guard, network guard, browser assertion, or cleanup check failed. This cancellation noise is retained here rather than reported as an application-test failure. The production-log and final read-only database checks are part of repository closeout and do not authorize participant, result, Lock, or Reveal writes.</p>
+<p>The local production server printed React&#39;s <code>The destination stream closed early</code> cancellation message when browser navigation intentionally abandoned an in-flight dynamic response. No routed journey, response-status guard, network guard, browser assertion, or cleanup check failed. This cancellation noise is retained here rather than reported as an application-test failure.</p>
+<p><a href="https://github.com/vdoshi96/Pl-predictions/pull/29">PR #29</a> merged the revealed-state smoke correction as <code>375509fe5f427a332af12408130a53320fd1af99</code>. Its docs/test-only Vercel deployment <code>dpl_38GEr27yEAa61S3BiFBxGRFnBPsA</code> became Ready; the stable alias intentionally remained on the separately verified application deployment <code>dpl_Ag5fn9u1gwQvj2Mi7Wdgy4sSkq7J</code>. Live response checks returned HTTP 200 health, a per-response nonce CSP with <code>strict-dynamic</code> and no script <code>unsafe-inline</code>, exact HSTS <code>max-age=63072000; includeSubDomains</code>, and a repeat catalogue request with positive age and <code>x-vercel-cache: HIT</code>. Exact-deployment queries over the final 30-minute window returned no error-level records, fatal records, or HTTP 500 records.</p>
+<p>The final transaction-scoped read-only database postcheck at <code>2026-08-22T07:30:40.784Z</code>, WAL <code>0/C629B50</code>, again found ten exact migration hashes, 14 complete prediction parents, one complete standings snapshot, unchanged false manual lock/reveal flags and standings pointers, six result snapshots with 109 items and four active/no final datasets, 580 active players with 578 portraits, and both security tables. No participant, result, Lock, Reveal, seed, or other production-data mutation ran during release verification.</p>
 <h2 id="august-21-season-glance-display-upgrade">August 21 season-glance display upgrade</h2>
 <p>This iteration changes only public read surfaces and their server-derived queries. It adds no schema, dependency, environment variable, data import, production database write, or deployment action.</p>
 <table>
@@ -595,7 +597,7 @@
 <li><input checked="" disabled="" type="checkbox"> Regenerate final HTML peers, publish this closeout through <code>main</code>, synchronize local and remote <code>main</code>, and remove completed branch state.</li>
 </ul>
 
-      <p class="source">Generated deterministically from <a href="QA.md">docs/QA.md</a>. Canonical SHA-256: <code>45ac9ab6f86ec0c8e70bf233fd9889191e909f108f85e72bb06303db256a8439</code>.</p>
+      <p class="source">Generated deterministically from <a href="QA.md">docs/QA.md</a>. Canonical SHA-256: <code>edf9138c473b52f871d909b59c72acc975dfef8b965ba429032e4ed7a94dac59</code>.</p>
     </main>
   </body>
 </html>

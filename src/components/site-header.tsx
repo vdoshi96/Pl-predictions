@@ -3,7 +3,7 @@ import Link from "next/link";
 import { BrandMark } from "./brand-mark";
 
 const navigation = [
-  { href: "/", label: "Predict" },
+  { href: "/", label: "Home" },
   { href: "/leaderboard", label: "Table" },
   { href: "/spotlight", label: "Spotlight" },
   { href: "/rules", label: "Rules" },

@@ -1425,13 +1425,13 @@ describe("shared site chrome", () => {
     const { rerender } = render(<SiteHeader />);
 
     const navigation = screen.getByRole("navigation", { name: /primary/i });
-    const predictLink = screen.getByRole("link", { name: /^predict$/i });
+    const homeLink = screen.getByRole("link", { name: /^home$/i });
 
     expect(navigation).toBeVisible();
     expect(navigation).toHaveClass("basis-full", "sm:basis-auto");
     expect(within(navigation).getByRole("list")).toHaveClass("flex");
-    expect(predictLink).toHaveAttribute("href", "/");
-    expect(predictLink).toHaveClass("min-h-12", "min-w-0");
+    expect(homeLink).toHaveAttribute("href", "/");
+    expect(homeLink).toHaveClass("min-h-12", "min-w-0");
     expect(screen.getByRole("link", { name: /^table$/i })).toHaveAttribute(
       "href",
       "/leaderboard",

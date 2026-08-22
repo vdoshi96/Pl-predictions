@@ -6,19 +6,43 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { SPOTLIGHT_SCORING_MESSAGE } from "@/content/public-copy";
 import { LeaderboardEntryLink } from "@/features/leaderboard/entry-link";
+import {
+  buildSpotlightCategoryBoard,
+  buildSpotlightMatrix,
+  canLoadSpotlightCategoryData,
+  parseSpotlightView,
+  type SpotlightView,
+} from "@/features/leaderboard/spotlight-board";
 import { getLeaderboardView } from "@/features/leaderboard/queries";
 import { SpotlightPickGrid } from "@/features/leaderboard/spotlight-pick-grid";
+import {
+  SpotlightCategoriesView,
+  SpotlightMatrixView,
+} from "@/features/leaderboard/spotlight-views";
 import {
   PREDICTION_CATEGORY_DEFINITIONS,
   isPredictionCategory,
   type PredictionCategory,
 } from "@/features/predictions/categories";
+import {
+  getActiveSpotlightAliasResolutions,
+  getCategoryOutcomeLeaders,
+  type CategoryOutcomeLeader,
+} from "@/features/results/queries";
+import { getActiveSeasonContext } from "@/features/seasons/queries";
+import { getSeasonTableView } from "@/features/standings/season-table";
+import { formatExpectationIndex } from "@/features/standings/season-table-view";
 import { formatUtcDateTime } from "@/shared/format";
 
 export const metadata: Metadata = { title: "Spotlight accuracy" };
 export const dynamic = "force-dynamic";
 
 type SpotlightSort = "overall" | PredictionCategory;
+const viewOptions: readonly { label: string; value: SpotlightView }[] = [
+  { label: "Categories", value: "categories" },
+  { label: "Entries", value: "entries" },
+  { label: "Matrix", value: "matrix" },
+];
 
 const sortOptions: readonly { label: string; value: SpotlightSort }[] = [
   { label: "Overall", value: "overall" },
@@ -60,10 +84,14 @@ function resultFor(
 export default async function SpotlightPage({
   searchParams,
 }: {
-  searchParams: Promise<{ sort?: string | string[] }>;
+  searchParams: Promise<{
+    sort?: string | string[];
+    view?: string | string[];
+  }>;
 }) {
   const [view, query] = await Promise.all([getLeaderboardView(), searchParams]);
   const sort = parseSort(query.sort);
+  const selectedView = parseSpotlightView(query.view);
   const selectedDefinition =
     sort === "overall"
       ? null
@@ -86,6 +114,62 @@ export default async function SpotlightPage({
         nameCollator.compare(left.participantName, right.participantName)
       );
     });
+  }
+
+  const categoryLeaders: Partial<
+    Record<PredictionCategory, CategoryOutcomeLeader>
+  > = {};
+  let liveCategories: PredictionCategory[] = [];
+  let categoryBoards = entries ? buildSpotlightCategoryBoard(entries) : [];
+  const matrixEntries = entries ? buildSpotlightMatrix(entries) : [];
+
+  if (
+    entries &&
+    canLoadSpotlightCategoryData({
+      entryCount: entries.length,
+      predictionsRevealed: view.predictionsRevealed,
+      view: selectedView,
+    })
+  ) {
+    const { season } = await getActiveSeasonContext();
+    const [outcomes, aliases, seasonTable] = await Promise.all([
+      getCategoryOutcomeLeaders(season.id, view.entries.length),
+      getActiveSpotlightAliasResolutions(season.id),
+      getSeasonTableView(),
+    ]);
+    Object.assign(categoryLeaders, outcomes.leaders);
+    liveCategories = [...outcomes.liveCategories];
+    categoryBoards = buildSpotlightCategoryBoard(entries, { aliases });
+
+    if (seasonTable.consensusActive) {
+      liveCategories.push("underdog_team", "overrated_team");
+      const overachiever = seasonTable.callouts.overachiever;
+      const underachiever = seasonTable.callouts.underachiever;
+      if (overachiever) {
+        categoryLeaders.underdog_team = {
+          assetPath: overachiever.team.assetPath,
+          category: "underdog_team",
+          displayName: overachiever.team.displayName,
+          metricLabel: formatExpectationIndex(
+            overachiever.avgPredicted - overachiever.actualPosition,
+          ),
+          shortName: overachiever.team.shortName,
+          subject: "team",
+        };
+      }
+      if (underachiever) {
+        categoryLeaders.overrated_team = {
+          assetPath: underachiever.team.assetPath,
+          category: "overrated_team",
+          displayName: underachiever.team.displayName,
+          metricLabel: formatExpectationIndex(
+            underachiever.actualPosition - underachiever.avgPredicted,
+          ),
+          shortName: underachiever.team.shortName,
+          subject: "team",
+        };
+      }
+    }
   }
 
   return (
@@ -152,49 +236,78 @@ export default async function SpotlightPage({
           </CardContent>
         </Card>
 
-        <section
-          aria-labelledby="spotlight-sort-heading"
-          className="grid gap-3"
-        >
-          <div className="flex items-center gap-2">
-            <SlidersHorizontal
-              aria-hidden="true"
-              className="text-brand size-5 shrink-0"
-            />
-            <h2
-              id="spotlight-sort-heading"
-              className="text-brand-strong text-xl font-black"
-            >
-              Real bracket accuracy
-            </h2>
-          </div>
-          <nav aria-label="Sort spotlight accuracy">
-            <ul className="flex flex-wrap gap-2">
-              {sortOptions.map((option) => {
-                const active = option.value === sort;
-                return (
-                  <li key={option.value}>
-                    <Link
-                      aria-current={active ? "page" : undefined}
-                      className={`focus-visible:ring-accent-blue inline-flex min-h-11 items-center rounded-xl border px-3 text-xs font-black outline-none focus-visible:ring-2 ${
-                        active
-                          ? "border-brand bg-brand text-white"
-                          : "border-border bg-white text-slate-700 hover:bg-slate-50"
-                      }`}
-                      href={
-                        option.value === "overall"
-                          ? "/spotlight"
-                          : `/spotlight?sort=${option.value}`
-                      }
-                    >
-                      {option.label}
-                    </Link>
-                  </li>
-                );
-              })}
-            </ul>
-          </nav>
-        </section>
+        <nav aria-label="Spotlight views">
+          <ul className="bg-surface-subtle grid grid-cols-3 gap-1 rounded-xl p-1">
+            {viewOptions.map((option) => {
+              const active = option.value === selectedView;
+              const href =
+                option.value === "categories"
+                  ? "/spotlight"
+                  : `/spotlight?view=${option.value}`;
+              return (
+                <li key={option.value}>
+                  <Link
+                    aria-current={active ? "page" : undefined}
+                    className={`focus-visible:ring-accent-blue inline-flex min-h-11 w-full items-center justify-center rounded-lg px-2 text-xs font-black outline-none focus-visible:ring-2 ${
+                      active
+                        ? "bg-brand text-white"
+                        : "text-slate-600 hover:bg-white"
+                    }`}
+                    href={href}
+                  >
+                    {option.label}
+                  </Link>
+                </li>
+              );
+            })}
+          </ul>
+        </nav>
+
+        {selectedView === "entries" ? (
+          <section
+            aria-labelledby="spotlight-sort-heading"
+            className="grid gap-3"
+          >
+            <div className="flex items-center gap-2">
+              <SlidersHorizontal
+                aria-hidden="true"
+                className="text-brand size-5 shrink-0"
+              />
+              <h2
+                id="spotlight-sort-heading"
+                className="text-brand-strong text-xl font-black"
+              >
+                Real bracket accuracy
+              </h2>
+            </div>
+            <nav aria-label="Sort spotlight accuracy">
+              <ul className="flex flex-wrap gap-2">
+                {sortOptions.map((option) => {
+                  const active = option.value === sort;
+                  return (
+                    <li key={option.value}>
+                      <Link
+                        aria-current={active ? "page" : undefined}
+                        className={`focus-visible:ring-accent-blue inline-flex min-h-11 items-center rounded-xl border px-3 text-xs font-black outline-none focus-visible:ring-2 ${
+                          active
+                            ? "border-brand bg-brand text-white"
+                            : "border-border bg-white text-slate-700 hover:bg-slate-50"
+                        }`}
+                        href={
+                          option.value === "overall"
+                            ? "/spotlight?view=entries"
+                            : `/spotlight?view=entries&sort=${option.value}`
+                        }
+                      >
+                        {option.label}
+                      </Link>
+                    </li>
+                  );
+                })}
+              </ul>
+            </nav>
+          </section>
+        ) : null}
 
         {!view.predictionsRevealed ? (
           <Card>
@@ -239,6 +352,15 @@ export default async function SpotlightPage({
               </p>
             </CardContent>
           </Card>
+        ) : selectedView === "categories" ? (
+          <SpotlightCategoriesView
+            boards={categoryBoards}
+            entryCount={view.entries.length}
+            leaders={categoryLeaders}
+            liveCategories={liveCategories}
+          />
+        ) : selectedView === "matrix" ? (
+          <SpotlightMatrixView entries={matrixEntries} />
         ) : (
           <div className="grid gap-3">
             {!hasAvailableResults ? (

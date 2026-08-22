@@ -89,7 +89,9 @@ export default defineConfig({
     executionMode === "isolated"
       ? {
           command:
-            "npm run dev -- --webpack --no-server-fast-refresh --port 3100",
+            process.env.LOCAL_HTTP_E2E === "1"
+              ? "npm run start -- --port 3100"
+              : "npm run dev -- --webpack --no-server-fast-refresh --port 3100",
           url: "http://127.0.0.1:3100/api/health",
           reuseExistingServer: !process.env.CI,
           timeout: 120_000,

@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="generated-by" content="scripts/generate-docs-html.mjs" />
     <meta name="canonical-source" content="LOG.md" />
-    <meta name="canonical-source-sha256" content="072dd4ebefded61e39ce0a57cc31286bfc3216a5731e0358ba8f168cc49a0196" />
+    <meta name="canonical-source-sha256" content="094df23e65bb27bfd168b55d309c920fe06d81358e2fd2f04dd777632769e70d" />
     <title>Session log</title>
     <style>
       :root { color-scheme: light dark; font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
@@ -42,6 +42,12 @@
       <h1 id="session-log">Session log</h1>
 <h2 id="2026-08-21">2026-08-21</h2>
 <ul>
+<li>Implemented the approved season-glance display. The unrevealed root still renders the existing three-stage form; the revealed root shows the current 20-club table, consensus averages, expectation deltas, and overachiever/underachiever callouts without exposing consensus-bearing data before reveal.</li>
+<li>Replaced the leaderboard card stack with a top-three podium and dense real table. Shared ranks repeat, deterministic initials support non-Latin names, progress remains capped at 100, and movement compares canonical scores with the previous meaningful standings snapshot.</li>
+<li>Split Spotlight into default category boards, the retained per-entry list, and a sticky-column matrix. Category leaders come only from active sealed factual snapshots or active standings scoring; pending and attested outside-range states remain distinct.</li>
+<li>Passed 338 unit/component tests with 21 guarded skips, all 21 isolated Neon integration tests, strict TypeScript, ESLint, and the production build during phased verification.</li>
+<li>Passed the local production-server pre-kickoff routes across desktop/mobile Chromium, exact 320/430-pixel reflow, and mobile WebKit, plus the post-kickoff season-glance journey in desktop and exact-width Chromium. The literal final <code>CI=1 npm run check</code> passed every non-browser gate, then its development-server phase reproduced router initialization, truncated JSON, Fast Refresh reload, and selector-loss failures: 3 passed, 22 intentionally skipped, 4 failed, and 1 flaky after retries. The development-server aggregate is not claimed as a browser pass.</li>
+<li>Verified the completed browser runs left zero active-season predictions and zero post-kickoff QA snapshots in the isolated database. No production data, deployment, schema, dependency, or environment variable changed.</li>
 <li>Published the administrator paste-entry implementation through <a href="https://github.com/vdoshi96/Pl-predictions/pull/24">PR #24</a>, merged as <code>0a5ad854fe522993ff668ce06ffa94a4c9c0fed8</code>. Its Vercel preview checks passed. The merge did not authorize or run any production database action, and production behavior remains outside this local and preview verification record.</li>
 <li>Implemented the approved administrator paste-entry design on <code>feature/admin-paste-entry</code>: shared normalization and aliases, guarded standings parsing and diffing, result-list parsing, current-bracket coverage and boundary-tie checks, submission-derived subject seeding, paste panels, and a combined review, attestation, save, and exact-snapshot publish flow.</li>
 <li>Preserved the existing server-action, session, same-origin, immutable snapshot, CAS, alias, and atomic standings boundaries. A successful save followed by a failed publish remains a recoverable clean working draft. No production data, seed, result pointer, standing, prediction, or deployment changed.</li>
@@ -279,7 +285,7 @@
 <li>Next handoff: use <code>main</code> as the base for future pull requests. No GitHub access blocker remains for the current repository workflow.</li>
 </ul>
 
-      <p class="source">Generated deterministically from <a href="LOG.md">docs/context/LOG.md</a>. Canonical SHA-256: <code>072dd4ebefded61e39ce0a57cc31286bfc3216a5731e0358ba8f168cc49a0196</code>.</p>
+      <p class="source">Generated deterministically from <a href="LOG.md">docs/context/LOG.md</a>. Canonical SHA-256: <code>094df23e65bb27bfd168b55d309c920fe06d81358e2fd2f04dd777632769e70d</code>.</p>
     </main>
   </body>
 </html>

@@ -375,7 +375,9 @@ test("post-kickoff table and spotlight rankings stay split at desktop and mobile
     page.getByRole("link", { name: "View spotlight accuracy" }),
   ).toBeVisible();
 
-  await page.goto("/spotlight?sort=overall", { waitUntil: "networkidle" });
+  await page.goto("/spotlight?view=entries&sort=overall", {
+    waitUntil: "networkidle",
+  });
   await expect(
     page.getByRole("heading", { level: 1, name: "Spotlight accuracy" }),
   ).toBeVisible();
@@ -422,12 +424,21 @@ test("post-kickoff table and spotlight rankings stay split at desktop and mobile
     .returning({ id: seasons.id });
   expect(reobserved).toHaveLength(1);
 
+  await page.goto("/", { waitUntil: "networkidle" });
+  await expect(
+    page.getByRole("heading", { level: 1, name: "Season table" }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("table", { name: "Premier League season table" }),
+  ).toBeVisible();
+  await expectNoHorizontalOverflow(page);
+
   await page.goto("/leaderboard", { waitUntil: "networkidle" });
   const scoredLeaderboard = page.getByLabel("Scored leaderboard");
   await expect(scoredLeaderboard).toBeVisible();
   await expect(page.getByText("Matchweek 1", { exact: true })).toBeVisible();
   await expect(page.getByText("Provisional", { exact: true })).toBeVisible();
-  await expect(scoredLeaderboard.getByRole("article")).toHaveCount(2);
+  await expect(scoredLeaderboard.getByRole("row")).toHaveCount(3);
 
   const exactEntry = page.getByLabel(`${exactName} leaderboard entry`);
   await expect(exactEntry.getByLabel("Rank 1")).toHaveText("1");
@@ -465,7 +476,27 @@ test("post-kickoff table and spotlight rankings stay split at desktop and mobile
 
   await expectNoHorizontalOverflow(page);
 
-  await page.goto("/spotlight?sort=overall", { waitUntil: "networkidle" });
+  await page.goto("/spotlight", { waitUntil: "networkidle" });
+  await expect(page.getByLabel("Spotlight categories")).toBeVisible();
+  await expect(
+    page.getByLabel("Spotlight categories").getByRole("heading", { level: 2 }),
+  ).toHaveCount(7);
+  await expect(page.getByText("Result live")).toHaveCount(2);
+  await expect(page.getByText("Result pending")).toHaveCount(5);
+  await expectNoHorizontalOverflow(page);
+
+  await page.goto("/spotlight?view=matrix", { waitUntil: "networkidle" });
+  await expect(page.getByLabel("Spotlight matrix")).toBeVisible();
+  await expect(
+    page
+      .getByRole("table", { name: /seven spotlight picks/i })
+      .getByRole("row"),
+  ).toHaveCount(3);
+  await expectNoHorizontalOverflow(page);
+
+  await page.goto("/spotlight?view=entries&sort=overall", {
+    waitUntil: "networkidle",
+  });
   const accuracyLeaderboard = page.getByLabel("Spotlight accuracy leaderboard");
   await expect(accuracyLeaderboard.getByRole("article")).toHaveCount(2);
   const exactAccuracyEntry = page.getByLabel(
@@ -498,7 +529,7 @@ test("post-kickoff table and spotlight rankings stay split at desktop and mobile
     exactAccuracyEntry.getByText(`${suffix} exact scorer`, { exact: true }),
   ).toBeVisible();
 
-  await page.goto("/spotlight?sort=underdog_team", {
+  await page.goto("/spotlight?view=entries&sort=underdog_team", {
     waitUntil: "networkidle",
   });
   const underdogAccuracyEntries = page

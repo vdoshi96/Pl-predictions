@@ -22,11 +22,15 @@ export async function getSpotlightPicksByPredictionId(
     .select({
       category: predictionCategoryPicks.category,
       customPlayerName: predictionCategoryPicks.customPlayerName,
+      normalizedCustomPlayerName:
+        predictionCategoryPicks.normalizedCustomPlayerName,
       playerAssetPath: players.assetPath,
       playerDisplayName: players.displayName,
+      playerId: predictionCategoryPicks.playerId,
       predictionId: predictionCategoryPicks.predictionId,
       teamAssetPath: teams.assetPath,
       teamDisplayName: teams.displayName,
+      teamId: predictionCategoryPicks.teamId,
       teamShortName: teams.shortName,
     })
     .from(predictionCategoryPicks)
@@ -54,8 +58,11 @@ export async function getSpotlightPicksByPredictionId(
       category: row.category,
       displayName,
       label: PREDICTION_CATEGORY_LABEL[row.category],
+      normalizedCustomPlayerName: row.normalizedCustomPlayerName,
+      playerId: row.playerId,
       shortName: teamSubject ? row.teamShortName : null,
       subject: teamSubject ? "team" : "player",
+      teamId: row.teamId,
     });
     grouped.set(row.predictionId, picks);
   }

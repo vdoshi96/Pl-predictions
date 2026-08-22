@@ -1,17 +1,24 @@
 import Link from "next/link";
 
+import { cn } from "@/components/ui/cn";
+
 type LeaderboardEntryLinkProps = {
   entryId: string;
   participantName: string;
+  className?: string;
 };
 
 export function LeaderboardEntryLink({
   entryId,
   participantName,
+  className,
 }: LeaderboardEntryLinkProps) {
   return (
     <Link
-      className="block font-black [overflow-wrap:anywhere] text-slate-950 underline decoration-slate-300 decoration-2 underline-offset-4 hover:decoration-slate-700"
+      className={cn(
+        "inline-flex min-h-11 items-center font-black [overflow-wrap:anywhere] text-slate-950 underline decoration-slate-300 decoration-2 underline-offset-4 hover:decoration-slate-700",
+        className,
+      )}
       href={`/entries/${entryId}`}
     >
       {participantName}

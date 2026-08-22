@@ -22,9 +22,15 @@ import {
 import { getManualResultAssignments } from "@/features/results/queries";
 import { hasSeasonStarted } from "@/features/seasons/deadline";
 import { getSeasonAccess } from "@/shared/policy";
+import { formatExpectationIndex } from "@/features/standings/season-table-view";
 
 import { getActiveSeasonContext, getSeasonTeams } from "../seasons/queries";
 import { getSpotlightPicksByPredictionId } from "./pick-queries";
+import {
+  computeRankMovement,
+  selectPreviousMeaningfulSnapshot,
+  type SnapshotIdentity,
+} from "./movement";
 import type { SpotlightPickDisplay } from "./spotlight-pick-grid";
 
 export type LeaderboardChampion = {
@@ -51,6 +57,7 @@ export type ScoredLeaderboardEntry = RankedLeaderboardEntry<{
   exactCount: number;
   id: string;
   participantName: string;
+  movement: number | null;
   tableScore: number;
   totalScore: number;
   withinThreeCount: number;
@@ -86,12 +93,6 @@ const nameCollator = new Intl.Collator("en-GB", {
   numeric: true,
   sensitivity: "base",
 });
-
-function formatExpectationIndex(value: number): string {
-  const rounded = Math.round(value * 10) / 10;
-  const normalized = Object.is(rounded, -0) ? 0 : rounded;
-  return `Index ${normalized > 0 ? "+" : ""}${normalized.toFixed(1)}`;
-}
 
 type AvailableSpotlightResult = {
   accuracyPoints: number;
@@ -310,6 +311,22 @@ export async function getEntrySpotlightPicksWithAccuracy({
     const result = resultByCategory.get(pick.category);
     return result ? { ...pick, ...result } : pick;
   });
+}
+
+export async function getPreviousMeaningfulSnapshot(
+  seasonId: string,
+  activeSnapshot: SnapshotIdentity,
+): Promise<SnapshotIdentity | null> {
+  const candidates = await getDb()
+    .select({
+      capturedAt: standingsSnapshots.capturedAt,
+      id: standingsSnapshots.id,
+      matchweek: standingsSnapshots.matchweek,
+    })
+    .from(standingsSnapshots)
+    .where(eq(standingsSnapshots.seasonId, seasonId));
+
+  return selectPreviousMeaningfulSnapshot(candidates, activeSnapshot);
 }
 
 export async function getLeaderboardView(): Promise<LeaderboardView> {
@@ -591,22 +608,73 @@ export async function getLeaderboardView(): Promise<LeaderboardView> {
       exactCount: state.summary.exactCount,
       id: entry.id,
       participantName: entry.participantName,
+      movement: null,
       tableScore: state.summary.total,
       totalScore: state.summary.total,
       withinThreeCount: state.summary.withinThreeCount,
     };
   });
 
+  const currentRanks = scored.some((entry) => entry === null)
+    ? null
+    : assignSharedRanks(
+        scored.filter((entry): entry is NonNullable<typeof entry> =>
+          Boolean(entry),
+        ),
+      );
+  let previousRanks: Array<{ id: string; rank: number }> | null = null;
+  if (currentRanks) {
+    const previousSnapshot = await getPreviousMeaningfulSnapshot(
+      season.id,
+      snapshot,
+    );
+    if (previousSnapshot) {
+      const previousTable = await db
+        .select({
+          actualPosition: standingsItems.actualPosition,
+          playedGames: standingsItems.playedGames,
+          teamId: standingsItems.teamId,
+        })
+        .from(standingsItems)
+        .where(eq(standingsItems.snapshotId, previousSnapshot.id));
+      const previousScoringWindowOpen = hasSeasonStarted(
+        previousSnapshot.capturedAt,
+        season.openingKickoff,
+      );
+      if (
+        previousScoringWindowOpen &&
+        isStandingsScoringActive(previousTable)
+      ) {
+        previousRanks = assignSharedRanks(
+          entryRows.map((entry) => {
+            const state = scorePredictionIfActive(
+              itemsByPrediction.get(entry.id) ?? [],
+              previousTable,
+              previousScoringWindowOpen,
+            );
+            if (state.status !== "scored") {
+              throw new Error("A meaningful previous table must be scoreable.");
+            }
+            return {
+              id: entry.id,
+              participantName: entry.participantName,
+              totalScore: state.summary.total,
+            };
+          }),
+        );
+      }
+    }
+  }
+  const movementById = computeRankMovement(currentRanks ?? [], previousRanks);
+
   return {
     entries: revealedEntries,
     predictionsRevealed: true,
-    scoredEntries: scored.some((entry) => entry === null)
-      ? null
-      : assignSharedRanks(
-          scored.filter((entry): entry is NonNullable<typeof entry> =>
-            Boolean(entry),
-          ),
-        ),
+    scoredEntries:
+      currentRanks?.map((entry) => ({
+        ...entry,
+        movement: movementById.get(entry.id) ?? null,
+      })) ?? null,
     seasonName: season.name,
     seasonStarted: access.seasonStarted,
     snapshot: observedSnapshot,

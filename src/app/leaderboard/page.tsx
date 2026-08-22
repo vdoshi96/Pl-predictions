@@ -2,10 +2,12 @@ import { Clock3, EyeOff, Medal, Sparkles, Trophy, Users } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
 
-import { TeamMark } from "@/components/team-mark";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
-import { LeaderboardEntryLink } from "@/features/leaderboard/entry-link";
+import {
+  LeaderboardRosterTable,
+  ScoredLeaderboardBoard,
+} from "@/features/leaderboard/leaderboard-board";
 import { getLeaderboardView } from "@/features/leaderboard/queries";
 import { formatUtcDateTime } from "@/shared/format";
 
@@ -141,111 +143,12 @@ export default async function LeaderboardPage() {
             </CardContent>
           </Card>
         ) : scoringStarted && view.scoredEntries ? (
-          <section aria-label="Scored leaderboard" className="grid gap-3">
-            {view.scoredEntries.map((entry) => (
-              <Card
-                aria-label={`${entry.participantName} leaderboard entry`}
-                key={entry.id}
-                role="article"
-              >
-                <CardContent className="grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-2.5 py-3">
-                  <span
-                    className="bg-brand grid size-10 place-items-center rounded-xl text-base font-black text-white"
-                    aria-label={`Rank ${entry.rank}`}
-                  >
-                    {entry.rank}
-                  </span>
-                  <div className="min-w-0">
-                    <LeaderboardEntryLink
-                      entryId={entry.id}
-                      participantName={entry.participantName}
-                    />
-                    <span className="mt-0.5 block text-xs text-slate-500">
-                      {formatUtcDateTime(entry.createdAt)}
-                    </span>
-                    <span
-                      aria-label={`Predicted champion: ${entry.champion.displayName}`}
-                      className="text-brand mt-1 inline-flex min-w-0 items-center gap-1.5 text-xs font-bold"
-                    >
-                      <TeamMark
-                        decorative
-                        initials={entry.champion.shortName}
-                        name={entry.champion.displayName}
-                        size="sm"
-                        src={entry.champion.assetPath}
-                      />
-                      <span className="truncate">
-                        {entry.champion.displayName}
-                      </span>
-                    </span>
-                    <span className="mt-1 block text-[0.68rem] leading-4 font-semibold text-slate-500">
-                      {entry.exactCount} exact · {entry.withinThreeCount} within
-                      3 · {entry.correctHalfCount} same half
-                    </span>
-                  </div>
-                  <div className="text-right">
-                    <strong className="text-rose-score block text-2xl font-black tabular-nums">
-                      {entry.totalScore}
-                    </strong>
-                    <span className="text-[0.68rem] font-bold tracking-wide text-slate-500 uppercase">
-                      table points
-                    </span>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </section>
+          <ScoredLeaderboardBoard entries={view.scoredEntries} />
         ) : (
-          <section aria-label="Submission roster" className="grid gap-2">
-            {view.entries.map((entry) => (
-              <Card
-                aria-label={`${entry.participantName} leaderboard entry`}
-                key={entry.publicKey}
-                role="article"
-              >
-                <CardContent className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 py-3">
-                  <div className="min-w-0">
-                    {view.predictionsRevealed && entry.id ? (
-                      <LeaderboardEntryLink
-                        entryId={entry.id}
-                        participantName={entry.participantName}
-                      />
-                    ) : (
-                      <span className="block font-black [overflow-wrap:anywhere] text-slate-950">
-                        {entry.participantName}
-                      </span>
-                    )}
-                    <span className="mt-0.5 block text-xs text-slate-500">
-                      Submitted {formatUtcDateTime(entry.createdAt)}
-                    </span>
-                    <span
-                      aria-label={`Predicted champion: ${entry.champion.displayName}`}
-                      className="text-brand mt-1 inline-flex min-w-0 items-center gap-1.5 text-xs font-bold"
-                    >
-                      <TeamMark
-                        decorative
-                        initials={entry.champion.shortName}
-                        name={entry.champion.displayName}
-                        size="sm"
-                        src={entry.champion.assetPath}
-                      />
-                      <span className="truncate">
-                        {entry.champion.displayName}
-                      </span>
-                    </span>
-                  </div>
-                  <div className="text-right">
-                    <strong className="text-rose-score block text-2xl font-black tabular-nums">
-                      {entry.totalScore}
-                    </strong>
-                    <span className="text-[0.68rem] font-bold tracking-wide text-slate-500 uppercase">
-                      table points
-                    </span>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </section>
+          <LeaderboardRosterTable
+            entries={view.entries}
+            predictionsRevealed={view.predictionsRevealed}
+          />
         )}
       </div>
     </main>

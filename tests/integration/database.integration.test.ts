@@ -41,6 +41,8 @@ import { STANDINGS_FUTURE_TIMESTAMP_ERROR_CODE } from "@/features/standings/vali
 import { importCanonicalStandings } from "../../scripts/import-standings";
 import { seedDatabase } from "../../scripts/seed";
 import { getSpotlightPicksByPredictionId } from "@/features/leaderboard/pick-queries";
+import { getLeaderboardView } from "@/features/leaderboard/queries";
+import { getSeasonTableView } from "@/features/standings/season-table";
 import { assertIsolatedDatabaseEnvironment } from "../test-environment-safety";
 
 const enabled = process.env.RUN_DB_INTEGRATION === "1";
@@ -231,6 +233,152 @@ afterEach(async () => {
 });
 
 describe.runIf(enabled)("Neon integration", () => {
+  it("guards season consensus before reveal and derives movement from the previous snapshot", async () => {
+    const { activeTeams, db, season } = await activeFixture();
+    const suffix = randomUUID().slice(0, 8);
+    const source = `season-glance-${suffix}`;
+    const predictionIds = [randomUUID(), randomUUID()];
+    const predictionIdSet = new Set<string>(predictionIds);
+    const now = (resolveIsolatedTestNow() ?? new Date()).getTime();
+    const firstCapturedAt = new Date(now - 120_000);
+    const secondCapturedAt = new Date(now - 60_000);
+    const privateOpeningKickoff = new Date(now + 86_400_000);
+    const scoredOpeningKickoff = new Date(now - 86_400_000);
+    const [baselinePredictionCount] = await db
+      .select({ value: count() })
+      .from(predictions)
+      .where(eq(predictions.seasonId, season.id));
+    rememberSeasonSubmissionSettings(season);
+    importSources.add(source);
+    originalSeasonStateBySource.set(source, {
+      activeSnapshotId: season.activeSnapshotId,
+      finalSnapshotId: season.finalSnapshotId,
+      seasonId: season.id,
+      standingsAcceptedThrough: season.standingsAcceptedThrough,
+    });
+    for (const predictionId of predictionIds) {
+      createdPredictionIds.add(predictionId);
+    }
+
+    await db
+      .update(seasons)
+      .set({
+        openingKickoff: privateOpeningKickoff,
+        revealPredictions: false,
+        submissionsLocked: false,
+      })
+      .where(eq(seasons.id, season.id));
+    await db.insert(predictions).values(
+      predictionIds.map((id, index) => ({
+        createdAt: new Date(now - 300_000 + index * 1_000),
+        id,
+        normalizedParticipantName: `season glance ${index} ${suffix}`,
+        participantName: `Season Glance ${index + 1} ${suffix}`,
+        seasonId: season.id,
+      })),
+    );
+    await db.insert(predictionItems).values([
+      ...activeTeams.map((team, index) => ({
+        predictedPosition: index + 1,
+        predictionId: predictionIds[0]!,
+        teamId: team.id,
+      })),
+      ...[...activeTeams].reverse().map((team, index) => ({
+        predictedPosition: index + 1,
+        predictionId: predictionIds[1]!,
+        teamId: team.id,
+      })),
+    ]);
+    await db.insert(predictionCategoryPicks).values(
+      predictionIds.flatMap((predictionId, index) =>
+        categoryPicksFor(activeTeams).map((pick) => ({
+          category: pick.category,
+          customPlayerName:
+            "customPlayerName" in pick
+              ? `${pick.customPlayerName} ${index} ${suffix}`
+              : undefined,
+          normalizedCustomPlayerName:
+            "customPlayerName" in pick
+              ? `${pick.customPlayerName} ${index} ${suffix}`.toLowerCase()
+              : undefined,
+          predictionId,
+          teamId: "teamId" in pick ? pick.teamId : undefined,
+        })),
+      ),
+    );
+
+    const snapshotInput = {
+      isFinal: false,
+      kind: "snapshot" as const,
+      seasonSlug: season.slug,
+      source,
+      sourceReference: null,
+      sourceUpdatedAt: null,
+      version: 1 as const,
+    };
+    const first = await importCanonicalStandings({
+      ...snapshotInput,
+      capturedAt: firstCapturedAt.toISOString(),
+      matchweek: 1,
+      standings: activeTeams.map((team, index) => ({
+        actualPosition: index + 1,
+        leaguePoints: activeTeams.length - index,
+        playedGames: 1,
+        teamSlug: team.slug,
+      })),
+    });
+    expect(first.status).toBe("succeeded");
+    const second = await importCanonicalStandings({
+      ...snapshotInput,
+      capturedAt: secondCapturedAt.toISOString(),
+      matchweek: 2,
+      standings: [...activeTeams].reverse().map((team, index) => ({
+        actualPosition: index + 1,
+        leaguePoints: activeTeams.length - index,
+        playedGames: 2,
+        teamSlug: team.slug,
+      })),
+    });
+    expect(second.status).toBe("succeeded");
+
+    const privateView = await getSeasonTableView();
+    expect(privateView).toMatchObject({
+      consensusActive: false,
+      entryCount: 0,
+      predictionsRevealed: false,
+      rows: null,
+    });
+
+    await db
+      .update(seasons)
+      .set({
+        openingKickoff: scoredOpeningKickoff,
+        revealPredictions: true,
+        submissionsLocked: true,
+      })
+      .where(eq(seasons.id, season.id));
+    const [seasonView, leaderboardView] = await Promise.all([
+      getSeasonTableView(),
+      getLeaderboardView(),
+    ]);
+    expect(seasonView.predictionsRevealed).toBe(true);
+    expect(seasonView.consensusActive).toBe(true);
+    expect(seasonView.entryCount).toBe(
+      Number(baselinePredictionCount?.value ?? 0) + 2,
+    );
+    expect(seasonView.rows).toHaveLength(20);
+    expect(seasonView.rows?.every((row) => row.avgPredicted !== null)).toBe(
+      true,
+    );
+    const fixtureMovement = new Map(
+      leaderboardView.scoredEntries
+        ?.filter((entry) => predictionIdSet.has(entry.id))
+        .map((entry) => [entry.id, entry.movement]),
+    );
+    expect(fixtureMovement.get(predictionIds[0]!)).toBeLessThan(0);
+    expect(fixtureMovement.get(predictionIds[1]!)).toBeGreaterThan(0);
+  });
+
   it("reseeds by stable external ID while retaining inactive historical player references", async () => {
     const { activeTeams, db, season } = await activeFixture();
     const fixturePlayer = PREMIER_LEAGUE_2026_27_PLAYERS.find(

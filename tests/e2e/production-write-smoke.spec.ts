@@ -262,7 +262,7 @@ test("production enforces its current submission state and cleans any QA entry",
 
   for (const spotlightSort of spotlightSorts) {
     const spotlightHtmlResponse = await page.request.get(
-      `/spotlight?sort=${spotlightSort}`,
+      `/spotlight?view=entries&sort=${spotlightSort}`,
       { headers: { accept: "text/html" } },
     );
     expect(spotlightHtmlResponse.ok()).toBe(true);
@@ -275,7 +275,7 @@ test("production enforces its current submission state and cleans any QA entry",
     }
 
     const spotlightRscResponse = await page.request.get(
-      `/spotlight?sort=${spotlightSort}&_rsc=privacy-${spotlightSort}`,
+      `/spotlight?view=entries&sort=${spotlightSort}&_rsc=privacy-${spotlightSort}`,
       { headers: { accept: "text/x-component", rsc: "1" } },
     );
     expect(spotlightRscResponse.ok()).toBe(true);
@@ -307,7 +307,7 @@ test("production enforces its current submission state and cleans any QA entry",
   await expect(
     freshPage.getByRole("heading", { level: 1, name: "That page is offside." }),
   ).toBeVisible();
-  await freshPage.goto("/spotlight?sort=top_scorer");
+  await freshPage.goto("/spotlight?view=entries&sort=top_scorer");
   await expect(
     freshPage.getByRole("heading", { level: 1, name: "Spotlight accuracy" }),
   ).toBeVisible();

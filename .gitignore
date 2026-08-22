@@ -31,6 +31,11 @@
 *.tsbuildinfo
 next-env.d.ts
 
-# Marketplace-installed global agent material is not project source.
-.agents/
+# Marketplace-installed global agent material is not project source. Track only
+# the project-owned update-results skill.
+.agents/*
+!.agents/skills/
+.agents/skills/*
+!.agents/skills/update-results/
+!.agents/skills/update-results/**
 skills-lock.json

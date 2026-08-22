@@ -1,0 +1,7 @@
+interface:
+  display_name: "Update results"
+  short_description: "Publish reviewed FotMob results provisionally"
+  default_prompt: "Use $update-results to refresh the live-season standings and spotlight results from FotMob."
+
+policy:
+  allow_implicit_invocation: false

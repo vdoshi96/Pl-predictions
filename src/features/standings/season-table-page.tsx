@@ -25,9 +25,10 @@ function DeltaChip({ delta }: { delta: number | null }) {
   if (delta === null) {
     return <span className="text-muted text-sm font-bold">—</span>;
   }
-  const magnitude = Math.abs(delta);
-  const neutral = magnitude < 0.5;
-  const positive = delta >= 0.5;
+  const roundedDelta = Number(formatConsensusValue(delta));
+  const magnitude = Math.abs(roundedDelta);
+  const neutral = roundedDelta === 0;
+  const positive = roundedDelta > 0;
   const visible = `${neutral ? "‒" : positive ? "▲" : "▼"} ${formatConsensusValue(magnitude)}`;
   const description = neutral
     ? `${formatConsensusValue(magnitude)} places from the league's average prediction`

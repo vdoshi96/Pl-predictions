@@ -116,6 +116,68 @@ describe("season table landing", () => {
     ).toHaveClass("sr-only");
   });
 
+  it("shows the direction of every nonzero rounded consensus delta", async () => {
+    render(
+      await SeasonTablePage({
+        view: view({
+          consensusActive: true,
+          rows: [
+            {
+              actualPosition: 1,
+              avgPredicted: 1.1,
+              delta: 0.1,
+              leaguePoints: 3,
+              team,
+            },
+            {
+              actualPosition: 2,
+              avgPredicted: 1.9,
+              delta: -0.1,
+              leaguePoints: 3,
+              team: {
+                assetPath: "/team-marks/chelsea.png",
+                displayName: "Chelsea",
+                id: "chelsea",
+                shortName: "CHE",
+              },
+            },
+            {
+              actualPosition: 3,
+              avgPredicted: 3,
+              delta: 0,
+              leaguePoints: 3,
+              team: {
+                assetPath: "/team-marks/liverpool.png",
+                displayName: "Liverpool",
+                id: "liverpool",
+                shortName: "LIV",
+              },
+            },
+          ],
+          snapshot: {
+            capturedAt: new Date("2026-08-22T12:00:00.000Z"),
+            isFinal: false,
+            matchweek: 1,
+          },
+        }),
+      }),
+    );
+
+    expect(screen.getByText("▲ 0.1")).toBeVisible();
+    expect(screen.getByText("▼ 0.1")).toBeVisible();
+    expect(screen.getByText("‒ 0.0")).toBeVisible();
+    expect(
+      screen.getByText(
+        "overachieving by 0.1 places vs the league's average prediction",
+      ),
+    ).toHaveClass("sr-only");
+    expect(
+      screen.getByText(
+        "underachieving by 0.1 places vs the league's average prediction",
+      ),
+    ).toHaveClass("sr-only");
+  });
+
   it("uses Home for the root navigation item", () => {
     render(<SiteHeader />);
     expect(screen.getByRole("link", { name: "Home" })).toHaveAttribute(

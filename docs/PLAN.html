@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="generated-by" content="scripts/generate-docs-html.mjs" />
     <meta name="canonical-source" content="PLAN.md" />
-    <meta name="canonical-source-sha256" content="54363e510a1e5cbc0ce56242fff9ffd01b116203da01ba57aa069e2ebb98dd07" />
+    <meta name="canonical-source-sha256" content="a8d0a715ffafc64c04b0aa4547ca73f3b7cafab33fe357ab69321eba8be6481b" />
     <title>Implementation plan</title>
     <style>
       :root { color-scheme: light dark; font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
@@ -49,7 +49,7 @@
 <li>Rebuild and seed the isolated Neon database from all migrations; run formatting, lint, strict TypeScript, unit/component, integration, production build, and desktop/mobile Chromium/WebKit journeys; regenerate and verify every HTML documentation peer.</li>
 <li>Run a read-only production preflight, apply additive migrations <code>0008</code> and <code>0009</code> before code publication, push and merge through GitHub <code>main</code>, wait for the exact Vercel deployment, run guarded read-only production browser/header/database verification, synchronize local <code>main</code>, and remove the completed worktree.</li>
 </ol>
-<p>Items 1–5 are complete. Documentation parity, the 580-player/578-portrait validator, Prettier, ESLint, strict TypeScript, all 343 enabled unit/component tests, all 22 isolated Neon integration tests, the production build, eight routed pre-kickoff journeys across desktop/mobile Chromium and iPhone WebKit, and three routed fixed post-kickoff journeys pass. Exact aggregate cleanup is zero. Item 6 remains; production is unchanged.</p>
+<p>Items 1–5 are complete. Documentation parity, the 580-player/578-portrait validator, Prettier, ESLint, strict TypeScript, all 343 enabled unit/component tests, all 22 isolated Neon integration tests, the production build, eight routed pre-kickoff journeys across desktop/mobile Chromium and iPhone WebKit, and three routed fixed post-kickoff journeys pass. Exact aggregate cleanup is zero. The item 6 read-only production preflight also passes; migrations and code publication remain, and production is unchanged.</p>
 <h2 id="august-20-catalogue-and-oxalpha-ui-remediation-release-complete-repository-closeout-pending">August 20 catalogue and Oxalpha UI remediation (release complete; repository closeout pending)</h2>
 <ol>
 <li>Start from verified GitHub <code>main</code> in a new worktree and discard the superseded unmerged UI branch, while preserving unrelated private handoffs and report files in the primary checkout.</li>
@@ -126,7 +126,7 @@
 </ol>
 <p>Items 1–12 are implemented and released. The migration-first production gate passed before code publication: read-only preflight succeeded, additive <code>0006</code>/<code>0007</code> were applied while the old application remained compatible, and a read-only rollback postcheck proved the expected empty pending state. Feature <a href="https://github.com/vdoshi96/Pl-predictions/pull/19">PR #19</a> merged as <code>9cdad64c285fb66f96d9e11a0b71780008b05160</code>; exact-SHA Vercel deployment <code>dpl_2evvhgizD4spM9QfXKNhvHLEBrgG</code> became Ready and was explicitly assigned to the stable alias. The guarded five-project read-only production smoke passed, its 11-image evidence set was visually inspected and retained, and bounded exact-deployment error/fatal/HTTP-500 queries were empty. The clean merged feature worktree and all enumerated temporary screenshot, HTTPS, Playwright, and evidence directories were removed after the promoted-evidence audit. The three isolated databases remain deliberately retained because <code>DROP DATABASE</code> is destructive, not locally recoverable, and lacks direct owner authorization; no Neon recovery operation was requested. Evidence-PR merge, local-main synchronization, and removal of this closeout worktree remain.</p>
 
-      <p class="source">Generated deterministically from <a href="PLAN.md">docs/PLAN.md</a>. Canonical SHA-256: <code>54363e510a1e5cbc0ce56242fff9ffd01b116203da01ba57aa069e2ebb98dd07</code>.</p>
+      <p class="source">Generated deterministically from <a href="PLAN.md">docs/PLAN.md</a>. Canonical SHA-256: <code>a8d0a715ffafc64c04b0aa4547ca73f3b7cafab33fe357ab69321eba8be6481b</code>.</p>
     </main>
   </body>
 </html>

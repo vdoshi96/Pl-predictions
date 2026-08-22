@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="generated-by" content="scripts/generate-docs-html.mjs" />
     <meta name="canonical-source" content="LOG.md" />
-    <meta name="canonical-source-sha256" content="f58a111ebb8760d8c1f48f0c6c3312ae147b667cef30bcfd50ee99b6c190778a" />
+    <meta name="canonical-source-sha256" content="b570fe628e04a13d304c973877a6638ff46e72ad7b01894174c80eedbf469f6d" />
     <title>Session log</title>
     <style>
       :root { color-scheme: light dark; font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
@@ -48,6 +48,7 @@
 <li>Corrected public result and provisional-tie language, explicit result-rank labels, mobile deadline and sticky-action presentation, narrow-name wrapping, current August 20 roster facts, and the closed-form public state. Recaptured and visually inspected all three walkthrough sources from the current 390 × 844 flow, with Stage 1 and Stage 2 now beginning at their headings rather than midway through controls.</li>
 <li>Rebuilt the isolated Neon database from migrations <code>0000</code>–<code>0009</code>, seeded 20 teams and 580 players, and passed all 22 integration tests. Documentation parity for 16 pairs, the exact player/portrait validator, Prettier, ESLint, strict TypeScript, all 343 enabled unit/component tests, and the Webpack production build pass.</li>
 <li>Passed eight routed pre-kickoff production-server journeys across desktop Chromium, 390-pixel mobile Chromium, exact 320/430-pixel Chromium, and iPhone WebKit, plus three routed fixed post-kickoff journeys at desktop, 320, and 430 pixels. A final aggregate audit returned zero QA predictions, post-kickoff snapshots, and rate-limit rows. Deleted the seven isolated administrator sessions created by browser login and verified zero active-session residue. Production remains unchanged pending migration and release.</li>
+<li>Passed the transaction-scoped read-only production preflight at <code>2026-08-22T07:13:15.757Z</code>, WAL <code>0/C60F2B8</code>. It found eight migrations through <code>0007</code>; 14 prediction parents with exact 20-item/seven-pick shapes; one complete standings snapshot; false manual lock/reveal flags; 580 active players and 578 portraits; six active provisional result snapshots with 109 items, zero pinned aliases, and no final dataset; and no <code>admin_sessions</code> or <code>security_rate_limits</code> tables. Corrected the stale all-results-pending documentation before mutation.</li>
 </ul>
 <h2 id="2026-08-21">2026-08-21</h2>
 <ul>
@@ -295,7 +296,7 @@
 <li>Next handoff: use <code>main</code> as the base for future pull requests. No GitHub access blocker remains for the current repository workflow.</li>
 </ul>
 
-      <p class="source">Generated deterministically from <a href="LOG.md">docs/context/LOG.md</a>. Canonical SHA-256: <code>f58a111ebb8760d8c1f48f0c6c3312ae147b667cef30bcfd50ee99b6c190778a</code>.</p>
+      <p class="source">Generated deterministically from <a href="LOG.md">docs/context/LOG.md</a>. Canonical SHA-256: <code>b570fe628e04a13d304c973877a6638ff46e72ad7b01894174c80eedbf469f6d</code>.</p>
     </main>
   </body>
 </html>

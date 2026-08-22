@@ -9,7 +9,7 @@
 5. Rebuild and seed the isolated Neon database from all migrations; run formatting, lint, strict TypeScript, unit/component, integration, production build, and desktop/mobile Chromium/WebKit journeys; regenerate and verify every HTML documentation peer.
 6. Run a read-only production preflight, apply additive migrations `0008` and `0009` before code publication, push and merge through GitHub `main`, wait for the exact Vercel deployment, run guarded read-only production browser/header/database verification, synchronize local `main`, and remove the completed worktree.
 
-Items 1–5 are complete. Documentation parity, the 580-player/578-portrait validator, Prettier, ESLint, strict TypeScript, all 343 enabled unit/component tests, all 22 isolated Neon integration tests, the production build, eight routed pre-kickoff journeys across desktop/mobile Chromium and iPhone WebKit, and three routed fixed post-kickoff journeys pass. Exact aggregate cleanup is zero. Item 6 remains; production is unchanged.
+Items 1–5 are complete. Documentation parity, the 580-player/578-portrait validator, Prettier, ESLint, strict TypeScript, all 343 enabled unit/component tests, all 22 isolated Neon integration tests, the production build, eight routed pre-kickoff journeys across desktop/mobile Chromium and iPhone WebKit, and three routed fixed post-kickoff journeys pass. Exact aggregate cleanup is zero. The item 6 read-only production preflight also passes; migrations and code publication remain, and production is unchanged.
 
 ## August 20 catalogue and Oxalpha UI remediation (release complete; repository closeout pending)
 

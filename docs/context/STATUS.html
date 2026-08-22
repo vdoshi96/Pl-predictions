@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="generated-by" content="scripts/generate-docs-html.mjs" />
     <meta name="canonical-source" content="STATUS.md" />
-    <meta name="canonical-source-sha256" content="94cd4dea0ee18493a5ca7173b7bf3870956fab2ddf418c39b247b0dee8f89301" />
+    <meta name="canonical-source-sha256" content="a278bdc1a8906b7009b7033aea3cd5dec3df6d652deaf897dd80b862da65bb80" />
     <title>Status</title>
     <style>
       :root { color-scheme: light dark; font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
@@ -95,7 +95,7 @@
 </li>
 <li><p>Scoring: the predicted champion remains table position 1 without a separate bonus. With <code>N</code> active, nondeleted brackets, spotlight accuracy is <code>max(0, N + 1 - outcome rank)</code> and sums only resolved categories. Equal overall scores share a competition rank. Team underdog uses <code>average predicted position - actual position</code>; overrated uses the inverse.</p>
 </li>
-<li><p>Pending result inputs: all five factual views remain pending until the owner enters, reviews, attests, and publishes their datasets through <code>/admin/results</code>. The roster snapshot is selector input, not an outcome feed, and every relevant Other-player spelling must map to a canonical season player in the exact saved snapshot.</p>
+<li><p>Production result inputs: the 2026-08-22 read-only preflight found active provisional snapshots for all four factual datasets that back the five result views: six snapshots, 109 items, zero pinned aliases, and no final dataset. The roster snapshot remains selector input rather than an outcome feed; future Other-player spellings still require exact canonical mapping before publication.</p>
 </li>
 <li><p>Runtime boundary: the deployed application has no runtime football API, scraper, image hotlink, or Vercel Cron. Manual administrator result entry, manual standings, and the authenticated canonical standings importer preserve reviewed, last-good boundaries.</p>
 </li>
@@ -115,7 +115,7 @@
 </li>
 </ul>
 
-      <p class="source">Generated deterministically from <a href="STATUS.md">docs/context/STATUS.md</a>. Canonical SHA-256: <code>94cd4dea0ee18493a5ca7173b7bf3870956fab2ddf418c39b247b0dee8f89301</code>.</p>
+      <p class="source">Generated deterministically from <a href="STATUS.md">docs/context/STATUS.md</a>. Canonical SHA-256: <code>a278bdc1a8906b7009b7033aea3cd5dec3df6d652deaf897dd80b862da65bb80</code>.</p>
     </main>
   </body>
 </html>

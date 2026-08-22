@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="generated-by" content="scripts/generate-docs-html.mjs" />
     <meta name="canonical-source" content="README.md" />
-    <meta name="canonical-source-sha256" content="a3dfbcf13cc6b1117d7934cee10cd0a2f6e810ba0e35571d9e54703c5890beca" />
+    <meta name="canonical-source-sha256" content="00609c6388ae6fae994d529bca18c6542c0417f3a46e21feb5a505d2ae3d3b52" />
     <title>Dranx Prediction League</title>
     <style>
       :root { color-scheme: light dark; font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
@@ -220,7 +220,12 @@ npm run dev
 <tr>
 <td><code>STANDINGS_INGEST_SECRET</code></td>
 <td>For automated imports</td>
-<td>Bearer credential for <code>/api/automation/standings</code>; server-only.</td>
+<td>Primary bearer credential for <code>/api/automation/standings</code>; server-only.</td>
+</tr>
+<tr>
+<td><code>STANDINGS_INGEST_SECRET_PREVIOUS</code></td>
+<td>Rotation only</td>
+<td>Optional previous bearer credential accepted during a bounded rotation. Remove it after every caller uses the primary credential.</td>
 </tr>
 </tbody></table>
 <p>There are no <code>NEXT_PUBLIC</code> secrets, football-provider token, or cron secret.</p>
@@ -251,7 +256,7 @@ npm run db:seed             # idempotently seed the active season and 20 clubs
 npm run db:test:migrate     # apply migrations only to the isolated test target
 npm run db:test:seed        # seed only the isolated test target
 </code></pre>
-<p>The committed schema history starts with <code>drizzle/0000_oval_slyde.sql</code>. <code>drizzle/0001_left_iron_fist.sql</code> adds and backfills the season-level accepted-through standings watermark. <code>drizzle/0002_breezy_king_cobra.sql</code> persists and backfills each season&#39;s reviewed opening kickoff while preserving the null automatic-deadline sentinel. That nullable deadline field is now legacy compatibility state and is not an application cutoff. <code>drizzle/0003_fluffy_franklin_richards.sql</code> adds the season-scoped player catalogue and the seven category-pick rows attached to each prediction. <code>drizzle/0004_aromatic_kat_farrell.sql</code> tightens the player-pick subject constraint so a player ID or both normalized custom-name fields are explicitly required. <code>drizzle/0005_enforce_spotlight_seasons.sql</code> adds database triggers that prevent a player&#39;s club or a category subject from crossing season boundaries. <code>drizzle/0006_complex_ultimatum.sql</code> adds the four result-dataset states, immutable snapshot/items, mutable working aliases, publication pointers, cross-season/type checks, and empty pending-state backfill. <code>drizzle/0007_brainy_harpoon.sql</code> adds immutable aliases pinned to each snapshot so later working-alias changes cannot rewrite published scoring. These two migrations also seal a snapshot before any pointer may reference it and reject later fact appends. Do not edit a migration after it has been applied to production; create a new forward migration.</p>
+<p>The committed schema history starts with <code>drizzle/0000_oval_slyde.sql</code>. <code>drizzle/0001_left_iron_fist.sql</code> adds and backfills the season-level accepted-through standings watermark. <code>drizzle/0002_breezy_king_cobra.sql</code> persists and backfills each season&#39;s reviewed opening kickoff while preserving the null automatic-deadline sentinel. That nullable deadline field is now legacy compatibility state and is not an application cutoff. <code>drizzle/0003_fluffy_franklin_richards.sql</code> adds the season-scoped player catalogue and the seven category-pick rows attached to each prediction. <code>drizzle/0004_aromatic_kat_farrell.sql</code> tightens the player-pick subject constraint so a player ID or both normalized custom-name fields are explicitly required. <code>drizzle/0005_enforce_spotlight_seasons.sql</code> adds database triggers that prevent a player&#39;s club or a category subject from crossing season boundaries. <code>drizzle/0006_complex_ultimatum.sql</code> adds the four result-dataset states, immutable snapshot/items, mutable working aliases, publication pointers, cross-season/type checks, and empty pending-state backfill. <code>drizzle/0007_brainy_harpoon.sql</code> adds immutable aliases pinned to each snapshot so later working-alias changes cannot rewrite published scoring. These two migrations also seal a snapshot before any pointer may reference it and reject later fact appends. <code>drizzle/0008_previous_ezekiel_stane.sql</code> adds revocable administrator sessions and persistent security rate-limit buckets. <code>drizzle/0009_condemned_nighthawk.sql</code> enforces final/active standings-pointer consistency, same-season prediction clubs, and immutability or referenced-delete protection for accepted standings facts. Do not edit a migration after it has been applied to production; create a new forward migration.</p>
 <h2 id="standings-operations">Standings operations</h2>
 <h3 id="manual-fallback">Manual fallback</h3>
 <p>Sign in at <code>/admin/login</code>, open <code>/admin/standings</code>, order all 20 clubs, and optionally enter matchweek, games played, and league points. A save writes one complete provisional snapshot. Invalid, duplicate, stale, incomplete, or concurrent input cannot replace the last active good table.</p>
@@ -267,7 +272,7 @@ npm run db:test:seed        # seed only the isolated test target
   --header &quot;Content-Type: application/json&quot; \
   --data-binary @/absolute/path/to/standings.json
 </code></pre>
-<p>The endpoint has a 64 KiB body limit, validates a complete known-team permutation, rejects stale, implausibly future, or post-final snapshots, records import outcomes, and preserves the last good snapshot on every failure. A database-time-anchored five-minute skew bound protects both capture timestamps. A season-level accepted-through watermark also advances for newer duplicate observations, so delayed changed data cannot regress the active table. The payload&#39;s <code>isFinal</code> field is advisory only; only an authenticated administrator can confirm final status.</p>
+<p>The endpoint has a 64 KiB body limit, a persistent 60-request-per-minute source limit, and a bounded two-secret rotation path. It validates a complete known-team permutation, rejects stale, implausibly future, or post-final snapshots, records import outcomes, and preserves the last good snapshot on every failure. A database-time-anchored five-minute skew bound protects both capture timestamps. A season-level accepted-through watermark also advances for newer duplicate observations, so delayed changed data cannot regress the active table. The payload&#39;s <code>isFinal</code> field is advisory only; only an authenticated administrator can confirm final status.</p>
 <h3 id="offline-source-boundary">Offline source boundary</h3>
 <p>The owner confirmed on 2026-08-14 that the required permissions for this player-catalogue workflow have been obtained. Owner-run FotMob or Transfermarkt acquisition may run offline, retain its private provenance, and produce reviewed local snapshots or result payloads. The deployed application still stores no source cookies or credentials and never performs a runtime source request, scrape, hotlink, football API call, or scheduled acquisition.</p>
 <h2 id="admin-credential-configuration-and-rotation">Admin credential configuration and rotation</h2>
@@ -281,8 +286,8 @@ printf &#39;%s\n&#39; admin | vercel env add ADMIN_USERNAME preview --force
 printf &#39;%s\n&#39; admin | vercel env add ADMIN_USERNAME development --force
 vercel deploy --prod
 </code></pre>
-<p>Each password-hash command intentionally produces a different salt; all resulting hashes validate the same Keychain password. <code>ADMIN_SECRET</code> remains a migration-only fallback when <code>ADMIN_PASSWORD_HASH</code> is empty. After the PBKDF2-backed login is verified in every environment, remove the legacy value rather than keeping two active password sources. A malformed or weak configuration fails closed. Rotating <code>ADMIN_SESSION_SECRET</code> separately invalidates all existing eight-hour administrator sessions.</p>
-<p>Every administrator mutation still requires the signed HttpOnly, SameSite Strict cookie and an exact same-origin request. Vercel Firewall limits <code>POST /admin/login</code> to 10 requests per 60 seconds for each IP. Excess requests receive HTTP 429. Deleting an entry removes the parent prediction. PostgreSQL cascades through its 20 table rows and seven spotlight rows. The deletion invalidates the receipt and lets the normalized name submit again. Table ranks, team expectation indexes, and spotlight accuracy, including <code>N</code>, recalculate from the remaining entries. The bounded deletion audit remains.</p>
+<p>Each password-hash command intentionally produces a different salt; all resulting hashes validate the same Keychain password. <code>ADMIN_SECRET</code> remains a migration-only fallback when <code>ADMIN_PASSWORD_HASH</code> is empty. After the PBKDF2-backed login is verified in every environment, remove the legacy value rather than keeping two active password sources. A malformed or weak configuration fails closed. Rotating <code>ADMIN_SESSION_SECRET</code> separately invalidates all existing eight-hour administrator sessions. Logout also revokes the current hashed session nonce in PostgreSQL. Applying migration <code>0008</code> invalidates cookies issued before the persistent session registry existed, so the owner must sign in again after that migration and deployment.</p>
+<p>Every administrator mutation still requires the signed HttpOnly, SameSite Strict cookie and an exact same-origin request. A persistent application limiter allows five password attempts per source in 15 minutes and blocks further PBKDF2 work with HTTP 429; the Vercel Firewall remains an outer layer. Deleting an entry removes the parent prediction. PostgreSQL cascades through its 20 table rows and seven spotlight rows. The deletion invalidates the receipt and lets the normalized name submit again. Table ranks, team expectation indexes, and spotlight accuracy, including <code>N</code>, recalculate from the remaining entries. The bounded deletion audit remains.</p>
 <h2 id="deployment">Deployment</h2>
 <p>The Vercel project is <code>vdoshi96s-projects/pl-predictions</code>. Neon resource <code>neon-coffee-queen</code> was provisioned through Vercel Marketplace before migrations and seed data were applied.</p>
 <p>For a new environment:</p>
@@ -321,7 +326,7 @@ vercel deploy --prod
 <p>Season membership and club names use the official Premier League 2026/27 table and AGM announcement. On 2026-08-14 the owner confirmed that the required permissions for this player-catalogue workflow have been obtained, including acquisition, storage, redistribution, and production use. Owner-run FotMob or Transfermarkt acquisition may run offline and produce reviewed local snapshots or result payloads. The deployed application does not fetch, scrape, or hotlink football data or images at runtime. FotMob average season rating is the requested metric for both player-opinion categories. The project owner supplied the local club badges and dated player snapshot. The official Premier League logo is not included. The roster import does not supply the five pending outcomes. <a href="docs/RESEARCH.html">docs/RESEARCH.md</a> records the dated sources and current permission disposition.</p>
 <p>This is an unofficial fan project and is not affiliated with the Premier League. Club names and crests belong to their respective owners.</p>
 
-      <p class="source">Generated deterministically from <a href="README.md">README.md</a>. Canonical SHA-256: <code>a3dfbcf13cc6b1117d7934cee10cd0a2f6e810ba0e35571d9e54703c5890beca</code>.</p>
+      <p class="source">Generated deterministically from <a href="README.md">README.md</a>. Canonical SHA-256: <code>00609c6388ae6fae994d529bca18c6542c0417f3a46e21feb5a505d2ae3d3b52</code>.</p>
     </main>
   </body>
 </html>

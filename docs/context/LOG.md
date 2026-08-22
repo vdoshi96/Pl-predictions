@@ -1,5 +1,14 @@
 # Session log
 
+## 2026-08-22
+
+- Reconciled `adversarial-review-2026-08-22.html` and `visual-qa-issues-2026-08-21.html` against current `main`, then continued the half-finished result-validation change in a dedicated worktree without modifying unrelated primary-worktree material.
+- Added persistent administrator login throttling and revocable sessions, standings-ingest throttling and bounded bearer rotation, a per-response nonce CSP without script `unsafe-inline`, production HSTS, fail-closed local-QA flags on Vercel, invisible/control-character rejection, shared catalogue caching, and migrations `0008`/`0009` for the new security rows and standings invariants.
+- Moved the standings importer into application source, left the script as a thin CLI, removed the dead champion component, shared root season context through React request caching, and ignored the supplied review/reproduction artifacts.
+- Corrected public result and provisional-tie language, explicit result-rank labels, mobile deadline and sticky-action presentation, narrow-name wrapping, current August 20 roster facts, and the closed-form public state. Recaptured and visually inspected all three walkthrough sources from the current 390 × 844 flow, with Stage 1 and Stage 2 now beginning at their headings rather than midway through controls.
+- Rebuilt the isolated Neon database from migrations `0000`–`0009`, seeded 20 teams and 580 players, and passed all 22 integration tests. Documentation parity for 16 pairs, the exact player/portrait validator, Prettier, ESLint, strict TypeScript, all 343 enabled unit/component tests, and the Webpack production build pass.
+- Passed eight routed pre-kickoff production-server journeys across desktop Chromium, 390-pixel mobile Chromium, exact 320/430-pixel Chromium, and iPhone WebKit, plus three routed fixed post-kickoff journeys at desktop, 320, and 430 pixels. A final aggregate audit returned zero QA predictions, post-kickoff snapshots, and rate-limit rows. Deleted the seven isolated administrator sessions created by browser login and verified zero active-session residue. Production remains unchanged pending migration and release.
+
 ## 2026-08-21
 
 - Published the season-glance implementation through [PR #26](https://github.com/vdoshi96/Pl-predictions/pull/26), merged as `ee325557b268510bafa9c7b54aa3b46cba509da4`. Both Vercel checks passed. Local `main` and `origin/main` matched the merge exactly before this documentation-only closeout, the remote feature branch was deleted, and no production database or production deployment action ran.

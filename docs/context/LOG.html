@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="generated-by" content="scripts/generate-docs-html.mjs" />
     <meta name="canonical-source" content="LOG.md" />
-    <meta name="canonical-source-sha256" content="85afe28fea9e6cb4fa1cacf4514c8d90ba48f43c9463c6b33a60f3daed22025d" />
+    <meta name="canonical-source-sha256" content="f58a111ebb8760d8c1f48f0c6c3312ae147b667cef30bcfd50ee99b6c190778a" />
     <title>Session log</title>
     <style>
       :root { color-scheme: light dark; font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
@@ -40,6 +40,15 @@
   <body>
     <main>
       <h1 id="session-log">Session log</h1>
+<h2 id="2026-08-22">2026-08-22</h2>
+<ul>
+<li>Reconciled <code>adversarial-review-2026-08-22.html</code> and <code>visual-qa-issues-2026-08-21.html</code> against current <code>main</code>, then continued the half-finished result-validation change in a dedicated worktree without modifying unrelated primary-worktree material.</li>
+<li>Added persistent administrator login throttling and revocable sessions, standings-ingest throttling and bounded bearer rotation, a per-response nonce CSP without script <code>unsafe-inline</code>, production HSTS, fail-closed local-QA flags on Vercel, invisible/control-character rejection, shared catalogue caching, and migrations <code>0008</code>/<code>0009</code> for the new security rows and standings invariants.</li>
+<li>Moved the standings importer into application source, left the script as a thin CLI, removed the dead champion component, shared root season context through React request caching, and ignored the supplied review/reproduction artifacts.</li>
+<li>Corrected public result and provisional-tie language, explicit result-rank labels, mobile deadline and sticky-action presentation, narrow-name wrapping, current August 20 roster facts, and the closed-form public state. Recaptured and visually inspected all three walkthrough sources from the current 390 × 844 flow, with Stage 1 and Stage 2 now beginning at their headings rather than midway through controls.</li>
+<li>Rebuilt the isolated Neon database from migrations <code>0000</code>–<code>0009</code>, seeded 20 teams and 580 players, and passed all 22 integration tests. Documentation parity for 16 pairs, the exact player/portrait validator, Prettier, ESLint, strict TypeScript, all 343 enabled unit/component tests, and the Webpack production build pass.</li>
+<li>Passed eight routed pre-kickoff production-server journeys across desktop Chromium, 390-pixel mobile Chromium, exact 320/430-pixel Chromium, and iPhone WebKit, plus three routed fixed post-kickoff journeys at desktop, 320, and 430 pixels. A final aggregate audit returned zero QA predictions, post-kickoff snapshots, and rate-limit rows. Deleted the seven isolated administrator sessions created by browser login and verified zero active-session residue. Production remains unchanged pending migration and release.</li>
+</ul>
 <h2 id="2026-08-21">2026-08-21</h2>
 <ul>
 <li>Published the season-glance implementation through <a href="https://github.com/vdoshi96/Pl-predictions/pull/26">PR #26</a>, merged as <code>ee325557b268510bafa9c7b54aa3b46cba509da4</code>. Both Vercel checks passed. Local <code>main</code> and <code>origin/main</code> matched the merge exactly before this documentation-only closeout, the remote feature branch was deleted, and no production database or production deployment action ran.</li>
@@ -286,7 +295,7 @@
 <li>Next handoff: use <code>main</code> as the base for future pull requests. No GitHub access blocker remains for the current repository workflow.</li>
 </ul>
 
-      <p class="source">Generated deterministically from <a href="LOG.md">docs/context/LOG.md</a>. Canonical SHA-256: <code>85afe28fea9e6cb4fa1cacf4514c8d90ba48f43c9463c6b33a60f3daed22025d</code>.</p>
+      <p class="source">Generated deterministically from <a href="LOG.md">docs/context/LOG.md</a>. Canonical SHA-256: <code>f58a111ebb8760d8c1f48f0c6c3312ae147b667cef30bcfd50ee99b6c190778a</code>.</p>
     </main>
   </body>
 </html>

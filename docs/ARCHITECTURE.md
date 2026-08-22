@@ -43,9 +43,9 @@ The initial homepage server path reads an explicit active-season projection and 
 
 ## Routes
 
-- `/` — three-stage table, spotlight, and review flow or the server-derived closed state.
-- `/leaderboard` — 0-point champion-pick cards before reveal and a shared-rank table-only leaderboard afterward. The maximum is 100 points.
-- `/spotlight` — a separate fun-accuracy leaderboard with overall and category sorts. Before reveal it exposes only the number of complete brackets, not their picks or hidden ordering.
+- `/` — the three-stage table, spotlight, and review flow before reveal; after reveal, the live Premier League table versus consensus averages and expectation-index callouts.
+- `/leaderboard` — a 0-point champion-pick roster before scoring, then a top-three podium and dense shared-rank table with previous-snapshot movement, score breakdowns, and progress toward the 100-point cap.
+- `/spotlight` — separate fun-accuracy views selected by `?view=categories|entries|matrix`. Categories are the default, entries retain `?sort=`, and the desktop matrix keeps its first column sticky. Before reveal, every view exposes only the complete-bracket count, not picks, identifiers, or hidden ordering.
 - `/entries/[id]` — receipt/admin-authorized private confirmation before reveal; public comparison afterward.
 - `/rules` — an annotated three-screen live-mobile walkthrough followed by table tiers, spotlight rank rules, team formulas, privacy, and pending-data explanation.
 - `/admin/login` — owner credential handoff.
@@ -64,7 +64,7 @@ The prediction and manual standings experiences share the same accessible sorter
 
 The open-submissions panel includes a compact days/hours/minutes/seconds calendar-flip countdown. Its initial duration is calculated on the server from the database wall clock and the persisted opening kickoff. The client advances that duration from monotonic `performance.now()` rather than trusting the participant device clock, then refreshes the server page once at zero. This display never authorizes a write; the database-locking kickoff check in the prediction write path remains authoritative.
 
-Leaderboard and comparison data use mobile cards before expanding into denser desktop layouts. The administrator navigation becomes a full-width two-column grid at narrow widths without forcing the primary page or prediction list to overflow.
+The revealed season table and leaderboard reflow without page-level horizontal scrolling at 320 pixels. The scored leaderboard uses a real table on wide screens and CSS-only stacked rows on phones. The spotlight category board changes from one to two columns at 860 pixels; its matrix intentionally scrolls inside a bounded wrapper and keeps the entry column sticky. The administrator navigation becomes a full-width two-column grid at narrow widths without forcing the primary page or prediction list to overflow.
 
 ## Prediction write path
 
@@ -83,7 +83,7 @@ Predictions are immutable after submission. Administrator deletion removes the p
 
 The shared server policy reveals full entries at the owning season row's persisted Gameweek 1 opening kickoff or after irreversible manual lock or early reveal. The opening kickoff is the sole timed cutoff. Pages read PostgreSQL's wall clock with the season, and the atomic insert independently checks the same persisted instant after acquiring its row lock, so app-clock skew or lock contention cannot admit a competing entry after reveal. Both administrator closure controls reveal predictions and permanently close submissions; there is no editable earlier deadline.
 
-Before full reveal, the leaderboard publishes one narrow projection: participant name, submission time, 0-point total, and predicted champion. Prediction UUIDs, positions 2–20, all spotlight picks, and hidden accuracy ordering remain absent from public HTML and RSC. An entry lookup still requires the matching receipt cookie or an administrator session. After reveal, full entries and spotlight choices become public. If every outcome is pending, `/spotlight` lists the revealed picks but hides overall score and rank.
+Before full reveal, the leaderboard publishes one narrow projection: participant name, 0-point total, and predicted champion. Prediction UUIDs, positions 2–20, all spotlight picks, consensus averages, and hidden accuracy ordering remain absent from public HTML and RSC. The server returns from the season-table query before loading any consensus-bearing rows, and Spotlight does not load category leaders or aliases. An entry lookup still requires the matching receipt cookie or an administrator session. After reveal, full entries, consensus values, and spotlight choices become public. If every outcome is pending, the Spotlight entry view lists revealed picks but hides overall score and rank; category cards and matrix cells label pending data without converting it to zero.
 
 ## Fixed deadline and irreversible closure
 
@@ -136,7 +136,7 @@ Spotlight accuracy is separate from the table score. Each category uses the sele
 
 Scoring cannot activate before the verified opening kickoff. The active table must also have an observation at or after kickoff. A preseason table cannot receive points only because the clock crossed kickoff. All-zero played-games tables remain inactive. Underdog-team and overrated-team ranks use the active table and all remaining submissions. The other five categories read independently published manual facts from four datasets: goals, assists, club clean sheets, and one player-ratings dataset ranked high and low without pre-ranking rounding. A missing dataset or unresolved alias remains pending. After the owner attests complete coverage through the snapshot's bracket-count boundary, an omitted canonical subject is resolved outside scoring range with zero points and still increases the available-category count.
 
-Before activation, each table-leaderboard card shows 0 and its predicted champion. When scoring is active, cards show table points and the champion's actual position. Entries sort by table points only. Equal totals share a competition rank. The separate spotlight page sorts by overall available accuracy or one category. Category sorts use outcome rank from low to high, put pending entries last, and use participant name for deterministic ties. Only atomic 20-position-plus-seven-pick submissions contribute to its bracket count or accuracy view; the retired Alex/Jordan cards were code fixtures and never prediction rows.
+Before activation, each table-leaderboard row shows 0 and its predicted champion. When scoring is active, the podium and dense table show table points, exact/within-three/correct-half counts, and the champion. Entries sort by table points only, and equal totals share a competition rank. Movement recomputes the same canonical table score against the previous meaningful snapshot, assigns shared ranks again, and reports previous rank minus current rank. The separate Spotlight entry view sorts by overall available accuracy or one category. Category sorts use outcome rank from low to high, put pending entries last, and use participant name for deterministic ties. Category boards regroup the already resolved picks by canonical team, player, pinned alias, or normalized Other identity. The matrix reuses each pick's existing result rank, status, and accuracy points. Only atomic 20-position-plus-seven-pick submissions contribute to bracket counts, consensus, or accuracy views.
 
 ## Database model and invariants
 

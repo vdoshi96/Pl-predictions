@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="generated-by" content="scripts/generate-docs-html.mjs" />
     <meta name="canonical-source" content="QA.md" />
-    <meta name="canonical-source-sha256" content="1029232a71bbc9f40294cba9ef8bf946bd7c330fdcdb916fd2584d9e8c3c116d" />
+    <meta name="canonical-source-sha256" content="8c53103fc14953bf61035b8e5699d4ebbdf263c72e77a678d7b0a0699f7875be" />
     <title>Quality assurance</title>
     <style>
       :root { color-scheme: light dark; font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
@@ -40,6 +40,40 @@
   <body>
     <main>
       <h1 id="quality-assurance">Quality assurance</h1>
+<h2 id="august-21-season-glance-display-upgrade">August 21 season-glance display upgrade</h2>
+<p>This iteration changes only public read surfaces and their server-derived queries. It adds no schema, dependency, environment variable, data import, production database write, or deployment action.</p>
+<table>
+<thead>
+<tr>
+<th>Gate</th>
+<th>Evidence</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Data and privacy</td>
+<td>Unit coverage proves previous-snapshot selection, shared-rank movement, deterministic initials, canonical season-table presentation, Spotlight grouping and alias resolution, matrix ordering, invalid-view fallback, and the pre-reveal category-query gate. The season-table server query returns no entry count, rows, consensus, or callouts before reveal.</td>
+</tr>
+<tr>
+<td>Components</td>
+<td>Component tests cover revealed landing states, consensus callouts, seven taxonomy-ordered category cards, pending versus outside-range results, the sticky matrix column, shared-rank podium ties, movement labels, score progress, and the CSS-only 320-pixel leaderboard reflow.</td>
+</tr>
+<tr>
+<td>Isolated Neon</td>
+<td>All 21 integration cases pass. New cases verify pre-reveal consensus suppression, a 20-row revealed season table, movement recomputed from the previous meaningful snapshot, active fact-category leaders in both player-rating directions, and pending datasets that remain non-live.</td>
+</tr>
+<tr>
+<td>Production-server browser</td>
+<td>The pre-kickoff production-server matrix passes seven routed journeys plus the focused mobile WebKit retry, with 22 intentional project-routing skips. The fixed post-kickoff journey passes desktop Chromium and exact 320/430-pixel Chromium. It covers the revealed home table, leaderboard podium and dense rows, default category boards, entry sorts, matrix, no page overflow, and exact cleanup.</td>
+</tr>
+<tr>
+<td>Test data cleanup</td>
+<td>Read-back after the completed browser runs returned zero active-season predictions and zero <code>post-kickoff-e2e-*</code> snapshots in the isolated database. Fourteen older <code>QA Repro</code> parents and two interrupted-run parents were exact-ID deleted with cascading children before the clean acceptance runs; no production database was targeted.</td>
+</tr>
+<tr>
+<td>Development-server boundary</td>
+<td>The aggregate development-server Playwright path still reproduces the documented Next.js router-initialization corruption. The equivalent clean production-server matrices pass and are the browser acceptance evidence for this iteration.</td>
+</tr>
+</tbody></table>
 <h2 id="august-21-administrator-paste-entry">August 21 administrator paste entry</h2>
 <p>This iteration adds guarded paste workflows for complete standings and reviewed spotlight result datasets. All database-backed verification uses the fail-closed isolated Neon wrapper. No production database, result pointer, prediction, or standings row was read or changed during implementation QA.</p>
 <table>
@@ -506,7 +540,7 @@
 <li><input checked="" disabled="" type="checkbox"> Regenerate final HTML peers, publish this closeout through <code>main</code>, synchronize local and remote <code>main</code>, and remove completed branch state.</li>
 </ul>
 
-      <p class="source">Generated deterministically from <a href="QA.md">docs/QA.md</a>. Canonical SHA-256: <code>1029232a71bbc9f40294cba9ef8bf946bd7c330fdcdb916fd2584d9e8c3c116d</code>.</p>
+      <p class="source">Generated deterministically from <a href="QA.md">docs/QA.md</a>. Canonical SHA-256: <code>8c53103fc14953bf61035b8e5699d4ebbdf263c72e77a678d7b0a0699f7875be</code>.</p>
     </main>
   </body>
 </html>

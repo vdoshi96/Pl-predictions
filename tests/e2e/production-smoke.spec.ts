@@ -166,18 +166,33 @@ test("production public routes are mobile-safe and healthy", async ({
   });
 
   await page.goto("/");
-  await expect(
-    page.getByRole("heading", {
-      level: 1,
-      name: "Build your 2026/27 Premier League table.",
-    }),
-  ).toBeVisible();
-  await expect(
-    page
-      .getByRole("list", { name: "Premier League predicted positions" })
-      .getByRole("listitem"),
-  ).toHaveCount(20);
-  const clubMarks = page.getByRole("img", { name: / club mark$/u });
+  const seasonTableHeading = page.getByRole("heading", {
+    level: 1,
+    name: "Season table",
+  });
+  const entryHeading = page.getByRole("heading", {
+    level: 1,
+    name: "Build your 2026/27 Premier League table.",
+  });
+  await expect(seasonTableHeading.or(entryHeading)).toBeVisible();
+  const predictionsRevealed = await seasonTableHeading.isVisible();
+  let clubMarks: import("@playwright/test").Locator;
+  if (predictionsRevealed) {
+    await expect(seasonTableHeading).toBeVisible();
+    const seasonTable = page.getByRole("table", {
+      name: "Premier League season table",
+    });
+    await expect(seasonTable.locator("tbody tr")).toHaveCount(20);
+    clubMarks = seasonTable.locator("tbody img");
+  } else {
+    await expect(entryHeading).toBeVisible();
+    await expect(
+      page
+        .getByRole("list", { name: "Premier League predicted positions" })
+        .getByRole("listitem"),
+    ).toHaveCount(20);
+    clubMarks = page.getByRole("img", { name: / club mark$/u });
+  }
   await expect(clubMarks).toHaveCount(20);
   expect(
     await clubMarks.evaluateAll((images) =>
@@ -196,7 +211,7 @@ test("production public routes are mobile-safe and healthy", async ({
   });
   await expectNoHorizontalOverflow(page);
 
-  if (await participantName.isEnabled()) {
+  if (!predictionsRevealed && (await participantName.isEnabled())) {
     const countdown = page.getByRole("timer", {
       name: /until submissions lock$/u,
     });
@@ -339,6 +354,20 @@ test("production public routes are mobile-safe and healthy", async ({
     }
     await page.keyboard.press("Escape");
     await page.getByRole("button", { name: "Back to table" }).click();
+  } else if (predictionsRevealed) {
+    await expect(participantName).toHaveCount(0);
+    await expect(continueButton).toHaveCount(0);
+    await expect(page.getByRole("timer")).toHaveCount(0);
+    await expect(
+      page.getByText("Submissions closed · predictions revealed", {
+        exact: true,
+      }),
+    ).toBeVisible();
+    if (captureMobileEvidence) {
+      await page.screenshot({
+        path: path.join(screenshotDirectory!, "season-table-mobile.png"),
+      });
+    }
   } else {
     await expect(page.getByText("Closed", { exact: true })).toBeVisible();
     await expect(
@@ -376,24 +405,41 @@ test("production public routes are mobile-safe and healthy", async ({
     page.getByRole("heading", { level: 1, name: "Spotlight accuracy" }),
   ).toBeVisible();
   await expect(
-    page.getByRole("heading", {
-      name: "Spotlight picks are still private",
-    }),
-  ).toBeVisible();
-  await expect(
     page.getByRole("region", { name: "Spotlight accuracy test run" }),
   ).toHaveCount(0);
   await expect(page.getByText("Demo Alex", { exact: true })).toHaveCount(0);
   await expect(page.getByText("Demo Jordan", { exact: true })).toHaveCount(0);
-  await expect(page.getByLabel("Spotlight accuracy leaderboard")).toHaveCount(
-    0,
+  const spotlightLeaderboard = page.getByLabel(
+    "Spotlight accuracy leaderboard",
   );
+  if (predictionsRevealed) {
+    await expect(
+      page.getByRole("heading", {
+        name: "Spotlight picks are still private",
+      }),
+    ).toHaveCount(0);
+    await expect(spotlightLeaderboard).toBeVisible();
+    await expect
+      .poll(() => spotlightLeaderboard.getByRole("article").count())
+      .toBeGreaterThan(0);
+  } else {
+    await expect(
+      page.getByRole("heading", {
+        name: "Spotlight picks are still private",
+      }),
+    ).toBeVisible();
+    await expect(spotlightLeaderboard).toHaveCount(0);
+  }
   await expect(page.getByText(/^\d+ active brackets?$/u)).toBeVisible();
   await expectNoHorizontalOverflow(page);
   if (captureMobileEvidence) {
-    await page
-      .getByRole("heading", { name: "Spotlight picks are still private" })
-      .scrollIntoViewIfNeeded();
+    if (predictionsRevealed) {
+      await spotlightLeaderboard.scrollIntoViewIfNeeded();
+    } else {
+      await page
+        .getByRole("heading", { name: "Spotlight picks are still private" })
+        .scrollIntoViewIfNeeded();
+    }
     await page.screenshot({
       animations: "disabled",
       path: path.join(screenshotDirectory!, "spotlight-mobile.png"),

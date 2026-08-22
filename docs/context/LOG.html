@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="generated-by" content="scripts/generate-docs-html.mjs" />
     <meta name="canonical-source" content="LOG.md" />
-    <meta name="canonical-source-sha256" content="c90373f4e400112ad7d4f0affa7ca2f036d6564bf61078f45d54e9750d5e0c40" />
+    <meta name="canonical-source-sha256" content="89e6081bfe0485ee2b2b8e83b2471ad4cd48651753de8c9d810749656773103e" />
     <title>Session log</title>
     <style>
       :root { color-scheme: light dark; font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
@@ -42,6 +42,11 @@
       <h1 id="session-log">Session log</h1>
 <h2 id="2026-08-22">2026-08-22</h2>
 <ul>
+<li>Released the dark-mode and dual-zone time implementation through <a href="https://github.com/vdoshi96/Pl-predictions/pull/31">PR #31</a>, merged as <code>eb1bc82a50f850ff5965c80d3d933e36e8c3f6b5</code>. The change implements report items B, C, and D: system-preference light/dark palettes, browser theme metadata, explicit light walkthrough frames, bordered leaderboard tracks, and an unclipped top-three podium with accessible first-to-third document order and desktop <code>2–1–3</code> visual placement.</li>
+<li>Replaced site-rendered UTC-only and viewer-local date-time labels with deterministic Chicago-local-plus-UTC text. Administrator deadline comparison retains an optional selected third time zone after the Chicago-and-UTC baseline.</li>
+<li>Passed formatting, ESLint, strict TypeScript, 346 enabled unit/component tests, all 22 isolated Neon integration tests, and the Webpack production build. The optimized local production server passed seven pre-kickoff journeys, a focused mobile WebKit rerun, and three post-kickoff journeys; the development-server aggregate retained its documented response-stream corruption boundary.</li>
+<li>Verified Ready production deployment <code>dpl_252wwia4AqFJevuPhTiWZrwwR3a7</code> at <a href="https://pl-predictions-75wicw45f-vdoshi96s-projects.vercel.app">https://pl-predictions-75wicw45f-vdoshi96s-projects.vercel.app</a>. The automatic production aliases advanced while the documented stable alias still served the prior deployment, so explicitly assigned <a href="https://pl-predictions-2026.vercel.app">https://pl-predictions-2026.vercel.app</a> and proved it resolved to the new deployment ID.</li>
+<li>Passed the bounded five-browser anonymous smoke after the alias update. Live desktop and 390-pixel browser checks verified both palettes, Chicago-plus-UTC text, podium and progress details, no horizontal overflow, and zero console errors. Deployment error and HTTP 5xx log queries returned no records. No migration, seed, authenticated mutation, or production database write ran.</li>
 <li>Reconciled <code>adversarial-review-2026-08-22.html</code> and <code>visual-qa-issues-2026-08-21.html</code> against current <code>main</code>, then continued the half-finished result-validation change in a dedicated worktree without modifying unrelated primary-worktree material.</li>
 <li>Added persistent administrator login throttling and revocable sessions, standings-ingest throttling and bounded bearer rotation, a per-response nonce CSP without script <code>unsafe-inline</code>, production HSTS, fail-closed local-QA flags on Vercel, invisible/control-character rejection, shared catalogue caching, and migrations <code>0008</code>/<code>0009</code> for the new security rows and standings invariants.</li>
 <li>Moved the standings importer into application source, left the script as a thin CLI, removed the dead champion component, shared root season context through React request caching, and ignored the supplied review/reproduction artifacts.</li>
@@ -298,7 +303,7 @@
 <li>Next handoff: use <code>main</code> as the base for future pull requests. No GitHub access blocker remains for the current repository workflow.</li>
 </ul>
 
-      <p class="source">Generated deterministically from <a href="LOG.md">docs/context/LOG.md</a>. Canonical SHA-256: <code>c90373f4e400112ad7d4f0affa7ca2f036d6564bf61078f45d54e9750d5e0c40</code>.</p>
+      <p class="source">Generated deterministically from <a href="LOG.md">docs/context/LOG.md</a>. Canonical SHA-256: <code>89e6081bfe0485ee2b2b8e83b2471ad4cd48651753de8c9d810749656773103e</code>.</p>
     </main>
   </body>
 </html>

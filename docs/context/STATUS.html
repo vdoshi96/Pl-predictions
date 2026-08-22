@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="generated-by" content="scripts/generate-docs-html.mjs" />
     <meta name="canonical-source" content="STATUS.md" />
-    <meta name="canonical-source-sha256" content="d095c7a153348fd654adbf4c439b03426dbee3b5c9528147542bdd440dab88a4" />
+    <meta name="canonical-source-sha256" content="0f776da98ad98e9c3418be182b81fe26da9080a97d6b3212982a1135a00974e9" />
     <title>Status</title>
     <style>
       :root { color-scheme: light dark; font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
@@ -41,7 +41,13 @@
     <main>
       <h1 id="status">Status</h1>
 <ul>
-<li><p>Current product change (2026-08-22, release in progress): both supplied adversarial and visual review reports are implemented on PR #28. Documentation parity for 16 pairs, the 580-player/578-portrait validator, Prettier, ESLint, strict TypeScript, 343 enabled unit/component tests, 22 isolated Neon integration tests after a clean migration/seed rebuild, the Webpack production build, eight routed pre-kickoff journeys across desktop/mobile Chromium and iPhone WebKit, and three routed post-kickoff Chromium journeys pass. Exact aggregate QA cleanup is zero. The production preflight, additive migrations <code>0008</code>/<code>0009</code>, exact postcheck, Ready Vercel preview, and authenticated HTTP 200 preview route checks pass. GitHub <code>main</code> and the stable production alias still run the previous code until PR #28 merges.</p>
+<li><p>Current release (2026-08-22): <a href="https://github.com/vdoshi96/Pl-predictions/pull/31">PR #31</a> merged the dark-mode, leaderboard-detail, and dual-zone time changes as <code>eb1bc82a50f850ff5965c80d3d933e36e8c3f6b5</code>. Vercel deployment <code>dpl_252wwia4AqFJevuPhTiWZrwwR3a7</code> is Ready at <a href="https://pl-predictions-75wicw45f-vdoshi96s-projects.vercel.app">its immutable URL</a>. The stable <a href="https://pl-predictions-2026.vercel.app">production alias</a> was explicitly assigned to that deployment, and deployment-ID read-back proved the mapping.</p>
+</li>
+<li><p>Product change: the site follows the operating-system light or dark preference through semantic color tokens and matching browser theme metadata. Leaderboard score tracks retain a visible border, and the top-three cards keep rank pills and crown/medal markers outside clipped card content while preserving first-to-third document order. Site date-time labels show Chicago local time followed by UTC; the administrator time-zone comparison keeps its optional third-zone view.</p>
+</li>
+<li><p>Release verification: formatting, ESLint, strict TypeScript, 346 enabled unit/component tests, all 22 isolated Neon integration tests, and the Webpack production build pass. The optimized local production server passed seven routed pre-kickoff journeys, the focused mobile WebKit rerun, and three routed post-kickoff journeys. The stable production alias passed the bounded five-browser anonymous smoke. Live desktop and 390-pixel checks verified both color schemes, dual-zone text, podium ordering, the bordered progress track, no horizontal overflow, zero console errors, and no deployment error or HTTP 5xx log records.</p>
+</li>
+<li><p>Release boundary: this code-only release ran no migration, seed, administrator mutation, or production database write. The production smoke used only read-only same-origin methods.</p>
 </li>
 <li><p>Review behavior change: applying migration <code>0008</code> creates the persistent administrator session registry, so existing signed administrator cookies will require one fresh login after release. No participant prediction, standings fact, result fact, pointer, lock, reveal, or roster row is changed by migrations <code>0008</code>/<code>0009</code>.</p>
 </li>
@@ -55,9 +61,9 @@
 </li>
 <li><p>Production boundary: the owner-approved supported seed ran exactly once after the exact application deployment became Ready. Production now has 613 total player rows, 580 active rows, 33 preserved inactive rows, 578 active portrait paths, and the two documented silhouette fallbacks.</p>
 </li>
-<li><p>Current phase: the season-glance implementation is merged through PR #26; this documentation-only closeout records the merge evidence and preserves the production-verification boundary.</p>
+<li><p>Current phase: the dark-mode, leaderboard-detail, and dual-zone time release is merged, deployed, and production-verified. This documentation closeout records the exact repository, deployment, alias, and read-only browser evidence.</p>
 </li>
-<li><p>GitHub release: <a href="https://github.com/vdoshi96/Pl-predictions/pull/21">PR #21</a> merged the implementation as <code>a033f3613f57c37720e2f0db51ada63965a4783c</code>. <a href="https://github.com/vdoshi96/Pl-predictions/pull/22">PR #22</a> merged the selector and production-smoke corrections as <code>947118f5304271b5ae2a824329080b83d4d80723</code>. <a href="https://github.com/vdoshi96/Pl-predictions/pull/24">PR #24</a> merged administrator paste entry as <code>0a5ad854fe522993ff668ce06ffa94a4c9c0fed8</code>. <a href="https://github.com/vdoshi96/Pl-predictions/pull/26">PR #26</a> merged the season-glance display as <code>ee325557b268510bafa9c7b54aa3b46cba509da4</code>.</p>
+<li><p>GitHub release: <a href="https://github.com/vdoshi96/Pl-predictions/pull/21">PR #21</a> merged the UI and catalogue implementation as <code>a033f3613f57c37720e2f0db51ada63965a4783c</code>. <a href="https://github.com/vdoshi96/Pl-predictions/pull/22">PR #22</a> merged the selector and production-smoke corrections as <code>947118f5304271b5ae2a824329080b83d4d80723</code>. <a href="https://github.com/vdoshi96/Pl-predictions/pull/24">PR #24</a> merged administrator paste entry as <code>0a5ad854fe522993ff668ce06ffa94a4c9c0fed8</code>. <a href="https://github.com/vdoshi96/Pl-predictions/pull/26">PR #26</a> merged the season-glance display as <code>ee325557b268510bafa9c7b54aa3b46cba509da4</code>. <a href="https://github.com/vdoshi96/Pl-predictions/pull/31">PR #31</a> merged this release as <code>eb1bc82a50f850ff5965c80d3d933e36e8c3f6b5</code>.</p>
 </li>
 <li><p>Product: Dranx Prediction League uses one immutable three-stage entry: enter a display name and order all 20 clubs, choose seven spotlight predictions, then review and submit. Receipt privacy, derived leaderboard/comparison, owner settings and exact submission deletion, manual standings, authenticated source-neutral import, final-table controls, and the new manual results desk share one application.</p>
 </li>
@@ -77,7 +83,7 @@
 </li>
 <li><p>Compatibility decision: use the exact refreshed portrait set with 17 obsolete paths removed and four club-move path renames. Do not retain legacy compatibility copies. The owner accepted the brief deploy-before-seed silhouette window; it ended when the seed completed. Historical database player rows remain because the seed deactivates absent fixture players instead of deleting them.</p>
 </li>
-<li><p>Vercel: project <code>vdoshi96s-projects/pl-predictions</code>; deployment <code>dpl_J3We57iVsWDMbKSFkoCDTi62mhCz</code> is Ready at <a href="https://pl-predictions-9z25e3j3o-vdoshi96s-projects.vercel.app">https://pl-predictions-9z25e3j3o-vdoshi96s-projects.vercel.app</a>, and <a href="https://pl-predictions-2026.vercel.app">https://pl-predictions-2026.vercel.app</a> resolves to that same deployment ID.</p>
+<li><p>Vercel: project <code>vdoshi96s-projects/pl-predictions</code>; deployment <code>dpl_252wwia4AqFJevuPhTiWZrwwR3a7</code> is Ready at <a href="https://pl-predictions-75wicw45f-vdoshi96s-projects.vercel.app">https://pl-predictions-75wicw45f-vdoshi96s-projects.vercel.app</a>, and <a href="https://pl-predictions-2026.vercel.app">https://pl-predictions-2026.vercel.app</a> resolves to that same deployment ID after explicit alias assignment and read-back.</p>
 </li>
 <li><p>Recovery proof: the pre-seed read-only capture at 2026-08-21 15:51:21 UTC recorded WAL <code>0/9675540</code>, 20 teams, 599 total players, 582 active, 17 inactive, and 582 portrait paths. Neon point-in-time recovery uses the project&#39;s configured restore window; this timestamp and LSN are the exact rollback marker. No restore operation ran.</p>
 </li>
@@ -115,7 +121,7 @@
 </li>
 </ul>
 
-      <p class="source">Generated deterministically from <a href="STATUS.md">docs/context/STATUS.md</a>. Canonical SHA-256: <code>d095c7a153348fd654adbf4c439b03426dbee3b5c9528147542bdd440dab88a4</code>.</p>
+      <p class="source">Generated deterministically from <a href="STATUS.md">docs/context/STATUS.md</a>. Canonical SHA-256: <code>0f776da98ad98e9c3418be182b81fe26da9080a97d6b3212982a1135a00974e9</code>.</p>
     </main>
   </body>
 </html>

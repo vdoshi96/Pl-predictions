@@ -41,18 +41,18 @@ export function PublishReviewDialog({
       className="fixed inset-0 z-50 grid place-items-center bg-slate-950/60 p-4"
       role="dialog"
     >
-      <div className="max-h-[85vh] w-full max-w-2xl overflow-y-auto rounded-2xl bg-white p-5">
-        <h2 className="text-lg font-black text-slate-950">
+      <div className="bg-surface max-h-[85vh] w-full max-w-2xl overflow-y-auto rounded-2xl p-5">
+        <h2 className="text-foreground text-lg font-black">
           Review &amp; publish — {datasetLabel}
         </h2>
-        <p className="mt-1 text-sm text-slate-600">
+        <p className="text-muted mt-1 text-sm">
           Coverage through rank {coveredThroughRank ?? "—"} of required{" "}
           {requiredRank ?? "—"}. {diff.addedCount} added, {diff.changedCount}{" "}
           changed, {diff.removedCount} removed.
         </p>
         {aliasBlocked ? (
           <p
-            className="mt-2 rounded-xl bg-red-50 p-3 text-sm font-bold text-red-800"
+            className="bg-danger-soft text-danger mt-2 rounded-xl p-3 text-sm font-bold"
             role="alert"
           >
             {unresolvedAliasCount} Other-player match
@@ -61,7 +61,7 @@ export function PublishReviewDialog({
           </p>
         ) : null}
         {boundaryWarnings.length > 0 ? (
-          <ul className="mt-2 list-disc rounded-xl bg-amber-50 p-3 pl-6 text-sm font-semibold text-amber-900">
+          <ul className="bg-warning-soft text-warning mt-2 list-disc rounded-xl p-3 pl-6 text-sm font-semibold">
             {boundaryWarnings.map((warning) => (
               <li key={`${warning.tiedValue}-${warning.direction}`}>
                 Tie at {warning.tiedValue} spans rank {warning.boundaryRank} —{" "}
@@ -70,30 +70,30 @@ export function PublishReviewDialog({
             ))}
           </ul>
         ) : null}
-        <ul className="mt-3 max-h-72 divide-y divide-slate-100 overflow-y-auto rounded-xl border border-slate-200">
+        <ul className="border-border mt-3 max-h-72 divide-y divide-slate-100 overflow-y-auto rounded-xl border">
           {diff.entries.map((entry) => (
             <li
               className="flex items-center justify-between gap-3 px-3 py-2 text-sm"
               key={entry.subjectId}
             >
-              <span className="font-semibold text-slate-950">
+              <span className="text-foreground font-semibold">
                 {entry.label}
               </span>
               <span className="text-xs font-bold tracking-wide uppercase">
                 <span
                   className={
                     entry.kind === "removed"
-                      ? "text-red-700"
+                      ? "text-danger"
                       : entry.kind === "added"
-                        ? "text-emerald-700"
+                        ? "text-mint-ink"
                         : entry.kind === "changed"
-                          ? "text-amber-700"
-                          : "text-slate-500"
+                          ? "text-warning"
+                          : "text-muted"
                   }
                 >
                   {entry.kind}
                 </span>{" "}
-                <span className="text-slate-700">
+                <span className="text-muted">
                   {entry.oldMetric ?? "—"} → {entry.newMetric ?? "—"}
                   {entry.oldRank !== null && entry.newRank !== null
                     ? ` (rank ${entry.oldRank} → ${entry.newRank})`
@@ -103,7 +103,7 @@ export function PublishReviewDialog({
             </li>
           ))}
         </ul>
-        <label className="mt-4 flex items-start gap-2 rounded-xl bg-slate-50 p-3 text-xs leading-5 font-semibold text-slate-700">
+        <label className="bg-surface-subtle text-muted mt-4 flex items-start gap-2 rounded-xl p-3 text-xs leading-5 font-semibold">
           <input
             checked={attested}
             className="mt-1 size-4 shrink-0 accent-emerald-600"

@@ -6,7 +6,7 @@ export function Card({ className, ...props }: HTMLAttributes<HTMLDivElement>) {
   return (
     <div
       className={cn(
-        "border-border text-foreground min-w-0 rounded-2xl border bg-white",
+        "border-border bg-surface text-foreground min-w-0 rounded-2xl border",
         className,
       )}
       {...props}
@@ -39,7 +39,7 @@ export function CardFooter({
 }: HTMLAttributes<HTMLDivElement>) {
   return (
     <div
-      className={cn("min-w-0 border-t border-slate-100 p-4 sm:p-6", className)}
+      className={cn("border-border min-w-0 border-t p-4 sm:p-6", className)}
       {...props}
     />
   );

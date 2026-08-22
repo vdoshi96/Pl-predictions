@@ -7,7 +7,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { HOME_SPOTLIGHT_MESSAGE } from "@/content/public-copy";
 import type { ActiveSeasonContext } from "@/features/seasons/queries";
 import { getSeasonTeams } from "@/features/seasons/queries";
-import { formatUtcDateTime } from "@/shared/format";
+import { formatChicagoUtcDateTime } from "@/shared/format";
 import type { SeasonAccess } from "@/shared/policy";
 
 import { PredictionForm } from "./prediction-form";
@@ -45,7 +45,7 @@ export async function PredictionLanding({
       <div className="mx-auto grid max-w-3xl gap-5 sm:gap-7">
         <section className="brand-hero order-1 rounded-3xl px-5 py-4 text-white sm:px-8 sm:py-9">
           <div className="flex flex-wrap items-center gap-2">
-            <Badge className="bg-accent text-brand ring-accent">
+            <Badge className="bg-accent text-accent-ink ring-accent">
               {season.name}
             </Badge>
             <Badge variant={access.submissionsOpen ? "success" : "warning"}>
@@ -74,8 +74,8 @@ export async function PredictionLanding({
               </p>
               <p className="mt-1 text-xs leading-5 text-white/65">
                 Submission deadline:{" "}
-                {formatUtcDateTime(access.submissionDeadline)} · Arsenal v
-                Coventry kickoff
+                {formatChicagoUtcDateTime(access.submissionDeadline)} · Arsenal
+                v Coventry kickoff
               </p>
               {access.submissionsOpen ? (
                 <SubmissionCountdown
@@ -99,7 +99,7 @@ export async function PredictionLanding({
                   Two separate tables
                 </h2>
               </div>
-              <p className="mt-1 text-sm leading-6 text-slate-600">
+              <p className="text-muted mt-1 text-sm leading-6">
                 The main leaderboard uses the 5–3–1 scoring tiers and stays
                 capped at 100. {HOME_SPOTLIGHT_MESSAGE}
               </p>
@@ -110,16 +110,16 @@ export async function PredictionLanding({
                   className="bg-brand-soft ring-border min-w-0 rounded-xl px-2 py-2.5 text-center ring-1"
                   key={rule.label}
                 >
-                  <strong className="text-brand block text-lg font-black">
+                  <strong className="text-brand-ink block text-lg font-black">
                     {rule.points}
                   </strong>
-                  <span className="mt-0.5 block text-[0.68rem] leading-4 font-medium text-slate-600">
+                  <span className="text-muted mt-0.5 block text-[0.68rem] leading-4 font-medium">
                     {rule.label}
                   </span>
                 </div>
               ))}
             </div>
-            <p className="flex items-center gap-2 text-xs font-semibold text-slate-500 sm:col-span-2">
+            <p className="text-muted flex items-center gap-2 text-xs font-semibold sm:col-span-2">
               <Check aria-hidden="true" className="text-mint-ink size-4" />
               Exact full table: 100 points · spotlight accuracy stays separate.
             </p>

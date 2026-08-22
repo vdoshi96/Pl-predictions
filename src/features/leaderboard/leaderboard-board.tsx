@@ -33,11 +33,7 @@ function Movement({ value }: { value: number | null }) {
   return (
     <span
       className={`mt-1 block text-[0.7rem] font-black whitespace-nowrap ${
-        climbed
-          ? "text-emerald-700"
-          : dropped
-            ? "text-rose-score"
-            : "text-slate-400"
+        climbed ? "text-mint-ink" : dropped ? "text-rose-score" : "text-muted"
       }`}
     >
       <span aria-hidden="true">
@@ -56,7 +52,7 @@ function Champion({
   return (
     <span
       aria-label={`Predicted champion: ${champion.displayName}`}
-      className="text-brand inline-flex min-w-0 items-center gap-1.5 text-xs font-bold"
+      className="text-brand-ink inline-flex min-w-0 items-center gap-1.5 text-xs font-bold"
     >
       <TeamMark
         decorative
@@ -73,54 +69,77 @@ function Champion({
 }
 
 function Podium({ entries }: { entries: readonly ScoredLeaderboardEntry[] }) {
+  const podium = [
+    { icon: "👑", lift: "", order: "sm:order-2" },
+    { icon: "🥈", lift: "sm:mt-6", order: "sm:order-1" },
+    { icon: "🥉", lift: "sm:mt-8", order: "sm:order-3" },
+  ] as const;
+
   return (
     <section
       aria-label="Leaderboard podium"
-      className="grid gap-3 sm:grid-cols-3"
+      className="grid gap-3 sm:grid-cols-3 sm:items-end"
     >
       {entries.slice(0, 3).map((entry, index) => {
         const winner = index === 0;
+        const meta = podium[index];
         return (
-          <Card
-            className={`relative mt-2 overflow-visible ${
-              winner ? "brand-hero border-brand text-white" : "bg-surface-lilac"
-            }`}
+          <div
+            className={`relative mt-4 ${meta.order} ${meta.lift}`}
+            data-testid="podium-entry"
             key={entry.id}
           >
             <span
-              className={`absolute -top-2.5 left-4 rounded-full px-2.5 py-0.5 text-[0.68rem] font-black ${
+              className={`absolute -top-2.5 left-4 z-10 rounded-full px-2.5 py-0.5 text-[0.68rem] font-black ${
                 winner
-                  ? "bg-accent text-brand"
+                  ? "bg-accent text-accent-ink"
                   : index === 1
-                    ? "bg-accent-blue text-brand"
-                    : "bg-accent-yellow text-brand"
+                    ? "bg-accent-blue text-accent-ink"
+                    : "bg-accent-yellow text-accent-ink"
               }`}
             >
               {ordinal(entry.rank)}
             </span>
-            <CardContent className="pt-6">
-              <div className="flex min-w-0 items-center gap-2">
-                <EntryAvatar name={entry.participantName} />
-                <LeaderboardEntryLink
-                  className={
-                    winner ? "text-white decoration-white/40" : undefined
-                  }
-                  entryId={entry.id}
-                  participantName={entry.participantName}
-                />
-              </div>
-              <strong
-                className={`mt-2 block text-3xl font-black tabular-nums ${winner ? "text-accent" : "text-rose-score"}`}
-              >
-                {entry.totalScore}
-              </strong>
-              <span
-                className={`mt-1 block text-xs font-semibold ${winner ? "text-white/70" : "text-slate-600"}`}
-              >
-                {entry.exactCount} exact · champion {entry.champion.displayName}
-              </span>
-            </CardContent>
-          </Card>
+            <span
+              aria-hidden="true"
+              className={`bg-surface border-border absolute right-4 z-10 grid place-items-center rounded-full border shadow-lg ${
+                winner ? "-top-6 size-12 text-2xl" : "-top-5 size-10 text-xl"
+              }`}
+            >
+              {meta.icon}
+            </span>
+            <Card
+              className={`h-full overflow-hidden ${
+                winner
+                  ? "brand-hero border-brand text-white"
+                  : "bg-surface-lilac"
+              }`}
+            >
+              <CardContent className="pt-7">
+                <div className="flex min-w-0 items-center gap-2">
+                  <EntryAvatar name={entry.participantName} />
+                  <LeaderboardEntryLink
+                    className={
+                      winner ? "text-white decoration-white/40" : undefined
+                    }
+                    entryId={entry.id}
+                    participantName={entry.participantName}
+                  />
+                </div>
+                <strong
+                  className={`mt-2 block text-3xl font-black tabular-nums ${winner ? "text-accent" : "text-rose-score"}`}
+                >
+                  {entry.totalScore}
+                </strong>
+                <span
+                  className={`mt-1 block text-xs font-semibold ${winner ? "text-white/70" : "text-muted"}`}
+                >
+                  {entry.exactCount} exact · champion{" "}
+                  {entry.champion.displayName}
+                </span>
+              </CardContent>
+            </Card>
+          </div>
         );
       })}
     </section>
@@ -142,7 +161,7 @@ export function ScoredLeaderboardBoard({
             scoring breakdowns, and points out of 100.
           </caption>
           <thead className="max-sm:sr-only">
-            <tr className="border-border border-b-2 text-left text-[0.62rem] font-black tracking-wider text-slate-500 uppercase">
+            <tr className="border-border text-muted border-b-2 text-left text-[0.62rem] font-black tracking-wider uppercase">
               <th className="w-20 px-3 py-3" scope="col">
                 Rank
               </th>
@@ -164,7 +183,7 @@ export function ScoredLeaderboardBoard({
             {entries.map((entry) => (
               <tr
                 aria-label={`${entry.participantName} leaderboard entry`}
-                className="border-surface-lilac-border border-b align-middle last:border-b-0 hover:bg-slate-50 max-sm:grid max-sm:min-h-24 max-sm:grid-cols-[3rem_minmax(0,1fr)_auto] max-sm:grid-rows-[auto_auto] max-sm:items-center max-sm:gap-x-2 max-sm:px-3 max-sm:py-2"
+                className="border-surface-lilac-border hover:bg-surface-subtle border-b align-middle last:border-b-0 max-sm:grid max-sm:min-h-24 max-sm:grid-cols-[3rem_minmax(0,1fr)_auto] max-sm:grid-rows-[auto_auto] max-sm:items-center max-sm:gap-x-2 max-sm:px-3 max-sm:py-2"
                 key={entry.id}
               >
                 <td className="px-3 py-2 max-sm:col-start-1 max-sm:row-span-2 max-sm:p-0">
@@ -193,7 +212,7 @@ export function ScoredLeaderboardBoard({
                     <span className="bg-mint text-mint-ink rounded-full px-2 py-1 text-[0.68rem] font-black">
                       {entry.exactCount} exact
                     </span>
-                    <span className="bg-sky-soft text-brand rounded-full px-2 py-1 text-[0.68rem] font-black">
+                    <span className="bg-sky-soft text-brand-ink rounded-full px-2 py-1 text-[0.68rem] font-black">
                       {entry.withinThreeCount} within 3
                     </span>
                     <span className="bg-rose-soft text-rose-ink rounded-full px-2 py-1 text-[0.68rem] font-black">
@@ -209,12 +228,12 @@ export function ScoredLeaderboardBoard({
                   <strong className="text-rose-score block text-xl font-black tabular-nums">
                     {entry.totalScore}
                   </strong>
-                  <span className="text-[0.62rem] font-bold text-slate-500 uppercase">
+                  <span className="text-muted text-[0.62rem] font-bold uppercase">
                     table points
                   </span>
                   <span
                     aria-label={`${entry.totalScore} of 100 table points`}
-                    className="bg-surface-subtle mt-1 ml-auto block h-1.5 w-24 overflow-hidden rounded-full max-sm:w-16"
+                    className="border-border bg-surface-subtle mt-1 ml-auto block h-2 w-24 overflow-hidden rounded-full border max-sm:w-16"
                     role="progressbar"
                     aria-valuemax={100}
                     aria-valuemin={0}
@@ -252,7 +271,7 @@ export function LeaderboardRosterTable({
             Active prediction entries and their public champion picks.
           </caption>
           <thead className="max-sm:sr-only">
-            <tr className="border-border border-b-2 text-left text-[0.62rem] font-black tracking-wider text-slate-500 uppercase">
+            <tr className="border-border text-muted border-b-2 text-left text-[0.62rem] font-black tracking-wider uppercase">
               <th className="w-16 px-3 py-3" scope="col">
                 Rank
               </th>
@@ -291,7 +310,7 @@ export function LeaderboardRosterTable({
                         participantName={entry.participantName}
                       />
                     ) : (
-                      <span className="font-black [overflow-wrap:anywhere] text-slate-950">
+                      <span className="text-foreground font-black [overflow-wrap:anywhere]">
                         {entry.participantName}
                       </span>
                     )}
@@ -304,7 +323,7 @@ export function LeaderboardRosterTable({
                   <strong className="text-rose-score block text-xl font-black tabular-nums">
                     {entry.totalScore}
                   </strong>
-                  <span className="text-[0.62rem] font-bold text-slate-500 uppercase">
+                  <span className="text-muted text-[0.62rem] font-bold uppercase">
                     table points
                   </span>
                 </td>

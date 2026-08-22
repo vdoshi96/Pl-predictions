@@ -1071,11 +1071,11 @@ test("mobile journey preserves privacy and gives the owner full control", async 
   ).toBeVisible();
   await expect(page.locator('input[type="datetime-local"]')).toHaveCount(0);
   await expect(
-    page.getByText("Central Time baseline", { exact: true }),
+    page.getByText("Chicago and UTC baseline", { exact: true }),
   ).toBeVisible();
   await expect(
     page
-      .getByText("Central Time baseline", { exact: true })
+      .getByText("Chicago and UTC baseline", { exact: true })
       .locator("xpath=following-sibling::time"),
   ).toContainText(/C(?:S|D)T/u);
   const kickoffZone = page.getByLabel("View kickoff in another time zone");
@@ -1098,7 +1098,7 @@ test("mobile journey preserves privacy and gives the owner full control", async 
     "Fixed kickoff and protected closure — isolated QA",
     [
       "The earlier-deadline editor is gone; kickoff is the only deadline.",
-      "The same instant is shown in Central Time and the selected IANA zone.",
+      "The same instant is shown in Chicago, UTC, and the selected IANA zone.",
       "No lock or reveal action was invoked for this evidence image.",
     ],
   );

@@ -106,7 +106,7 @@ const SortableTeamRow = memo(function SortableTeamRow({
       data-team-id={team.id}
       data-position={position}
       className={cn(
-        "group relative flex min-h-14 w-full min-w-0 items-center gap-2 rounded-xl border bg-white pr-1 pl-2 transition-[border-color,box-shadow,opacity,transform] duration-150 motion-reduce:transition-none",
+        "group bg-surface relative flex min-h-14 w-full min-w-0 items-center gap-2 rounded-xl border pr-1 pl-2 transition-[border-color,box-shadow,opacity,transform] duration-150 motion-reduce:transition-none",
         position === 11
           ? "border-border border-t-accent-blue mt-2 border-t-4"
           : "border-border",
@@ -119,7 +119,9 @@ const SortableTeamRow = memo(function SortableTeamRow({
         aria-label={`${positionKind === "predicted" ? "Predicted" : "Actual"} position ${position}`}
         className={cn(
           "grid size-8 shrink-0 place-items-center rounded-lg font-mono text-xs font-black tabular-nums",
-          position <= 10 ? "bg-brand text-white" : "bg-brand-soft text-brand",
+          position <= 10
+            ? "bg-brand text-white"
+            : "bg-brand-soft text-brand-ink",
         )}
       >
         {position}
@@ -132,7 +134,7 @@ const SortableTeamRow = memo(function SortableTeamRow({
         size="sm"
       />
 
-      <span className="text-brand-strong min-w-0 grow text-sm leading-4 font-bold break-words sm:truncate sm:text-base sm:leading-5">
+      <span className="text-brand-ink-strong min-w-0 grow text-sm leading-4 font-bold break-words sm:truncate sm:text-base sm:leading-5">
         {team.displayName}
       </span>
 
@@ -162,7 +164,7 @@ const SortableTeamRow = memo(function SortableTeamRow({
           event.stopPropagation();
           onKeyboardMove(team.id, destination);
         }}
-        className="border-border bg-brand-soft text-brand hover:border-accent-lilac hover:text-brand-strong focus-visible:ring-accent-blue inline-flex size-14 shrink-0 touch-none items-center justify-center rounded-xl border outline-none select-none hover:bg-white focus-visible:ring-2 focus-visible:ring-offset-2 active:cursor-grabbing disabled:cursor-not-allowed disabled:opacity-45 motion-reduce:transition-none sm:cursor-grab"
+        className="border-border bg-brand-soft text-brand-ink hover:border-accent-lilac hover:text-brand-ink-strong focus-visible:ring-accent-blue hover:bg-surface focus-visible:ring-offset-background inline-flex size-14 shrink-0 touch-none items-center justify-center rounded-xl border outline-none select-none focus-visible:ring-2 focus-visible:ring-offset-2 active:cursor-grabbing disabled:cursor-not-allowed disabled:opacity-45 motion-reduce:transition-none sm:cursor-grab"
       >
         <GripVertical
           aria-hidden="true"
@@ -331,7 +333,10 @@ export function PredictionSorter({
     <section className={cn("min-w-0", className)} aria-labelledby={headingId}>
       <div className="mb-3 flex flex-wrap items-end justify-between gap-3">
         <div className="min-w-0">
-          <h2 id={headingId} className="text-brand-strong text-lg font-black">
+          <h2
+            id={headingId}
+            className="text-brand-ink-strong text-lg font-black"
+          >
             {mode === "standings"
               ? "Current league table"
               : "Your predicted table"}

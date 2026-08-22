@@ -44,12 +44,12 @@ export function ResultsPastePanel({
   return (
     <section
       aria-label={`Paste ${datasetLabel} list`}
-      className="grid gap-2 rounded-xl border border-slate-200 p-3"
+      className="border-border grid gap-2 rounded-xl border p-3"
     >
-      <label className="grid gap-1 text-sm font-bold text-slate-800">
+      <label className="text-foreground grid gap-1 text-sm font-bold">
         Paste {datasetLabel.toLowerCase()} list
         <textarea
-          className="min-h-24 w-full rounded-xl border border-slate-300 bg-white p-2 font-mono text-xs outline-none focus:border-emerald-600 focus:ring-2 focus:ring-emerald-200 disabled:bg-slate-100"
+          className="border-border bg-surface focus:border-accent focus:ring-accent/30 disabled:bg-surface-subtle min-h-24 w-full rounded-xl border p-2 font-mono text-xs outline-none focus:ring-2"
           disabled={disabled}
           onChange={(event) => {
             setText(event.target.value);
@@ -83,14 +83,14 @@ export function ResultsPastePanel({
           Apply {matched.length || ""} row{matched.length === 1 ? "" : "s"}
         </Button>
         {problemRows.length > 0 ? (
-          <span className="text-xs font-semibold text-amber-700">
+          <span className="text-warning text-xs font-semibold">
             {problemRows.length} line{problemRows.length === 1 ? "" : "s"}{" "}
             {problemRows.length === 1 ? "needs" : "need"} attention below.
           </span>
         ) : null}
       </div>
       {problemRows.length > 0 ? (
-        <ul className="list-disc rounded-xl bg-amber-50 p-2 pl-6 text-xs font-semibold text-amber-900">
+        <ul className="bg-warning-soft text-warning list-disc rounded-xl p-2 pl-6 text-xs font-semibold">
           {problemRows.map((row) => (
             <li key={row.rawLine}>
               “{row.rawLine}” —{" "}

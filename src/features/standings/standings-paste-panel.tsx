@@ -157,18 +157,18 @@ export function StandingsPastePanel({
   return (
     <section
       aria-labelledby="paste-table-title"
-      className="rounded-xl border border-slate-200 p-4"
+      className="border-border rounded-xl border p-4"
     >
-      <h2 className="font-black text-slate-950" id="paste-table-title">
+      <h2 className="text-foreground font-black" id="paste-table-title">
         Paste table
       </h2>
-      <p className="mt-1 text-sm leading-6 text-slate-600">
+      <p className="text-muted mt-1 text-sm leading-6">
         Copy any league table as text. Parsing never guesses: unknown or
         ambiguous clubs block saving.
       </p>
       <textarea
         aria-label="Pasted table text"
-        className="mt-3 min-h-40 w-full rounded-xl border border-slate-300 bg-white p-3 font-mono text-sm outline-none focus:border-emerald-600 focus:ring-2 focus:ring-emerald-200 disabled:bg-slate-100"
+        className="border-border bg-surface focus:border-accent focus:ring-accent/30 disabled:bg-surface-subtle mt-3 min-h-40 w-full rounded-xl border p-3 font-mono text-sm outline-none focus:ring-2"
         disabled={disabled || busy}
         onChange={(event) => {
           setText(event.target.value);
@@ -196,21 +196,21 @@ export function StandingsPastePanel({
         </Button>
       </div>
       {message ? (
-        <p className="mt-2 text-sm font-semibold text-slate-700" role="status">
+        <p className="text-muted mt-2 text-sm font-semibold" role="status">
           {message}
         </p>
       ) : null}
       {parsed ? (
         <div className="mt-4 grid gap-3">
           {problems.length > 0 ? (
-            <ul className="list-disc rounded-xl bg-red-50 p-3 pl-6 text-sm font-semibold text-red-800">
+            <ul className="bg-danger-soft text-danger list-disc rounded-xl p-3 pl-6 text-sm font-semibold">
               {problems.map((problem) => (
                 <li key={problem}>{problem}</li>
               ))}
             </ul>
           ) : null}
           {diff ? (
-            <p className="text-sm font-semibold text-slate-700" role="status">
+            <p className="text-muted text-sm font-semibold" role="status">
               {diff.movedCount} of {diff.rows.length} rows differ from the
               active table.
               {diff.missingTeams.length > 0
@@ -218,9 +218,9 @@ export function StandingsPastePanel({
                 : ""}
             </p>
           ) : null}
-          <div className="max-w-full overflow-x-auto rounded-xl border border-slate-200">
+          <div className="border-border max-w-full overflow-x-auto rounded-xl border">
             <table className="w-full min-w-[32rem] border-collapse text-left text-sm">
-              <thead className="bg-slate-50 text-xs tracking-wide text-slate-600 uppercase">
+              <thead className="bg-surface-subtle text-muted text-xs tracking-wide uppercase">
                 <tr>
                   <th className="px-3 py-2" scope="col">
                     Pos

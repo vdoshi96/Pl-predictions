@@ -351,6 +351,11 @@ describe("SpotlightResultsDesk", () => {
     });
     expect(within(published).getByText(activeId)).toBeVisible();
     expect(
+      within(published).getByText(
+        "20 May 2027, 13:00 CDT · 20 May 2027, 18:00 UTC",
+      ),
+    ).toBeVisible();
+    expect(
       within(published).getByRole("button", { name: "Finalize 11111111" }),
     ).toBeEnabled();
   });

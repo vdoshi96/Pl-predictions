@@ -1,6 +1,7 @@
 @import "tailwindcss";
 
 :root {
+  color-scheme: light dark;
   --background: #f8f4fa;
   --surface: #ffffff;
   --surface-subtle: #f2eaf4;
@@ -9,12 +10,15 @@
   --border: #dfd2e3;
   --brand: #37003c;
   --brand-strong: #26002d;
+  --brand-ink: #37003c;
+  --brand-ink-strong: #26002d;
   --brand-soft: #f1e5f3;
   --accent: #00ff87;
   --accent-blue: #05f0ff;
   --accent-pink: #ff2882;
   --accent-lilac: #953bff;
   --accent-yellow: #ebff00;
+  --accent-ink: #26002d;
   --danger: #a32b32;
   --danger-soft: #fde8e8;
   --warning: #8a5a00;
@@ -34,6 +38,35 @@
   --shadow: 0 22px 70px rgb(55 0 60 / 12%);
 }
 
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #17041a;
+    --surface: #23102a;
+    --surface-subtle: #2c1533;
+    --foreground: #f3e9f5;
+    --muted: #b8a5bd;
+    --border: #5a3d61;
+    --brand-ink: #e7c7eb;
+    --brand-ink-strong: #f3e9f5;
+    --brand-soft: #33143a;
+    --danger: #ff9ba0;
+    --danger-soft: #3d1216;
+    --warning: #ffd60a;
+    --warning-soft: #3a2c05;
+    --mint: #12382d;
+    --mint-ink: #8fffc9;
+    --mint-ink-strong: #b7ffdc;
+    --sky-soft: #0d353a;
+    --rose-ink: #ff9bc0;
+    --rose-score: #ff6ca2;
+    --rose-soft: #3c1627;
+    --surface-lilac: #28132e;
+    --surface-lilac-border: #513358;
+    --brand-pressed: #47204f;
+    --shadow: 0 22px 70px rgb(0 0 0 / 32%);
+  }
+}
+
 @theme inline {
   --color-background: var(--background);
   --color-surface: var(--surface);
@@ -43,12 +76,15 @@
   --color-border: var(--border);
   --color-brand: var(--brand);
   --color-brand-strong: var(--brand-strong);
+  --color-brand-ink: var(--brand-ink);
+  --color-brand-ink-strong: var(--brand-ink-strong);
   --color-brand-soft: var(--brand-soft);
   --color-accent: var(--accent);
   --color-accent-blue: var(--accent-blue);
   --color-accent-pink: var(--accent-pink);
   --color-accent-lilac: var(--accent-lilac);
   --color-accent-yellow: var(--accent-yellow);
+  --color-accent-ink: var(--accent-ink);
   --color-danger: var(--danger);
   --color-danger-soft: var(--danger-soft);
   --color-warning: var(--warning);
@@ -104,7 +140,7 @@ a {
 
 ::selection {
   background: var(--accent);
-  color: var(--foreground);
+  color: var(--accent-ink);
 }
 
 :focus-visible {
@@ -119,6 +155,19 @@ a {
 
 .panel-shadow {
   box-shadow: var(--shadow);
+}
+
+.light-preview {
+  color-scheme: only light;
+  --background: #f8f4fa;
+  --surface: #ffffff;
+  --surface-subtle: #f2eaf4;
+  --foreground: #2a0730;
+  --muted: #6f5f73;
+  --border: #dfd2e3;
+  --brand-ink: #37003c;
+  --brand-ink-strong: #26002d;
+  --brand-soft: #f1e5f3;
 }
 
 .brand-hero {

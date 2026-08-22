@@ -9,11 +9,11 @@ export interface BadgeProps extends HTMLAttributes<HTMLSpanElement> {
 }
 
 const variantClasses: Record<BadgeVariant, string> = {
-  neutral: "bg-brand-soft text-brand ring-border",
-  accent: "bg-sky-soft text-brand ring-accent-blue",
+  neutral: "bg-brand-soft text-brand-ink ring-border",
+  accent: "bg-sky-soft text-brand-ink ring-accent-blue",
   success: "bg-mint text-mint-ink ring-accent",
-  warning: "bg-amber-50 text-amber-900 ring-amber-200",
-  danger: "bg-red-50 text-red-800 ring-red-200",
+  warning: "bg-warning-soft text-warning ring-warning/35",
+  danger: "bg-danger-soft text-danger ring-danger/35",
 };
 
 export function Badge({

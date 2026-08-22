@@ -39,10 +39,10 @@ export default async function AdminSettingsPage() {
       <div className="grid gap-5">
         <div>
           <Badge variant="accent">Fairness controls</Badge>
-          <h1 className="mt-3 text-3xl font-black tracking-tight text-slate-950 sm:text-4xl">
+          <h1 className="text-foreground mt-3 text-3xl font-black tracking-tight sm:text-4xl">
             Season settings
           </h1>
-          <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-600">
+          <p className="text-muted mt-2 max-w-2xl text-sm leading-6">
             The fixed opening kickoff and permanent controls are enforced on the
             server for every new submission.
           </p>
@@ -51,7 +51,7 @@ export default async function AdminSettingsPage() {
         <AdminNav current="/admin/settings" />
 
         {access.predictionsRevealed ? (
-          <p className="rounded-xl border border-amber-200 bg-amber-50 p-3 text-sm font-bold text-amber-900">
+          <p className="border-warning/35 bg-warning-soft text-warning rounded-xl border p-3 text-sm font-bold">
             Predictions have been revealed. Fairness protection keeps new
             entries permanently closed.
           </p>
@@ -62,13 +62,13 @@ export default async function AdminSettingsPage() {
             <div className="flex items-start gap-3">
               <CalendarClock
                 aria-hidden="true"
-                className="mt-0.5 size-5 shrink-0 text-emerald-700"
+                className="text-mint-ink mt-0.5 size-5 shrink-0"
               />
               <div className="min-w-0 grow">
-                <h2 className="font-black text-slate-950">
+                <h2 className="text-foreground font-black">
                   Fixed submission deadline
                 </h2>
-                <p className="mt-1 text-sm leading-6 text-slate-600">
+                <p className="text-muted mt-1 text-sm leading-6">
                   Submissions close at Arsenal v Coventry&apos;s opening
                   kickoff. This time cannot be edited here.{" "}
                   <a
@@ -97,13 +97,13 @@ export default async function AdminSettingsPage() {
             <div className="flex items-start gap-3">
               <LockKeyhole
                 aria-hidden="true"
-                className="mt-0.5 size-5 shrink-0 text-red-700"
+                className="text-danger mt-0.5 size-5 shrink-0"
               />
               <div>
-                <h2 className="font-black text-slate-950">
+                <h2 className="text-foreground font-black">
                   Permanent season actions
                 </h2>
-                <p className="mt-1 text-sm leading-6 text-slate-600">
+                <p className="text-muted mt-1 text-sm leading-6">
                   Both actions reveal predictions and permanently close new
                   submissions. Choose the action that records your intent.
                 </p>

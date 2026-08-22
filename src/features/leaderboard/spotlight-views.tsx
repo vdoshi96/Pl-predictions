@@ -55,7 +55,7 @@ function ResultChip({
   }
   if (resultStatus === "outside-range") {
     return (
-      <span className="rounded-lg bg-slate-100 px-2 py-1 text-[0.68rem] font-black text-slate-600">
+      <span className="bg-surface-subtle text-muted rounded-lg px-2 py-1 text-[0.68rem] font-black">
         Outside range · {accuracyPoints ?? 0} pts
       </span>
     );
@@ -67,8 +67,8 @@ function ResultChip({
         rank === 1
           ? "bg-mint text-mint-ink"
           : rank <= 5
-            ? "bg-sky-soft text-brand"
-            : "bg-slate-100 text-slate-600"
+            ? "bg-sky-soft text-brand-ink"
+            : "bg-surface-subtle text-muted"
       }`}
     >
       Result rank {rank} · {accuracyPoints ?? 0} pts
@@ -117,23 +117,23 @@ export function SpotlightCategoriesView({
                     subject={leader.subject}
                   />
                   <div className="min-w-0">
-                    <span className="block text-[0.62rem] font-black tracking-wider text-slate-500 uppercase">
+                    <span className="text-muted block text-[0.62rem] font-black tracking-wider uppercase">
                       Current leader
                     </span>
-                    <strong className="text-brand-strong mt-0.5 block text-sm font-black [overflow-wrap:anywhere]">
+                    <strong className="text-brand-ink-strong mt-0.5 block text-sm font-black [overflow-wrap:anywhere]">
                       {leader.displayName}
                     </strong>
-                    <span className="mt-0.5 block text-xs font-semibold text-slate-500">
+                    <span className="text-muted mt-0.5 block text-xs font-semibold">
                       {leader.metricLabel}
                     </span>
                   </div>
                 </>
               ) : (
                 <div>
-                  <span className="block text-[0.62rem] font-black tracking-wider text-slate-500 uppercase">
+                  <span className="text-muted block text-[0.62rem] font-black tracking-wider uppercase">
                     Current leader
                   </span>
-                  <strong className="mt-1 block text-sm font-black text-slate-500">
+                  <strong className="text-muted mt-1 block text-sm font-black">
                     Awaiting results publication
                   </strong>
                 </div>
@@ -152,7 +152,7 @@ export function SpotlightCategoriesView({
                     subject={row.subject}
                   />
                   <div className="min-w-0">
-                    <strong className="block text-xs font-black [overflow-wrap:anywhere] text-slate-950">
+                    <strong className="text-foreground block text-xs font-black [overflow-wrap:anywhere]">
                       {row.displayName}{" "}
                       {row.isOther ? (
                         <Badge className="ml-1 min-h-5 px-1.5 py-0 text-[0.58rem]">
@@ -176,12 +176,12 @@ export function SpotlightCategoriesView({
                           </span>
                         ))}
                         {row.count > 5 ? (
-                          <span className="-ml-1.5 grid min-w-6 place-items-center rounded-full border-2 border-white bg-slate-200 px-1 text-[0.55rem] font-black text-slate-700">
+                          <span className="bg-surface-subtle text-muted -ml-1.5 grid min-w-6 place-items-center rounded-full border-2 border-white px-1 text-[0.55rem] font-black">
                             +{row.count - 5}
                           </span>
                         ) : null}
                       </span>
-                      <span className="text-[0.68rem] font-bold text-slate-500">
+                      <span className="text-muted text-[0.68rem] font-bold">
                         {row.count} of {entryCount}
                       </span>
                     </div>
@@ -205,12 +205,12 @@ function shortPickName(pick: SpotlightPickDisplay): string {
 
 function matrixCellClass(pick: SpotlightPickDisplay): string {
   if (pick.resultStatus === "outside-range")
-    return "bg-slate-100 text-slate-600";
+    return "bg-surface-subtle text-muted";
   if (pick.resultRank === undefined || pick.resultRank === null)
     return "bg-warning-soft text-warning";
   if (pick.resultRank === 1) return "bg-mint text-mint-ink";
-  if (pick.resultRank <= 5) return "bg-sky-soft text-brand";
-  return "bg-slate-100 text-slate-600";
+  if (pick.resultRank <= 5) return "bg-sky-soft text-brand-ink";
+  return "bg-surface-subtle text-muted";
 }
 
 function matrixResult(pick: SpotlightPickDisplay): string {
@@ -244,9 +244,9 @@ export function SpotlightMatrixView({
               Every entry&apos;s seven spotlight picks and current accuracy.
             </caption>
             <thead>
-              <tr className="border-border border-b-2 text-[0.6rem] font-black tracking-wider text-slate-500 uppercase">
+              <tr className="border-border text-muted border-b-2 text-[0.6rem] font-black tracking-wider uppercase">
                 <th
-                  className="sticky left-0 z-20 bg-white px-3 py-3 text-left"
+                  className="bg-surface sticky left-0 z-20 px-3 py-3 text-left"
                   scope="col"
                 >
                   Entry
@@ -272,7 +272,7 @@ export function SpotlightMatrixView({
                   key={entry.id}
                 >
                   <th
-                    className="sticky left-0 z-10 min-w-40 bg-white px-3 py-2 text-left"
+                    className="bg-surface sticky left-0 z-10 min-w-40 px-3 py-2 text-left"
                     scope="row"
                   >
                     <LeaderboardEntryLink
@@ -299,7 +299,7 @@ export function SpotlightMatrixView({
                             </span>
                           </span>
                         ) : (
-                          <span className="text-slate-400">—</span>
+                          <span className="text-muted">—</span>
                         )}
                       </td>
                     );
@@ -308,7 +308,7 @@ export function SpotlightMatrixView({
                     <strong className="text-rose-score block text-base font-black tabular-nums">
                       {entry.accuracyScore}
                     </strong>
-                    <span className="text-[0.62rem] font-bold text-slate-500">
+                    <span className="text-muted text-[0.62rem] font-bold">
                       {entry.availableCategoryCount} of 7 available
                     </span>
                   </td>

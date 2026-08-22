@@ -87,12 +87,12 @@ export function HowToPlay() {
         <div>
           <Badge variant="accent">Live mobile walkthrough</Badge>
           <h2
-            className="text-brand-strong mt-2 text-2xl font-black tracking-tight sm:text-3xl"
+            className="text-brand-ink-strong mt-2 text-2xl font-black tracking-tight sm:text-3xl"
             id="how-to-play-heading"
           >
             How to play in three steps
           </h2>
-          <p className="mt-1 max-w-3xl text-sm leading-6 text-slate-600">
+          <p className="text-muted mt-1 max-w-3xl text-sm leading-6">
             These annotated 390 × 844 screenshots were captured from the current
             mobile flow. Swipe the cards on a phone, then follow the numbered
             notes below each screen.
@@ -108,7 +108,7 @@ export function HowToPlay() {
           >
             <Card className="h-full overflow-hidden">
               <figure className="grid h-full grid-rows-[auto_1fr]">
-                <div className="bg-brand-soft relative overflow-hidden border-b border-slate-200">
+                <div className="light-preview border-border bg-brand-soft relative overflow-hidden border-b">
                   <Image
                     alt={walkthrough.alt}
                     className="h-auto w-full"
@@ -121,7 +121,7 @@ export function HowToPlay() {
                   {walkthrough.callouts.map((callout) => (
                     <span
                       aria-hidden="true"
-                      className="bg-accent text-brand absolute grid size-7 -translate-x-1/2 -translate-y-1/2 place-items-center rounded-full text-xs font-black shadow-[0_6px_16px_rgba(38,0,45,0.35)] ring-2 ring-white/90"
+                      className="bg-accent text-accent-ink absolute grid size-7 -translate-x-1/2 -translate-y-1/2 place-items-center rounded-full text-xs font-black shadow-[0_6px_16px_rgba(38,0,45,0.35)] ring-2 ring-white/90"
                       key={callout.marker}
                       style={callout.position}
                     >
@@ -133,19 +133,19 @@ export function HowToPlay() {
                   <p className="text-rose-ink text-xs font-black tracking-[0.12em] uppercase">
                     Step {walkthrough.step} of 3
                   </p>
-                  <h3 className="text-brand-strong mt-1 text-xl font-black tracking-tight">
+                  <h3 className="text-brand-ink-strong mt-1 text-xl font-black tracking-tight">
                     {walkthrough.title}
                   </h3>
-                  <p className="mt-2 text-sm leading-6 text-slate-600">
+                  <p className="text-muted mt-2 text-sm leading-6">
                     {walkthrough.description}
                   </p>
                   <ol className="mt-4 grid gap-2">
                     {walkthrough.callouts.map((callout) => (
                       <li
-                        className="flex items-start gap-2 text-xs leading-5 font-semibold text-slate-600"
+                        className="text-muted flex items-start gap-2 text-xs leading-5 font-semibold"
                         key={callout.marker}
                       >
-                        <span className="bg-accent text-brand mt-0.5 grid size-5 shrink-0 place-items-center rounded-full text-[0.65rem] font-black">
+                        <span className="bg-accent text-accent-ink mt-0.5 grid size-5 shrink-0 place-items-center rounded-full text-[0.65rem] font-black">
                           {callout.marker}
                         </span>
                         <span>{callout.label}</span>

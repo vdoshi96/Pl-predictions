@@ -280,10 +280,10 @@ export default async function AdminResultsPage() {
       <div className="grid gap-5">
         <div>
           <Badge variant="accent">Manual reviewed outcomes</Badge>
-          <h1 className="mt-3 text-3xl font-black tracking-tight text-slate-950 sm:text-4xl">
+          <h1 className="text-foreground mt-3 text-3xl font-black tracking-tight sm:text-4xl">
             Spotlight results
           </h1>
-          <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-600">
+          <p className="text-muted mt-2 max-w-3xl text-sm leading-6">
             Enter reviewed season outcomes row by row. Draft snapshots stay
             private; publishing moves one exact immutable snapshot into public
             scoring, and final status can only be undone against that same

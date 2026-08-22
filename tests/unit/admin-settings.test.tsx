@@ -45,7 +45,7 @@ describe("admin deadline display", () => {
     ).toContain("1:00 PM CST");
   });
 
-  it("keeps Central visible while converting the selected view", () => {
+  it("keeps Chicago and UTC visible while converting the selected view", () => {
     render(
       <DeadlineTimeZones
         deadlineIso={kickoffIso}
@@ -53,8 +53,10 @@ describe("admin deadline display", () => {
       />,
     );
 
-    expect(screen.getByText("Central Time baseline")).toBeVisible();
-    expect(screen.getAllByText(/2:00 PM CDT/u)).toHaveLength(2);
+    expect(screen.getByText("Chicago and UTC baseline")).toBeVisible();
+    expect(
+      screen.getByText("21 Aug 2026, 14:00 CDT · 21 Aug 2026, 19:00 UTC"),
+    ).toBeVisible();
 
     fireEvent.change(
       screen.getByLabelText("View kickoff in another time zone"),
@@ -62,7 +64,7 @@ describe("admin deadline display", () => {
     );
 
     expect(screen.getByText(/12:00 PM PDT/u)).toBeVisible();
-    expect(screen.getByText("Central Time baseline")).toBeVisible();
+    expect(screen.getByText("Chicago and UTC baseline")).toBeVisible();
   });
 });
 

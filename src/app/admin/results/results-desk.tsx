@@ -5,6 +5,7 @@ import { useMemo, useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { formatChicagoUtcDateTime } from "@/shared/format";
 import { SearchablePredictionSelect } from "@/features/predictions/searchable-prediction-select";
 import {
   evaluateCoverage,
@@ -172,20 +173,20 @@ function DatasetMetadata({
 }) {
   return (
     <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-      <label className="grid gap-1 text-sm font-bold text-slate-800">
+      <label className="text-foreground grid gap-1 text-sm font-bold">
         Source
         <input
-          className="min-h-11 rounded-xl border border-slate-300 bg-white px-3 font-normal outline-none focus:border-emerald-600 focus:ring-2 focus:ring-emerald-200 disabled:bg-slate-100"
+          className="border-border bg-surface focus:border-accent focus:ring-accent/30 disabled:bg-surface-subtle min-h-11 rounded-xl border px-3 font-normal outline-none focus:ring-2"
           disabled={disabled}
           maxLength={64}
           onChange={(event) => onChange({ source: event.target.value })}
           value={dataset.source}
         />
       </label>
-      <label className="grid gap-1 text-sm font-bold text-slate-800">
+      <label className="text-foreground grid gap-1 text-sm font-bold">
         Source reference
         <input
-          className="min-h-11 rounded-xl border border-slate-300 bg-white px-3 font-normal outline-none focus:border-emerald-600 focus:ring-2 focus:ring-emerald-200 disabled:bg-slate-100"
+          className="border-border bg-surface focus:border-accent focus:ring-accent/30 disabled:bg-surface-subtle min-h-11 rounded-xl border px-3 font-normal outline-none focus:ring-2"
           disabled={disabled}
           maxLength={2048}
           onChange={(event) =>
@@ -195,20 +196,20 @@ function DatasetMetadata({
           value={dataset.sourceReference}
         />
       </label>
-      <label className="grid gap-1 text-sm font-bold text-slate-800">
+      <label className="text-foreground grid gap-1 text-sm font-bold">
         Captured at (UTC)
         <input
-          className="min-h-11 rounded-xl border border-slate-300 bg-white px-3 font-normal outline-none focus:border-emerald-600 focus:ring-2 focus:ring-emerald-200 disabled:bg-slate-100"
+          className="border-border bg-surface focus:border-accent focus:ring-accent/30 disabled:bg-surface-subtle min-h-11 rounded-xl border px-3 font-normal outline-none focus:ring-2"
           disabled={disabled}
           onChange={(event) => onChange({ capturedAt: event.target.value })}
           type="datetime-local"
           value={dataset.capturedAt}
         />
       </label>
-      <label className="grid gap-1 text-sm font-bold text-slate-800">
+      <label className="text-foreground grid gap-1 text-sm font-bold">
         Complete through rank
         <input
-          className="min-h-11 rounded-xl border border-slate-300 bg-white px-3 font-normal outline-none focus:border-emerald-600 focus:ring-2 focus:ring-emerald-200 disabled:bg-slate-100"
+          className="border-border bg-surface focus:border-accent focus:ring-accent/30 disabled:bg-surface-subtle min-h-11 rounded-xl border px-3 font-normal outline-none focus:ring-2"
           disabled={disabled}
           min={1}
           onChange={(event) =>
@@ -283,12 +284,12 @@ function EditableResultTable({
       <div className="mb-2 flex flex-wrap items-end justify-between gap-2">
         <div>
           <h3
-            className="font-black text-slate-950"
+            className="text-foreground font-black"
             id={`${dataset}-${direction}-title`}
           >
             {title}
           </h3>
-          <p className="text-xs leading-5 text-slate-500">
+          <p className="text-muted text-xs leading-5">
             Ranked {direction === "descending" ? "highest" : "lowest"} first;
             equal values share a rank.
           </p>
@@ -308,9 +309,9 @@ function EditableResultTable({
           Add row
         </Button>
       </div>
-      <div className="max-w-full overflow-x-auto rounded-xl border border-slate-200">
+      <div className="border-border max-w-full overflow-x-auto rounded-xl border">
         <table className="w-full min-w-[36rem] border-collapse text-left text-sm">
-          <thead className="bg-slate-50 text-xs tracking-wide text-slate-600 uppercase">
+          <thead className="bg-surface-subtle text-muted text-xs tracking-wide uppercase">
             <tr>
               <th className="w-16 px-3 py-3" scope="col">
                 Rank
@@ -329,9 +330,7 @@ function EditableResultTable({
           <tbody className="divide-y divide-slate-100">
             {ranked.map((row) => (
               <tr key={row.subjectId}>
-                <td className="px-3 py-2 font-black text-slate-700">
-                  {row.rank}
-                </td>
+                <td className="text-muted px-3 py-2 font-black">{row.rank}</td>
                 <td className="px-3 py-2">
                   <SearchablePredictionSelect
                     description="Search this season's reviewed subjects."
@@ -351,7 +350,7 @@ function EditableResultTable({
                 <td className="px-3 py-2">
                   <input
                     aria-label={`${title} ${METRIC_LABELS[dataset]} for ${labelBySubjectId.get(row.subjectId) ?? "subject"}`}
-                    className="min-h-11 w-full rounded-xl border border-slate-300 bg-white px-3 outline-none focus:border-emerald-600 focus:ring-2 focus:ring-emerald-200 disabled:bg-slate-100"
+                    className="border-border bg-surface focus:border-accent focus:ring-accent/30 disabled:bg-surface-subtle min-h-11 w-full rounded-xl border px-3 outline-none focus:ring-2"
                     disabled={disabled}
                     max={dataset === "player_ratings" ? 10 : undefined}
                     min={0}
@@ -386,10 +385,7 @@ function EditableResultTable({
             ))}
             {ranked.length === 0 ? (
               <tr>
-                <td
-                  className="px-3 py-6 text-center text-slate-500"
-                  colSpan={4}
-                >
+                <td className="text-muted px-3 py-6 text-center" colSpan={4}>
                   Add the first reviewed row.
                 </td>
               </tr>
@@ -852,15 +848,15 @@ export function SpotlightResultsDesk({
       finalized;
     const message = messages[datasetName];
     return (
-      <div className="mt-4 flex flex-col gap-3 border-t border-slate-100 pt-4 sm:flex-row sm:items-center sm:justify-between">
+      <div className="border-border mt-4 flex flex-col gap-3 border-t pt-4 sm:flex-row sm:items-center sm:justify-between">
         <div aria-live="polite" className="min-h-5 text-sm font-semibold">
           {message ? (
-            <span className={message.ok ? "text-emerald-700" : "text-red-700"}>
+            <span className={message.ok ? "text-mint-ink" : "text-danger"}>
               {message.message}
             </span>
           ) : null}
           {dataset.dirty ? (
-            <span className="text-amber-700">
+            <span className="text-warning">
               Unsaved changes will be saved before publication.
             </span>
           ) : null}
@@ -895,15 +891,15 @@ export function SpotlightResultsDesk({
     return (
       <section
         aria-label={`${DATASET_LABELS[datasetName]} published snapshot`}
-        className="rounded-xl border border-sky-200 bg-sky-50 p-4"
+        className="border-accent-blue/40 bg-sky-soft rounded-xl border p-4"
       >
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
-            <h3 className="font-black text-slate-950">
+            <h3 className="text-foreground font-black">
               Published active snapshot
             </h3>
             {active ? (
-              <div className="mt-2 grid gap-1 text-xs leading-5 text-slate-700">
+              <div className="text-muted mt-2 grid gap-1 text-xs leading-5">
                 <p>
                   Exact ID: <code className="break-all">{active.id}</code>
                 </p>
@@ -911,10 +907,10 @@ export function SpotlightResultsDesk({
                   {active.source} · {active.itemCount} rows · complete through
                   rank {active.coveredThroughRank}
                 </p>
-                <p>{new Date(active.capturedAt).toLocaleString()}</p>
+                <p>{formatChicagoUtcDateTime(active.capturedAt)}</p>
               </div>
             ) : (
-              <p className="mt-1 text-sm text-slate-600">
+              <p className="text-muted mt-1 text-sm">
                 No snapshot is public for this dataset.
               </p>
             )}
@@ -981,8 +977,8 @@ export function SpotlightResultsDesk({
         <CardContent>
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div>
-              <h2 className="font-black text-slate-950">Publication gate</h2>
-              <p className="mt-1 text-sm leading-6 text-slate-600">
+              <h2 className="text-foreground font-black">Publication gate</h2>
+              <p className="text-muted mt-1 text-sm leading-6">
                 {seasonName} has {bracketCount} submitted bracket
                 {bracketCount === 1 ? "" : "s"}. Every published list must be
                 complete through exactly rank {bracketCount || "N"}, including
@@ -1023,7 +1019,7 @@ export function SpotlightResultsDesk({
           <Card key={datasetName}>
             <CardContent className="grid gap-5">
               <div className="flex flex-wrap items-center justify-between gap-2">
-                <h2 className="text-xl font-black text-slate-950">
+                <h2 className="text-foreground text-xl font-black">
                   {DATASET_LABELS[datasetName]}
                 </h2>
                 <Badge variant={dataset.dirty ? "warning" : "neutral"}>
@@ -1044,7 +1040,7 @@ export function SpotlightResultsDesk({
                 subjects={subjects}
                 title={DATASET_LABELS[datasetName]}
               />
-              <p className="text-xs font-semibold text-slate-600" role="status">
+              <p className="text-muted text-xs font-semibold" role="status">
                 {coverage.complete
                   ? `Coverage complete through rank ${coverage.coveredThroughRank}.`
                   : `Short by ${coverage.shortfall} row${coverage.shortfall === 1 ? "" : "s"} of rank ${bracketCount}.`}
@@ -1080,10 +1076,10 @@ export function SpotlightResultsDesk({
         <CardContent className="grid gap-5">
           <div className="flex flex-wrap items-center justify-between gap-2">
             <div>
-              <h2 className="text-xl font-black text-slate-950">
+              <h2 className="text-foreground text-xl font-black">
                 Player ratings
               </h2>
-              <p className="mt-1 text-sm leading-6 text-slate-600">
+              <p className="text-muted mt-1 text-sm leading-6">
                 These two synchronized views edit one shared ratings draft.
               </p>
             </div>
@@ -1117,7 +1113,7 @@ export function SpotlightResultsDesk({
           {(() => {
             const coverage = evaluateCoverage(ratings.rows, bracketCount);
             return (
-              <p className="text-xs font-semibold text-slate-600" role="status">
+              <p className="text-muted text-xs font-semibold" role="status">
                 {coverage.complete
                   ? `Coverage complete through rank ${coverage.coveredThroughRank}.`
                   : `Short by ${coverage.shortfall} row${coverage.shortfall === 1 ? "" : "s"} of rank ${bracketCount}.`}
@@ -1153,22 +1149,22 @@ export function SpotlightResultsDesk({
 
       <Card>
         <CardContent>
-          <h2 className="text-xl font-black text-slate-950">
+          <h2 className="text-foreground text-xl font-black">
             Other-player matches
           </h2>
-          <p className="mt-1 text-sm leading-6 text-slate-600">
+          <p className="text-muted mt-1 text-sm leading-6">
             Match each submitted spelling to a player from this season. Inactive
             catalogue players remain available for result-only matching.
           </p>
-          <div className="mt-4 grid gap-3 rounded-xl border border-sky-200 bg-sky-50 p-4 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-end">
-            <label className="grid gap-1 text-sm font-bold text-slate-800">
+          <div className="border-accent-blue/40 bg-sky-soft mt-4 grid gap-3 rounded-xl border p-4 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-end">
+            <label className="text-foreground grid gap-1 text-sm font-bold">
               New factual result subject
-              <span className="text-xs leading-5 font-normal text-slate-600">
+              <span className="text-muted text-xs leading-5 font-normal">
                 Use when a newly identified player belongs in a factual result
                 list but was not in the active prediction catalogue.
               </span>
               <input
-                className="min-h-11 rounded-xl border border-slate-300 bg-white px-3 font-normal outline-none focus:border-emerald-600 focus:ring-2 focus:ring-emerald-200"
+                className="border-border bg-surface focus:border-accent focus:ring-accent/30 min-h-11 rounded-xl border px-3 font-normal outline-none focus:ring-2"
                 maxLength={120}
                 onChange={(event) => setNewResultOnlyName(event.target.value)}
                 placeholder="Player display name"
@@ -1186,7 +1182,7 @@ export function SpotlightResultsDesk({
             </Button>
             {messages["standalone-player"] ? (
               <p
-                className={`text-sm font-semibold sm:col-span-2 ${messages["standalone-player"].ok ? "text-emerald-700" : "text-red-700"}`}
+                className={`text-sm font-semibold sm:col-span-2 ${messages["standalone-player"].ok ? "text-mint-ink" : "text-danger"}`}
                 role="status"
               >
                 {messages["standalone-player"].message}
@@ -1199,14 +1195,14 @@ export function SpotlightResultsDesk({
               const message = messages[key];
               return (
                 <div
-                  className="grid gap-2 rounded-xl border border-slate-200 p-3 sm:grid-cols-[minmax(0,1fr)_minmax(0,2fr)_auto] sm:items-end"
+                  className="border-border grid gap-2 rounded-xl border p-3 sm:grid-cols-[minmax(0,1fr)_minmax(0,2fr)_auto] sm:items-end"
                   key={alias.normalizedCustomPlayerName}
                 >
                   <div>
-                    <p className="text-xs font-black tracking-wide text-slate-500 uppercase">
+                    <p className="text-muted text-xs font-black tracking-wide uppercase">
                       Submitted spelling
                     </p>
-                    <p className="mt-1 font-bold break-words text-slate-950">
+                    <p className="text-foreground mt-1 font-bold break-words">
                       {alias.customPlayerName}
                     </p>
                   </div>
@@ -1274,7 +1270,7 @@ export function SpotlightResultsDesk({
                   </div>
                   {message ? (
                     <p
-                      className={`text-sm font-semibold sm:col-start-2 sm:col-end-4 ${message.ok ? "text-emerald-700" : "text-red-700"}`}
+                      className={`text-sm font-semibold sm:col-start-2 sm:col-end-4 ${message.ok ? "text-mint-ink" : "text-danger"}`}
                       role="status"
                     >
                       {message.message}
@@ -1284,7 +1280,7 @@ export function SpotlightResultsDesk({
               );
             })}
             {aliases.length === 0 ? (
-              <p className="rounded-xl bg-slate-50 p-4 text-sm font-semibold text-slate-600">
+              <p className="bg-surface-subtle text-muted rounded-xl p-4 text-sm font-semibold">
                 No Other-player spellings need matching.
               </p>
             ) : null}

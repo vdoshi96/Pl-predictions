@@ -9,7 +9,7 @@ import {
   ScoredLeaderboardBoard,
 } from "@/features/leaderboard/leaderboard-board";
 import { getLeaderboardView } from "@/features/leaderboard/queries";
-import { formatUtcDateTime } from "@/shared/format";
+import { formatChicagoUtcDateTime } from "@/shared/format";
 
 export const metadata: Metadata = { title: "Table leaderboard" };
 export const dynamic = "force-dynamic";
@@ -23,7 +23,7 @@ export default async function LeaderboardPage() {
       <div className="grid gap-5 sm:gap-7">
         <section className="brand-hero rounded-3xl p-5 text-white sm:p-8">
           <div className="flex flex-wrap items-center gap-2">
-            <Badge className="bg-accent text-brand ring-accent">
+            <Badge className="bg-accent text-accent-ink ring-accent">
               {view.seasonName}
             </Badge>
             <Badge className="bg-white/15 text-white ring-white/20">
@@ -66,7 +66,7 @@ export default async function LeaderboardPage() {
                   aria-hidden="true"
                   className="text-accent-blue size-4"
                 />
-                Updated {formatUtcDateTime(view.snapshot.capturedAt)}
+                Updated {formatChicagoUtcDateTime(view.snapshot.capturedAt)}
               </span>
             ) : null}
             {view.snapshot?.matchweek ? (
@@ -75,7 +75,7 @@ export default async function LeaderboardPage() {
               </span>
             ) : null}
             <Link
-              className="bg-accent text-brand hover:bg-accent-yellow inline-flex min-h-10 items-center gap-2 rounded-xl px-3 font-black transition-colors"
+              className="bg-accent text-accent-ink hover:bg-accent-yellow inline-flex min-h-10 items-center gap-2 rounded-xl px-3 font-black transition-colors"
               href="/spotlight"
             >
               <Sparkles aria-hidden="true" className="size-4" />
@@ -87,14 +87,14 @@ export default async function LeaderboardPage() {
         {!view.predictionsRevealed ? (
           <Card>
             <CardContent className="flex items-start gap-3">
-              <span className="grid size-11 shrink-0 place-items-center rounded-xl bg-slate-100 text-slate-600">
+              <span className="bg-surface-subtle text-muted grid size-11 shrink-0 place-items-center rounded-xl">
                 <EyeOff aria-hidden="true" className="size-5" />
               </span>
               <div>
-                <h2 className="font-black text-slate-950">
+                <h2 className="text-foreground font-black">
                   Full tables are still private
                 </h2>
-                <p className="mt-1 text-sm leading-6 text-slate-600">
+                <p className="text-muted mt-1 text-sm leading-6">
                   Everyone is on 0 table points, and only each predicted
                   champion is public now. The other 19 positions and all seven
                   spotlight picks stay private until the opening kickoff, a
@@ -106,16 +106,16 @@ export default async function LeaderboardPage() {
         ) : !scoringStarted ? (
           <Card>
             <CardContent className="flex items-start gap-3">
-              <span className="grid size-11 shrink-0 place-items-center rounded-xl bg-amber-100 text-amber-800">
+              <span className="bg-warning-soft text-warning grid size-11 shrink-0 place-items-center rounded-xl">
                 <Medal aria-hidden="true" className="size-5" />
               </span>
               <div>
-                <h2 className="font-black text-slate-950">
+                <h2 className="text-foreground font-black">
                   {view.seasonStarted
                     ? "Waiting for the first active table"
                     : "Everyone starts on 0 points"}
                 </h2>
-                <p className="mt-1 text-sm leading-6 text-slate-600">
+                <p className="text-muted mt-1 text-sm leading-6">
                   {view.seasonStarted
                     ? "Table scores will recalculate as soon as a meaningful standings snapshot is active."
                     : "Only predicted champions are shown until Arsenal v Coventry kicks off."}
@@ -128,14 +128,14 @@ export default async function LeaderboardPage() {
         {view.entries.length === 0 ? (
           <Card>
             <CardContent className="py-10 text-center">
-              <h2 className="text-xl font-black text-slate-950">
+              <h2 className="text-foreground text-xl font-black">
                 No entries yet
               </h2>
-              <p className="mt-2 text-sm text-slate-600">
+              <p className="text-muted mt-2 text-sm">
                 Be the first to submit a full 1–20.
               </p>
               <Link
-                className="bg-accent text-brand hover:bg-accent-yellow mt-5 inline-flex min-h-11 items-center rounded-xl px-4 text-sm font-black"
+                className="bg-accent text-accent-ink hover:bg-accent-yellow mt-5 inline-flex min-h-11 items-center rounded-xl px-4 text-sm font-black"
                 href="/"
               >
                 Make your prediction

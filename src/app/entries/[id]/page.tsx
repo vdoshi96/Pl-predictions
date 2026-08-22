@@ -8,7 +8,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { TeamMark } from "@/components/team-mark";
 import { getEntryComparison } from "@/features/entries/queries";
 import { SpotlightPickGrid } from "@/features/leaderboard/spotlight-pick-grid";
-import { formatUtcDateTime, ordinal } from "@/shared/format";
+import { formatChicagoUtcDateTime, ordinal } from "@/shared/format";
 
 export const dynamic = "force-dynamic";
 
@@ -23,12 +23,15 @@ export async function generateMetadata({
 
 const tierPresentation = {
   exact: { label: "Exact", className: "bg-mint text-mint-ink" },
-  "within-three": { label: "Within 3", className: "bg-sky-soft text-brand" },
+  "within-three": {
+    label: "Within 3",
+    className: "bg-sky-soft text-brand-ink",
+  },
   "correct-half": {
     label: "Correct half",
     className: "bg-rose-soft text-rose-ink",
   },
-  miss: { label: "No points", className: "bg-slate-100 text-slate-700" },
+  miss: { label: "No points", className: "bg-surface-subtle text-muted" },
 } as const;
 
 export default async function EntryPage({
@@ -45,7 +48,7 @@ export default async function EntryPage({
       <div className="mx-auto grid max-w-4xl gap-5 sm:gap-7">
         <section className="brand-hero rounded-3xl p-5 text-white sm:p-8">
           <div className="flex flex-wrap items-center gap-2">
-            <Badge className="bg-accent text-brand ring-accent">
+            <Badge className="bg-accent text-accent-ink ring-accent">
               2026/27 prediction
             </Badge>
             {entry.predictionsRevealed ? (
@@ -63,11 +66,11 @@ export default async function EntryPage({
             {entry.participantName}&apos;s prediction
           </h1>
           <p className="mt-3 text-sm leading-6 text-white/75">
-            Submitted {formatUtcDateTime(entry.createdAt)}
+            Submitted {formatChicagoUtcDateTime(entry.createdAt)}
           </p>
           {entry.totalScore !== null ? (
             <div className="mt-6 flex items-center gap-3">
-              <span className="bg-accent text-brand grid size-12 place-items-center rounded-2xl">
+              <span className="bg-accent text-accent-ink grid size-12 place-items-center rounded-2xl">
                 <Medal aria-hidden="true" className="size-6" />
               </span>
               <div>
@@ -87,13 +90,13 @@ export default async function EntryPage({
             <CardContent className="flex items-start gap-3">
               <LockKeyhole
                 aria-hidden="true"
-                className="mt-0.5 size-5 shrink-0 text-amber-700"
+                className="text-warning mt-0.5 size-5 shrink-0"
               />
               <div>
-                <h2 className="font-black text-slate-950">
+                <h2 className="text-foreground font-black">
                   Only this browser can see the table
                 </h2>
-                <p className="mt-1 text-sm leading-6 text-slate-600">
+                <p className="text-muted mt-1 text-sm leading-6">
                   Your secure receipt authorizes this confirmation. Other people
                   cannot enumerate or open it before reveal.
                 </p>
@@ -106,16 +109,16 @@ export default async function EntryPage({
           <CardContent>
             <div className="flex flex-wrap items-start justify-between gap-2">
               <div>
-                <h2 className="text-brand-strong text-xl font-black">
+                <h2 className="text-brand-ink-strong text-xl font-black">
                   Spotlight picks
                 </h2>
-                <p className="mt-1 text-sm leading-6 text-slate-600">
+                <p className="text-muted mt-1 text-sm leading-6">
                   These seven picks are stored with the table. Their separate
                   just-for-fun accuracy appears as result lists become available
                   and never changes the 100-point table score.
                 </p>
                 {entry.snapshot && !entry.snapshot.isFinal ? (
-                  <p className="mt-2 text-xs leading-5 font-semibold text-amber-800">
+                  <p className="text-warning mt-2 text-xs leading-5 font-semibold">
                     Accuracy uses provisional published snapshots. Shared ties
                     can award the same high rank, including zero-stat rows early
                     in the season.
@@ -129,7 +132,7 @@ export default async function EntryPage({
                   {availableSpotlightCount} of 7 results available
                 </Badge>
                 <Link
-                  className="text-brand focus-visible:ring-accent-blue inline-flex min-h-10 items-center gap-2 rounded-xl border border-purple-200 px-3 text-xs font-black outline-none hover:bg-purple-50 focus-visible:ring-2"
+                  className="text-brand-ink focus-visible:ring-accent-blue border-accent-lilac/30 hover:bg-brand-soft inline-flex min-h-10 items-center gap-2 rounded-xl border px-3 text-xs font-black outline-none focus-visible:ring-2"
                   href="/spotlight"
                 >
                   <Sparkles aria-hidden="true" className="size-4" />
@@ -143,7 +146,7 @@ export default async function EntryPage({
                 picks={entry.spotlightPicks}
               />
             ) : (
-              <p className="mt-4 rounded-xl bg-slate-50 p-3 text-sm text-slate-500">
+              <p className="bg-surface-subtle text-muted mt-4 rounded-xl p-3 text-sm">
                 This legacy entry does not contain spotlight picks.
               </p>
             )}
@@ -151,17 +154,18 @@ export default async function EntryPage({
         </Card>
 
         {entry.snapshot ? (
-          <p className="flex min-w-0 items-center gap-2 text-xs font-semibold text-slate-500">
+          <p className="text-muted flex min-w-0 items-center gap-2 text-xs font-semibold">
             <Eye aria-hidden="true" className="size-4 shrink-0" />
             <span className="min-w-0 break-words">
-              Standings snapshot {formatUtcDateTime(entry.snapshot.capturedAt)}
+              Standings snapshot{" "}
+              {formatChicagoUtcDateTime(entry.snapshot.capturedAt)}
               {entry.snapshot.matchweek
                 ? ` · Matchweek ${entry.snapshot.matchweek}`
                 : ""}
             </span>
           </p>
         ) : (
-          <p className="text-sm font-semibold text-slate-600">
+          <p className="text-muted text-sm font-semibold">
             Actual positions and table scoring appear once a meaningful season
             table is active.
           </p>
@@ -189,22 +193,22 @@ export default async function EntryPage({
                       size="md"
                       src={item.assetPath}
                     />
-                    <span className="min-w-0 font-black [overflow-wrap:anywhere] text-slate-950 sm:truncate">
+                    <span className="text-foreground min-w-0 font-black [overflow-wrap:anywhere] sm:truncate">
                       {item.displayName}
                     </span>
                     <div className="col-start-1 text-center sm:col-start-auto">
-                      <span className="block text-[0.64rem] font-bold tracking-wide text-slate-500 uppercase">
+                      <span className="text-muted block text-[0.64rem] font-bold tracking-wide uppercase">
                         Actual
                       </span>
-                      <strong className="font-mono text-sm text-slate-900">
+                      <strong className="text-foreground font-mono text-sm">
                         {item.actualPosition ?? "—"}
                       </strong>
                     </div>
                     <div className="text-center">
-                      <span className="block text-[0.64rem] font-bold tracking-wide text-slate-500 uppercase">
+                      <span className="text-muted block text-[0.64rem] font-bold tracking-wide uppercase">
                         Difference
                       </span>
-                      <strong className="font-mono text-sm text-slate-900">
+                      <strong className="text-foreground font-mono text-sm">
                         {item.difference ?? "—"}
                       </strong>
                     </div>
@@ -216,7 +220,7 @@ export default async function EntryPage({
                           {item.points} · {tier.label}
                         </span>
                       ) : (
-                        <span className="text-sm font-bold text-slate-400">
+                        <span className="text-muted text-sm font-bold">
                           Not scored
                         </span>
                       )}

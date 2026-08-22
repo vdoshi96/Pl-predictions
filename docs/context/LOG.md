@@ -2,6 +2,7 @@
 
 ## 2026-08-21
 
+- Published the season-glance implementation through [PR #26](https://github.com/vdoshi96/Pl-predictions/pull/26), merged as `ee325557b268510bafa9c7b54aa3b46cba509da4`. Both Vercel checks passed. Local `main` and `origin/main` matched the merge exactly before this documentation-only closeout, the remote feature branch was deleted, and no production database or production deployment action ran.
 - Implemented the approved season-glance display. The unrevealed root still renders the existing three-stage form; the revealed root shows the current 20-club table, consensus averages, expectation deltas, and overachiever/underachiever callouts without exposing consensus-bearing data before reveal.
 - Replaced the leaderboard card stack with a top-three podium and dense real table. Shared ranks repeat, deterministic initials support non-Latin names, progress remains capped at 100, and movement compares canonical scores with the previous meaningful standings snapshot.
 - Split Spotlight into default category boards, the retained per-entry list, and a sticky-column matrix. Category leaders come only from active sealed factual snapshots or active standings scoring; pending and attested outside-range states remain distinct.

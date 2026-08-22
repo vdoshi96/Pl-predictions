@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="generated-by" content="scripts/generate-docs-html.mjs" />
+    <meta name="canonical-source" content="SKILL.md" />
+    <meta name="canonical-source-sha256" content="9c6f6fc275b025e200bc35abe543fec54f4a60bb8d5a39c6c23c0f5c0ba683f6" />
+    <title>Update results (FotMob → admin)</title>
+    <style>
+      :root { color-scheme: light dark; font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+      body { margin: 0; background: #f5f5f0; color: #18201c; }
+      main { box-sizing: border-box; width: min(100% - 2rem, 880px); margin: 2rem auto; padding: clamp(1.25rem, 4vw, 3rem); background: #fff; border: 1px solid #d9ddd8; border-radius: 1rem; box-shadow: 0 18px 60px rgb(22 31 26 / 8%); }
+      h1, h2, h3 { line-height: 1.15; color: #102d22; }
+      h1 { font-size: clamp(2rem, 5vw, 3.25rem); letter-spacing: -.04em; }
+      h2 { margin-top: 2.5rem; padding-top: 1rem; border-top: 1px solid #e2e6e2; }
+      p, li { line-height: 1.7; }
+      a { color: #087854; text-underline-offset: .2em; }
+      code { padding: .12rem .35rem; border-radius: .3rem; background: #edf1ed; font-size: .92em; }
+      pre { overflow-x: auto; padding: 1rem; border-radius: .65rem; background: #111a16; color: #edf8f2; }
+      pre code { padding: 0; background: transparent; }
+      table { display: block; overflow-x: auto; width: 100%; border-collapse: collapse; }
+      th, td { padding: .65rem .8rem; border: 1px solid #d9ddd8; text-align: left; vertical-align: top; }
+      th { background: #edf4ef; }
+      img { max-width: 100%; height: auto; border-radius: .75rem; }
+      blockquote { margin-left: 0; padding-left: 1rem; border-left: .25rem solid #1b9a6c; color: #49564f; }
+      .source { margin-top: 3rem; padding-top: 1rem; border-top: 1px solid #d9ddd8; color: #627069; font-size: .85rem; }
+      @media (prefers-color-scheme: dark) {
+        body { background: #0e1512; color: #e5ebe7; }
+        main { background: #16201b; border-color: #34423a; }
+        h1, h2, h3 { color: #f2fff8; }
+        h2, .source { border-color: #34423a; }
+        a { color: #58ddb0; }
+        code, th { background: #24322b; }
+        th, td { border-color: #3b4b42; }
+        blockquote { color: #b5c2bb; }
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <hr>
+<h2 id="name-update-results-description-pulls-current-fotmob-premier-league-table-and-spotlight-stats-then-publishes-them-through-the-owner-admin-desk-and-checks-table-plus-spotlight-scoring-use-only-when-the-user-explicitly-invokes-update-results-to-refresh-live-season-standings-and-spotlight-categories">name: update-results
+description: &gt;-
+  Pulls current FotMob Premier League table and spotlight stats, then publishes
+  them through the owner admin desk and checks table plus spotlight scoring.
+  Use only when the user explicitly invokes $update-results to refresh live-season
+  standings and spotlight categories.</h2>
+<h1 id="update-results-fotmob-admin">Update results (FotMob → admin)</h1>
+<p>Owner-run reviewed entry: fetch FotMob facts offline, paste them through <code>/admin/standings</code> and <code>/admin/results</code>, publish provisional snapshots, then verify scoring. Do not add FotMob to the deployed app.</p>
+<h2 id="hard-stop">Hard stop</h2>
+<p>Do not:</p>
+<ul>
+<li>add a runtime football client, scraper, cron, or FotMob call to the Next.js app</li>
+<li>print <code>ADMIN_SECRET</code>, <code>ADMIN_PASSWORD_HASH</code>, <code>DATABASE_URL</code>, or any credential</li>
+<li>use <code>playwright.config.ts</code> / <code>npm run test:e2e</code> (those fail closed against the live DB)</li>
+<li>LOCK, REVEAL, or finalize snapshots unless the user asked</li>
+<li>seed unplayed players into <code>player_ratings</code> at rating <code>0</code></li>
+<li>invent goals, assists, clean sheets, or ratings</li>
+<li>commit, push, migrate, seed, or deploy as part of this skill</li>
+</ul>
+<p>Invoking <code>$update-results</code> authorizes live-season admin writes. Confirm the connected DB is the intended season database (prediction count, season slug) before mutating.</p>
+<h2 id="checklist">Checklist</h2>
+<pre><code>- [ ] Fetch FotMob table + goals, assists, team clean sheets, player ratings
+- [ ] Read N (active brackets) and distinct seeded subjects per dataset
+- [ ] Start local Next against .env.local; sign in without logging the password
+- [ ] Paste and save the 20-club table
+- [ ] Seed + fill each spotlight dataset through rank N; publish provisionally
+- [ ] Confirm each dataset has active_snapshot_id; verify /leaderboard and /spotlight
+</code></pre>
+<h2 id="1-fetch-fotmob">1. Fetch FotMob</h2>
+<p>League id <code>47</code>. Do not hardcode the season stats id.</p>
+<pre><code>https://www.fotmob.com/api/data/leagues?id=47
+</code></pre>
+<p>Use <code>details.selectedSeason</code>, <code>table[0].data.table.all</code> (position, shortName, played, pts), and <code>stats.seasonStatLinks</code> for the matching season. Then fetch:</p>
+<ul>
+<li><code>https://data.fotmob.com/{RelativePath-dir}/goals.json</code></li>
+<li><code>.../goal_assist.json</code></li>
+<li><code>.../clean_sheet_team.json</code></li>
+<li><code>.../rating.json</code></li>
+</ul>
+<p>Relative paths look like <code>stats/47/season/&lt;id&gt;/topstats.json</code>; swap the filename.</p>
+<p>Paste standings with <strong>canonical display names</strong> from <code>src/data/teams.ts</code> (not FotMob shorts). <code>Nottm Forest</code> does not match <code>Nott&#39;m Forest</code>.</p>
+<pre><code>Pos Club P Pts
+1 Arsenal 1 3
+…
+20 Coventry City 1 0
+</code></pre>
+<h2 id="2-coverage-rules">2. Coverage rules</h2>
+<p><code>N</code> = <code>count(*)</code> from <code>predictions</code> for the active season. Every published list must use <code>coveredThroughRank = N</code>.</p>
+<table>
+<thead>
+<tr>
+<th>Dataset</th>
+<th>How to fill</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>goals</code> / <code>assists</code></td>
+<td>Seed from submissions. Set FotMob leaders to their real totals. Keep seeded names at factual <code>0</code> if they have none. If distinct subjects <code>&lt; N</code>, add other current FotMob top players (same match/stat list) until there are <strong>exactly N rows</strong>. Extra <code>0</code> rows that straddle rank N trip the boundary-tie warning.</td>
+</tr>
+<tr>
+<td><code>clean_sheets</code></td>
+<td>Paste all 20 clubs. Only clubs with a FotMob clean sheet get <code>1+</code>; the rest are <code>0</code>.</td>
+</tr>
+<tr>
+<td><code>player_ratings</code></td>
+<td>Paste every FotMob-rated player (high and low). Need at least <code>min(2N, season player count)</code> rows. Do <strong>not</strong> seed unplayed catalogue picks at <code>0</code> — that falsely ranks them as most overrated. Unplayed picks resolve as outside-range zero after publish.</td>
+</tr>
+</tbody></table>
+<p>No Other-player aliases to match unless custom names exist.</p>
+<p>Source = <code>FotMob</code>. Source reference = <code>https://www.fotmob.com/leagues/47/stats/premier-league</code>. Leave snapshots provisional.</p>
+<h2 id="3-drive-the-admin-desk">3. Drive the admin desk</h2>
+<ol>
+<li><code>npm run dev -- --port 3000</code> with <code>.env.local</code>.</li>
+<li>Standalone Playwright (<code>chromium.launch</code>), <strong>not</strong> the repo Playwright config. Login: <code>PLAYWRIGHT_ADMIN_PASSWORD</code> or <code>ADMIN_SECRET</code>, username <code>admin</code> unless <code>ADMIN_USERNAME</code> is set. Never log the secret.</li>
+<li><code>/admin/standings</code>: paste table → Parse → Save. Duplicate-active is OK.</li>
+<li><code>/admin/results</code>: wait for <strong>Publish gate ready</strong> (kickoff already reveals and closes; do not LOCK).</li>
+<li>Per dataset card (<code>div.rounded-2xl.border.bg-surface</code> filtered by the heading <strong>Top scorer</strong> / <strong>Top assister</strong> / <strong>Most clean sheets</strong> / <strong>Player ratings</strong>): set source, seed if applicable, paste, Parse, fix unmatched lines, Apply, Review &amp; publish, attest, Publish provisional.</li>
+<li>After each publish, wait for <strong>that card&#39;s</strong> success text, or query <code>spotlight_result_states.active_snapshot_id</code>. Do not <code>getByText(&quot;Provisional result published.&quot;)</code> globally — leftover messages from earlier datasets are false positives. If save succeeded but active is still null, open Review &amp; publish again.</li>
+</ol>
+<h2 id="4-verify-scoring">4. Verify scoring</h2>
+<p>Table: <code>/leaderboard</code> shows scored totals (not “scoring has not started”), 14 or fewer shared competition ranks, and 5/3/1 club breakdowns. All-zero-played tables stay inactive; one club with <code>played &gt; 0</code> is enough.</p>
+<p>Spotlight: <code>/spotlight</code> and <code>?sort=</code> for all seven categories. Accuracy is <code>max(0, N + 1 − outcome rank)</code>. Tied rank 1 earns N. Omitted subjects after a complete publish are outside-range zero and still count as available. Overall should read <code>7 of 7 results available</code>.</p>
+<p>Spot-check at least one pick against FotMob (for example a rank-1 rating pick earns N; a 0-goal seeded scorer inside the N-row list occupies the first 0-goal rank).</p>
+<p>Also confirm the public alias <code>https://pl-predictions-2026.vercel.app/leaderboard</code> if <code>.env.local</code> points at the live season DB.</p>
+<h2 id="5-final-reply">5. Final reply</h2>
+<p>Return only:</p>
+<ol>
+<li>FotMob matchweek context (which matches are in the table)</li>
+<li>N and what was filled beyond seeded subjects</li>
+<li>Table top few scores</li>
+<li>Spotlight overall leader and one check per category</li>
+<li>Confirmation: provisional only; no finalize; no app/runtime FotMob client</li>
+</ol>
+<p>Then stop.</p>
+<h2 id="example">Example</h2>
+<p>User: <code>$update-results</code></p>
+<p>Agent: reads FotMob GW1 (Arsenal 3–0 Coventry), pastes the 20-club table, publishes four FotMob datasets through rank 14, filling goals/assists with extra top players from that match, pastes all 29 rated players, verifies <code>/leaderboard</code> and <code>/spotlight</code>, stops.</p>
+
+      <p class="source">Generated deterministically from <a href="SKILL.md">.agents/skills/update-results/SKILL.md</a>. Canonical SHA-256: <code>9c6f6fc275b025e200bc35abe543fec54f4a60bb8d5a39c6c23c0f5c0ba683f6</code>.</p>
+    </main>
+  </body>
+</html>

@@ -8,6 +8,7 @@ import {
   TEAM_PREDICTION_CATEGORIES,
 } from "./categories";
 import {
+  hasDisallowedControlCharacter,
   normalizeDisplayText,
   normalizeParticipantName,
   normalizedDisplayTextKey,
@@ -21,6 +22,9 @@ const POSITION_VALUES = Array.from(
 
 export const participantNameSchema = z
   .string()
+  .refine((value) => !hasDisallowedControlCharacter(value), {
+    message: "Display names cannot contain control characters.",
+  })
   .transform(normalizeParticipantName)
   .pipe(
     z
@@ -42,6 +46,9 @@ export const normalizedParticipantNameKeySchema =
 
 export const customPlayerNameSchema = z
   .string()
+  .refine((value) => !hasDisallowedControlCharacter(value), {
+    message: "Player names cannot contain control characters.",
+  })
   .transform(normalizeDisplayText)
   .pipe(
     z

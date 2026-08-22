@@ -14,12 +14,14 @@ import {
 import { getDb } from "@/db/client";
 import {
   adminAuditLogs,
+  adminSessions,
   players,
   predictionCategoryPicks,
   predictionItems,
   predictions,
   seasons,
   standingsImportRuns,
+  standingsItems,
   standingsSnapshots,
   teams,
 } from "@/db/schema";
@@ -37,6 +39,15 @@ import {
   getActiveSeasonPlayers,
 } from "@/features/seasons/queries";
 import { PublicError } from "@/shared/errors";
+import {
+  clearSecurityRateLimit,
+  reserveSecurityAttempt,
+} from "@/features/security/rate-limit";
+import {
+  isAdminSessionActive,
+  registerAdminSession,
+  revokeAdminSession,
+} from "@/features/admin/session-store";
 import { STANDINGS_FUTURE_TIMESTAMP_ERROR_CODE } from "@/features/standings/validation";
 import { importCanonicalStandings } from "../../scripts/import-standings";
 import { seedDatabase } from "../../scripts/seed";
@@ -233,6 +244,48 @@ afterEach(async () => {
 });
 
 describe.runIf(enabled)("Neon integration", () => {
+  it("persists rate limits and supports server-side session revocation", async () => {
+    const requestHeaders = new Headers({
+      "x-vercel-forwarded-for": `203.0.113.${Math.floor(Math.random() * 200) + 1}`,
+    });
+    let keyHash = "";
+    try {
+      for (let attemptNumber = 1; attemptNumber <= 5; attemptNumber += 1) {
+        const attempt = await reserveSecurityAttempt({
+          blockSeconds: 900,
+          limit: 5,
+          requestHeaders,
+          scope: "admin_login",
+          windowSeconds: 900,
+        });
+        keyHash = attempt.keyHash;
+        expect(attempt.allowed).toBe(true);
+      }
+      await expect(
+        reserveSecurityAttempt({
+          blockSeconds: 900,
+          limit: 5,
+          requestHeaders,
+          scope: "admin_login",
+          windowSeconds: 900,
+        }),
+      ).resolves.toMatchObject({ allowed: false });
+    } finally {
+      if (keyHash) await clearSecurityRateLimit("admin_login", keyHash);
+    }
+
+    const sessionId = randomUUID().replaceAll("-", "").repeat(2);
+    await registerAdminSession(sessionId, new Date(Date.now() + 60_000));
+    expect(await isAdminSessionActive(sessionId)).toBe(true);
+    await revokeAdminSession(sessionId);
+    expect(await isAdminSessionActive(sessionId)).toBe(false);
+    const [remaining] = await getDb()
+      .select({ value: count() })
+      .from(adminSessions)
+      .where(eq(adminSessions.id, sessionId));
+    expect(remaining?.value).toBe(0);
+  });
+
   it("guards season consensus before reveal and derives movement from the previous snapshot", async () => {
     const { activeTeams, db, season } = await activeFixture();
     const suffix = randomUUID().slice(0, 8);
@@ -1176,7 +1229,10 @@ describe.runIf(enabled)("Neon integration", () => {
       throw new Error("A successful import must identify its snapshot.");
     }
     const [importedSnapshot] = await db
-      .select({ isFinal: standingsSnapshots.isFinal })
+      .select({
+        isFinal: standingsSnapshots.isFinal,
+        source: standingsSnapshots.source,
+      })
       .from(standingsSnapshots)
       .where(eq(standingsSnapshots.id, imported.snapshotId));
     const [afterValid] = await db
@@ -1188,6 +1244,47 @@ describe.runIf(enabled)("Neon integration", () => {
       .where(eq(seasons.id, season.id));
     expect(importedSnapshot?.isFinal).toBe(false);
     expect(afterValid?.finalSnapshotId).toBe(season.finalSnapshotId);
+
+    await expect(
+      db
+        .update(standingsSnapshots)
+        .set({ source: `${source}-tampered` })
+        .where(eq(standingsSnapshots.id, imported.snapshotId)),
+    ).rejects.toThrow();
+    const [snapshotAfterRejectedUpdate] = await db
+      .select({ source: standingsSnapshots.source })
+      .from(standingsSnapshots)
+      .where(eq(standingsSnapshots.id, imported.snapshotId));
+    expect(snapshotAfterRejectedUpdate?.source).toBe(importedSnapshot?.source);
+    const [importedItem] = await db
+      .select({
+        snapshotId: standingsItems.snapshotId,
+        teamId: standingsItems.teamId,
+      })
+      .from(standingsItems)
+      .where(eq(standingsItems.snapshotId, imported.snapshotId))
+      .limit(1);
+    expect(importedItem).toBeTruthy();
+    await expect(
+      db
+        .delete(standingsItems)
+        .where(
+          and(
+            eq(standingsItems.snapshotId, imported.snapshotId),
+            eq(standingsItems.teamId, importedItem!.teamId),
+          ),
+        ),
+    ).rejects.toThrow();
+    const [itemAfterRejectedDelete] = await db
+      .select({ teamId: standingsItems.teamId })
+      .from(standingsItems)
+      .where(
+        and(
+          eq(standingsItems.snapshotId, imported.snapshotId),
+          eq(standingsItems.teamId, importedItem!.teamId),
+        ),
+      );
+    expect(itemAfterRejectedDelete?.teamId).toBe(importedItem?.teamId);
 
     await expect(
       importCanonicalStandings({

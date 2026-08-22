@@ -3,12 +3,15 @@ import "server-only";
 import { createHash, randomBytes, timingSafeEqual } from "node:crypto";
 import { cookies } from "next/headers";
 
+import { isLocalHttpE2EEnvironment } from "@/shared/runtime-environment";
+
 const RECEIPT_COOKIE = "pl_prediction_receipt";
 const RECEIPT_MAX_AGE_SECONDS = 60 * 60 * 24 * 400;
 
 function shouldUseSecureCookies() {
   return (
-    process.env.NODE_ENV === "production" && process.env.LOCAL_HTTP_E2E !== "1"
+    process.env.NODE_ENV === "production" &&
+    !isLocalHttpE2EEnvironment(process.env)
   );
 }
 

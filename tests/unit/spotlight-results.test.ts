@@ -16,6 +16,7 @@ import {
   resolveSpotlightResult,
   spotlightResultContentHash,
 } from "@/features/results";
+import { PublicError } from "@/shared/errors";
 
 const seasonId = "00000000-0000-4000-8000-000000000001";
 const snapshotId = "00000000-0000-4000-8000-000000000002";
@@ -38,9 +39,17 @@ describe("spotlight result validation", () => {
       { metricValue: 14, outcomeRank: 3, subjectId: playerC },
     ]);
     expect(() => assertPublishableCoverage("goals", rows, 3)).not.toThrow();
-    expect(() => assertPublishableCoverage("goals", rows, 4)).toThrow(
-      "boundary tie through rank 4",
-    );
+    try {
+      assertPublishableCoverage("goals", rows, 4);
+      throw new Error("Expected incomplete coverage to fail.");
+    } catch (error) {
+      expect(error).toBeInstanceOf(PublicError);
+      expect(error).toMatchObject({ code: "BAD_REQUEST" });
+      expect(error).toHaveProperty(
+        "message",
+        "Include every row and boundary tie through rank 4.",
+      );
+    }
   });
 
   it("requires ratings coverage in both directions", () => {

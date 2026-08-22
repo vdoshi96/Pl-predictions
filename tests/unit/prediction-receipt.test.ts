@@ -69,4 +69,15 @@ describe("prediction receipt cookie", () => {
 
     expect(cookieStore.set.mock.calls[0]?.[2]).toMatchObject({ secure: false });
   });
+
+  it("keeps the cookie Secure when the local harness flag is copied to Vercel", async () => {
+    vi.stubEnv("NODE_ENV", "production");
+    vi.stubEnv("LOCAL_HTTP_E2E", "1");
+    vi.stubEnv("VERCEL", "1");
+    vi.stubEnv("VERCEL_ENV", "production");
+
+    await setReceiptCookie(PREDICTION_ID, TOKEN);
+
+    expect(cookieStore.set.mock.calls[0]?.[2]).toMatchObject({ secure: true });
+  });
 });

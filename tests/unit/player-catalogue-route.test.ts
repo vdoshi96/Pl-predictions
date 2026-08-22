@@ -26,12 +26,14 @@ beforeEach(() => {
 });
 
 describe("GET /api/player-catalogue", () => {
-  it("returns the active season's minimal dynamic catalogue without caching", async () => {
+  it("returns the active season's minimal catalogue with shared revalidation caching", async () => {
     const response = await GET();
 
     expect(dynamic).toBe("force-dynamic");
     expect(mocks.getActiveSeasonPlayers).toHaveBeenCalledWith("season-id");
-    expect(response.headers.get("cache-control")).toBe("private, no-store");
+    expect(response.headers.get("cache-control")).toBe(
+      "public, s-maxage=3600, stale-while-revalidate=86400",
+    );
     await expect(response.json()).resolves.toEqual({
       players: [
         {

@@ -1,8 +1,17 @@
 const COLLAPSIBLE_WHITESPACE = /\s+/gu;
+const FORMAT_CHARACTERS = /\p{Cf}+/gu;
+
+export function hasDisallowedControlCharacter(value: string): boolean {
+  return /[\p{Cc}\p{Cs}\p{Co}\p{Cn}]/u.test(value);
+}
 
 /** Normalizes a user-entered display value without removing meaningful text. */
 export function normalizeDisplayText(value: string): string {
-  return value.normalize("NFKC").trim().replace(COLLAPSIBLE_WHITESPACE, " ");
+  return value
+    .normalize("NFKC")
+    .replace(FORMAT_CHARACTERS, "")
+    .trim()
+    .replace(COLLAPSIBLE_WHITESPACE, " ");
 }
 
 export function normalizeParticipantName(value: string): string {

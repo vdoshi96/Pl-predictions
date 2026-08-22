@@ -11,6 +11,18 @@ import {
 import { cookies, headers } from "next/headers";
 import { promisify } from "node:util";
 
+import {
+  clearSecurityRateLimit,
+  reserveSecurityAttempt,
+} from "@/features/security/rate-limit";
+import { isLocalHttpE2EEnvironment } from "@/shared/runtime-environment";
+
+import {
+  isAdminSessionActive,
+  registerAdminSession,
+  revokeAdminSession,
+} from "./session-store";
+
 export const ADMIN_SESSION_COOKIE = "plp_admin_session";
 export const ADMIN_SESSION_TTL_SECONDS = 8 * 60 * 60;
 
@@ -30,6 +42,8 @@ const PASSWORD_HASH_ITERATIONS = 600_000;
 const PASSWORD_HASH_BYTES = 32;
 const PASSWORD_SALT_BYTES = 16;
 const pbkdf2Async = promisify(pbkdf2);
+const ADMIN_LOGIN_ATTEMPT_LIMIT = 5;
+const ADMIN_LOGIN_WINDOW_SECONDS = 15 * 60;
 
 export type AdminSecurityErrorCode =
   | "ADMIN_AUTHENTICATION_REQUIRED"
@@ -467,12 +481,29 @@ export function verifyAdminSessionToken(
   });
 }
 
+function verifiedAdminSessionRecord(
+  token: unknown,
+  now = Date.now(),
+): { id: string; session: AdminSession } | null {
+  const session = verifyAdminSessionToken(token, now);
+  if (!session || typeof token !== "string") return null;
+
+  const payloadSegment = token.split(".", 1)[0];
+  const payload = parsePayload(payloadSegment ?? "");
+  if (!payload) return null;
+
+  return {
+    id: createHash("sha256").update(payload.nonce, "ascii").digest("hex"),
+    session,
+  };
+}
+
 function adminCookieOptions(expires: Date) {
   return {
     httpOnly: true,
     secure:
       process.env.NODE_ENV === "production" &&
-      process.env.LOCAL_HTTP_E2E !== "1",
+      !isLocalHttpE2EEnvironment(process.env),
     sameSite: "strict" as const,
     path: "/",
     expires,
@@ -486,7 +517,19 @@ export async function loginAdmin(
   candidateUsername: unknown,
   candidatePassword: unknown,
 ): Promise<boolean> {
-  await requireSameOrigin();
+  const requestHeaders = await headers();
+  if (!isSameOriginAdminRequest(requestHeaders)) {
+    throw new AdminInvalidOriginError();
+  }
+
+  const attempt = await reserveSecurityAttempt({
+    blockSeconds: ADMIN_LOGIN_WINDOW_SECONDS,
+    limit: ADMIN_LOGIN_ATTEMPT_LIMIT,
+    requestHeaders,
+    scope: "admin_login",
+    windowSeconds: ADMIN_LOGIN_WINDOW_SECONDS,
+  });
+  if (!attempt.allowed) return false;
 
   if (
     !(await verifyAdminCredentialsAsync(candidateUsername, candidatePassword))
@@ -495,16 +538,22 @@ export async function loginAdmin(
   }
 
   const token = issueAdminSessionToken();
-  const session = verifyAdminSessionToken(token);
-  if (!session) {
+  const record = verifiedAdminSessionRecord(token);
+  if (!record) {
     throw new AdminSecurityConfigurationError();
   }
+
+  await registerAdminSession(
+    record.id,
+    new Date(record.session.expiresAt * 1_000),
+  );
+  await clearSecurityRateLimit("admin_login", attempt.keyHash);
 
   const cookieStore = await cookies();
   cookieStore.set(
     ADMIN_SESSION_COOKIE,
     token,
-    adminCookieOptions(new Date(session.expiresAt * 1_000)),
+    adminCookieOptions(new Date(record.session.expiresAt * 1_000)),
   );
 
   return true;
@@ -515,6 +564,10 @@ export async function logoutAdmin(): Promise<void> {
   await requireSameOrigin();
 
   const cookieStore = await cookies();
+  const record = verifiedAdminSessionRecord(
+    cookieStore.get(ADMIN_SESSION_COOKIE)?.value,
+  );
+  if (record) await revokeAdminSession(record.id);
   cookieStore.set(ADMIN_SESSION_COOKIE, "", {
     ...adminCookieOptions(new Date(0)),
     maxAge: 0,
@@ -523,7 +576,9 @@ export async function logoutAdmin(): Promise<void> {
 
 export async function getAdminSession(): Promise<AdminSession | null> {
   const token = (await cookies()).get(ADMIN_SESSION_COOKIE)?.value;
-  return verifyAdminSessionToken(token);
+  const record = verifiedAdminSessionRecord(token);
+  if (!record || !(await isAdminSessionActive(record.id))) return null;
+  return record.session;
 }
 
 export async function requireAdmin(): Promise<AdminSession> {

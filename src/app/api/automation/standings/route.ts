@@ -1,36 +1,39 @@
-import { createHash, timingSafeEqual } from "node:crypto";
 import { NextResponse } from "next/server";
 
-import { importCanonicalStandings } from "../../../../../scripts/import-standings";
+import {
+  clearSecurityRateLimit,
+  reserveSecurityAttempt,
+} from "@/features/security/rate-limit";
+import { isStandingsIngestAuthorized } from "@/features/standings/ingest-security";
+import { importCanonicalStandings } from "@/features/standings/importer";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
 const MAX_BODY_BYTES = 64 * 1024;
 
-function fixedDigest(value: string) {
-  return createHash("sha256").update(value, "utf8").digest();
-}
-
-function authorized(request: Request) {
-  const expected = process.env.STANDINGS_INGEST_SECRET;
-  const authorization = request.headers.get("authorization") ?? "";
-  const candidate = authorization.startsWith("Bearer ")
-    ? authorization.slice("Bearer ".length)
-    : "";
-
-  if (!expected || expected.length < 32 || candidate.length > 4096)
-    return false;
-  return timingSafeEqual(fixedDigest(expected), fixedDigest(candidate));
-}
-
 export async function POST(request: Request) {
-  if (!authorized(request)) {
+  const attempt = await reserveSecurityAttempt({
+    blockSeconds: 60,
+    limit: 60,
+    requestHeaders: request.headers,
+    scope: "standings_ingest",
+    windowSeconds: 60,
+  });
+  if (!attempt.allowed) {
+    return NextResponse.json(
+      { error: "Too many requests" },
+      { status: 429, headers: { "Cache-Control": "no-store" } },
+    );
+  }
+
+  if (!isStandingsIngestAuthorized(request)) {
     return NextResponse.json(
       { error: "Unauthorized" },
       { status: 401, headers: { "Cache-Control": "no-store" } },
     );
   }
+  await clearSecurityRateLimit("standings_ingest", attempt.keyHash);
 
   const declaredLength = Number(request.headers.get("content-length") ?? 0);
   if (declaredLength > MAX_BODY_BYTES) {

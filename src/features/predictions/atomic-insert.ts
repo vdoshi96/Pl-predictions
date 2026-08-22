@@ -175,6 +175,9 @@ export async function insertPredictionAtomically(
   const result = await db.execute<AtomicPredictionInsertResultRow>(
     buildAtomicPredictionInsertQuery(input),
   );
+  // Migration 0009 adds a deferred database trigger that rejects any parent
+  // without exactly 20 table rows and seven spotlight picks before commit.
+  // These checks also verify that the CTE reports its committed shape truthfully.
   const row = result.rows[0];
 
   if (!row) {

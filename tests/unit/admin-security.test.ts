@@ -4,9 +4,20 @@ const nextHeadersMocks = vi.hoisted(() => ({
   cookies: vi.fn(),
   headers: vi.fn(),
 }));
+const sessionStoreMocks = vi.hoisted(() => ({
+  isAdminSessionActive: vi.fn(),
+  registerAdminSession: vi.fn(),
+  revokeAdminSession: vi.fn(),
+}));
+const rateLimitMocks = vi.hoisted(() => ({
+  clearSecurityRateLimit: vi.fn(),
+  reserveSecurityAttempt: vi.fn(),
+}));
 
 vi.mock("../../src/features/admin/server-only", () => ({}));
 vi.mock("next/headers", () => nextHeadersMocks);
+vi.mock("../../src/features/admin/session-store", () => sessionStoreMocks);
+vi.mock("../../src/features/security/rate-limit", () => rateLimitMocks);
 
 import {
   ADMIN_SESSION_COOKIE,
@@ -68,6 +79,18 @@ beforeEach(() => {
   };
   nextHeadersMocks.cookies.mockReset().mockResolvedValue(cookieStore);
   nextHeadersMocks.headers.mockReset().mockResolvedValue(sameOriginHeaders());
+  sessionStoreMocks.isAdminSessionActive.mockReset().mockResolvedValue(true);
+  sessionStoreMocks.registerAdminSession
+    .mockReset()
+    .mockResolvedValue(undefined);
+  sessionStoreMocks.revokeAdminSession.mockReset().mockResolvedValue(undefined);
+  rateLimitMocks.clearSecurityRateLimit
+    .mockReset()
+    .mockResolvedValue(undefined);
+  rateLimitMocks.reserveSecurityAttempt.mockReset().mockResolvedValue({
+    allowed: true,
+    keyHash: "synthetic-rate-limit-key",
+  });
 });
 
 afterEach(() => {
@@ -260,6 +283,30 @@ describe("administrator cookie lifecycle", () => {
     expect(cookieStore.set.mock.calls[0]?.[2]).toMatchObject({ secure: false });
   });
 
+  it("keeps the cookie Secure when a Vercel environment copies the local harness flag", async () => {
+    vi.stubEnv("NODE_ENV", "production");
+    vi.stubEnv("LOCAL_HTTP_E2E", "1");
+    vi.stubEnv("VERCEL", "1");
+    vi.stubEnv("VERCEL_ENV", "production");
+
+    await loginAdmin(ADMIN_USERNAME, ADMIN_PASSWORD);
+
+    expect(cookieStore.set.mock.calls[0]?.[2]).toMatchObject({ secure: true });
+  });
+
+  it("stops before password verification when the login source is rate limited", async () => {
+    rateLimitMocks.reserveSecurityAttempt.mockResolvedValue({
+      allowed: false,
+      keyHash: "blocked-rate-limit-key",
+    });
+
+    await expect(loginAdmin(ADMIN_USERNAME, ADMIN_PASSWORD)).resolves.toBe(
+      false,
+    );
+    expect(sessionStoreMocks.registerAdminSession).not.toHaveBeenCalled();
+    expect(cookieStore.set).not.toHaveBeenCalled();
+  });
+
   it("does not create a cookie for an invalid credential", async () => {
     await expect(loginAdmin(ADMIN_USERNAME, "wrong-credential")).resolves.toBe(
       false,
@@ -280,7 +327,11 @@ describe("administrator cookie lifecycle", () => {
   });
 
   it("expires the cookie with matching security attributes on logout", async () => {
+    const token = issueAdminSessionToken();
+    cookieStore.get.mockReturnValue({ value: token });
     await logoutAdmin();
+
+    expect(sessionStoreMocks.revokeAdminSession).toHaveBeenCalledOnce();
 
     expect(cookieStore.set).toHaveBeenCalledWith(
       ADMIN_SESSION_COOKIE,
@@ -309,6 +360,18 @@ describe("administrator authorization", () => {
     });
     await expect(requireAdmin()).resolves.toMatchObject({ subject: "admin" });
     expect(nextHeadersMocks.cookies).toHaveBeenCalledTimes(2);
+    expect(sessionStoreMocks.isAdminSessionActive).toHaveBeenCalledTimes(2);
+  });
+
+  it("rejects a cryptographically valid session after server-side revocation", async () => {
+    const token = issueAdminSessionToken();
+    cookieStore.get.mockReturnValue({
+      name: ADMIN_SESSION_COOKIE,
+      value: token,
+    });
+    sessionStoreMocks.isAdminSessionActive.mockResolvedValue(false);
+
+    await expect(getAdminSession()).resolves.toBeNull();
   });
 
   it("treats a malformed cookie as unauthenticated", async () => {

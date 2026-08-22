@@ -3,6 +3,7 @@ import "server-only";
 import { sql, type SQL } from "drizzle-orm";
 
 import { assertIsolatedDatabaseEnvironment } from "../../../scripts/test-database-identity.mjs";
+import { isLocalHttpE2EEnvironment } from "@/shared/runtime-environment";
 
 type ClockEnvironment = {
   DATABASE_URL?: string;
@@ -12,6 +13,8 @@ type ClockEnvironment = {
   PL_PREDICTIONS_PRODUCTION_DATABASE_IDENTITY_SHA256?: string;
   PL_PREDICTIONS_TEST_NOW_ISO?: string;
   TEST_DATABASE_URL?: string;
+  VERCEL?: string;
+  VERCEL_ENV?: string;
 };
 
 function hasVerifiedIsolatedDatabase(environment: ClockEnvironment): boolean {
@@ -34,7 +37,7 @@ export function resolveIsolatedTestNow(
 ): Date | null {
   if (
     (environment.NODE_ENV === "production" &&
-      environment.LOCAL_HTTP_E2E !== "1") ||
+      !isLocalHttpE2EEnvironment(environment)) ||
     !environment.PL_PREDICTIONS_ISOLATED_TEST_DATABASE?.trim() ||
     !hasVerifiedIsolatedDatabase(environment)
   ) {

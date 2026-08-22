@@ -64,6 +64,10 @@ export const seasons = pgTable(
       "seasons_slug_check",
       sql`${table.slug} ~ '^[a-z0-9]+(?:-[a-z0-9]+)*$'`,
     ),
+    check(
+      "seasons_final_active_snapshot_check",
+      sql`${table.finalSnapshotId} is null or ${table.finalSnapshotId} = ${table.activeSnapshotId}`,
+    ),
   ],
 );
 
@@ -715,6 +719,65 @@ export const adminAuditLogs = pgTable(
   ],
 );
 
+export const adminSessions = pgTable(
+  "admin_sessions",
+  {
+    id: varchar("id", { length: 64 }).primaryKey(),
+    expiresAt: timestamp("expires_at", {
+      mode: "date",
+      withTimezone: true,
+    }).notNull(),
+    createdAt: timestamp("created_at", { mode: "date", withTimezone: true })
+      .defaultNow()
+      .notNull(),
+  },
+  (table) => [
+    index("admin_sessions_expires_at_idx").on(table.expiresAt),
+    check("admin_sessions_id_check", sql`char_length(${table.id}) = 64`),
+  ],
+);
+
+export const securityRateLimits = pgTable(
+  "security_rate_limits",
+  {
+    scope: varchar("scope", { length: 32 }).notNull(),
+    keyHash: varchar("key_hash", { length: 64 }).notNull(),
+    windowStartedAt: timestamp("window_started_at", {
+      mode: "date",
+      withTimezone: true,
+    })
+      .defaultNow()
+      .notNull(),
+    attemptCount: smallint("attempt_count").default(0).notNull(),
+    blockedUntil: timestamp("blocked_until", {
+      mode: "date",
+      withTimezone: true,
+    }),
+    updatedAt: timestamp("updated_at", { mode: "date", withTimezone: true })
+      .defaultNow()
+      .notNull(),
+  },
+  (table) => [
+    primaryKey({
+      name: "security_rate_limits_scope_key_pk",
+      columns: [table.scope, table.keyHash],
+    }),
+    index("security_rate_limits_updated_at_idx").on(table.updatedAt),
+    check(
+      "security_rate_limits_scope_check",
+      sql`${table.scope} in ('admin_login', 'standings_ingest')`,
+    ),
+    check(
+      "security_rate_limits_key_hash_check",
+      sql`char_length(${table.keyHash}) = 64`,
+    ),
+    check(
+      "security_rate_limits_attempt_count_check",
+      sql`${table.attemptCount} between 0 and 32767`,
+    ),
+  ],
+);
+
 export type Season = typeof seasons.$inferSelect;
 export type NewSeason = typeof seasons.$inferInsert;
 export type Team = typeof teams.$inferSelect;
@@ -752,3 +815,7 @@ export type StandingsImportRun = typeof standingsImportRuns.$inferSelect;
 export type NewStandingsImportRun = typeof standingsImportRuns.$inferInsert;
 export type AdminAuditLog = typeof adminAuditLogs.$inferSelect;
 export type NewAdminAuditLog = typeof adminAuditLogs.$inferInsert;
+export type AdminSessionRecord = typeof adminSessions.$inferSelect;
+export type NewAdminSessionRecord = typeof adminSessions.$inferInsert;
+export type SecurityRateLimit = typeof securityRateLimits.$inferSelect;
+export type NewSecurityRateLimit = typeof securityRateLimits.$inferInsert;

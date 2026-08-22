@@ -16,7 +16,7 @@ type AdminRoute = (typeof links)[number]["href"];
 
 export function AdminNav({ current }: { current: AdminRoute }) {
   return (
-    <div className="grid gap-3 rounded-2xl border border-slate-200 bg-white p-3 sm:grid-cols-[1fr_auto] sm:items-center">
+    <div className="border-border bg-surface grid gap-3 rounded-2xl border p-3 sm:grid-cols-[1fr_auto] sm:items-center">
       <nav aria-label="Admin navigation" className="min-w-0">
         <ul className="grid grid-cols-2 gap-1 sm:flex sm:flex-wrap">
           {links.map((link) => {
@@ -26,7 +26,7 @@ export function AdminNav({ current }: { current: AdminRoute }) {
               <li key={link.href}>
                 <Link
                   aria-current={active ? "page" : undefined}
-                  className={`inline-flex min-h-11 w-full items-center justify-center rounded-xl px-3 text-sm font-bold outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2 sm:w-auto ${active ? "bg-slate-900 text-white" : "text-slate-700 hover:bg-slate-100 hover:text-slate-950"}`}
+                  className={`focus-visible:ring-accent/30 focus-visible:ring-offset-background inline-flex min-h-11 w-full items-center justify-center rounded-xl px-3 text-sm font-bold outline-none focus-visible:ring-2 focus-visible:ring-offset-2 sm:w-auto ${active ? "bg-brand text-white" : "text-muted hover:bg-surface-subtle hover:text-foreground"}`}
                   href={link.href}
                 >
                   {link.label}

@@ -25,17 +25,17 @@ export default async function AdminLoginPage({
     <main className="page-shell flex w-full flex-1 items-center justify-center py-10 sm:py-16">
       <Card className="panel-shadow w-full max-w-md overflow-hidden">
         <CardContent className="p-6 sm:p-8">
-          <span className="grid size-12 place-items-center rounded-2xl bg-emerald-100 text-emerald-800">
+          <span className="bg-mint text-mint-ink grid size-12 place-items-center rounded-2xl">
             <ShieldCheck aria-hidden="true" className="size-6" />
           </span>
-          <p className="mt-5 text-xs font-black tracking-[0.16em] text-emerald-700 uppercase">
+          <p className="text-mint-ink mt-5 text-xs font-black tracking-[0.16em] uppercase">
             Owner access
           </p>
-          <h1 className="mt-2 text-3xl font-black tracking-tight text-slate-950">
+          <h1 className="text-foreground mt-2 text-3xl font-black tracking-tight">
             Admin sign in
           </h1>
           <p
-            className="mt-3 text-sm leading-6 text-slate-600"
+            className="text-muted mt-3 text-sm leading-6"
             id="admin-login-help"
           >
             Use the owner username and password. The password is verified
@@ -46,7 +46,7 @@ export default async function AdminLoginPage({
           <form action={loginAction} className="mt-7 grid gap-4">
             <div>
               <label
-                className="text-sm font-bold text-slate-800"
+                className="text-foreground text-sm font-bold"
                 htmlFor="username"
               >
                 Username
@@ -54,7 +54,7 @@ export default async function AdminLoginPage({
               <div className="relative mt-2">
                 <UserRound
                   aria-hidden="true"
-                  className="pointer-events-none absolute top-3.5 left-3.5 size-5 text-slate-400"
+                  className="text-muted pointer-events-none absolute top-3.5 left-3.5 size-5"
                 />
                 <input
                   aria-describedby={
@@ -65,7 +65,7 @@ export default async function AdminLoginPage({
                   aria-invalid={invalid}
                   autoCapitalize="none"
                   autoComplete="username"
-                  className="min-h-12 w-full rounded-xl border border-slate-300 bg-white pr-3.5 pl-11 text-base text-slate-950 outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100"
+                  className="border-border bg-surface text-foreground focus:border-accent focus:ring-accent/30 min-h-12 w-full rounded-xl border pr-3.5 pl-11 text-base outline-none focus:ring-2"
                   id="username"
                   maxLength={64}
                   name="username"
@@ -78,7 +78,7 @@ export default async function AdminLoginPage({
 
             <div>
               <label
-                className="text-sm font-bold text-slate-800"
+                className="text-foreground text-sm font-bold"
                 htmlFor="password"
               >
                 Password
@@ -86,7 +86,7 @@ export default async function AdminLoginPage({
               <div className="relative mt-2">
                 <KeyRound
                   aria-hidden="true"
-                  className="pointer-events-none absolute top-3.5 left-3.5 size-5 text-slate-400"
+                  className="text-muted pointer-events-none absolute top-3.5 left-3.5 size-5"
                 />
                 <input
                   aria-describedby={
@@ -97,7 +97,7 @@ export default async function AdminLoginPage({
                   aria-invalid={invalid}
                   autoCapitalize="none"
                   autoComplete="current-password"
-                  className="min-h-12 w-full rounded-xl border border-slate-300 bg-white pr-3.5 pl-11 text-base text-slate-950 outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100"
+                  className="border-border bg-surface text-foreground focus:border-accent focus:ring-accent/30 min-h-12 w-full rounded-xl border pr-3.5 pl-11 text-base outline-none focus:ring-2"
                   enterKeyHint="go"
                   id="password"
                   maxLength={4096}
@@ -111,7 +111,7 @@ export default async function AdminLoginPage({
 
             {invalid ? (
               <p
-                className="rounded-xl border border-red-200 bg-red-50 p-3 text-sm font-semibold text-red-800"
+                className="border-danger/35 bg-danger-soft text-danger rounded-xl border p-3 text-sm font-semibold"
                 id="admin-login-error"
                 role="alert"
               >

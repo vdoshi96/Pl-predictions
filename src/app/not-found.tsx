@@ -4,7 +4,7 @@ export default function NotFound() {
   return (
     <main className="page-shell flex flex-1 items-center justify-center py-20">
       <section className="panel-shadow border-border bg-surface max-w-lg rounded-3xl border p-8 text-center sm:p-12">
-        <p className="text-brand text-sm font-bold tracking-[0.18em] uppercase">
+        <p className="text-brand-ink text-sm font-bold tracking-[0.18em] uppercase">
           404
         </p>
         <h1 className="mt-3 text-3xl font-black tracking-tight">

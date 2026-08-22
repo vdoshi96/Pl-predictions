@@ -15,7 +15,7 @@ import {
 } from "@/db/schema";
 import { getAdminSession } from "@/features/admin";
 import { getActiveSeasonContext } from "@/features/seasons/queries";
-import { formatUtcDateTime } from "@/shared/format";
+import { formatChicagoUtcDateTime } from "@/shared/format";
 
 import { AdminNav } from "../admin-nav";
 import { deleteSubmission } from "./actions";
@@ -69,10 +69,10 @@ export default async function AdminSubmissionsPage({
       <div className="grid gap-5">
         <div>
           <Badge variant="accent">Immutable entries</Badge>
-          <h1 className="mt-3 text-3xl font-black tracking-tight text-slate-950 sm:text-4xl">
+          <h1 className="text-foreground mt-3 text-3xl font-black tracking-tight sm:text-4xl">
             Submissions
           </h1>
-          <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-600">
+          <p className="text-muted mt-2 max-w-2xl text-sm leading-6">
             Participants cannot edit an entry. Delete only a confirmed mistake
             so the same display name can submit again.
           </p>
@@ -82,7 +82,7 @@ export default async function AdminSubmissionsPage({
 
         {params.deleted === "1" ? (
           <p
-            className="rounded-xl border border-emerald-200 bg-emerald-50 p-3 text-sm font-bold text-emerald-900"
+            className="border-accent/30 bg-mint text-mint-ink rounded-xl border p-3 text-sm font-bold"
             role="status"
           >
             Entire submission deleted: table, spotlight picks, and receipt.
@@ -91,7 +91,7 @@ export default async function AdminSubmissionsPage({
 
         {params.error ? (
           <p
-            className="rounded-xl border border-red-200 bg-red-50 p-3 text-sm font-bold text-red-800"
+            className="border-danger/35 bg-danger-soft text-danger rounded-xl border p-3 text-sm font-bold"
             role="alert"
           >
             That submission could not be deleted. Refresh and try again.
@@ -101,14 +101,11 @@ export default async function AdminSubmissionsPage({
         {rows.length === 0 ? (
           <Card>
             <CardContent className="py-10 text-center">
-              <Users
-                aria-hidden="true"
-                className="mx-auto size-8 text-slate-400"
-              />
-              <h2 className="mt-3 text-xl font-black text-slate-950">
+              <Users aria-hidden="true" className="text-muted mx-auto size-8" />
+              <h2 className="text-foreground mt-3 text-xl font-black">
                 No submissions yet
               </h2>
-              <p className="mt-2 text-sm text-slate-600">
+              <p className="text-muted mt-2 text-sm">
                 New entries will appear here.
               </p>
             </CardContent>
@@ -121,15 +118,16 @@ export default async function AdminSubmissionsPage({
                   <CardContent className="flex flex-col gap-3 py-3 sm:flex-row sm:items-center">
                     <div className="min-w-0 grow">
                       <Link
-                        className="inline-flex min-h-11 max-w-full items-center truncate rounded-lg font-black text-slate-950 underline-offset-4 outline-none hover:underline focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2"
+                        className="text-foreground focus-visible:ring-accent/30 focus-visible:ring-offset-background inline-flex min-h-11 max-w-full items-center truncate rounded-lg font-black underline-offset-4 outline-none hover:underline focus-visible:ring-2 focus-visible:ring-offset-2"
                         href={`/entries/${entry.id}`}
                       >
                         {entry.participantName}
                       </Link>
-                      <p className="mt-1 text-xs text-slate-500">
-                        {formatUtcDateTime(entry.createdAt)} · {entry.itemCount}{" "}
-                        positions · {pickCountByPredictionId.get(entry.id) ?? 0}{" "}
-                        spotlight picks
+                      <p className="text-muted mt-1 text-xs">
+                        {formatChicagoUtcDateTime(entry.createdAt)} ·{" "}
+                        {entry.itemCount} positions ·{" "}
+                        {pickCountByPredictionId.get(entry.id) ?? 0} spotlight
+                        picks
                       </p>
                     </div>
                     <form action={deleteSubmission}>

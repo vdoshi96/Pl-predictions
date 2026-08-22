@@ -56,7 +56,7 @@ export default function RulesPage() {
       <div className="mx-auto grid max-w-4xl gap-5 sm:gap-7">
         <section className="brand-hero rounded-3xl p-5 text-white sm:p-8">
           <div className="flex flex-wrap gap-2">
-            <Badge className="bg-accent text-brand ring-accent">
+            <Badge className="bg-accent text-accent-ink ring-accent">
               2026/27 competition
             </Badge>
             <Badge variant="accent">Owner-reviewed results</Badge>
@@ -84,14 +84,14 @@ export default function RulesPage() {
         <Card>
           <CardContent>
             <div className="flex items-start gap-3">
-              <span className="bg-brand-soft text-brand grid size-11 shrink-0 place-items-center rounded-xl">
+              <span className="bg-brand-soft text-brand-ink grid size-11 shrink-0 place-items-center rounded-xl">
                 <Trophy aria-hidden="true" className="size-5" />
               </span>
               <div>
-                <h2 className="text-brand-strong text-xl font-black">
+                <h2 className="text-brand-ink-strong text-xl font-black">
                   League-table points
                 </h2>
-                <p className="mt-1 text-sm leading-6 text-slate-600">
+                <p className="text-muted mt-1 text-sm leading-6">
                   Each club earns only its highest matching tier. Your champion
                   is the club placed first in your table; it is highlighted on
                   the leaderboard and uses the same table scoring, with no
@@ -105,10 +105,10 @@ export default function RulesPage() {
                   className="bg-brand-soft ring-border rounded-xl p-3 text-center ring-1"
                   key={rule.label}
                 >
-                  <dt className="text-xs leading-4 font-semibold text-slate-600">
+                  <dt className="text-muted text-xs leading-4 font-semibold">
                     {rule.label}
                   </dt>
-                  <dd className="text-brand mt-1 text-2xl font-black">
+                  <dd className="text-brand-ink mt-1 text-2xl font-black">
                     {rule.points}
                   </dd>
                 </div>
@@ -124,10 +124,10 @@ export default function RulesPage() {
                 <Sparkles aria-hidden="true" className="size-5" />
               </span>
               <div>
-                <h2 className="text-brand-strong text-xl font-black">
+                <h2 className="text-brand-ink-strong text-xl font-black">
                   Spotlight accuracy
                 </h2>
-                <p className="mt-1 text-sm leading-6 text-slate-600">
+                <p className="text-muted mt-1 text-sm leading-6">
                   This score never joins the table leaderboard. With N active
                   brackets, an occupied result rank earns max(0, N + 1 − rank)
                   accuracy points. Rank 1 earns N, rank 2 earns N − 1, and ranks
@@ -142,10 +142,10 @@ export default function RulesPage() {
                   className="border-border bg-surface-lilac rounded-xl border p-3"
                   key={label}
                 >
-                  <h3 className="text-brand-strong text-sm font-black">
+                  <h3 className="text-brand-ink-strong text-sm font-black">
                     {label}
                   </h3>
-                  <p className="mt-1 text-xs leading-5 text-slate-600">
+                  <p className="text-muted mt-1 text-xs leading-5">
                     {description}
                   </p>
                 </div>
@@ -162,14 +162,14 @@ export default function RulesPage() {
 
         <Card>
           <CardContent className="grid gap-4 sm:grid-cols-[auto_1fr]">
-            <span className="bg-sky-soft text-brand grid size-11 place-items-center rounded-xl">
+            <span className="bg-sky-soft text-brand-ink grid size-11 place-items-center rounded-xl">
               <Calculator aria-hidden="true" className="size-5" />
             </span>
             <div>
-              <h2 className="text-brand-strong text-xl font-black">
+              <h2 className="text-brand-ink-strong text-xl font-black">
                 Team expectation example
               </h2>
-              <p className="mt-1 text-sm leading-6 text-slate-600">
+              <p className="text-muted mt-1 text-sm leading-6">
                 If Manchester United’s average predicted finish is 2.4 and its
                 actual position is 10th, its underdog index is 2.4 − 10 = −7.6,
                 while its overrated index is 10 − 2.4 = +7.6. Indexes keep full
@@ -182,11 +182,11 @@ export default function RulesPage() {
         <div className="grid gap-3 sm:grid-cols-2">
           <Card>
             <CardContent>
-              <Search aria-hidden="true" className="text-brand size-6" />
-              <h2 className="text-brand-strong mt-3 text-lg font-black">
+              <Search aria-hidden="true" className="text-brand-ink size-6" />
+              <h2 className="text-brand-ink-strong mt-3 text-lg font-black">
                 Player list and Other
               </h2>
-              <p className="mt-1 text-sm leading-6 text-slate-600">
+              <p className="text-muted mt-1 text-sm leading-6">
                 The 2026-08-20 snapshot covers 580 players across all 20 clubs.
                 It is the owner-selected, internally reconciled roster for this
                 game, not an independently verified official league list. Player
@@ -203,11 +203,11 @@ export default function RulesPage() {
 
           <Card>
             <CardContent>
-              <EyeOff aria-hidden="true" className="text-brand size-6" />
-              <h2 className="text-brand-strong mt-3 text-lg font-black">
+              <EyeOff aria-hidden="true" className="text-brand-ink size-6" />
+              <h2 className="text-brand-ink-strong mt-3 text-lg font-black">
                 Privacy and reveal
               </h2>
-              <p className="mt-1 text-sm leading-6 text-slate-600">
+              <p className="text-muted mt-1 text-sm leading-6">
                 Before reveal, the public leaderboard shows only the
                 participant, 0 points, and champion pick. The other 19 table
                 positions and all seven spotlight picks stay private. A receipt
@@ -217,15 +217,12 @@ export default function RulesPage() {
           </Card>
         </div>
 
-        <Card className="border-amber-200 bg-amber-50">
+        <Card className="border-warning/35 bg-warning-soft">
           <CardContent className="flex items-start gap-3">
-            <Medal
-              aria-hidden="true"
-              className="mt-0.5 size-5 text-amber-800"
-            />
+            <Medal aria-hidden="true" className="text-warning mt-0.5 size-5" />
             <div>
-              <h2 className="font-black text-amber-950">Current data status</h2>
-              <p className="mt-1 text-sm leading-6 text-amber-900">
+              <h2 className="text-warning font-black">Current data status</h2>
+              <p className="text-warning mt-1 text-sm leading-6">
                 The app stores and displays all seven picks. Underdog-team and
                 overrated-team accuracy can recalculate from the group tables
                 and active standings. The player roster and available portraits
@@ -237,7 +234,7 @@ export default function RulesPage() {
           </CardContent>
         </Card>
 
-        <p className="flex items-start gap-2 text-xs leading-5 text-slate-500">
+        <p className="text-muted flex items-start gap-2 text-xs leading-5">
           <ShieldCheck aria-hidden="true" className="mt-0.5 size-4 shrink-0" />
           Table scores are derived on read and remain capped at 100. Spotlight
           accuracy is separate; manually entered outcome lists supply results,

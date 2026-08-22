@@ -3,6 +3,7 @@
 import { useId, useState } from "react";
 
 import { SubmissionCountdown } from "@/components/submission-countdown";
+import { formatChicagoUtcDateTime } from "@/shared/format";
 
 const TIME_ZONES = [
   { label: "Eastern Time", value: "America/New_York" },
@@ -47,27 +48,27 @@ export function DeadlineTimeZones({
       </div>
 
       <div className="grid gap-3 sm:grid-cols-2">
-        <div className="rounded-xl border border-slate-200 bg-slate-50 p-3">
-          <span className="text-xs font-black tracking-wide text-slate-500 uppercase">
-            Central Time baseline
+        <div className="border-border bg-surface-subtle rounded-xl border p-3">
+          <span className="text-muted text-xs font-black tracking-wide uppercase">
+            Chicago and UTC baseline
           </span>
           <time
-            className="mt-1 block text-sm font-black text-slate-950"
+            className="text-foreground mt-1 block text-sm font-black"
             dateTime={deadlineIso}
           >
-            {formatDeadlineInTimeZone(deadlineIso, "America/Chicago")}
+            {formatChicagoUtcDateTime(deadlineIso)}
           </time>
         </div>
 
         <div>
           <label
-            className="text-sm font-black text-slate-950"
+            className="text-foreground text-sm font-black"
             htmlFor={selectId}
           >
             View kickoff in another time zone
           </label>
           <select
-            className="mt-1 min-h-12 w-full rounded-xl border border-slate-300 bg-white px-3 text-base text-slate-950 outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100"
+            className="border-border bg-surface text-foreground focus:border-accent focus:ring-accent/30 mt-1 min-h-12 w-full rounded-xl border px-3 text-base outline-none focus:ring-2"
             id={selectId}
             onChange={(event) => setSelectedZone(event.target.value)}
             value={selectedZone}
@@ -80,7 +81,7 @@ export function DeadlineTimeZones({
           </select>
           <time
             aria-live="polite"
-            className="mt-2 block text-sm font-bold text-slate-700"
+            className="text-muted mt-2 block text-sm font-bold"
             dateTime={deadlineIso}
           >
             {formatDeadlineInTimeZone(deadlineIso, selectedZone)}

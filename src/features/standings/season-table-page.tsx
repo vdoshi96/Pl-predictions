@@ -4,7 +4,7 @@ import Link from "next/link";
 import { TeamMark } from "@/components/team-mark";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
-import { formatUtcDateTime, ordinal } from "@/shared/format";
+import { formatChicagoUtcDateTime, ordinal } from "@/shared/format";
 
 import { getSeasonTableView, type SeasonTableView } from "./season-table";
 import { formatConsensusValue } from "./season-table-view";
@@ -23,7 +23,7 @@ function zoneFor(position: number): {
 
 function DeltaChip({ delta }: { delta: number | null }) {
   if (delta === null) {
-    return <span className="text-sm font-bold text-slate-400">—</span>;
+    return <span className="text-muted text-sm font-bold">—</span>;
   }
   const magnitude = Math.abs(delta);
   const neutral = magnitude < 0.5;
@@ -37,7 +37,7 @@ function DeltaChip({ delta }: { delta: number | null }) {
     <span
       className={`inline-flex min-h-7 items-center rounded-lg px-2 text-xs font-black whitespace-nowrap ${
         neutral
-          ? "bg-slate-100 text-slate-600"
+          ? "bg-surface-subtle text-muted"
           : positive
             ? "bg-mint text-mint-ink"
             : "bg-rose-soft text-rose-ink"
@@ -77,7 +77,7 @@ function Callout({
           >
             {positive ? "Overachiever" : "Underachiever"}
           </span>
-          <strong className="text-brand-strong mt-1 block text-sm leading-5 font-black [overflow-wrap:anywhere] sm:text-base">
+          <strong className="text-brand-ink-strong mt-1 block text-sm leading-5 font-black [overflow-wrap:anywhere] sm:text-base">
             {value.team.displayName} · {ordinal(value.actualPosition)}, league
             said {formatConsensusValue(value.avgPredicted)}
           </strong>
@@ -105,7 +105,7 @@ export async function SeasonTablePage({
       <div className="grid gap-5 sm:gap-7">
         <section className="brand-hero rounded-3xl p-5 text-white sm:p-8">
           <div className="flex flex-wrap items-center gap-2">
-            <Badge className="bg-accent text-brand ring-accent">
+            <Badge className="bg-accent text-accent-ink ring-accent">
               {view.seasonName}
             </Badge>
             {view.snapshot?.matchweek ? (
@@ -116,7 +116,7 @@ export async function SeasonTablePage({
             {view.snapshot ? (
               <>
                 <Badge className="bg-white/15 text-white ring-white/20">
-                  Updated {formatUtcDateTime(view.snapshot.capturedAt)}
+                  Updated {formatChicagoUtcDateTime(view.snapshot.capturedAt)}
                 </Badge>
                 <Badge className="bg-white/15 text-white ring-white/20">
                   {view.snapshot.isFinal ? "Final" : "Provisional"}
@@ -144,13 +144,13 @@ export async function SeasonTablePage({
           </div>
           <div className="mt-6 flex flex-wrap gap-3">
             <Link
-              className="bg-accent text-brand hover:bg-accent-yellow inline-flex min-h-11 items-center rounded-xl px-4 text-sm font-black transition-colors"
+              className="bg-accent text-accent-ink hover:bg-accent-yellow inline-flex min-h-11 items-center rounded-xl px-4 text-sm font-black transition-colors"
               href="/leaderboard"
             >
               Table leaderboard
             </Link>
             <Link
-              className="bg-accent-blue text-brand inline-flex min-h-11 items-center rounded-xl px-4 text-sm font-black transition-colors hover:bg-white"
+              className="bg-accent-blue text-accent-ink hover:bg-surface inline-flex min-h-11 items-center rounded-xl px-4 text-sm font-black transition-colors"
               href="/spotlight"
             >
               Spotlight
@@ -175,13 +175,13 @@ export async function SeasonTablePage({
             <CardContent className="flex items-start gap-3 py-8">
               <Clock3
                 aria-hidden="true"
-                className="text-brand mt-0.5 size-5 shrink-0"
+                className="text-brand-ink mt-0.5 size-5 shrink-0"
               />
               <div>
-                <h2 className="font-black text-slate-950">
+                <h2 className="text-foreground font-black">
                   Waiting for the first standings import
                 </h2>
-                <p className="mt-1 text-sm leading-6 text-slate-600">
+                <p className="text-muted mt-1 text-sm leading-6">
                   The season table will appear here after the owner accepts the
                   first complete standings snapshot.
                 </p>
@@ -191,17 +191,17 @@ export async function SeasonTablePage({
         ) : (
           <>
             {!view.consensusActive ? (
-              <Card className="border-sky-200 bg-sky-50">
+              <Card className="border-accent-blue/40 bg-sky-soft">
                 <CardContent className="flex items-start gap-3">
                   <Clock3
                     aria-hidden="true"
-                    className="mt-0.5 size-5 shrink-0 text-sky-800"
+                    className="text-brand-ink mt-0.5 size-5 shrink-0"
                   />
                   <div>
-                    <h2 className="font-black text-sky-950">
+                    <h2 className="text-brand-ink font-black">
                       Consensus comparison is waiting for a meaningful table
                     </h2>
-                    <p className="mt-1 text-sm leading-6 text-sky-900">
+                    <p className="text-brand-ink mt-1 text-sm leading-6">
                       Live positions remain visible. Consensus appears once the
                       scoring window is open and the active table contains
                       played matches.
@@ -231,7 +231,7 @@ export async function SeasonTablePage({
                   {showConsensus ? <col className="w-20" /> : null}
                 </colgroup>
                 <thead>
-                  <tr className="border-border border-b-2 text-left text-[0.62rem] font-black tracking-wider text-slate-500 uppercase">
+                  <tr className="border-border text-muted border-b-2 text-left text-[0.62rem] font-black tracking-wider uppercase">
                     <th scope="col">
                       <span className="sr-only">Zone</span>
                     </th>
@@ -278,7 +278,7 @@ export async function SeasonTablePage({
                           {row.actualPosition}
                         </td>
                         <td className="min-w-0 px-1 py-2">
-                          <span className="flex min-w-0 items-center gap-1.5 font-black text-slate-950">
+                          <span className="text-foreground flex min-w-0 items-center gap-1.5 font-black">
                             <TeamMark
                               decorative
                               initials={row.team.shortName}
@@ -295,7 +295,7 @@ export async function SeasonTablePage({
                           {row.leaguePoints ?? "—"}
                         </td>
                         {showConsensus ? (
-                          <td className="px-1 py-2 text-right text-xs font-bold text-slate-500 tabular-nums max-[479px]:hidden">
+                          <td className="text-muted px-1 py-2 text-right text-xs font-bold tabular-nums max-[479px]:hidden">
                             {row.avgPredicted === null
                               ? "—"
                               : formatConsensusValue(row.avgPredicted)}

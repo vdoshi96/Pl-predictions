@@ -19,7 +19,7 @@ import {
 } from "@/features/seasons/queries";
 import { ManualStandingsForm } from "@/features/standings/manual-standings-form";
 import { StandingsPastePanel } from "@/features/standings/standings-paste-panel";
-import { formatUtcDateTime } from "@/shared/format";
+import { formatChicagoUtcDateTime } from "@/shared/format";
 
 import { AdminNav } from "../admin-nav";
 import {
@@ -96,10 +96,10 @@ export default async function AdminStandingsPage({
       <div className="grid gap-5">
         <div>
           <Badge variant="accent">Validated snapshot control</Badge>
-          <h1 className="mt-3 text-3xl font-black tracking-tight text-slate-950 sm:text-4xl">
+          <h1 className="text-foreground mt-3 text-3xl font-black tracking-tight sm:text-4xl">
             Current standings
           </h1>
-          <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-600">
+          <p className="text-muted mt-2 max-w-2xl text-sm leading-6">
             Reorder the 20 clubs manually or review owner-run imports. Every
             save is a complete atomic snapshot; malformed data cannot replace
             the last good table.
@@ -110,7 +110,7 @@ export default async function AdminStandingsPage({
 
         {params.error === "incomplete" ? (
           <p
-            className="rounded-xl border border-red-200 bg-red-50 p-3 text-sm font-bold text-red-800"
+            className="border-danger/35 bg-danger-soft text-danger rounded-xl border p-3 text-sm font-bold"
             role="alert"
           >
             Final status requires all 20 clubs to have 38 played games. No
@@ -120,7 +120,7 @@ export default async function AdminStandingsPage({
 
         {params.error === "changed" ? (
           <p
-            className="rounded-xl border border-amber-200 bg-amber-50 p-3 text-sm font-bold text-amber-900"
+            className="border-warning/35 bg-warning-soft text-warning rounded-xl border p-3 text-sm font-bold"
             role="alert"
           >
             The active standings changed while final status was being applied.
@@ -131,7 +131,7 @@ export default async function AdminStandingsPage({
 
         {params.error === "undo-changed" ? (
           <p
-            className="rounded-xl border border-amber-200 bg-amber-50 p-3 text-sm font-bold text-amber-900"
+            className="border-warning/35 bg-warning-soft text-warning rounded-xl border p-3 text-sm font-bold"
             role="alert"
           >
             Final status changed while the undo was being applied. Review the
@@ -143,7 +143,7 @@ export default async function AdminStandingsPage({
           <CardContent className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <div className="flex flex-wrap items-center gap-2">
-                <h2 className="font-black text-slate-950">Active snapshot</h2>
+                <h2 className="text-foreground font-black">Active snapshot</h2>
                 <Badge
                   variant={
                     activeSnapshot?.isFinal
@@ -160,9 +160,9 @@ export default async function AdminStandingsPage({
                     : "None"}
                 </Badge>
               </div>
-              <p className="mt-1 text-sm leading-6 break-words text-slate-600">
+              <p className="text-muted mt-1 text-sm leading-6 break-words">
                 {activeSnapshot
-                  ? `${formatUtcDateTime(season.standingsAcceptedThrough ?? activeSnapshot.capturedAt)} · ${activeSnapshot.source}${activeSnapshot.matchweek ? ` · Matchweek ${activeSnapshot.matchweek}` : ""}`
+                  ? `${formatChicagoUtcDateTime(season.standingsAcceptedThrough ?? activeSnapshot.capturedAt)} · ${activeSnapshot.source}${activeSnapshot.matchweek ? ` · Matchweek ${activeSnapshot.matchweek}` : ""}`
                   : "No table is active, so scoring has not started."}
               </p>
             </div>
@@ -190,7 +190,7 @@ export default async function AdminStandingsPage({
                 </ConfirmSubmitButton>
               </form>
             ) : activeSnapshot ? (
-              <p className="max-w-xs text-sm leading-5 font-semibold text-slate-600">
+              <p className="text-muted max-w-xs text-sm leading-5 font-semibold">
                 Finalization unlocks after all 20 clubs have 38 played games.
               </p>
             ) : null}
@@ -199,7 +199,7 @@ export default async function AdminStandingsPage({
 
         {completedCandidate && !activeSnapshot?.isFinal ? (
           <p
-            className="flex items-start gap-2 rounded-xl border border-emerald-200 bg-emerald-50 p-3 text-sm font-bold text-emerald-900"
+            className="border-accent/30 bg-mint text-mint-ink flex items-start gap-2 rounded-xl border p-3 text-sm font-bold"
             role="status"
           >
             <CheckCircle2
@@ -225,7 +225,7 @@ export default async function AdminStandingsPage({
         />
 
         {activeSnapshot?.isFinal ? (
-          <p className="flex items-start gap-2 rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm leading-6 font-semibold text-amber-950">
+          <p className="border-warning/35 bg-warning-soft text-warning flex items-start gap-2 rounded-xl border p-4 text-sm leading-6 font-semibold">
             <AlertTriangle
               aria-hidden="true"
               className="mt-0.5 size-5 shrink-0"
@@ -258,24 +258,24 @@ export default async function AdminStandingsPage({
         <Card>
           <CardContent>
             <div className="flex items-center gap-2">
-              <History aria-hidden="true" className="size-5 text-slate-500" />
-              <h2 className="font-black text-slate-950">
+              <History aria-hidden="true" className="text-muted size-5" />
+              <h2 className="text-foreground font-black">
                 Recent import history
               </h2>
             </div>
             {latestRuns.length === 0 ? (
-              <p className="mt-3 text-sm text-slate-600">
+              <p className="text-muted mt-3 text-sm">
                 No imports recorded yet.
               </p>
             ) : (
               <ul className="mt-4 grid gap-2">
                 {latestRuns.map((run) => (
                   <li
-                    className="rounded-xl border border-slate-200 p-3"
+                    className="border-border rounded-xl border p-3"
                     key={run.id}
                   >
                     <div className="flex flex-wrap items-center justify-between gap-2">
-                      <span className="font-bold break-all text-slate-900">
+                      <span className="text-foreground font-bold break-all">
                         {run.source}
                       </span>
                       <Badge
@@ -291,11 +291,12 @@ export default async function AdminStandingsPage({
                         {run.status}
                       </Badge>
                     </div>
-                    <p className="mt-1 text-xs text-slate-500">
-                      {formatUtcDateTime(run.createdAt)} · {run.itemCount} rows
+                    <p className="text-muted mt-1 text-xs">
+                      {formatChicagoUtcDateTime(run.createdAt)} ·{" "}
+                      {run.itemCount} rows
                     </p>
                     {run.errorCode ? (
-                      <p className="mt-2 text-xs leading-5 break-words text-red-700">
+                      <p className="text-danger mt-2 text-xs leading-5 break-words">
                         Import issue: {run.errorCode.replaceAll("_", " ")}
                       </p>
                     ) : null}

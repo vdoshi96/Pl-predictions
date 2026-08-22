@@ -20,9 +20,9 @@ export function AlphabeticalOrderDialog({
     <Dialog.Root open={open} onOpenChange={onOpenChange}>
       <Dialog.Portal>
         <Dialog.Overlay className="bg-brand-strong/75 fixed inset-0 z-50 backdrop-blur-[2px] data-[state=closed]:animate-none motion-reduce:animate-none" />
-        <Dialog.Content className="border-border fixed top-1/2 left-1/2 z-50 w-[min(28rem,calc(100vw-2rem))] -translate-x-1/2 -translate-y-1/2 rounded-2xl border bg-white p-5 shadow-2xl outline-none sm:p-6">
+        <Dialog.Content className="border-border bg-surface fixed top-1/2 left-1/2 z-50 w-[min(28rem,calc(100vw-2rem))] -translate-x-1/2 -translate-y-1/2 rounded-2xl border p-5 shadow-2xl outline-none sm:p-6">
           <div className="flex items-start justify-between gap-3">
-            <span className="grid size-11 shrink-0 place-items-center rounded-xl bg-amber-100 text-amber-900">
+            <span className="bg-warning-soft text-warning grid size-11 shrink-0 place-items-center rounded-xl">
               <AlertTriangle aria-hidden="true" className="size-5" />
             </span>
             <Dialog.Close asChild>
@@ -36,10 +36,10 @@ export function AlphabeticalOrderDialog({
               </Button>
             </Dialog.Close>
           </div>
-          <Dialog.Title className="text-brand-strong mt-4 text-xl font-black tracking-tight">
+          <Dialog.Title className="text-brand-ink-strong mt-4 text-xl font-black tracking-tight">
             This table is still alphabetical
           </Dialog.Title>
-          <Dialog.Description className="mt-2 text-sm leading-6 text-slate-600">
+          <Dialog.Description className="text-muted mt-2 text-sm leading-6">
             The A–Z order is only a blank slate, not last season’s table or a
             suggested prediction. Continue only if this exact order is really
             what you want.

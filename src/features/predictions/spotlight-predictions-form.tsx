@@ -257,11 +257,11 @@ export function SpotlightPredictionsForm({
             <h2
               id="spotlight-picks-heading"
               tabIndex={-1}
-              className="text-brand-strong mt-1 text-2xl font-black tracking-tight outline-none"
+              className="text-brand-ink-strong mt-1 text-2xl font-black tracking-tight outline-none"
             >
               Make your spotlight picks
             </h2>
-            <p className="mt-2 text-sm leading-6 text-slate-600">
+            <p className="text-muted mt-2 text-sm leading-6">
               {players.length > 0
                 ? `Type at least 2 letters to search ${players.length.toLocaleString("en-GB")} ${players.length === 1 ? "player" : "players"} by name. Up to 20 matches are shown, and Other player remains available for anyone new or unavailable.`
                 : "No player catalogue is loaded yet. Other player remains available in every player category."}

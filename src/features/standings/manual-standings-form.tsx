@@ -158,14 +158,14 @@ export function ManualStandingsForm({
         <CardContent className="grid gap-5">
           <div>
             <label
-              className="text-sm font-black text-slate-900"
+              className="text-foreground text-sm font-black"
               htmlFor="matchweek"
             >
               Matchweek{" "}
-              <span className="font-medium text-slate-500">(optional)</span>
+              <span className="text-muted font-medium">(optional)</span>
             </label>
             <input
-              className="mt-2 min-h-12 w-full rounded-xl border border-slate-300 px-3.5 text-base outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100 sm:max-w-40"
+              className="border-border focus:border-accent focus:ring-accent/30 mt-2 min-h-12 w-full rounded-xl border px-3.5 text-base outline-none focus:ring-2 sm:max-w-40"
               id="matchweek"
               inputMode="numeric"
               max={38}
@@ -176,28 +176,28 @@ export function ManualStandingsForm({
             />
           </div>
 
-          <details className="rounded-2xl border border-slate-200 bg-slate-50 p-3 sm:p-4">
-            <summary className="min-h-11 cursor-pointer py-2 font-black text-slate-900">
+          <details className="border-border bg-surface-subtle rounded-2xl border p-3 sm:p-4">
+            <summary className="text-foreground min-h-11 cursor-pointer py-2 font-black">
               Optional games played and league points
             </summary>
-            <p className="mt-1 text-xs leading-5 text-slate-600">
+            <p className="text-muted mt-1 text-xs leading-5">
               Leave values blank when unknown. Enter 0 played for every club to
               preserve the preseason no-scoring state.
             </p>
             <div className="mt-4 grid gap-2">
               {orderedTeams.map((team) => (
                 <div
-                  className="grid grid-cols-[1fr_5rem_5rem] items-end gap-2 rounded-xl bg-white p-2 ring-1 ring-slate-200"
+                  className="bg-surface ring-border grid grid-cols-[1fr_5rem_5rem] items-end gap-2 rounded-xl p-2 ring-1"
                   key={team.id}
                 >
-                  <span className="min-w-0 truncate pb-3 text-sm font-bold text-slate-900">
+                  <span className="text-foreground min-w-0 truncate pb-3 text-sm font-bold">
                     {team.shortName}
                   </span>
-                  <label className="text-[0.65rem] font-bold tracking-wide text-slate-500 uppercase">
+                  <label className="text-muted text-[0.65rem] font-bold tracking-wide uppercase">
                     Played
                     <input
                       aria-label={`${team.displayName} games played`}
-                      className="mt-1 min-h-11 w-full rounded-lg border border-slate-300 px-2 text-base text-slate-950"
+                      className="border-border text-foreground mt-1 min-h-11 w-full rounded-lg border px-2 text-base"
                       inputMode="numeric"
                       max={38}
                       min={0}
@@ -211,11 +211,11 @@ export function ManualStandingsForm({
                       value={played[team.id] ?? ""}
                     />
                   </label>
-                  <label className="text-[0.65rem] font-bold tracking-wide text-slate-500 uppercase">
+                  <label className="text-muted text-[0.65rem] font-bold tracking-wide uppercase">
                     Points
                     <input
                       aria-label={`${team.displayName} league points`}
-                      className="mt-1 min-h-11 w-full rounded-lg border border-slate-300 px-2 text-base text-slate-950"
+                      className="border-border text-foreground mt-1 min-h-11 w-full rounded-lg border px-2 text-base"
                       inputMode="numeric"
                       max={114}
                       min={-100}
@@ -234,7 +234,7 @@ export function ManualStandingsForm({
             </div>
           </details>
 
-          <p className="flex items-start gap-2 rounded-xl border border-amber-200 bg-amber-50 p-3 text-sm leading-5 text-amber-950">
+          <p className="border-warning/35 bg-warning-soft text-warning flex items-start gap-2 rounded-xl border p-3 text-sm leading-5">
             <AlertTriangle
               aria-hidden="true"
               className="mt-0.5 size-4 shrink-0"
@@ -245,7 +245,7 @@ export function ManualStandingsForm({
 
           {message ? (
             <p
-              className={`flex items-start gap-2 rounded-xl border p-3 text-sm font-bold ${message.ok ? "border-emerald-200 bg-emerald-50 text-emerald-900" : "border-red-200 bg-red-50 text-red-800"}`}
+              className={`flex items-start gap-2 rounded-xl border p-3 text-sm font-bold ${message.ok ? "border-accent/30 bg-mint text-mint-ink" : "border-danger/35 bg-danger-soft text-danger"}`}
               role={message.ok ? "status" : "alert"}
             >
               {message.ok ? (
@@ -257,7 +257,7 @@ export function ManualStandingsForm({
         </CardContent>
       </Card>
 
-      <div className="sticky bottom-0 z-20 -mx-2 border-t border-slate-200/80 bg-white/95 px-2 pt-3 pb-[max(1rem,env(safe-area-inset-bottom))] backdrop-blur sm:static sm:mx-0 sm:border-0 sm:bg-transparent sm:p-0">
+      <div className="border-border/80 bg-surface/95 sticky bottom-0 z-20 -mx-2 border-t px-2 pt-3 pb-[max(1rem,env(safe-area-inset-bottom))] backdrop-blur sm:static sm:mx-0 sm:border-0 sm:bg-transparent sm:p-0">
         <Button className="w-full" disabled={pending} size="lg" type="submit">
           <Save aria-hidden="true" className="size-5" />
           {pending ? "Saving table…" : "Save provisional standings"}

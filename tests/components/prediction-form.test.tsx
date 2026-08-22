@@ -809,7 +809,7 @@ describe("PredictionForm", () => {
     const topScorerCard = getSpotlightCategory("top_scorer");
     const otherPlayerInput =
       within(topScorerCard).getByLabelText("Player’s full name");
-    expect(otherPlayerInput).toHaveClass("border-red-400");
+    expect(otherPlayerInput).toHaveClass("border-danger/35");
     expect(otherPlayerInput).toHaveAttribute("aria-invalid", "true");
     expect(otherPlayerInput).toHaveAccessibleDescription(
       /enter a valid player name/i,
@@ -1269,7 +1269,7 @@ describe("PredictionForm", () => {
 
     expect(stickyAction).toHaveClass("sticky", "bottom-0");
     expect(stickyAction?.className).toContain("safe-area-inset-bottom");
-    expect(stickyAction).toHaveClass("bg-white");
+    expect(stickyAction).toHaveClass("bg-surface");
     expect(screen.getByText(/^not submitted\./i)).not.toHaveClass("truncate");
     expect(reviewButton).toHaveClass("w-full", "min-h-12");
   });

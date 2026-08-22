@@ -219,10 +219,13 @@ export function SearchablePredictionSelect({
         if (!containerRef.current?.contains(event.relatedTarget)) closePicker();
       }}
     >
-      <label htmlFor={inputId} className="text-brand-strong text-sm font-black">
+      <label
+        htmlFor={inputId}
+        className="text-brand-ink-strong text-sm font-black"
+      >
         {label}
       </label>
-      <p id={descriptionId} className="mt-1 text-xs leading-5 text-slate-500">
+      <p id={descriptionId} className="text-muted mt-1 text-xs leading-5">
         {description}
       </p>
       <p className="sr-only" aria-live="polite">
@@ -252,9 +255,9 @@ export function SearchablePredictionSelect({
           aria-invalid={invalid}
           autoComplete="off"
           className={cn(
-            "text-brand-strong focus:ring-sky-soft min-h-12 w-full rounded-xl border bg-white pr-11 pl-10 text-base outline-none placeholder:text-slate-400 focus:ring-2 disabled:cursor-not-allowed disabled:bg-slate-100",
+            "text-brand-ink-strong focus:ring-accent-blue/30 bg-surface placeholder:text-muted disabled:bg-surface-subtle min-h-12 w-full rounded-xl border pr-11 pl-10 text-base outline-none focus:ring-2 disabled:cursor-not-allowed",
             invalid
-              ? "border-red-400"
+              ? "border-danger/35"
               : "border-border focus:border-accent-lilac",
           )}
           disabled={disabled}
@@ -281,7 +284,7 @@ export function SearchablePredictionSelect({
         <button
           type="button"
           aria-label={`${expanded ? "Close" : "Open"} ${label} options`}
-          className="text-brand focus-visible:ring-accent-blue absolute top-1/2 right-1 grid size-10 -translate-y-1/2 place-items-center rounded-lg outline-none focus-visible:ring-2 disabled:opacity-50"
+          className="text-brand-ink focus-visible:ring-accent-blue absolute top-1/2 right-1 grid size-10 -translate-y-1/2 place-items-center rounded-lg outline-none focus-visible:ring-2 disabled:opacity-50"
           disabled={disabled}
           tabIndex={-1}
           onMouseDown={(event) => event.preventDefault()}
@@ -302,15 +305,15 @@ export function SearchablePredictionSelect({
           id={listboxId}
           role="listbox"
           aria-label={`${label} options`}
-          className="border-border fixed inset-x-2 bottom-[max(0.5rem,env(safe-area-inset-bottom))] z-40 max-h-[min(22rem,52dvh)] overflow-y-auto overscroll-contain rounded-2xl border bg-white p-1.5 shadow-2xl sm:absolute sm:inset-x-0 sm:top-[calc(100%+0.35rem)] sm:bottom-auto sm:z-30 sm:max-h-72 sm:rounded-xl"
+          className="border-border bg-surface fixed inset-x-2 bottom-[max(0.5rem,env(safe-area-inset-bottom))] z-40 max-h-[min(22rem,52dvh)] overflow-y-auto overscroll-contain rounded-2xl border p-1.5 shadow-2xl sm:absolute sm:inset-x-0 sm:top-[calc(100%+0.35rem)] sm:bottom-auto sm:z-30 sm:max-h-72 sm:rounded-xl"
         >
           {queryReady && matchingOptions.length > filteredOptions.length ? (
-            <p className="px-3 py-2 text-xs font-bold text-slate-500">
+            <p className="text-muted px-3 py-2 text-xs font-bold">
               {filteredOptions.length} of {matchingOptions.length} matches
             </p>
           ) : null}
           {filteredOptions.length === 0 ? (
-            <p className="px-3 py-3 text-sm leading-5 text-slate-500">
+            <p className="text-muted px-3 py-3 text-sm leading-5">
               {queryReady ? emptyMessage : queryPrompt}
             </p>
           ) : null}
@@ -323,10 +326,10 @@ export function SearchablePredictionSelect({
               aria-selected={value === option.id}
               tabIndex={-1}
               className={cn(
-                "flex min-h-12 w-full min-w-0 items-center gap-3 rounded-lg px-2.5 py-2 text-left text-sm font-bold text-slate-800 outline-none",
+                "text-foreground flex min-h-12 w-full min-w-0 items-center gap-3 rounded-lg px-2.5 py-2 text-left text-sm font-bold outline-none",
                 index === activeChoiceIndex
-                  ? "bg-brand-soft text-brand-strong"
-                  : "hover:bg-slate-50",
+                  ? "bg-brand-soft text-brand-ink-strong"
+                  : "hover:bg-surface-subtle",
               )}
               onMouseDown={(event) => {
                 event.preventDefault();
@@ -357,8 +360,8 @@ export function SearchablePredictionSelect({
               className={cn(
                 "border-border mt-1 flex min-h-12 w-full items-center gap-3 rounded-lg border-t px-2.5 py-2 text-left text-sm font-black outline-none",
                 activeChoiceIndex === filteredOptions.length
-                  ? "bg-brand-soft text-brand-strong"
-                  : "text-brand hover:bg-slate-50",
+                  ? "bg-brand-soft text-brand-ink-strong"
+                  : "text-brand-ink hover:bg-surface-subtle",
               )}
               onMouseDown={(event) => {
                 event.preventDefault();
@@ -380,13 +383,13 @@ export function SearchablePredictionSelect({
       ) : null}
 
       {invalid ? (
-        <p id={errorId} className="mt-2 text-xs font-semibold text-red-700">
+        <p id={errorId} className="text-danger mt-2 text-xs font-semibold">
           {invalidMessage}
         </p>
       ) : null}
 
       {selectedOption && !expanded ? (
-        <div className="mt-2 flex min-w-0 items-center gap-2 text-xs font-semibold text-slate-600">
+        <div className="text-muted mt-2 flex min-w-0 items-center gap-2 text-xs font-semibold">
           {renderLeading?.(selectedOption)}
           <span className="min-w-0 break-words">
             Selected: {selectedOption.displayName}
@@ -398,7 +401,7 @@ export function SearchablePredictionSelect({
         <div className="bg-surface-lilac ring-surface-lilac-border mt-3 rounded-xl p-3 ring-1">
           <label
             htmlFor={otherInputId}
-            className="text-brand-strong text-xs font-black"
+            className="text-brand-ink-strong text-xs font-black"
           >
             Player’s full name
           </label>
@@ -406,9 +409,9 @@ export function SearchablePredictionSelect({
             ref={otherInputRef}
             id={otherInputId}
             className={cn(
-              "text-brand-strong focus:ring-sky-soft mt-1.5 min-h-12 w-full rounded-xl border bg-white px-3.5 text-base outline-none placeholder:text-slate-400 focus:ring-2",
+              "text-brand-ink-strong focus:ring-accent-blue/30 bg-surface placeholder:text-muted mt-1.5 min-h-12 w-full rounded-xl border px-3.5 text-base outline-none focus:ring-2",
               invalid
-                ? "border-red-400"
+                ? "border-danger/35"
                 : "border-border focus:border-accent-lilac",
             )}
             disabled={disabled}

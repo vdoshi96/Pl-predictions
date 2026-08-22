@@ -14,7 +14,7 @@ import {
 } from "@/db/schema";
 import { getAdminSession } from "@/features/admin";
 import { getActiveSeasonContext } from "@/features/seasons/queries";
-import { formatUtcDateTime } from "@/shared/format";
+import { formatChicagoUtcDateTime } from "@/shared/format";
 import { getSeasonAccess } from "@/shared/policy";
 
 import { AdminNav } from "./admin-nav";
@@ -90,7 +90,7 @@ export default async function AdminPage() {
           : "Provisional"
         : "None",
       detail: activeSnapshot
-        ? formatUtcDateTime(
+        ? formatChicagoUtcDateTime(
             season.standingsAcceptedThrough ?? activeSnapshot.capturedAt,
           )
         : "Scoring has not started",
@@ -102,10 +102,10 @@ export default async function AdminPage() {
       <div className="grid gap-5">
         <div>
           <Badge variant="accent">Private owner area</Badge>
-          <h1 className="mt-3 text-3xl font-black tracking-tight text-slate-950 sm:text-4xl">
+          <h1 className="text-foreground mt-3 text-3xl font-black tracking-tight sm:text-4xl">
             Season control room
           </h1>
-          <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-600">
+          <p className="text-muted mt-2 max-w-2xl text-sm leading-6">
             Manage fairness, submissions, validated standings, and reviewed
             spotlight-result snapshots.
           </p>
@@ -122,15 +122,15 @@ export default async function AdminPage() {
               <CardContent>
                 <stat.icon
                   aria-hidden="true"
-                  className="size-5 text-emerald-700"
+                  className="text-mint-ink size-5"
                 />
-                <p className="mt-4 text-xs font-black tracking-[0.12em] text-slate-500 uppercase">
+                <p className="text-muted mt-4 text-xs font-black tracking-[0.12em] uppercase">
                   {stat.label}
                 </p>
-                <p className="mt-1 text-2xl font-black tracking-tight text-slate-950">
+                <p className="text-foreground mt-1 text-2xl font-black tracking-tight">
                   {stat.value}
                 </p>
-                <p className="mt-1 text-xs leading-5 text-slate-500">
+                <p className="text-muted mt-1 text-xs leading-5">
                   {stat.detail}
                 </p>
               </CardContent>
@@ -141,22 +141,22 @@ export default async function AdminPage() {
         <Card>
           <CardContent className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div className="flex items-start gap-3">
-              <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-slate-100 text-slate-700">
+              <span className="bg-surface-subtle text-muted grid size-10 shrink-0 place-items-center rounded-xl">
                 <RefreshCcw aria-hidden="true" className="size-5" />
               </span>
               <div>
-                <h2 className="font-black text-slate-950">
+                <h2 className="text-foreground font-black">
                   Latest standings import
                 </h2>
-                <p className="mt-1 text-sm leading-6 text-slate-600">
+                <p className="text-muted mt-1 text-sm leading-6">
                   {latestRun
-                    ? `${latestRun.status} · ${formatUtcDateTime(latestRun.createdAt)}`
+                    ? `${latestRun.status} · ${formatChicagoUtcDateTime(latestRun.createdAt)}`
                     : "No automation or manual import has been recorded yet."}
                 </p>
               </div>
             </div>
             <Link
-              className="inline-flex min-h-11 w-full items-center justify-center rounded-xl bg-slate-900 px-4 text-sm font-bold text-white outline-none hover:bg-slate-800 focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2 sm:w-auto"
+              className="bg-brand hover:bg-brand-hover focus-visible:ring-accent/30 focus-visible:ring-offset-background inline-flex min-h-11 w-full items-center justify-center rounded-xl px-4 text-sm font-bold text-white outline-none focus-visible:ring-2 focus-visible:ring-offset-2 sm:w-auto"
               href="/admin/standings"
             >
               Manage table

@@ -44,7 +44,7 @@ function ReviewTeamRow({
         src={team.assetPath}
         size="sm"
       />
-      <span className="text-brand-strong min-w-0 grow text-sm leading-4 font-bold break-words">
+      <span className="text-brand-ink-strong min-w-0 grow text-sm leading-4 font-bold break-words">
         {team.displayName}
       </span>
     </li>
@@ -78,7 +78,7 @@ export function ReviewDialog({
           onInteractOutside={(event) => {
             if (pending) event.preventDefault();
           }}
-          className="border-border text-foreground fixed inset-x-2 top-[max(0.5rem,env(safe-area-inset-top))] bottom-2 z-50 flex flex-col overflow-hidden rounded-2xl border bg-white shadow-2xl outline-none sm:inset-x-auto sm:top-1/2 sm:bottom-auto sm:left-1/2 sm:max-h-[min(900px,calc(100dvh-2rem))] sm:w-[min(48rem,calc(100vw-2rem))] sm:-translate-x-1/2 sm:-translate-y-1/2"
+          className="border-border text-foreground bg-surface fixed inset-x-2 top-[max(0.5rem,env(safe-area-inset-top))] bottom-2 z-50 flex flex-col overflow-hidden rounded-2xl border shadow-2xl outline-none sm:inset-x-auto sm:top-1/2 sm:bottom-auto sm:left-1/2 sm:max-h-[min(900px,calc(100dvh-2rem))] sm:w-[min(48rem,calc(100vw-2rem))] sm:-translate-x-1/2 sm:-translate-y-1/2"
         >
           <div className="border-border flex shrink-0 items-start justify-between gap-3 border-b px-4 py-4 sm:px-6">
             <div className="min-w-0">
@@ -87,15 +87,15 @@ export function ReviewDialog({
                 <Badge>{teams.length} clubs</Badge>
                 <Badge>{spotlightPicks.length} spotlight picks</Badge>
               </div>
-              <Dialog.Title className="text-brand-strong text-xl font-black tracking-tight sm:text-2xl">
+              <Dialog.Title className="text-brand-ink-strong text-xl font-black tracking-tight sm:text-2xl">
                 Review every prediction
               </Dialog.Title>
               <Dialog.Description
                 id="prediction-review-description"
-                className="mt-1 text-sm leading-5 [overflow-wrap:anywhere] text-slate-600"
+                className="text-muted mt-1 text-sm leading-5 [overflow-wrap:anywhere]"
               >
                 Submitting as{" "}
-                <span className="text-brand-strong font-bold">
+                <span className="text-brand-ink-strong font-bold">
                   {participantName}
                 </span>
                 . Your table and spotlight picks cannot be edited after
@@ -119,7 +119,7 @@ export function ReviewDialog({
             <section aria-labelledby="spotlight-review-heading">
               <h2
                 id="spotlight-review-heading"
-                className="text-brand-strong px-1 text-sm font-black"
+                className="text-brand-ink-strong px-1 text-sm font-black"
               >
                 Spotlight picks
               </h2>
@@ -148,7 +148,7 @@ export function ReviewDialog({
                       <span className="text-rose-ink text-[0.65rem] font-black tracking-wide uppercase">
                         {pick.label}
                       </span>
-                      <strong className="text-brand-strong mt-0.5 block text-sm leading-5 break-words">
+                      <strong className="text-brand-ink-strong mt-0.5 block text-sm leading-5 break-words">
                         {pick.displayName}
                       </strong>
                     </div>
@@ -161,11 +161,11 @@ export function ReviewDialog({
               <div className="flex items-center justify-between gap-3 px-1">
                 <h2
                   id="table-review-heading"
-                  className="text-brand-strong text-sm font-black"
+                  className="text-brand-ink-strong text-sm font-black"
                 >
                   Predicted table
                 </h2>
-                <span className="text-xs font-semibold text-slate-500">
+                <span className="text-muted text-xs font-semibold">
                   Champion: {teams[0]?.displayName}
                 </span>
               </div>
@@ -190,7 +190,7 @@ export function ReviewDialog({
                 </div>
 
                 <details className="border-border bg-surface-lilac rounded-xl border">
-                  <summary className="text-brand cursor-pointer px-3 py-2.5 text-sm font-black">
+                  <summary className="text-brand-ink cursor-pointer px-3 py-2.5 text-sm font-black">
                     Show all 20 clubs
                   </summary>
                   <ol className="grid gap-1 px-2 pb-2" start={6}>
@@ -222,11 +222,11 @@ export function ReviewDialog({
             </section>
           </div>
 
-          <div className="border-border shrink-0 border-t bg-white px-4 pt-3 pb-[max(1rem,env(safe-area-inset-bottom))] sm:px-6">
+          <div className="border-border bg-surface shrink-0 border-t px-4 pt-3 pb-[max(1rem,env(safe-area-inset-bottom))] sm:px-6">
             {error ? (
               <p
                 role="alert"
-                className="mb-3 flex items-start gap-2 rounded-xl border border-red-200 bg-red-50 p-3 text-sm leading-5 font-medium text-red-800"
+                className="border-danger/35 bg-danger-soft text-danger mb-3 flex items-start gap-2 rounded-xl border p-3 text-sm leading-5 font-medium"
               >
                 <AlertCircle
                   aria-hidden="true"

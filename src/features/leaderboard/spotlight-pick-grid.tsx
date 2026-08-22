@@ -54,12 +54,12 @@ export function SpotlightPickGrid({
             <span className="text-rose-ink block text-[0.6rem] leading-4 font-black tracking-wide uppercase">
               {pick.label}
             </span>
-            <strong className="text-brand-strong block text-xs leading-4 break-words">
+            <strong className="text-brand-ink-strong block text-xs leading-4 break-words">
               {pick.displayName}
             </strong>
             {pick.accuracyPoints !== null &&
             pick.accuracyPoints !== undefined ? (
-              <span className="mt-0.5 block text-[0.65rem] leading-4 font-semibold text-slate-500">
+              <span className="text-muted mt-0.5 block text-[0.65rem] leading-4 font-semibold">
                 {pick.resultStatus === "outside-range" ? (
                   <>{pick.metricLabel} · </>
                 ) : (
@@ -72,7 +72,7 @@ export function SpotlightPickGrid({
                 {pick.accuracyPoints === 1 ? "pt" : "pts"}
               </span>
             ) : (
-              <span className="mt-0.5 block text-[0.65rem] leading-4 font-semibold text-slate-500">
+              <span className="text-muted mt-0.5 block text-[0.65rem] leading-4 font-semibold">
                 Result rank pending
               </span>
             )}

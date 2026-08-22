@@ -870,12 +870,12 @@ export function PredictionForm({
           </span>
           <div>
             <Badge variant="success">Prediction submitted</Badge>
-            <h2 className="text-brand-strong mt-3 text-2xl font-black tracking-tight [overflow-wrap:anywhere]">
+            <h2 className="text-brand-ink-strong mt-3 text-2xl font-black tracking-tight [overflow-wrap:anywhere]">
               You’re in, {normalizedName}.
             </h2>
             <p
               role="status"
-              className="mx-auto mt-2 max-w-md text-sm leading-6 text-slate-600"
+              className="text-muted mx-auto mt-2 max-w-md text-sm leading-6"
             >
               {success.message ??
                 `Your ${seasonName} table and seven spotlight picks are saved. They cannot be edited after submission.`}
@@ -885,14 +885,14 @@ export function PredictionForm({
             {success.entryId ? (
               <Link
                 href={`/entries/${success.entryId}`}
-                className="bg-accent text-brand hover:bg-accent-yellow focus-visible:ring-accent-blue inline-flex min-h-11 items-center justify-center rounded-xl px-4 text-sm font-bold outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
+                className="bg-accent text-accent-ink hover:bg-accent-yellow focus-visible:ring-accent-blue focus-visible:ring-offset-background inline-flex min-h-11 items-center justify-center rounded-xl px-4 text-sm font-bold outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
               >
                 View confirmation
               </Link>
             ) : null}
             <Link
               href="/leaderboard"
-              className="border-border text-brand hover:border-accent-lilac hover:bg-brand-soft focus-visible:ring-accent-blue inline-flex min-h-11 items-center justify-center rounded-xl border bg-white px-4 text-sm font-bold outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
+              className="border-border text-brand-ink hover:border-accent-lilac hover:bg-brand-soft focus-visible:ring-accent-blue bg-surface focus-visible:ring-offset-background inline-flex min-h-11 items-center justify-center rounded-xl border px-4 text-sm font-bold outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
             >
               View leaderboard
             </Link>
@@ -919,14 +919,14 @@ export function PredictionForm({
           <Card className="overflow-visible" id="submit-prediction">
             <CardContent className="grid gap-4">
               <div className="flex items-start gap-3">
-                <span className="bg-sky-soft text-brand grid size-10 shrink-0 place-items-center rounded-xl">
+                <span className="bg-sky-soft text-brand-ink grid size-10 shrink-0 place-items-center rounded-xl">
                   <ShieldCheck aria-hidden="true" className="size-5" />
                 </span>
                 <div className="min-w-0">
-                  <h2 className="text-brand-strong text-lg font-black">
+                  <h2 className="text-brand-ink-strong text-lg font-black">
                     Who is making this prediction?
                   </h2>
-                  <p className="mt-1 text-sm leading-5 text-slate-600">
+                  <p className="text-muted mt-1 text-sm leading-5">
                     Add your display name, then continue to the seven spotlight
                     picks before the final review.
                   </p>
@@ -936,7 +936,7 @@ export function PredictionForm({
               <div>
                 <label
                   htmlFor="participant-name"
-                  className="text-sm font-bold text-slate-800"
+                  className="text-foreground text-sm font-bold"
                 >
                   Your display name
                 </label>
@@ -958,12 +958,12 @@ export function PredictionForm({
                   required
                   disabled={!draftReady || disabled || pending}
                   aria-describedby="participant-name-help"
-                  className="border-border text-brand-strong focus:border-accent-lilac focus:ring-sky-soft mt-2 min-h-12 w-full rounded-xl border bg-white px-3.5 text-base outline-none placeholder:text-slate-400 focus:ring-2 disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-500"
+                  className="border-border text-brand-ink-strong focus:border-accent-lilac focus:ring-accent-blue/30 bg-surface placeholder:text-muted disabled:bg-surface-subtle disabled:text-muted mt-2 min-h-12 w-full rounded-xl border px-3.5 text-base outline-none focus:ring-2 disabled:cursor-not-allowed"
                   placeholder="e.g. Vishal"
                 />
                 <p
                   id="participant-name-help"
-                  className="mt-1.5 text-xs leading-5 text-slate-500"
+                  className="text-muted mt-1.5 text-xs leading-5"
                 >
                   2–40 characters. This is the only personal information stored.
                 </p>
@@ -988,7 +988,7 @@ export function PredictionForm({
               </div>
 
               {disabled ? (
-                <p className="flex items-start gap-2 rounded-xl border border-amber-200 bg-amber-50 p-3 text-sm font-medium text-amber-900">
+                <p className="border-warning/35 bg-warning-soft text-warning flex items-start gap-2 rounded-xl border p-3 text-sm font-medium">
                   <LockKeyhole
                     aria-hidden="true"
                     className="mt-0.5 size-4 shrink-0"
@@ -1000,7 +1000,7 @@ export function PredictionForm({
               {error ? (
                 <p
                   role="alert"
-                  className="flex items-start gap-2 rounded-xl border border-red-200 bg-red-50 p-3 text-sm leading-5 font-medium text-red-800"
+                  className="border-danger/35 bg-danger-soft text-danger flex items-start gap-2 rounded-xl border p-3 text-sm leading-5 font-medium"
                 >
                   <AlertCircle
                     aria-hidden="true"
@@ -1015,11 +1015,11 @@ export function PredictionForm({
           {isAlphabetical ? (
             <aside
               aria-labelledby="alphabetical-blank-slate-heading"
-              className="flex items-start gap-3 rounded-2xl border border-amber-200 bg-amber-50 p-4 text-amber-950"
+              className="border-warning/35 bg-warning-soft text-warning flex items-start gap-3 rounded-2xl border p-4"
             >
               <AlertTriangle
                 aria-hidden="true"
-                className="mt-0.5 size-5 shrink-0 text-amber-800"
+                className="text-warning mt-0.5 size-5 shrink-0"
               />
               <div>
                 <h2
@@ -1028,7 +1028,7 @@ export function PredictionForm({
                 >
                   The table starts A–Z as a blank slate
                 </h2>
-                <p className="mt-1 text-sm leading-5 text-amber-900">
+                <p className="text-warning mt-1 text-sm leading-5">
                   This is not last season’s table or a suggested prediction.
                   Reorder the clubs, or confirm the A–Z order when you continue
                   if it is really your prediction.
@@ -1048,7 +1048,7 @@ export function PredictionForm({
         <>
           {playerCatalogueStatus === "loading" ? (
             <p
-              className="rounded-xl border border-sky-200 bg-sky-50 p-3 text-sm font-bold text-sky-900"
+              className="border-accent-blue/40 bg-sky-soft text-brand-ink rounded-xl border p-3 text-sm font-bold"
               role="status"
             >
               Loading this season’s player catalogue… Other player remains
@@ -1057,7 +1057,7 @@ export function PredictionForm({
           ) : null}
           {playerCatalogueMessage ? (
             <div
-              className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-amber-200 bg-amber-50 p-3 text-sm font-bold text-amber-900"
+              className="border-warning/35 bg-warning-soft text-warning flex flex-wrap items-center justify-between gap-3 rounded-xl border p-3 text-sm font-bold"
               role="alert"
             >
               <span>{playerCatalogueMessage}</span>
@@ -1101,7 +1101,7 @@ export function PredictionForm({
       {stage === "spotlight" && error && !reviewOpen ? (
         <p
           role="alert"
-          className="flex items-start gap-2 rounded-xl border border-red-200 bg-red-50 p-3 text-sm leading-5 font-medium text-red-800"
+          className="border-danger/35 bg-danger-soft text-danger flex items-start gap-2 rounded-xl border p-3 text-sm leading-5 font-medium"
         >
           <AlertCircle aria-hidden="true" className="mt-0.5 size-4 shrink-0" />
           <span>{error}</span>
@@ -1109,7 +1109,7 @@ export function PredictionForm({
       ) : null}
 
       <div
-        className={`border-border/80 z-20 -mx-2 border-t bg-white px-2 pt-2 pb-[max(0.75rem,env(safe-area-inset-bottom))] shadow-[0_-16px_30px_-26px_rgba(55,0,60,0.6)] sm:static sm:mx-0 sm:border-0 sm:bg-transparent sm:p-0 sm:shadow-none ${
+        className={`border-border/80 bg-surface z-20 -mx-2 border-t px-2 pt-2 pb-[max(0.75rem,env(safe-area-inset-bottom))] shadow-[0_-16px_30px_-26px_rgba(55,0,60,0.6)] sm:static sm:mx-0 sm:border-0 sm:bg-transparent sm:p-0 sm:shadow-none ${
           disabled ? "static" : "sticky bottom-0"
         } ${stage === "spotlight" && expandedSelectorCategory ? "hidden" : ""}`}
       >
@@ -1163,7 +1163,7 @@ export function PredictionForm({
         <p
           id="review-button-help"
           aria-live="polite"
-          className="mt-1 px-1 text-center text-xs leading-5 text-slate-500"
+          className="text-muted mt-1 px-1 text-center text-xs leading-5"
         >
           {stage === "table"
             ? draftStatusMessage

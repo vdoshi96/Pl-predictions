@@ -56,6 +56,27 @@ describe("dense leaderboard", () => {
     const podium = screen.getByLabelText("Leaderboard podium");
     expect(within(podium).getByText("1st")).toBeVisible();
     expect(within(podium).getAllByText("2nd")).toHaveLength(2);
+    const podiumCards = within(podium).getAllByTestId("podium-entry");
+    expect(podiumCards[0]).toHaveClass("sm:order-2");
+    expect(podiumCards[1]).toHaveClass("sm:order-1", "sm:mt-6");
+    expect(podiumCards[2]).toHaveClass("sm:order-3", "sm:mt-8");
+    expect(podiumCards.map((card) => card.textContent)).toEqual([
+      expect.stringContaining("Maya"),
+      expect.stringContaining("Dev"),
+      expect.stringContaining("Vishal"),
+    ]);
+    expect(within(podium).getByText("👑")).toHaveAttribute(
+      "aria-hidden",
+      "true",
+    );
+    expect(within(podium).getByText("🥈")).toHaveAttribute(
+      "aria-hidden",
+      "true",
+    );
+    expect(within(podium).getByText("🥉")).toHaveAttribute(
+      "aria-hidden",
+      "true",
+    );
     expect(
       within(screen.getByLabelText("Scored leaderboard")).getAllByRole("row"),
     ).toHaveLength(4);
@@ -69,10 +90,9 @@ describe("dense leaderboard", () => {
     expect(within(row).getByText("5 exact")).toBeVisible();
     expect(within(row).getByText("9 within 3")).toBeVisible();
     expect(within(row).getByText("4 half")).toBeVisible();
-    expect(within(row).getByRole("progressbar")).toHaveAttribute(
-      "aria-valuenow",
-      "55",
-    );
+    const progressbar = within(row).getByRole("progressbar");
+    expect(progressbar).toHaveAttribute("aria-valuenow", "55");
+    expect(progressbar).toHaveClass("border", "border-border");
   });
 
   it("includes the CSS-only 320px stacked-row reflow", () => {

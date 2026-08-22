@@ -28,7 +28,10 @@ import {
   createStandaloneResultOnlyPlayerAtomically,
   saveResultDraftAtomically,
 } from "@/features/results";
-import { getManualResultAssignments } from "@/features/results/queries";
+import {
+  getCategoryOutcomeLeaders,
+  getManualResultAssignments,
+} from "@/features/results/queries";
 
 import { assertIsolatedDatabaseEnvironment } from "../test-environment-safety";
 
@@ -750,7 +753,7 @@ describe.runIf(enabled)("spotlight result transitions", () => {
       ).resolves.toBe(true);
     }
 
-    const [goalCutoffRows, assignments] = await Promise.all([
+    const [goalCutoffRows, assignments, outcomeLeaders] = await Promise.all([
       db
         .select({
           outcomeRank: spotlightResultItems.outcomeRank,
@@ -759,6 +762,7 @@ describe.runIf(enabled)("spotlight result transitions", () => {
         .from(spotlightResultItems)
         .where(eq(spotlightResultItems.snapshotId, goals.snapshotId)),
       getManualResultAssignments(seasonId, predictionIds, 4),
+      getCategoryOutcomeLeaders(seasonId, 4),
     ]);
     expect(goalCutoffRows.filter((row) => row.outcomeRank === 4)).toHaveLength(
       2,
@@ -803,6 +807,24 @@ describe.runIf(enabled)("spotlight result transitions", () => {
       accuracyPoints: 0,
       metricLabel: "Outside lowest 4",
       resultRank: 5,
+    });
+    expect(outcomeLeaders.liveCategories).toEqual(
+      expect.arrayContaining([
+        "top_scorer",
+        "underdog_player",
+        "overrated_player",
+      ]),
+    );
+    expect(outcomeLeaders.liveCategories).not.toContain("top_assister");
+    expect(outcomeLeaders.leaders.underdog_player).toMatchObject({
+      displayName: "Scoring player 1",
+      metricLabel: "Rating 9.123",
+      subject: "player",
+    });
+    expect(outcomeLeaders.leaders.overrated_player).toMatchObject({
+      displayName: "Scoring player 5",
+      metricLabel: "Rating 1.001",
+      subject: "player",
     });
 
     await db.delete(predictions).where(eq(predictions.id, predictionIds[1]));

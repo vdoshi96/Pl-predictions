@@ -917,7 +917,7 @@ test("mobile journey preserves privacy and gives the owner full control", async 
   }
   await expectNoHorizontalOverflow(page);
 
-  await page.goto("/spotlight?sort=top_scorer");
+  await page.goto("/spotlight?view=entries&sort=top_scorer");
   await expect(
     page.getByRole("heading", {
       name: "Spotlight picks are still private",
@@ -1096,6 +1096,7 @@ test("mobile journey preserves privacy and gives the owner full control", async 
   await expect(page.getByRole("status")).toContainText(
     "Predictions are public and submissions are permanently closed.",
   );
+  await page.waitForLoadState("networkidle");
   const settingsAudits = await getQaDb()
     .select({ id: adminAuditLogs.id })
     .from(adminAuditLogs)
@@ -1125,7 +1126,9 @@ test("mobile journey preserves privacy and gives the owner full control", async 
   await expect(page.getByText("Matchweek 1", { exact: true })).toBeVisible();
   await expect(page.getByText("Provisional", { exact: true })).toBeVisible();
 
-  await page.goto("/spotlight?sort=overall", { waitUntil: "networkidle" });
+  await page.goto("/spotlight?view=entries&sort=overall", {
+    waitUntil: "networkidle",
+  });
   await expect(
     page.getByRole("heading", { level: 1, name: "Spotlight accuracy" }),
   ).toBeVisible();

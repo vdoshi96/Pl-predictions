@@ -371,7 +371,7 @@ test("production public routes are mobile-safe and healthy", async ({
   ).toHaveCount(0);
   await expectNoHorizontalOverflow(page);
 
-  await page.goto("/spotlight?sort=overall");
+  await page.goto("/spotlight?view=entries&sort=overall");
   await expect(
     page.getByRole("heading", { level: 1, name: "Spotlight accuracy" }),
   ).toBeVisible();

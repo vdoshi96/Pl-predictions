@@ -408,7 +408,7 @@ test("320–430px reflow keeps private identifiers out of HTML and RSC", async (
 
   for (const spotlightSort of spotlightSorts) {
     const spotlightHtmlResponse = await page.request.get(
-      `/spotlight?sort=${spotlightSort}`,
+      `/spotlight?view=entries&sort=${spotlightSort}`,
       { headers: { accept: "text/html" } },
     );
     expect(spotlightHtmlResponse.ok()).toBe(true);
@@ -428,7 +428,7 @@ test("320–430px reflow keeps private identifiers out of HTML and RSC", async (
     }
 
     const spotlightRscResponse = await page.request.get(
-      `/spotlight?sort=${spotlightSort}&_rsc=privacy-${spotlightSort}`,
+      `/spotlight?view=entries&sort=${spotlightSort}&_rsc=privacy-${spotlightSort}`,
       { headers: { accept: "text/x-component", rsc: "1" } },
     );
     expect(spotlightRscResponse.ok()).toBe(true);
@@ -502,7 +502,7 @@ test("320–430px reflow keeps private identifiers out of HTML and RSC", async (
   });
   await expectNoHorizontalOverflow(page);
 
-  await page.goto("/spotlight?sort=overrated_player");
+  await page.goto("/spotlight?view=entries&sort=overrated_player");
   await expect(
     page.getByRole("heading", { level: 1, name: "Spotlight accuracy" }),
   ).toBeVisible();

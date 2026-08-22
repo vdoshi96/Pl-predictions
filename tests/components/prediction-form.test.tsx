@@ -623,7 +623,9 @@ describe("PredictionForm", () => {
     expect(onSuccess).toHaveBeenCalledWith(result, submitted);
     expect(onError).not.toHaveBeenCalled();
     expect(await screen.findByText(/you’re in, Vishal Doshi/i)).toBeVisible();
-    expect(window.localStorage.getItem(storageKey)).toBeNull();
+    await waitFor(() =>
+      expect(window.localStorage.getItem(storageKey)).toBeNull(),
+    );
     expect(
       screen.getByRole("link", { name: /view confirmation/i }),
     ).toHaveAttribute("href", "/entries/entry-123");
@@ -1267,7 +1269,27 @@ describe("PredictionForm", () => {
 
     expect(stickyAction).toHaveClass("sticky", "bottom-0");
     expect(stickyAction?.className).toContain("safe-area-inset-bottom");
+    expect(stickyAction).toHaveClass("bg-white");
+    expect(screen.getByText(/^not submitted\./i)).not.toHaveClass("truncate");
     expect(reviewButton).toHaveClass("w-full", "min-h-12");
+  });
+
+  it("removes fixed positioning from the closed-state action", () => {
+    render(
+      <PredictionForm
+        disabled
+        disabledReason="Predictions are permanently closed."
+        teams={teams}
+        onSubmit={vi.fn()}
+      />,
+    );
+
+    const reviewButton = screen.getByRole("button", {
+      name: /continue to spotlight picks/i,
+    });
+    expect(reviewButton.closest("div.border-border\\/80")).not.toHaveClass(
+      "sticky",
+    );
   });
 
   it("hides the sticky review action while a selector popup is open", async () => {

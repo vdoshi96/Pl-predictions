@@ -20,10 +20,11 @@ describe("LeaderboardEntryLink", () => {
       "/entries/00000000-0000-4000-8000-000000000001",
     );
     expect(link).toHaveClass(
-      "[overflow-wrap:anywhere]",
+      "[overflow-wrap:break-word]",
       "underline",
       "decoration-2",
     );
+    expect(link).not.toHaveClass("[overflow-wrap:anywhere]");
     expect(link).not.toHaveClass("truncate");
   });
 });

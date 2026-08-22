@@ -87,7 +87,7 @@ describe("spotlight category and matrix views", () => {
     expect(within(board).getAllByRole("heading", { level: 2 })).toHaveLength(7);
     expect(within(board).getAllByText("Result live")).toHaveLength(1);
     expect(within(board).getAllByText("Result pending")).toHaveLength(6);
-    expect(within(board).getByText("Rank 1")).toBeVisible();
+    expect(within(board).getByText("Result rank 1 · 2 pts")).toBeVisible();
     expect(within(board).getByText("Outside range · 0 pts")).toBeVisible();
     expect(within(board).getByText("Other")).toBeVisible();
   });

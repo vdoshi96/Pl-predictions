@@ -72,7 +72,7 @@ export async function PredictionLanding({
                   ? "Submissions open"
                   : "Submissions closed"}
               </p>
-              <p className="mt-1 hidden text-xs leading-5 text-white/65 sm:block">
+              <p className="mt-1 text-xs leading-5 text-white/65">
                 Submission deadline:{" "}
                 {formatUtcDateTime(access.submissionDeadline)} · Arsenal v
                 Coventry kickoff

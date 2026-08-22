@@ -1109,9 +1109,9 @@ export function PredictionForm({
       ) : null}
 
       <div
-        className={`border-border/80 sticky bottom-0 z-20 -mx-2 border-t bg-white/95 px-2 pt-2 pb-[max(0.75rem,env(safe-area-inset-bottom))] shadow-[0_-16px_30px_-26px_rgba(55,0,60,0.6)] sm:static sm:mx-0 sm:border-0 sm:bg-transparent sm:p-0 sm:shadow-none ${
-          stage === "spotlight" && expandedSelectorCategory ? "hidden" : ""
-        }`}
+        className={`border-border/80 z-20 -mx-2 border-t bg-white px-2 pt-2 pb-[max(0.75rem,env(safe-area-inset-bottom))] shadow-[0_-16px_30px_-26px_rgba(55,0,60,0.6)] sm:static sm:mx-0 sm:border-0 sm:bg-transparent sm:p-0 sm:shadow-none ${
+          disabled ? "static" : "sticky bottom-0"
+        } ${stage === "spotlight" && expandedSelectorCategory ? "hidden" : ""}`}
       >
         <div
           className={
@@ -1163,7 +1163,7 @@ export function PredictionForm({
         <p
           id="review-button-help"
           aria-live="polite"
-          className="mt-1 truncate text-center text-xs leading-5 text-slate-500"
+          className="mt-1 px-1 text-center text-xs leading-5 text-slate-500"
         >
           {stage === "table"
             ? draftStatusMessage

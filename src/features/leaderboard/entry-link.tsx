@@ -16,7 +16,7 @@ export function LeaderboardEntryLink({
   return (
     <Link
       className={cn(
-        "inline-flex min-h-11 items-center font-black [overflow-wrap:anywhere] text-slate-950 underline decoration-slate-300 decoration-2 underline-offset-4 hover:decoration-slate-700",
+        "inline-flex min-h-11 min-w-0 items-center font-black [overflow-wrap:break-word] text-slate-950 underline decoration-slate-300 decoration-2 underline-offset-4 hover:decoration-slate-700",
         className,
       )}
       href={`/entries/${entryId}`}

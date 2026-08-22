@@ -101,3 +101,8 @@ export function formatConsensusValue(value: number): string {
   const rounded = Math.round(value * 10) / 10;
   return (Object.is(rounded, -0) ? 0 : rounded).toFixed(1);
 }
+
+export function formatExpectationIndex(value: number): string {
+  const formatted = formatConsensusValue(value);
+  return `Index ${Number(formatted) > 0 ? "+" : ""}${formatted}`;
+}

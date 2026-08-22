@@ -8,6 +8,8 @@ import {
 import {
   buildSpotlightCategoryBoard,
   buildSpotlightMatrix,
+  canLoadSpotlightCategoryData,
+  parseSpotlightView,
 } from "@/features/leaderboard/spotlight-board";
 import { buildSeasonTablePresentation } from "@/features/standings/season-table-view";
 
@@ -270,5 +272,27 @@ describe("spotlight board", () => {
     expect(
       buildSpotlightMatrix(entries).map((entry) => entry.participantName),
     ).toEqual(["Ada", "Ben"]);
+  });
+
+  it("defaults invalid view values to categories and keeps data behind reveal", () => {
+    expect(parseSpotlightView(undefined)).toBe("categories");
+    expect(parseSpotlightView("invalid")).toBe("categories");
+    expect(parseSpotlightView(["matrix", "entries"])).toBe("matrix");
+    for (const selectedView of ["categories", "entries", "matrix"] as const) {
+      expect(
+        canLoadSpotlightCategoryData({
+          entryCount: 2,
+          predictionsRevealed: false,
+          view: selectedView,
+        }),
+      ).toBe(false);
+    }
+    expect(
+      canLoadSpotlightCategoryData({
+        entryCount: 2,
+        predictionsRevealed: true,
+        view: "categories",
+      }),
+    ).toBe(true);
   });
 });

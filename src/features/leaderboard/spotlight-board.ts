@@ -6,6 +6,29 @@ import {
   type PredictionCategory,
 } from "@/features/predictions/categories";
 
+export type SpotlightView = "categories" | "entries" | "matrix";
+
+export function parseSpotlightView(
+  value: string | string[] | undefined,
+): SpotlightView {
+  const candidate = Array.isArray(value) ? value[0] : value;
+  return candidate === "entries" || candidate === "matrix"
+    ? candidate
+    : "categories";
+}
+
+export function canLoadSpotlightCategoryData({
+  entryCount,
+  predictionsRevealed,
+  view,
+}: {
+  entryCount: number;
+  predictionsRevealed: boolean;
+  view: SpotlightView;
+}): boolean {
+  return view === "categories" && predictionsRevealed && entryCount > 0;
+}
+
 export type SpotlightAliasResolution = Readonly<{
   assetPath: string | null;
   category: PredictionCategory;

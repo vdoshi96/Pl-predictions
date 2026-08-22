@@ -22,6 +22,7 @@ import {
 import { getManualResultAssignments } from "@/features/results/queries";
 import { hasSeasonStarted } from "@/features/seasons/deadline";
 import { getSeasonAccess } from "@/shared/policy";
+import { formatExpectationIndex } from "@/features/standings/season-table-view";
 
 import { getActiveSeasonContext, getSeasonTeams } from "../seasons/queries";
 import { getSpotlightPicksByPredictionId } from "./pick-queries";
@@ -92,12 +93,6 @@ const nameCollator = new Intl.Collator("en-GB", {
   numeric: true,
   sensitivity: "base",
 });
-
-function formatExpectationIndex(value: number): string {
-  const rounded = Math.round(value * 10) / 10;
-  const normalized = Object.is(rounded, -0) ? 0 : rounded;
-  return `Index ${normalized > 0 ? "+" : ""}${normalized.toFixed(1)}`;
-}
 
 type AvailableSpotlightResult = {
   accuracyPoints: number;

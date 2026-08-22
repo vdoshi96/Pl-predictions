@@ -1,9 +1,11 @@
-import { render, screen } from "@testing-library/react";
-import { describe, expect, it } from "vitest";
+import { cleanup, render, screen } from "@testing-library/react";
+import { afterEach, describe, expect, it } from "vitest";
 
 import { SiteHeader } from "@/components/site-header";
 import { SeasonTablePage } from "@/features/standings/season-table-page";
 import type { SeasonTableView } from "@/features/standings/season-table";
+
+afterEach(cleanup);
 
 const team = {
   assetPath: "/team-marks/arsenal.png",

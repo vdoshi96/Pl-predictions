@@ -1,6 +1,6 @@
 # Implementation plan
 
-## August 22 adversarial and visual review remediation (release in progress)
+## August 22 adversarial and visual review remediation (release complete; repository closeout pending)
 
 1. Reconcile both supplied reports against current `main` and preserve unrelated primary-worktree changes.
 2. Add persistent administrator throttling and revocable sessions, bounded standings-import throttling and secret rotation, a nonce-based script CSP, HSTS, fail-closed local-QA flags, Unicode control rejection, catalogue caching, and stronger PostgreSQL standings/season invariants.
@@ -9,7 +9,7 @@
 5. Rebuild and seed the isolated Neon database from all migrations; run formatting, lint, strict TypeScript, unit/component, integration, production build, and desktop/mobile Chromium/WebKit journeys; regenerate and verify every HTML documentation peer.
 6. Run a read-only production preflight, apply additive migrations `0008` and `0009` before code publication, push and merge through GitHub `main`, wait for the exact Vercel deployment, run guarded read-only production browser/header/database verification, synchronize local `main`, and remove the completed worktree.
 
-Items 1–5 are complete. Documentation parity, the 580-player/578-portrait validator, Prettier, ESLint, strict TypeScript, all 343 enabled unit/component tests, all 22 isolated Neon integration tests, the production build, eight routed pre-kickoff journeys across desktop/mobile Chromium and iPhone WebKit, and three routed fixed post-kickoff journeys pass. Exact aggregate cleanup is zero. Item 6 has passed the read-only preflight, additive production migrations `0008`/`0009`, exact postcheck, Ready preview, and authenticated HTTP 200 preview routes. GitHub merge, production code deployment, final smoke, synchronization, and cleanup remain.
+Items 1–6 are complete through the production application release. Documentation parity, the 580-player/578-portrait validator, Prettier, ESLint, strict TypeScript, all 343 enabled unit/component tests, all 22 isolated Neon integration tests, the production build, eight routed pre-kickoff journeys across desktop/mobile Chromium and iPhone WebKit, and three routed fixed post-kickoff journeys pass. Exact aggregate cleanup is zero. The read-only production preflight, additive migrations `0008`/`0009`, exact postcheck, Ready preview, and authenticated HTTP 200 preview routes passed before [PR #28](https://github.com/vdoshi96/Pl-predictions/pull/28) merged as `a49d0e8f0ebe44c5fc2373d22685e9954254b33c`. Production deployment `dpl_Ag5fn9u1gwQvj2Mi7Wdgy4sSkq7J` became Ready, the stable alias resolved to that deployment, and the guarded five-project read-only smoke passed against the revealed-season state. The remaining repository closeout is to merge the state-aware smoke/evidence correction, synchronize local `main`, and remove the completed worktree; it changes no production runtime or data.
 
 ## August 20 catalogue and Oxalpha UI remediation (release complete; repository closeout pending)
 

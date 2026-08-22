@@ -79,3 +79,36 @@ Integration and full browser journeys must use an isolated database. Set `TEST_D
 A change is complete only when relevant unit/component tests, isolated Neon integration tests, TypeScript, ESLint, formatting, documentation parity, production build, and desktop/mobile browser checks pass. Mobile QA must cover the three-stage flow, draft reload, intentional A–Z and reorder, the table leaderboard, the separate spotlight-accuracy page, 320–430px reflow, 56px touch handles, mouse/touch/keyboard reorder, searchable keyboard-accessible category selectors, the Other-player text path, manual results editing, fixed-deadline time-zone display, safe-area actions, long-name wrapping, and no horizontal overflow. Preserve exact cleanup evidence for any QA data.
 
 Keep canonical Markdown and generated HTML peers synchronized. Before finishing an iteration, correct stale status/QA documentation, push the feature branch, merge it to GitHub `main`, update local `main` to the same commit, and remove completed worktrees.
+
+## Cursor Cloud specific instructions
+
+This environment runs the app fully offline with **no Neon/Vercel secrets**. A local PostgreSQL 16 instance stands in for Neon, fronted by a small local Neon-protocol proxy so the unmodified app, scripts, and tests all connect exactly as they would to real Neon. Standard commands are unchanged — see `README.md` / `package.json` `scripts` (`npm run dev`, `npm test`, `npm run test:integration`, `npm run test:e2e`, `npm run build:verify`, `db:migrate`, `db:seed`, etc.). The notes below are only the non-obvious local specifics.
+
+### Services to start after boot (not run by the update script)
+
+The update script only runs `npm ci`. Postgres and the proxy do not auto-start. Run once per boot:
+
+```bash
+bash ~/neon-http-proxy/start-services.sh   # idempotent: starts PostgreSQL 16 + the TLS proxy on :443
+```
+
+Prefer a tmux-backed session for the dev server so logs persist: `npm run dev` (Turbopack) serves on `http://localhost:3000`.
+
+### How the local Neon shim works (why the app "just works")
+
+- PostgreSQL 16 runs on `127.0.0.1:5432` (role `dranx` / password `dranx`, superuser). Databases: `main` (dev) and `main_test` (isolated tests). Data persists in the VM snapshot, already migrated + seeded (20 teams, 580 players).
+- `~/neon-http-proxy/server.mjs` is a TLS server on `:443` implementing the Neon protocol: `POST /sql` (HTTP driver) and `wss /v2` (Pool driver), forwarding to local Postgres.
+- The app **bundles** `@neondatabase/serverless`, so its `neonConfig` cannot be patched at runtime. Instead the driver's *default* endpoints are pointed at the proxy without code changes: `/etc/hosts` maps `api.db.local` and `pg.db.local` to `127.0.0.1`, and `NODE_EXTRA_CA_CERTS` (set in `~/.bashrc` → `~/neon-http-proxy/tls/cert.pem`) trusts the proxy cert. `DATABASE_URL` in `/workspace/.env.local` therefore uses host `pg.db.local` (the port is ignored by the driver; the transport is always HTTPS/WSS on 443).
+- Non-bundled processes (drizzle-kit, seed script, `vitest` integration) use the Pool/WebSocket transport. A tiny `NODE_OPTIONS` preload (`~/neon-http-proxy/preload.mjs`, wired in `~/.bashrc`) sets `neonConfig.pipelineConnect=false` for local `*.db.local` databases only, which is required for SCRAM auth to succeed against generic Postgres. It is a guarded no-op for real `*.neon.tech` databases.
+- To use a real Neon database instead, just set `DATABASE_URL`/`TEST_DATABASE_URL` to the `*.neon.tech` URL (via a secret) — the hosts/cert/preload shims are all inert for non-local hosts, and no service needs to run.
+
+### Local dev caveats (non-obvious)
+
+- **Admin login uses `ADMIN_SECRET`, not `ADMIN_PASSWORD_HASH`, in `.env.local`.** The PBKDF2 hash format contains `$` characters, and both Next.js's env loader and `dotenv-cli` (used by the `test:*`/`db:*` scripts) perform `$`-variable expansion, which corrupts the hash inconsistently between the two loaders. The `$`-free `ADMIN_SECRET` (≥16 bytes) avoids this. Local owner login: username `admin`, password `dev-admin-password-1234` (also exposed as `PLAYWRIGHT_ADMIN_PASSWORD` for e2e). This is a local-only convenience; production still uses `ADMIN_PASSWORD_HASH`.
+- **Submissions cutoff:** the real season opening kickoff (`2026-08-21`) has passed, so submissions are closed by default. The local `main` DB's `seasons.opening_kickoff` is set to a future date so the three-stage submission flow is open in `npm run dev`. e2e suites instead pin time with `PL_PREDICTIONS_TEST_NOW_ISO` against `main_test`.
+- **Only one `next dev` at a time:** Next 16 refuses a second dev server even on a different port. Stop the port-3000 dev server (kill its tmux session) before running `npm run test:e2e` (its Playwright web server binds 3100).
+- The admin login rate limiter is persistent (5 attempts / 15 min per source) in `security_rate_limits`. Repeated e2e runs can trip it; clear with `psql ... -c "DELETE FROM security_rate_limits;"` against `main_test` if admin steps start failing with a stuck login.
+
+### Test status in this environment
+
+`npm test` (346), `npm run test:integration` (22, both HTTP and WebSocket transports), `npm run build:verify`, `npm run lint`, and `npm run typecheck` all pass. In `npm run test:e2e`, the desktop `chromium` project passes fully; a few **mobile-viewport** projects (mobile-chromium/webkit app-journey, 320/430 reflow) can fail on touch-drag / combobox-tap timing under headless mobile emulation — a browser-interaction sensitivity, not a database/environment problem.

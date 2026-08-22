@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="generated-by" content="scripts/generate-docs-html.mjs" />
     <meta name="canonical-source" content="AGENTS.md" />
-    <meta name="canonical-source-sha256" content="a8ccb1c629f7a75933b9df4db7bae1bfb54acd1b544162459b18b6c14a957045" />
+    <meta name="canonical-source-sha256" content="6d21a8647579fa9414477ec713069c9834113ea0a0b348e2a34bc197263605bb" />
     <title>This is NOT the Next.js you know</title>
     <style>
       :root { color-scheme: light dark; font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
@@ -102,8 +102,32 @@ npm run docs:check
 <h2 id="definition-of-done">Definition of done</h2>
 <p>A change is complete only when relevant unit/component tests, isolated Neon integration tests, TypeScript, ESLint, formatting, documentation parity, production build, and desktop/mobile browser checks pass. Mobile QA must cover the three-stage flow, draft reload, intentional A–Z and reorder, the table leaderboard, the separate spotlight-accuracy page, 320–430px reflow, 56px touch handles, mouse/touch/keyboard reorder, searchable keyboard-accessible category selectors, the Other-player text path, manual results editing, fixed-deadline time-zone display, safe-area actions, long-name wrapping, and no horizontal overflow. Preserve exact cleanup evidence for any QA data.</p>
 <p>Keep canonical Markdown and generated HTML peers synchronized. Before finishing an iteration, correct stale status/QA documentation, push the feature branch, merge it to GitHub <code>main</code>, update local <code>main</code> to the same commit, and remove completed worktrees.</p>
+<h2 id="cursor-cloud-specific-instructions">Cursor Cloud specific instructions</h2>
+<p>This environment runs the app fully offline with <strong>no Neon/Vercel secrets</strong>. A local PostgreSQL 16 instance stands in for Neon, fronted by a small local Neon-protocol proxy so the unmodified app, scripts, and tests all connect exactly as they would to real Neon. Standard commands are unchanged — see <code>README.md</code> / <code>package.json</code> <code>scripts</code> (<code>npm run dev</code>, <code>npm test</code>, <code>npm run test:integration</code>, <code>npm run test:e2e</code>, <code>npm run build:verify</code>, <code>db:migrate</code>, <code>db:seed</code>, etc.). The notes below are only the non-obvious local specifics.</p>
+<h3 id="services-to-start-after-boot-not-run-by-the-update-script">Services to start after boot (not run by the update script)</h3>
+<p>The update script only runs <code>npm ci</code>. Postgres and the proxy do not auto-start. Run once per boot:</p>
+<pre><code class="language-bash">bash ~/neon-http-proxy/start-services.sh   # idempotent: starts PostgreSQL 16 + the TLS proxy on :443
+</code></pre>
+<p>Prefer a tmux-backed session for the dev server so logs persist: <code>npm run dev</code> (Turbopack) serves on <code>http://localhost:3000</code>.</p>
+<h3 id="how-the-local-neon-shim-works-why-the-app-just-works">How the local Neon shim works (why the app &quot;just works&quot;)</h3>
+<ul>
+<li>PostgreSQL 16 runs on <code>127.0.0.1:5432</code> (role <code>dranx</code> / password <code>dranx</code>, superuser). Databases: <code>main</code> (dev) and <code>main_test</code> (isolated tests). Data persists in the VM snapshot, already migrated + seeded (20 teams, 580 players).</li>
+<li><code>~/neon-http-proxy/server.mjs</code> is a TLS server on <code>:443</code> implementing the Neon protocol: <code>POST /sql</code> (HTTP driver) and <code>wss /v2</code> (Pool driver), forwarding to local Postgres.</li>
+<li>The app <strong>bundles</strong> <code>@neondatabase/serverless</code>, so its <code>neonConfig</code> cannot be patched at runtime. Instead the driver&#39;s <em>default</em> endpoints are pointed at the proxy without code changes: <code>/etc/hosts</code> maps <code>api.db.local</code> and <code>pg.db.local</code> to <code>127.0.0.1</code>, and <code>NODE_EXTRA_CA_CERTS</code> (set in <code>~/.bashrc</code> → <code>~/neon-http-proxy/tls/cert.pem</code>) trusts the proxy cert. <code>DATABASE_URL</code> in <code>/workspace/.env.local</code> therefore uses host <code>pg.db.local</code> (the port is ignored by the driver; the transport is always HTTPS/WSS on 443).</li>
+<li>Non-bundled processes (drizzle-kit, seed script, <code>vitest</code> integration) use the Pool/WebSocket transport. A tiny <code>NODE_OPTIONS</code> preload (<code>~/neon-http-proxy/preload.mjs</code>, wired in <code>~/.bashrc</code>) sets <code>neonConfig.pipelineConnect=false</code> for local <code>*.db.local</code> databases only, which is required for SCRAM auth to succeed against generic Postgres. It is a guarded no-op for real <code>*.neon.tech</code> databases.</li>
+<li>To use a real Neon database instead, just set <code>DATABASE_URL</code>/<code>TEST_DATABASE_URL</code> to the <code>*.neon.tech</code> URL (via a secret) — the hosts/cert/preload shims are all inert for non-local hosts, and no service needs to run.</li>
+</ul>
+<h3 id="local-dev-caveats-non-obvious">Local dev caveats (non-obvious)</h3>
+<ul>
+<li><strong>Admin login uses <code>ADMIN_SECRET</code>, not <code>ADMIN_PASSWORD_HASH</code>, in <code>.env.local</code>.</strong> The PBKDF2 hash format contains <code>$</code> characters, and both Next.js&#39;s env loader and <code>dotenv-cli</code> (used by the <code>test:*</code>/<code>db:*</code> scripts) perform <code>$</code>-variable expansion, which corrupts the hash inconsistently between the two loaders. The <code>$</code>-free <code>ADMIN_SECRET</code> (≥16 bytes) avoids this. Local owner login: username <code>admin</code>, password <code>dev-admin-password-1234</code> (also exposed as <code>PLAYWRIGHT_ADMIN_PASSWORD</code> for e2e). This is a local-only convenience; production still uses <code>ADMIN_PASSWORD_HASH</code>.</li>
+<li><strong>Submissions cutoff:</strong> the real season opening kickoff (<code>2026-08-21</code>) has passed, so submissions are closed by default. The local <code>main</code> DB&#39;s <code>seasons.opening_kickoff</code> is set to a future date so the three-stage submission flow is open in <code>npm run dev</code>. e2e suites instead pin time with <code>PL_PREDICTIONS_TEST_NOW_ISO</code> against <code>main_test</code>.</li>
+<li><strong>Only one <code>next dev</code> at a time:</strong> Next 16 refuses a second dev server even on a different port. Stop the port-3000 dev server (kill its tmux session) before running <code>npm run test:e2e</code> (its Playwright web server binds 3100).</li>
+<li>The admin login rate limiter is persistent (5 attempts / 15 min per source) in <code>security_rate_limits</code>. Repeated e2e runs can trip it; clear with <code>psql ... -c &quot;DELETE FROM security_rate_limits;&quot;</code> against <code>main_test</code> if admin steps start failing with a stuck login.</li>
+</ul>
+<h3 id="test-status-in-this-environment">Test status in this environment</h3>
+<p><code>npm test</code> (346), <code>npm run test:integration</code> (22, both HTTP and WebSocket transports), <code>npm run build:verify</code>, <code>npm run lint</code>, and <code>npm run typecheck</code> all pass. In <code>npm run test:e2e</code>, the desktop <code>chromium</code> project passes fully; a few <strong>mobile-viewport</strong> projects (mobile-chromium/webkit app-journey, 320/430 reflow) can fail on touch-drag / combobox-tap timing under headless mobile emulation — a browser-interaction sensitivity, not a database/environment problem.</p>
 
-      <p class="source">Generated deterministically from <a href="AGENTS.md">AGENTS.md</a>. Canonical SHA-256: <code>a8ccb1c629f7a75933b9df4db7bae1bfb54acd1b544162459b18b6c14a957045</code>.</p>
+      <p class="source">Generated deterministically from <a href="AGENTS.md">AGENTS.md</a>. Canonical SHA-256: <code>6d21a8647579fa9414477ec713069c9834113ea0a0b348e2a34bc197263605bb</code>.</p>
     </main>
   </body>
 </html>

@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="generated-by" content="scripts/generate-docs-html.mjs" />
     <meta name="canonical-source" content="LOG.md" />
-    <meta name="canonical-source-sha256" content="094df23e65bb27bfd168b55d309c920fe06d81358e2fd2f04dd777632769e70d" />
+    <meta name="canonical-source-sha256" content="85afe28fea9e6cb4fa1cacf4514c8d90ba48f43c9463c6b33a60f3daed22025d" />
     <title>Session log</title>
     <style>
       :root { color-scheme: light dark; font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
@@ -42,6 +42,7 @@
       <h1 id="session-log">Session log</h1>
 <h2 id="2026-08-21">2026-08-21</h2>
 <ul>
+<li>Published the season-glance implementation through <a href="https://github.com/vdoshi96/Pl-predictions/pull/26">PR #26</a>, merged as <code>ee325557b268510bafa9c7b54aa3b46cba509da4</code>. Both Vercel checks passed. Local <code>main</code> and <code>origin/main</code> matched the merge exactly before this documentation-only closeout, the remote feature branch was deleted, and no production database or production deployment action ran.</li>
 <li>Implemented the approved season-glance display. The unrevealed root still renders the existing three-stage form; the revealed root shows the current 20-club table, consensus averages, expectation deltas, and overachiever/underachiever callouts without exposing consensus-bearing data before reveal.</li>
 <li>Replaced the leaderboard card stack with a top-three podium and dense real table. Shared ranks repeat, deterministic initials support non-Latin names, progress remains capped at 100, and movement compares canonical scores with the previous meaningful standings snapshot.</li>
 <li>Split Spotlight into default category boards, the retained per-entry list, and a sticky-column matrix. Category leaders come only from active sealed factual snapshots or active standings scoring; pending and attested outside-range states remain distinct.</li>
@@ -285,7 +286,7 @@
 <li>Next handoff: use <code>main</code> as the base for future pull requests. No GitHub access blocker remains for the current repository workflow.</li>
 </ul>
 
-      <p class="source">Generated deterministically from <a href="LOG.md">docs/context/LOG.md</a>. Canonical SHA-256: <code>094df23e65bb27bfd168b55d309c920fe06d81358e2fd2f04dd777632769e70d</code>.</p>
+      <p class="source">Generated deterministically from <a href="LOG.md">docs/context/LOG.md</a>. Canonical SHA-256: <code>85afe28fea9e6cb4fa1cacf4514c8d90ba48f43c9463c6b33a60f3daed22025d</code>.</p>
     </main>
   </body>
 </html>

@@ -10,10 +10,13 @@ export type SpotlightPickDisplay = Readonly<{
   label: string;
   accuracyPoints?: number | null;
   metricLabel?: string | null;
+  normalizedCustomPlayerName?: string | null;
+  playerId?: string | null;
   resultRank?: number | null;
   resultStatus?: "outside-range" | "ranked";
   shortName?: string | null;
   subject: "player" | "team";
+  teamId?: string | null;
 }>;
 
 export interface SpotlightPickGridProps {

@@ -5,18 +5,22 @@ import { and, eq, inArray, isNotNull } from "drizzle-orm";
 import { getDb } from "@/db/client";
 import {
   predictionCategoryPicks,
+  players,
   spotlightResultItems,
   spotlightResultSnapshotAliases,
   spotlightResultSnapshots,
   spotlightResultStates,
+  teams,
 } from "@/db/schema";
 import {
   isPredictionCategory,
+  PREDICTION_CATEGORY_DEFINITIONS,
   type PredictionCategory,
 } from "@/features/predictions/categories";
 import { rankMetricItems } from "@/features/scoring/categories";
 
 import {
+  formatSpotlightMetric,
   resolveSpotlightResult,
   type ResolvedSpotlightResult,
 } from "./scoring";
@@ -64,6 +68,189 @@ function subjectIdForPick(
     id: aliasPlayerId ?? null,
     identityResolved: Boolean(aliasPlayerId),
   };
+}
+
+export type CategoryOutcomeLeader = Readonly<{
+  assetPath: string | null;
+  category: PredictionCategory;
+  displayName: string;
+  metricLabel: string;
+  shortName: string | null;
+  subject: "player" | "team";
+}>;
+
+export type CategoryOutcomeLeadersView = Readonly<{
+  leaders: Partial<Record<PredictionCategory, CategoryOutcomeLeader>>;
+  liveCategories: readonly PredictionCategory[];
+}>;
+
+function categoriesForDataset(
+  dataset: SpotlightResultDataset,
+): PredictionCategory[] {
+  return PREDICTION_CATEGORY_DEFINITIONS.flatMap((definition) =>
+    RESULT_DATASET_BY_CATEGORY[definition.category] === dataset
+      ? [definition.category]
+      : [],
+  );
+}
+
+export async function getCategoryOutcomeLeaders(
+  seasonId: string,
+  activeBracketCount: number,
+): Promise<CategoryOutcomeLeadersView> {
+  if (activeBracketCount < 1) {
+    return { leaders: {}, liveCategories: [] };
+  }
+  const db = getDb();
+  const snapshotRows = await db
+    .select({
+      coveredThroughRank: spotlightResultSnapshots.coveredThroughRank,
+      dataset: spotlightResultStates.dataset,
+      id: spotlightResultSnapshots.id,
+    })
+    .from(spotlightResultStates)
+    .innerJoin(
+      spotlightResultSnapshots,
+      eq(spotlightResultSnapshots.id, spotlightResultStates.activeSnapshotId),
+    )
+    .where(
+      and(
+        eq(spotlightResultStates.seasonId, seasonId),
+        isNotNull(spotlightResultStates.activeSnapshotId),
+        isNotNull(spotlightResultSnapshots.coveredThroughRank),
+        isNotNull(spotlightResultSnapshots.sealedAt),
+      ),
+    );
+  const snapshots = snapshotRows.flatMap((snapshot) =>
+    isSpotlightResultDataset(snapshot.dataset)
+      ? [{ dataset: snapshot.dataset, id: snapshot.id }]
+      : [],
+  );
+  if (snapshots.length === 0) {
+    return { leaders: {}, liveCategories: [] };
+  }
+  const itemRows = await db
+    .select({
+      metricValue: spotlightResultItems.metricValue,
+      outcomeRank: spotlightResultItems.outcomeRank,
+      playerAssetPath: players.assetPath,
+      playerDisplayName: players.displayName,
+      playerId: spotlightResultItems.playerId,
+      snapshotId: spotlightResultItems.snapshotId,
+      teamAssetPath: teams.assetPath,
+      teamDisplayName: teams.displayName,
+      teamId: spotlightResultItems.teamId,
+      teamShortName: teams.shortName,
+    })
+    .from(spotlightResultItems)
+    .leftJoin(players, eq(players.id, spotlightResultItems.playerId))
+    .leftJoin(teams, eq(teams.id, spotlightResultItems.teamId))
+    .where(
+      inArray(
+        spotlightResultItems.snapshotId,
+        snapshots.map((snapshot) => snapshot.id),
+      ),
+    );
+  const itemsBySnapshot = new Map<string, typeof itemRows>();
+  for (const item of itemRows) {
+    const group = itemsBySnapshot.get(item.snapshotId) ?? [];
+    group.push(item);
+    itemsBySnapshot.set(item.snapshotId, group);
+  }
+  const leaders: Partial<Record<PredictionCategory, CategoryOutcomeLeader>> =
+    {};
+  const liveCategories = snapshots.flatMap((snapshot) =>
+    categoriesForDataset(snapshot.dataset),
+  );
+
+  for (const snapshot of snapshots) {
+    const items = itemsBySnapshot.get(snapshot.id) ?? [];
+    for (const category of categoriesForDataset(snapshot.dataset)) {
+      const leader =
+        category === "overrated_player"
+          ? rankMetricItems(
+              items.flatMap((item) =>
+                item.playerId
+                  ? [{ id: item.playerId, item, metric: item.metricValue }]
+                  : [],
+              ),
+              "ascending",
+            ).find((item) => item.rank === 1)?.item
+          : items.find((item) => item.outcomeRank === 1);
+      if (!leader) continue;
+      const subject = leader.playerId ? "player" : "team";
+      const displayName =
+        subject === "player"
+          ? leader.playerDisplayName
+          : leader.teamDisplayName;
+      if (!displayName) continue;
+      leaders[category] = {
+        assetPath:
+          subject === "player" ? leader.playerAssetPath : leader.teamAssetPath,
+        category,
+        displayName,
+        metricLabel: formatSpotlightMetric(category, leader.metricValue),
+        shortName: subject === "team" ? leader.teamShortName : null,
+        subject,
+      };
+    }
+  }
+
+  return { leaders, liveCategories };
+}
+
+export async function getActiveSpotlightAliasResolutions(
+  seasonId: string,
+): Promise<
+  Array<{
+    assetPath: string | null;
+    category: PredictionCategory;
+    displayName: string;
+    normalizedCustomPlayerName: string;
+    playerId: string;
+  }>
+> {
+  const rows = await getDb()
+    .select({
+      assetPath: players.assetPath,
+      dataset: spotlightResultStates.dataset,
+      displayName: players.displayName,
+      normalizedCustomPlayerName:
+        spotlightResultSnapshotAliases.normalizedCustomPlayerName,
+      playerId: spotlightResultSnapshotAliases.playerId,
+    })
+    .from(spotlightResultStates)
+    .innerJoin(
+      spotlightResultSnapshots,
+      eq(spotlightResultSnapshots.id, spotlightResultStates.activeSnapshotId),
+    )
+    .innerJoin(
+      spotlightResultSnapshotAliases,
+      eq(
+        spotlightResultSnapshotAliases.snapshotId,
+        spotlightResultSnapshots.id,
+      ),
+    )
+    .innerJoin(players, eq(players.id, spotlightResultSnapshotAliases.playerId))
+    .where(
+      and(
+        eq(spotlightResultStates.seasonId, seasonId),
+        isNotNull(spotlightResultSnapshots.coveredThroughRank),
+        isNotNull(spotlightResultSnapshots.sealedAt),
+      ),
+    );
+
+  return rows.flatMap((row) =>
+    isSpotlightResultDataset(row.dataset)
+      ? categoriesForDataset(row.dataset).map((category) => ({
+          assetPath: row.assetPath,
+          category,
+          displayName: row.displayName,
+          normalizedCustomPlayerName: row.normalizedCustomPlayerName,
+          playerId: row.playerId,
+        }))
+      : [],
+  );
 }
 
 export function buildManualResultAssignments({

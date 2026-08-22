@@ -59,7 +59,7 @@ export default function RulesPage() {
             <Badge className="bg-accent text-brand ring-accent">
               2026/27 competition
             </Badge>
-            <Badge variant="warning">Five manual results pending</Badge>
+            <Badge variant="accent">Owner-reviewed results</Badge>
           </div>
           <div className="mt-5 flex items-start gap-3">
             <ListChecks
@@ -187,15 +187,16 @@ export default function RulesPage() {
                 Player list and Other
               </h2>
               <p className="mt-1 text-sm leading-6 text-slate-600">
-                The 2026-08-13 snapshot covers 582 players across all 20 clubs.
+                The 2026-08-20 snapshot covers 580 players across all 20 clubs.
                 It is the owner-selected, internally reconciled roster for this
                 game, not an independently verified official league list. Player
                 selectors search first, last, or full name after two letters and
-                show up to 20 matches; 582 supplied portraits appear locally.
-                Choose Other player for anyone unavailable or new. A silhouette
-                appears only if a portrait is missing or fails to load. Each
-                custom name must be matched to a canonical season player before
-                its reviewed result dataset can be published and scored.
+                show up to 20 matches; 578 supplied portraits appear locally.
+                Ryan McAidoo and Luc De Fougerolles use the silhouette fallback.
+                Choose Other player for anyone unavailable or newly added. A
+                silhouette also appears if a portrait fails to load. Each custom
+                name must be matched to a canonical season player before its
+                reviewed result dataset can be published and scored.
               </p>
             </CardContent>
           </Card>
@@ -225,11 +226,12 @@ export default function RulesPage() {
             <div>
               <h2 className="font-black text-amber-950">Current data status</h2>
               <p className="mt-1 text-sm leading-6 text-amber-900">
-                The app now stores and displays all seven picks. Underdog-team
-                and overrated-team accuracy can recalculate from the group
-                tables and active standings. The player roster and available
-                portraits are loaded. {RULES_PENDING_RESULTS_MESSAGE} Only
-                complete submitted entries appear in the active bracket count.
+                The app stores and displays all seven picks. Underdog-team and
+                overrated-team accuracy can recalculate from the group tables
+                and active standings. The player roster and available portraits
+                are loaded. {RULES_PENDING_RESULTS_MESSAGE} Result snapshots
+                remain provisional until the owner finalizes them. Only complete
+                submitted entries appear in the active bracket count.
               </p>
             </div>
           </CardContent>

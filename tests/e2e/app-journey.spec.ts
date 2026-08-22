@@ -144,6 +144,22 @@ async function capturePlainEvidence(
   });
 }
 
+async function positionWalkthroughCapture(
+  page: import("@playwright/test").Page,
+  anchor: import("@playwright/test").Locator,
+) {
+  await anchor.evaluate((element) => {
+    if (document.activeElement instanceof HTMLElement) {
+      document.activeElement.blur();
+    }
+    const top = element.getBoundingClientRect().top + window.scrollY - 16;
+    window.scrollTo({ behavior: "instant", left: 0, top: Math.max(0, top) });
+  });
+  await expect
+    .poll(() => page.evaluate(() => window.scrollY))
+    .toBeGreaterThan(0);
+}
+
 async function handleCenter(
   handle: import("@playwright/test").Locator,
 ): Promise<{ x: number; y: number }> {
@@ -748,9 +764,7 @@ test("mobile journey preserves privacy and gives the owner full control", async 
     /^Arsenal, predicted position 1 of 20$/,
   );
   await page.getByRole("textbox", { name: "Your display name" }).fill(qaName);
-  await page
-    .getByRole("heading", { name: "Who is making this prediction?" })
-    .evaluate((element) => element.scrollIntoView({ block: "start" }));
+  await positionWalkthroughCapture(page, page.locator("main form").first());
   await capturePlainEvidence(
     page,
     walkthroughScreenshotDirectory,
@@ -797,9 +811,10 @@ test("mobile journey preserves privacy and gives the owner full control", async 
   const customPlayerNames = await completeSpotlightPicks(page, qaName);
   await expectCompletePredictionDraftPersisted(page, qaName);
   await expect(page.getByText(/Draft saved in this browser/u)).toBeVisible();
-  await page
-    .getByRole("heading", { name: "Make your spotlight picks" })
-    .evaluate((element) => element.scrollIntoView({ block: "start" }));
+  await positionWalkthroughCapture(
+    page,
+    page.getByRole("heading", { name: "Make your spotlight picks" }),
+  );
   await capturePlainEvidence(
     page,
     walkthroughScreenshotDirectory,

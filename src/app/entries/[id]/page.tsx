@@ -114,6 +114,13 @@ export default async function EntryPage({
                   just-for-fun accuracy appears as result lists become available
                   and never changes the 100-point table score.
                 </p>
+                {entry.snapshot && !entry.snapshot.isFinal ? (
+                  <p className="mt-2 text-xs leading-5 font-semibold text-amber-800">
+                    Accuracy uses provisional published snapshots. Shared ties
+                    can award the same high rank, including zero-stat rows early
+                    in the season.
+                  </p>
+                ) : null}
               </div>
               <div className="flex flex-wrap items-center gap-2">
                 <Badge

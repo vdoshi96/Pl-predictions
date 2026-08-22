@@ -56,6 +56,18 @@ describe("isolated test clock", () => {
     ).toEqual(new Date("2026-08-08T12:00:00.000Z"));
   });
 
+  it("ignores the local harness flag inside Vercel production", () => {
+    expect(
+      resolveIsolatedTestNow({
+        ...isolatedEnvironment,
+        LOCAL_HTTP_E2E: "1",
+        NODE_ENV: "production",
+        VERCEL: "1",
+        VERCEL_ENV: "production",
+      }),
+    ).toBeNull();
+  });
+
   it("ignores an override when the database identity is not the test target", () => {
     expect(
       resolveIsolatedTestNow({

@@ -17,6 +17,8 @@ export async function GET() {
   };
 
   return NextResponse.json(response, {
-    headers: { "Cache-Control": "private, no-store" },
+    headers: {
+      "Cache-Control": "public, s-maxage=3600, stale-while-revalidate=86400",
+    },
   });
 }

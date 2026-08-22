@@ -12,13 +12,13 @@ const walkthroughSteps = [
         label:
           "Enter your display name first, then drag the handles or use Arrow, Page Up, Page Down, Home, and End.",
         marker: "1",
-        position: { left: "86%", top: "52%" },
+        position: { left: "96%", top: "84%" },
       },
       {
         label:
           "A–Z is only a blank slate. Reorder it, or explicitly confirm A–Z if that is your real prediction.",
         marker: "2",
-        position: { left: "84%", top: "18%" },
+        position: { left: "96%", top: "53%" },
       },
     ],
     description:
@@ -34,13 +34,13 @@ const walkthroughSteps = [
         label:
           "Type at least two letters to search up to 20 player matches; Other player always remains available.",
         marker: "1",
-        position: { left: "84%", top: "70%" },
+        position: { left: "96%", top: "37%" },
       },
       {
         label:
           "Complete all seven categories, then use Review all predictions.",
         marker: "2",
-        position: { left: "84%", top: "91%" },
+        position: { left: "96%", top: "91%" },
       },
     ],
     description:
@@ -56,13 +56,13 @@ const walkthroughSteps = [
         label:
           "Confirm the champion, seven spotlight picks, and table summary; expand the middle positions if needed.",
         marker: "1",
-        position: { left: "57%", top: "3%" },
+        position: { left: "96%", top: "51%" },
       },
       {
         label:
           "Submit only when everything is right; a completed entry cannot be edited.",
         marker: "2",
-        position: { left: "84%", top: "96%" },
+        position: { left: "96%", top: "94%" },
       },
     ],
     description:
@@ -121,7 +121,7 @@ export function HowToPlay() {
                   {walkthrough.callouts.map((callout) => (
                     <span
                       aria-hidden="true"
-                      className="bg-accent text-brand absolute grid size-8 -translate-x-1/2 -translate-y-1/2 place-items-center rounded-full text-sm font-black shadow-[0_6px_16px_rgba(38,0,45,0.35)] ring-4 ring-white/90"
+                      className="bg-accent text-brand absolute grid size-7 -translate-x-1/2 -translate-y-1/2 place-items-center rounded-full text-xs font-black shadow-[0_6px_16px_rgba(38,0,45,0.35)] ring-2 ring-white/90"
                       key={callout.marker}
                       style={callout.position}
                     >

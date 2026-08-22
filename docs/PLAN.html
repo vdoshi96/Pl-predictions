@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="generated-by" content="scripts/generate-docs-html.mjs" />
     <meta name="canonical-source" content="PLAN.md" />
-    <meta name="canonical-source-sha256" content="0f330e8654925b40988c6f954ce482f1557e4af177988c5fca9a36580f685fa1" />
+    <meta name="canonical-source-sha256" content="f4b90537fe505bb8157396321ea10ba17f06dc1be3a81b3ca5f036dca277c083" />
     <title>Implementation plan</title>
     <style>
       :root { color-scheme: light dark; font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
@@ -40,6 +40,16 @@
   <body>
     <main>
       <h1 id="implementation-plan">Implementation plan</h1>
+<h2 id="august-22-adversarial-and-visual-review-remediation-release-in-progress">August 22 adversarial and visual review remediation (release in progress)</h2>
+<ol>
+<li>Reconcile both supplied reports against current <code>main</code> and preserve unrelated primary-worktree changes.</li>
+<li>Add persistent administrator throttling and revocable sessions, bounded standings-import throttling and secret rotation, a nonce-based script CSP, HSTS, fail-closed local-QA flags, Unicode control rejection, catalogue caching, and stronger PostgreSQL standings/season invariants.</li>
+<li>Remove the server-to-script import dependency and dead champion component, share root season work through React request caching, and ignore local review/reproduction artifacts.</li>
+<li>Correct result-status language, provisional tie explanations, result-rank labels, closed-form behavior, mobile deadline/action/name wrapping, current roster facts, and the three 390 × 844 walkthrough captures and markers.</li>
+<li>Rebuild and seed the isolated Neon database from all migrations; run formatting, lint, strict TypeScript, unit/component, integration, production build, and desktop/mobile Chromium/WebKit journeys; regenerate and verify every HTML documentation peer.</li>
+<li>Run a read-only production preflight, apply additive migrations <code>0008</code> and <code>0009</code> before code publication, push and merge through GitHub <code>main</code>, wait for the exact Vercel deployment, run guarded read-only production browser/header/database verification, synchronize local <code>main</code>, and remove the completed worktree.</li>
+</ol>
+<p>Items 1–5 are complete. Documentation parity, the 580-player/578-portrait validator, Prettier, ESLint, strict TypeScript, all 343 enabled unit/component tests, all 22 isolated Neon integration tests, the production build, eight routed pre-kickoff journeys across desktop/mobile Chromium and iPhone WebKit, and three routed fixed post-kickoff journeys pass. Exact aggregate cleanup is zero. Item 6 has passed the read-only preflight, additive production migrations <code>0008</code>/<code>0009</code>, exact postcheck, Ready preview, and authenticated HTTP 200 preview routes. GitHub merge, production code deployment, final smoke, synchronization, and cleanup remain.</p>
 <h2 id="august-20-catalogue-and-oxalpha-ui-remediation-release-complete-repository-closeout-pending">August 20 catalogue and Oxalpha UI remediation (release complete; repository closeout pending)</h2>
 <ol>
 <li>Start from verified GitHub <code>main</code> in a new worktree and discard the superseded unmerged UI branch, while preserving unrelated private handoffs and report files in the primary checkout.</li>
@@ -116,7 +126,7 @@
 </ol>
 <p>Items 1–12 are implemented and released. The migration-first production gate passed before code publication: read-only preflight succeeded, additive <code>0006</code>/<code>0007</code> were applied while the old application remained compatible, and a read-only rollback postcheck proved the expected empty pending state. Feature <a href="https://github.com/vdoshi96/Pl-predictions/pull/19">PR #19</a> merged as <code>9cdad64c285fb66f96d9e11a0b71780008b05160</code>; exact-SHA Vercel deployment <code>dpl_2evvhgizD4spM9QfXKNhvHLEBrgG</code> became Ready and was explicitly assigned to the stable alias. The guarded five-project read-only production smoke passed, its 11-image evidence set was visually inspected and retained, and bounded exact-deployment error/fatal/HTTP-500 queries were empty. The clean merged feature worktree and all enumerated temporary screenshot, HTTPS, Playwright, and evidence directories were removed after the promoted-evidence audit. The three isolated databases remain deliberately retained because <code>DROP DATABASE</code> is destructive, not locally recoverable, and lacks direct owner authorization; no Neon recovery operation was requested. Evidence-PR merge, local-main synchronization, and removal of this closeout worktree remain.</p>
 
-      <p class="source">Generated deterministically from <a href="PLAN.md">docs/PLAN.md</a>. Canonical SHA-256: <code>0f330e8654925b40988c6f954ce482f1557e4af177988c5fca9a36580f685fa1</code>.</p>
+      <p class="source">Generated deterministically from <a href="PLAN.md">docs/PLAN.md</a>. Canonical SHA-256: <code>f4b90537fe505bb8157396321ea10ba17f06dc1be3a81b3ca5f036dca277c083</code>.</p>
     </main>
   </body>
 </html>

@@ -52,6 +52,15 @@ describe("participant name normalization", () => {
     expect(participantNameSchema.safeParse("a").success).toBe(false);
     expect(participantNameSchema.safeParse("İ".repeat(40)).success).toBe(false);
   });
+
+  it("removes invisible format characters and rejects control characters", () => {
+    expect(normalizedParticipantNameKey("Vish\u200Bal")).toBe("vishal");
+    expect(normalizedParticipantNameKey("Vi\u2066shal\u2069")).toBe("vishal");
+    expect(participantNameSchema.safeParse("Vish\u0000al").success).toBe(false);
+    expect(
+      customPlayerNameSchema.safeParse("Erling\u0007Haaland").success,
+    ).toBe(false);
+  });
 });
 
 describe("prediction permutation validation", () => {

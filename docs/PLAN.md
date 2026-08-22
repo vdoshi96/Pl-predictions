@@ -1,5 +1,16 @@
 # Implementation plan
 
+## August 22 adversarial and visual review remediation (release in progress)
+
+1. Reconcile both supplied reports against current `main` and preserve unrelated primary-worktree changes.
+2. Add persistent administrator throttling and revocable sessions, bounded standings-import throttling and secret rotation, a nonce-based script CSP, HSTS, fail-closed local-QA flags, Unicode control rejection, catalogue caching, and stronger PostgreSQL standings/season invariants.
+3. Remove the server-to-script import dependency and dead champion component, share root season work through React request caching, and ignore local review/reproduction artifacts.
+4. Correct result-status language, provisional tie explanations, result-rank labels, closed-form behavior, mobile deadline/action/name wrapping, current roster facts, and the three 390 × 844 walkthrough captures and markers.
+5. Rebuild and seed the isolated Neon database from all migrations; run formatting, lint, strict TypeScript, unit/component, integration, production build, and desktop/mobile Chromium/WebKit journeys; regenerate and verify every HTML documentation peer.
+6. Run a read-only production preflight, apply additive migrations `0008` and `0009` before code publication, push and merge through GitHub `main`, wait for the exact Vercel deployment, run guarded read-only production browser/header/database verification, synchronize local `main`, and remove the completed worktree.
+
+Items 1–5 are complete. Documentation parity, the 580-player/578-portrait validator, Prettier, ESLint, strict TypeScript, all 343 enabled unit/component tests, all 22 isolated Neon integration tests, the production build, eight routed pre-kickoff journeys across desktop/mobile Chromium and iPhone WebKit, and three routed fixed post-kickoff journeys pass. Exact aggregate cleanup is zero. Item 6 has passed the read-only preflight, additive production migrations `0008`/`0009`, exact postcheck, Ready preview, and authenticated HTTP 200 preview routes. GitHub merge, production code deployment, final smoke, synchronization, and cleanup remain.
+
 ## August 20 catalogue and Oxalpha UI remediation (release complete; repository closeout pending)
 
 1. Start from verified GitHub `main` in a new worktree and discard the superseded unmerged UI branch, while preserving unrelated private handoffs and report files in the primary checkout.

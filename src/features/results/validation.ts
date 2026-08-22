@@ -3,6 +3,7 @@ import { createHash } from "node:crypto";
 import { z } from "zod";
 
 import { rankMetricItems } from "@/features/scoring/categories";
+import { PublicError } from "@/shared/errors";
 
 import {
   SPOTLIGHT_RESULT_DATASETS,
@@ -121,7 +122,8 @@ export function assertPublishableCoverage(
   availableSubjectCount = Number.POSITIVE_INFINITY,
 ): asserts coveredThroughRank is number {
   if (coveredThroughRank === null) {
-    throw new Error(
+    throw new PublicError(
+      "BAD_REQUEST",
       "Enter the rank through which this result list is complete.",
     );
   }
@@ -130,13 +132,17 @@ export function assertPublishableCoverage(
     !Number.isInteger(availableSubjectCount) &&
     availableSubjectCount !== Number.POSITIVE_INFINITY
   ) {
-    throw new Error("The available result-subject count is invalid.");
+    throw new PublicError(
+      "BAD_REQUEST",
+      "The available result-subject count is invalid.",
+    );
   }
 
   const directionCoverage = Math.min(coveredThroughRank, availableSubjectCount);
 
   if (!directionHasCoverage(rows, directionCoverage, "descending")) {
-    throw new Error(
+    throw new PublicError(
+      "BAD_REQUEST",
       `Include every row and boundary tie through rank ${coveredThroughRank}.`,
     );
   }
@@ -150,7 +156,8 @@ export function assertPublishableCoverage(
       rows.length < minimumTwoSidedRows ||
       !directionHasCoverage(rows, directionCoverage, "ascending")
     ) {
-      throw new Error(
+      throw new PublicError(
+        "BAD_REQUEST",
         `Ratings must cover every high and low row, including ties, through rank ${coveredThroughRank}.`,
       );
     }

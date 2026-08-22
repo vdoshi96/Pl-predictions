@@ -1,23 +1,9 @@
 import type { NextConfig } from "next";
 
-const isProductionBuild = process.env.NODE_ENV === "production";
-const isLocalHttpE2E = process.env.LOCAL_HTTP_E2E === "1";
+import { isLocalHttpE2EEnvironment } from "./src/shared/runtime-environment";
 
-const contentSecurityPolicy = [
-  "default-src 'self'",
-  "base-uri 'self'",
-  "connect-src 'self'",
-  "font-src 'self' data:",
-  "form-action 'self'",
-  "frame-ancestors 'none'",
-  "img-src 'self' data:",
-  "object-src 'none'",
-  `script-src 'self' 'unsafe-inline'${isProductionBuild ? "" : " 'unsafe-eval'"}`,
-  "style-src 'self' 'unsafe-inline'",
-  ...(isProductionBuild && !isLocalHttpE2E
-    ? ["upgrade-insecure-requests"]
-    : []),
-].join("; ");
+const isProductionBuild = process.env.NODE_ENV === "production";
+const isLocalHttpE2E = isLocalHttpE2EEnvironment(process.env);
 
 const nextConfig: NextConfig = {
   allowedDevOrigins: ["127.0.0.1"],
@@ -28,10 +14,6 @@ const nextConfig: NextConfig = {
       {
         source: "/(.*)",
         headers: [
-          {
-            key: "Content-Security-Policy",
-            value: contentSecurityPolicy,
-          },
           { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
           { key: "X-Content-Type-Options", value: "nosniff" },
           { key: "X-Frame-Options", value: "DENY" },
@@ -40,6 +22,14 @@ const nextConfig: NextConfig = {
             value:
               "camera=(), microphone=(), geolocation=(), payment=(), usb=()",
           },
+          ...(isProductionBuild && !isLocalHttpE2E
+            ? [
+                {
+                  key: "Strict-Transport-Security",
+                  value: "max-age=63072000; includeSubDomains",
+                },
+              ]
+            : []),
         ],
       },
     ];

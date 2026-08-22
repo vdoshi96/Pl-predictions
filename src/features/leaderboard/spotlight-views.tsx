@@ -71,7 +71,7 @@ function ResultChip({
             : "bg-slate-100 text-slate-600"
       }`}
     >
-      Rank {rank}
+      Result rank {rank} · {accuracyPoints ?? 0} pts
     </span>
   );
 }

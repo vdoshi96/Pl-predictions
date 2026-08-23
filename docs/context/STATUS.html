@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="generated-by" content="scripts/generate-docs-html.mjs" />
     <meta name="canonical-source" content="STATUS.md" />
-    <meta name="canonical-source-sha256" content="04791803c7b334ba48da3a4c20dc2f5bee66f452864e129e65d2518e7a146a51" />
+    <meta name="canonical-source-sha256" content="be828dcec92b990cccde907f482452745a87c3a5080f4e749c99481d5ad3aa58" />
     <title>Status</title>
     <style>
       :root { color-scheme: light dark; font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
@@ -43,7 +43,7 @@
 <ul>
 <li><p>Win Streak release candidate (2026-08-23): <code>/win-streak</code> is implemented for Matchweeks 2–38 with 37 official rounds and 370 seeded fixture definitions. The leaderboard is public without entering a display name and includes personal best, current streak, and the current-matchweek pick. Playing uses a receipt-bound display name rather than a login. <code>/admin/win-streak</code> provides the reviewed all-ten-results transition.</p>
 </li>
-<li><p>Win Streak local verification: the 413-test unit/component suite with 31 guarded skips, all 29 isolated Neon integration tests, ESLint, strict TypeScript, the Webpack production build, and 16 focused optimized browser journeys pass. Unit and integration coverage proves shared results and every outcome transition. Desktop, 320-, 390-, and 430-pixel Chromium plus mobile WebKit cover public access, immutable picks, opposing picks, persistence, keyboard operation, light/dark presentation, clean consoles, and no horizontal overflow.</p>
+<li><p>Win Streak local verification: the uninterrupted <code>CI=1 npm run check</code> passes parity for 17 documentation pairs, the player validator, formatting, ESLint, strict TypeScript, 413 unit/component tests with 31 guarded skips, all 29 isolated Neon integration tests, the Webpack production build, 24 pre-kickoff browser journeys with 26 intentional routing skips, and three post-kickoff journeys with two intentional skips. The separate online official-fixture check passes with no drift. The focused 16-journey Win Streak matrix spans desktop, 320-, 390-, and 430-pixel Chromium plus mobile WebKit and covers public access, immutable picks, opposing picks, persistence, keyboard operation, light/dark presentation, clean browser consoles, and no horizontal overflow. Final read-back found zero test profiles, picks, resolved rounds, rate limits, or post-kickoff residue.</p>
 </li>
 <li><p>Win Streak release boundary: migration <code>0010</code>, the targeted 37-round/370-fixture production seed, GitHub merge, and production deployment have not run at this checkpoint. Matchweek 2 starts August 28, 2026, so there is no result backfill. The recurring update-results workflow now checks official fixture drift and fails closed outside safe future kickoff-only changes.</p>
 </li>
@@ -133,7 +133,7 @@
 </li>
 </ul>
 
-      <p class="source">Generated deterministically from <a href="STATUS.md">docs/context/STATUS.md</a>. Canonical SHA-256: <code>04791803c7b334ba48da3a4c20dc2f5bee66f452864e129e65d2518e7a146a51</code>.</p>
+      <p class="source">Generated deterministically from <a href="STATUS.md">docs/context/STATUS.md</a>. Canonical SHA-256: <code>be828dcec92b990cccde907f482452745a87c3a5080f4e749c99481d5ad3aa58</code>.</p>
     </main>
   </body>
 </html>

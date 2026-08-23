@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="generated-by" content="scripts/generate-docs-html.mjs" />
     <meta name="canonical-source" content="PLAN.md" />
-    <meta name="canonical-source-sha256" content="1635a5749ec18d6ae5c623647637fdedc45e1447fe739160ba39de12c2c6a5a2" />
+    <meta name="canonical-source-sha256" content="5f7c3ea0e7ab4b1b034d8319048d6014b4f052c89bbd232e5129646094f981dd" />
     <title>Implementation plan</title>
     <style>
       :root { color-scheme: light dark; font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
@@ -50,7 +50,7 @@
 <li>Verify formatting, documentation parity, fixture coverage, ESLint, TypeScript, unit/component tests, isolated Neon integration, production build, full local checks, desktop/mobile Chromium, mobile WebKit, both colour schemes, keyboard paths, long names, overflow, console output, and network boundaries.</li>
 <li>Run a read-only production preflight, apply only additive migration <code>0010</code> and the targeted Win Streak seed, publish through GitHub <code>main</code>, wait for the exact Vercel deployment, verify the stable public alias and database aggregates read-only, synchronize local <code>main</code>, and remove the completed worktree.</li>
 </ol>
-<p>Items 1–5 are implemented. Focused browser, unit/component, integration, lint, type, and build checks pass. Item 6&#39;s aggregate repository gate and item 7&#39;s production release remain pending at the local release-candidate checkpoint.</p>
+<p>Items 1–6 are complete. The uninterrupted aggregate gate passes documentation parity, catalogue validation, formatting, lint, type checking, 413 unit/component tests, 29 isolated Neon integration tests, the production build, and the full optimized browser matrix; the separate online official-fixture check also passes with no drift. The direct development-server diagnostic still reproduces the repository&#39;s documented Next.js stream-corruption boundary, so the aggregate gate now uses the production build it already verifies. Item 7&#39;s production release remains pending at this local release-candidate checkpoint.</p>
 <h2 id="august-22-adversarial-and-visual-review-remediation-release-complete-repository-closeout-pending">August 22 adversarial and visual review remediation (release complete; repository closeout pending)</h2>
 <ol>
 <li>Reconcile both supplied reports against current <code>main</code> and preserve unrelated primary-worktree changes.</li>
@@ -137,7 +137,7 @@
 </ol>
 <p>Items 1–12 are implemented and released. The migration-first production gate passed before code publication: read-only preflight succeeded, additive <code>0006</code>/<code>0007</code> were applied while the old application remained compatible, and a read-only rollback postcheck proved the expected empty pending state. Feature <a href="https://github.com/vdoshi96/Pl-predictions/pull/19">PR #19</a> merged as <code>9cdad64c285fb66f96d9e11a0b71780008b05160</code>; exact-SHA Vercel deployment <code>dpl_2evvhgizD4spM9QfXKNhvHLEBrgG</code> became Ready and was explicitly assigned to the stable alias. The guarded five-project read-only production smoke passed, its 11-image evidence set was visually inspected and retained, and bounded exact-deployment error/fatal/HTTP-500 queries were empty. The clean merged feature worktree and all enumerated temporary screenshot, HTTPS, Playwright, and evidence directories were removed after the promoted-evidence audit. The three isolated databases remain deliberately retained because <code>DROP DATABASE</code> is destructive, not locally recoverable, and lacks direct owner authorization; no Neon recovery operation was requested. Evidence-PR merge, local-main synchronization, and removal of this closeout worktree remain.</p>
 
-      <p class="source">Generated deterministically from <a href="PLAN.md">docs/PLAN.md</a>. Canonical SHA-256: <code>1635a5749ec18d6ae5c623647637fdedc45e1447fe739160ba39de12c2c6a5a2</code>.</p>
+      <p class="source">Generated deterministically from <a href="PLAN.md">docs/PLAN.md</a>. Canonical SHA-256: <code>5f7c3ea0e7ab4b1b034d8319048d6014b4f052c89bbd232e5129646094f981dd</code>.</p>
     </main>
   </body>
 </html>

@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="generated-by" content="scripts/generate-docs-html.mjs" />
     <meta name="canonical-source" content="QA.md" />
-    <meta name="canonical-source-sha256" content="eaf50e7efa2f6ad1c5c72ad238b02d7b51e05ce9b8c0f49237f610a96152939c" />
+    <meta name="canonical-source-sha256" content="4c9a6ef7eaea3e446f6da23dc0d5c424ecbb885c721f073dec1b41756709c1cf" />
     <title>Quality assurance</title>
     <style>
       :root { color-scheme: light dark; font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
@@ -63,11 +63,19 @@
 </tr>
 <tr>
 <td>Static and build gates</td>
-<td>ESLint, strict TypeScript, and the Next.js 16 Webpack production build passed. The final aggregate format, documentation-parity, fixture-source, repository-check, and release results are recorded at publication.</td>
+<td>The uninterrupted final <code>CI=1 npm run check</code> passed parity for 17 Markdown/HTML pairs, the 580-player/578-portrait validator, Prettier, ESLint, strict TypeScript, 413 unit/component tests with 31 guarded skips, all 29 isolated Neon integration tests, the Next.js 16 Webpack production build, and both browser phases. The online official-fixture check also passed with no drift.</td>
 </tr>
 <tr>
 <td>Browser acceptance</td>
-<td>The optimized production-server Win Streak matrix passed 16 journeys with four intentional project skips across desktop Chromium, 320-, 390-, and 430-pixel mobile Chromium, and mobile WebKit. It covers anonymous leaderboard access, name gating, creation, a real Space/Enter/Escape keyboard path, immutable confirmation, public current picks, two profiles with opposite picks in one fixture, takeover denial, reload persistence, dark mode, clean consoles, no runtime football requests, and no horizontal overflow.</td>
+<td>The aggregate optimized production-server matrix passed 24 pre-kickoff journeys with 26 intentional project-routing skips and three post-kickoff journeys with two intentional skips. The focused Win Streak subset passed 16 journeys with four intentional skips across desktop Chromium, 320-, 390-, and 430-pixel mobile Chromium, and mobile WebKit. It covers anonymous leaderboard access, name gating, creation, a real Space/Enter/Escape keyboard path, immutable confirmation, public current picks, two profiles with opposite picks in one fixture, takeover denial, reload persistence, dark mode, clean browser consoles, no runtime football requests, and no horizontal overflow.</td>
+</tr>
+<tr>
+<td>Aggregate harness</td>
+<td>The first literal check used the development server and reproduced the repository&#39;s known Next.js RSC/manifest corruption: 9 failures, 4 flaky retries, 11 passes, and 26 intentional skips before the post-kickoff phase. Because <code>npm run check</code> already creates a verified production build immediately before Playwright, its browser phase now starts that build through the existing <code>LOCAL_HTTP_E2E=1</code> safety gate. Direct <code>npm run test:e2e</code> retains the development-server diagnostic path. The corrected aggregate check then passed uninterrupted.</td>
+</tr>
+<tr>
+<td>Test data cleanup</td>
+<td>Final isolated-database read-back found 37 rounds, 370 fixtures, zero resolved rounds, zero Win Streak profiles, picks, and rate-limit rows, zero <code>post-kickoff-e2e-*</code> snapshots or predictions, null standings pointers, and false lock/reveal flags. No server remained on port 3100.</td>
 </tr>
 <tr>
 <td>Release boundary</td>
@@ -712,7 +720,7 @@
 <li><input checked="" disabled="" type="checkbox"> Regenerate final HTML peers, publish this closeout through <code>main</code>, synchronize local and remote <code>main</code>, and remove completed branch state.</li>
 </ul>
 
-      <p class="source">Generated deterministically from <a href="QA.md">docs/QA.md</a>. Canonical SHA-256: <code>eaf50e7efa2f6ad1c5c72ad238b02d7b51e05ce9b8c0f49237f610a96152939c</code>.</p>
+      <p class="source">Generated deterministically from <a href="QA.md">docs/QA.md</a>. Canonical SHA-256: <code>4c9a6ef7eaea3e446f6da23dc0d5c424ecbb885c721f073dec1b41756709c1cf</code>.</p>
     </main>
   </body>
 </html>

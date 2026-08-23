@@ -39,7 +39,7 @@
     "admin:hash-password": "node scripts/hash-admin-password.mjs",
     "docs:generate": "node scripts/generate-docs-html.mjs",
     "docs:check": "node scripts/generate-docs-html.mjs --check",
-    "check": "npm run docs:check && npm run players:check && npm run format:check && npm run lint && npm run typecheck && npm run test && npm run test:integration && npm run build:verify && npm run test:e2e"
+    "check": "npm run docs:check && npm run players:check && npm run format:check && npm run lint && npm run typecheck && npm run test && npm run test:integration && npm run build:verify && env LOCAL_HTTP_E2E=1 npm run test:e2e"
   },
   "dependencies": {
     "@dnd-kit/helpers": "0.5.0",

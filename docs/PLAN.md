@@ -10,7 +10,7 @@
 6. Verify formatting, documentation parity, fixture coverage, ESLint, TypeScript, unit/component tests, isolated Neon integration, production build, full local checks, desktop/mobile Chromium, mobile WebKit, both colour schemes, keyboard paths, long names, overflow, console output, and network boundaries.
 7. Run a read-only production preflight, apply only additive migration `0010` and the targeted Win Streak seed, publish through GitHub `main`, wait for the exact Vercel deployment, verify the stable public alias and database aggregates read-only, synchronize local `main`, and remove the completed worktree.
 
-Items 1–5 are implemented. Focused browser, unit/component, integration, lint, type, and build checks pass. Item 6's aggregate repository gate and item 7's production release remain pending at the local release-candidate checkpoint.
+Items 1–6 are complete. The uninterrupted aggregate gate passes documentation parity, catalogue validation, formatting, lint, type checking, 413 unit/component tests, 29 isolated Neon integration tests, the production build, and the full optimized browser matrix; the separate online official-fixture check also passes with no drift. The direct development-server diagnostic still reproduces the repository's documented Next.js stream-corruption boundary, so the aggregate gate now uses the production build it already verifies. Item 7's production release remains pending at this local release-candidate checkpoint.
 
 ## August 22 adversarial and visual review remediation (release complete; repository closeout pending)
 

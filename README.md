@@ -171,7 +171,7 @@ npm run test:e2e            # deterministic pre/post-kickoff desktop, 320/390/43
 npm run test:production-smoke       # read-only public deployment checks
 npm run test:production-write-smoke # explicit opt-in, exact-ID submit/delete proof
 npm run admin:hash-password         # read a password from stdin and emit its PBKDF2 hash
-npm run check               # complete local verification chain
+npm run check               # complete optimized local verification chain
 npm run docs:generate       # regenerate every Markdown HTML peer
 npm run docs:check          # prove generated HTML is current
 npm run win-streak:fixtures:check # compare the canonical snapshot with the official fixture page

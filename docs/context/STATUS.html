@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="generated-by" content="scripts/generate-docs-html.mjs" />
     <meta name="canonical-source" content="STATUS.md" />
-    <meta name="canonical-source-sha256" content="be828dcec92b990cccde907f482452745a87c3a5080f4e749c99481d5ad3aa58" />
+    <meta name="canonical-source-sha256" content="37ba9f1fd38373d77c839cc906f8f879746677574b623e9fc57861a0ed1daaec" />
     <title>Status</title>
     <style>
       :root { color-scheme: light dark; font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
@@ -41,11 +41,11 @@
     <main>
       <h1 id="status">Status</h1>
 <ul>
-<li><p>Win Streak release candidate (2026-08-23): <code>/win-streak</code> is implemented for Matchweeks 2–38 with 37 official rounds and 370 seeded fixture definitions. The leaderboard is public without entering a display name and includes personal best, current streak, and the current-matchweek pick. Playing uses a receipt-bound display name rather than a login. <code>/admin/win-streak</code> provides the reviewed all-ten-results transition.</p>
+<li><p>Current release (2026-08-23): Win Streak <a href="https://github.com/vdoshi96/Pl-predictions/pull/39">PR #39</a> merged as <code>19bf11b4df43f8c3410f704fb278d1d4bdd845b5</code>. <code>/win-streak</code> is live for Matchweeks 2–38 with 37 official rounds and 370 seeded fixtures. The leaderboard is public without entering a display name and includes personal best, current streak, and the current-matchweek pick. Playing uses a receipt-bound display name rather than a login. <code>/admin/win-streak</code> provides the reviewed all-ten-results transition.</p>
 </li>
 <li><p>Win Streak local verification: the uninterrupted <code>CI=1 npm run check</code> passes parity for 17 documentation pairs, the player validator, formatting, ESLint, strict TypeScript, 413 unit/component tests with 31 guarded skips, all 29 isolated Neon integration tests, the Webpack production build, 24 pre-kickoff browser journeys with 26 intentional routing skips, and three post-kickoff journeys with two intentional skips. The separate online official-fixture check passes with no drift. The focused 16-journey Win Streak matrix spans desktop, 320-, 390-, and 430-pixel Chromium plus mobile WebKit and covers public access, immutable picks, opposing picks, persistence, keyboard operation, light/dark presentation, clean browser consoles, and no horizontal overflow. Final read-back found zero test profiles, picks, resolved rounds, rate limits, or post-kickoff residue.</p>
 </li>
-<li><p>Win Streak release boundary: migration <code>0010</code>, the targeted 37-round/370-fixture production seed, GitHub merge, and production deployment have not run at this checkpoint. Matchweek 2 starts August 28, 2026, so there is no result backfill. The recurring update-results workflow now checks official fixture drift and fails closed outside safe future kickoff-only changes.</p>
+<li><p>Win Streak production verification: repeatable-read preflight, exact-hash migration <code>0010</code>, targeted fixture seed, and postchecks pass with unchanged existing aggregates. Ready deployment <code>dpl_BTncZC77GmA3EXtaUjAKvfWZvRzP</code> owns the stable production alias. The guarded five-browser anonymous smoke passes <code>/win-streak</code> with no mutations, console errors, or overflow; final database state has zero Win Streak profiles, picks, results, resolved rounds, or rate-limit rows, and bounded deployment error/fatal/HTTP-5xx queries are empty. Matchweek 2 starts August 28, so no result backfill is due. The recurring update-results workflow now checks official fixture drift and fails closed outside safe future kickoff-only changes.</p>
 </li>
 <li><p>Current release (2026-08-22): <a href="https://github.com/vdoshi96/Pl-predictions/pull/33">PR #33</a> merged directional consensus deltas as <code>0cf3caf9602bbbf10b2cf233c6676baf1005e9cc</code>. Every nonzero delta at the displayed one-decimal precision uses <code>▲</code> or <code>▼</code>; only displayed <code>0.0</code> remains neutral. Vercel deployment <code>dpl_8L2gqq4KjFiByeRrcVkXsWGFWjQQ</code> is Ready at <a href="https://pl-predictions-plwwrm1l9-vdoshi96s-projects.vercel.app">its immutable URL</a>, and deployment-ID read-back proves the stable <a href="https://pl-predictions-2026.vercel.app">production alias</a> resolves to it.</p>
 </li>
@@ -73,9 +73,9 @@
 </li>
 <li><p>Production boundary: the owner-approved supported seed ran exactly once after the exact application deployment became Ready. Production now has 613 total player rows, 580 active rows, 33 preserved inactive rows, 578 active portrait paths, and the two documented silhouette fallbacks.</p>
 </li>
-<li><p>Current phase: the directional consensus-delta release is merged, deployed, and production-verified. This documentation closeout records the exact repository, deployment, alias, and read-only browser evidence.</p>
+<li><p>Current phase: Win Streak is merged, seeded, deployed, and production-verified. This documentation closeout records the exact repository, migration, seed, deployment, alias, browser, log, and read-only database evidence.</p>
 </li>
-<li><p>GitHub release: <a href="https://github.com/vdoshi96/Pl-predictions/pull/21">PR #21</a> merged the UI and catalogue implementation as <code>a033f3613f57c37720e2f0db51ada63965a4783c</code>. <a href="https://github.com/vdoshi96/Pl-predictions/pull/22">PR #22</a> merged the selector and production-smoke corrections as <code>947118f5304271b5ae2a824329080b83d4d80723</code>. <a href="https://github.com/vdoshi96/Pl-predictions/pull/24">PR #24</a> merged administrator paste entry as <code>0a5ad854fe522993ff668ce06ffa94a4c9c0fed8</code>. <a href="https://github.com/vdoshi96/Pl-predictions/pull/26">PR #26</a> merged the season-glance display as <code>ee325557b268510bafa9c7b54aa3b46cba509da4</code>. <a href="https://github.com/vdoshi96/Pl-predictions/pull/31">PR #31</a> merged the dark-mode and dual-zone release as <code>eb1bc82a50f850ff5965c80d3d933e36e8c3f6b5</code>. <a href="https://github.com/vdoshi96/Pl-predictions/pull/33">PR #33</a> merged the directional consensus fix as <code>0cf3caf9602bbbf10b2cf233c6676baf1005e9cc</code>.</p>
+<li><p>GitHub release: <a href="https://github.com/vdoshi96/Pl-predictions/pull/21">PR #21</a> merged the UI and catalogue implementation as <code>a033f3613f57c37720e2f0db51ada63965a4783c</code>. <a href="https://github.com/vdoshi96/Pl-predictions/pull/22">PR #22</a> merged the selector and production-smoke corrections as <code>947118f5304271b5ae2a824329080b83d4d80723</code>. <a href="https://github.com/vdoshi96/Pl-predictions/pull/24">PR #24</a> merged administrator paste entry as <code>0a5ad854fe522993ff668ce06ffa94a4c9c0fed8</code>. <a href="https://github.com/vdoshi96/Pl-predictions/pull/26">PR #26</a> merged the season-glance display as <code>ee325557b268510bafa9c7b54aa3b46cba509da4</code>. <a href="https://github.com/vdoshi96/Pl-predictions/pull/31">PR #31</a> merged the dark-mode and dual-zone release as <code>eb1bc82a50f850ff5965c80d3d933e36e8c3f6b5</code>. <a href="https://github.com/vdoshi96/Pl-predictions/pull/33">PR #33</a> merged the directional consensus fix as <code>0cf3caf9602bbbf10b2cf233c6676baf1005e9cc</code>. <a href="https://github.com/vdoshi96/Pl-predictions/pull/39">PR #39</a> merged Win Streak as <code>19bf11b4df43f8c3410f704fb278d1d4bdd845b5</code>.</p>
 </li>
 <li><p>Product: Dranx Prediction League uses one immutable three-stage entry: enter a display name and order all 20 clubs, choose seven spotlight predictions, then review and submit. Receipt privacy, derived leaderboard/comparison, owner settings and exact submission deletion, manual standings, authenticated source-neutral import, final-table controls, and the new manual results desk share one application.</p>
 </li>
@@ -133,7 +133,7 @@
 </li>
 </ul>
 
-      <p class="source">Generated deterministically from <a href="STATUS.md">docs/context/STATUS.md</a>. Canonical SHA-256: <code>be828dcec92b990cccde907f482452745a87c3a5080f4e749c99481d5ad3aa58</code>.</p>
+      <p class="source">Generated deterministically from <a href="STATUS.md">docs/context/STATUS.md</a>. Canonical SHA-256: <code>37ba9f1fd38373d77c839cc906f8f879746677574b623e9fc57861a0ed1daaec</code>.</p>
     </main>
   </body>
 </html>

@@ -32,7 +32,7 @@ The public application never contacts FotMob or another football-data source. Th
 
 - Vercel project: `vdoshi96s-projects/pl-predictions`.
 - Production alias: `https://pl-predictions-2026.vercel.app`.
-- Current verified production release before Win Streak: GitHub PR #33 merged as `0cf3caf9602bbbf10b2cf233c6676baf1005e9cc`; Vercel deployment `dpl_8L2gqq4KjFiByeRrcVkXsWGFWjQQ` is Ready at `https://pl-predictions-plwwrm1l9-vdoshi96s-projects.vercel.app` and owns the production alias. Win Streak remains a local release candidate until its migration, targeted seed, merge, deployment, and stable-alias checks complete.
+- Current verified production release: Win Streak GitHub PR #39 merged as `19bf11b4df43f8c3410f704fb278d1d4bdd845b5`; Vercel deployment `dpl_BTncZC77GmA3EXtaUjAKvfWZvRzP` is Ready at `https://pl-predictions-cdq31rqls-vdoshi96s-projects.vercel.app` and owns the stable production alias. Additive migration `0010` and the targeted 37-round/370-fixture seed are applied.
 - Deployment protection: Vercel Authentication is `preview`; production is public and retained previews require Vercel sign-in.
 - Database: Neon resource `neon-coffee-queen`, project `young-leaf-03280061`, provisioned through Vercel Marketplace before migrations and seed. Its root `main` branch has a six-hour restore window.
 - Runtime: Node.js 24.x, Next.js 16.3.0, React 19.2.8, Neon serverless HTTP, and Drizzle ORM.

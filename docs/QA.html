@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="generated-by" content="scripts/generate-docs-html.mjs" />
     <meta name="canonical-source" content="QA.md" />
-    <meta name="canonical-source-sha256" content="4c9a6ef7eaea3e446f6da23dc0d5c424ecbb885c721f073dec1b41756709c1cf" />
+    <meta name="canonical-source-sha256" content="9a8901afc08a6ef8a6d685d5f6236e5ecaabc4073667349ecb121df2ac07d4ab" />
     <title>Quality assurance</title>
     <style>
       :root { color-scheme: light dark; font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
@@ -40,8 +40,8 @@
   <body>
     <main>
       <h1 id="quality-assurance">Quality assurance</h1>
-<h2 id="august-23-win-streak-release-candidate">August 23 Win Streak release candidate</h2>
-<p>Win Streak is locally complete for the production release gate. It begins at Matchweek 2, keeps its leaderboard public before name entry, and publishes each participant&#39;s current-matchweek pick. The screenshots use isolated QA profiles rather than production data.</p>
+<h2 id="august-23-win-streak-production-release">August 23 Win Streak production release</h2>
+<p>Win Streak is released for Matchweeks 2–38. Its leaderboard is public before name entry and publishes each participant&#39;s current-matchweek pick. The screenshots use isolated QA profiles rather than production data.</p>
 <table>
 <thead>
 <tr>
@@ -78,8 +78,16 @@
 <td>Final isolated-database read-back found 37 rounds, 370 fixtures, zero resolved rounds, zero Win Streak profiles, picks, and rate-limit rows, zero <code>post-kickoff-e2e-*</code> snapshots or predictions, null standings pointers, and false lock/reveal flags. No server remained on port 3100.</td>
 </tr>
 <tr>
-<td>Release boundary</td>
-<td>At this checkpoint no production migration, seed, profile, pick, result, GitHub merge, or deployment had run. Production verification will remain anonymous and read-only; it will not create a fake participant.</td>
+<td>Production database</td>
+<td>A repeatable-read, read-only preflight at <code>2026-08-23T20:18:10.429Z</code>, WAL <code>0/E8E6438</code>, confirmed <code>neondb</code>, ten known migrations, 14 prediction parents with 280 table rows and 98 spotlight picks, intact standings/result pointers, false lock/reveal flags, and no Win Streak tables. Additive migration <code>0010</code> then applied with exact hash <code>ce4aa426b4f91c85de7a126134a59ad8839374cf86cc1a278f17166be6f19134</code>. Postcheck found 11 migrations, four empty tables, 28 validated constraints, 19 indexes, 12 triggers, 10 functions, and unchanged existing aggregates. The targeted seed inserted 37 rounds and 370 fixtures; every round has ten fixtures, 20 clubs, and a deadline equal to its earliest kickoff.</td>
+</tr>
+<tr>
+<td>GitHub and deployment</td>
+<td><a href="https://github.com/vdoshi96/Pl-predictions/pull/39">PR #39</a> passed both Vercel checks and merged as <code>19bf11b4df43f8c3410f704fb278d1d4bdd845b5</code>. Exact deployment <code>dpl_BTncZC77GmA3EXtaUjAKvfWZvRzP</code> became Ready at <a href="https://pl-predictions-cdq31rqls-vdoshi96s-projects.vercel.app">its immutable URL</a>. The documented <a href="https://pl-predictions-2026.vercel.app">stable production alias</a> was explicitly assigned, and deployment-ID read-back proved the mapping.</td>
+</tr>
+<tr>
+<td>Production acceptance</td>
+<td>The guarded anonymous smoke passed all five projects: desktop Chromium, 390-pixel mobile Chromium, exact 320/430-pixel Chromium reflow, and mobile WebKit. It visited <code>/win-streak</code>, verified its anonymous leaderboard and current-pick explanation, enforced read-only same-origin methods, found no horizontal overflow, and recorded no browser console errors. Final read-only database state was 37 rounds, 370 fixtures, zero resolved rounds, results, profiles, picks, or Win Streak rate limits; the original 14/280/98 prediction shape and all standings/result aggregates remained unchanged. Exact-deployment 15-minute error, fatal, and HTTP 5xx log queries returned no records.</td>
 </tr>
 </tbody></table>
 <p><img src="assets/qa/win-streak-desktop.png" alt="Win Streak desktop acceptance"></p>
@@ -720,7 +728,7 @@
 <li><input checked="" disabled="" type="checkbox"> Regenerate final HTML peers, publish this closeout through <code>main</code>, synchronize local and remote <code>main</code>, and remove completed branch state.</li>
 </ul>
 
-      <p class="source">Generated deterministically from <a href="QA.md">docs/QA.md</a>. Canonical SHA-256: <code>4c9a6ef7eaea3e446f6da23dc0d5c424ecbb885c721f073dec1b41756709c1cf</code>.</p>
+      <p class="source">Generated deterministically from <a href="QA.md">docs/QA.md</a>. Canonical SHA-256: <code>9a8901afc08a6ef8a6d685d5f6236e5ecaabc4073667349ecb121df2ac07d4ab</code>.</p>
     </main>
   </body>
 </html>

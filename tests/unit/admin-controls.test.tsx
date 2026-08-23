@@ -15,10 +15,14 @@ describe("administrator navigation", () => {
     expect(
       screen.getByRole("navigation", { name: "Admin navigation" }),
     ).toBeVisible();
-    expect(screen.getAllByRole("link")).toHaveLength(5);
+    expect(screen.getAllByRole("link")).toHaveLength(6);
     expect(screen.getByRole("link", { name: "Results" })).toHaveAttribute(
       "href",
       "/admin/results",
+    );
+    expect(screen.getByRole("link", { name: "Win Streak" })).toHaveAttribute(
+      "href",
+      "/admin/win-streak",
     );
     expect(screen.getByRole("link", { name: "Settings" })).toHaveAttribute(
       "aria-current",

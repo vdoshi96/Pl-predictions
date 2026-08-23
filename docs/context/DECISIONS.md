@@ -1,5 +1,15 @@
 # Decisions
 
+## 2026-08-23: Release Win Streak from Matchweek 2
+
+Run Win Streak as a separate durable game across Matchweeks 2–38. One confirmed club-to-win pick is immutable for each profile and round. A win adds one to the current streak and keeps that winning club unavailable during the active streak. A draw or loss resets the current streak and unlocks every club. A missed round or void preserves the streak; a void returns that round's club to the available pool. Late joiners receive no retroactive penalty. Rank only personal best by shared competition rank, alphabetize tied names for deterministic presentation, and show current streak as supporting information.
+
+Lock the complete round at its earliest persisted fixture kickoff rather than giving later-playing clubs a longer selection window. Display each fixture's kickoff for context, but use the round deadline and PostgreSQL clock for every profile creation and pick authorization.
+
+Keep the leaderboard public before any display name is entered, and show each profile's current-matchweek pick with the fixture. Do not publish receipt tokens or internal identifiers. A 2–40-character display name creates a profile bound to one random browser receipt whose SHA-256 hash is stored. Do not allow name-only resumption or takeover. Accept the explicit no-login tradeoff that losing the cookie makes the profile unrecoverable; cap the season at 500 profiles and rate-limit profile and pick writes.
+
+Seed all 370 official Matchweek 2–38 fixtures from the Premier League snapshot checked August 23, 2026. Do not make runtime football requests. The recurring update-results workflow must check official fixture drift first. It may automatically prepare only a reviewed kickoff-time correction for a future, unpicked, unresolved fixture; every structural or protected-fixture difference fails closed. Publish a completed round only through the authenticated results desk, with all ten persisted kickoffs elapsed and all ten results committed atomically and immutably.
+
 ## 2026-08-21: August 20 player catalogue and UI-report remediation
 
 Use the owner-provided `premier-league-players-2026-08-20/` handoff as the current repository and production selector source. Normalize all 580 players and copy its 578 verified portraits. Keep null asset paths for Ryan McAidoo and Luc De Fougerolles so `PlayerMark` renders the generic silhouette. Relative to August 18, require exact parity for five additions, five removals, no intra-league moves, two position corrections, and two restored portraits for existing players. Do not run handoff acquisition scripts, infer result facts, or hotlink images. The owner approved the gated production release and one supported seed on 2026-08-21; the seed completed after the exact application deployment became Ready.

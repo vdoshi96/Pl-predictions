@@ -289,6 +289,8 @@ test.describe("admin paste entry", () => {
     await expect(
       page.getByRole("button", { name: "Seed from submissions" }).first(),
     ).toBeVisible();
-    await expect(page.getByLabel(/paste top scorer list/i)).toBeVisible();
+    await expect(
+      page.getByRole("textbox", { name: /paste top scorer list/i }),
+    ).toBeVisible();
   });
 });

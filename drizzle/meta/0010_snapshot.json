@@ -1,0 +1,3332 @@
+{
+  "id": "b6fc842f-78f3-4b63-8248-7644e08206d9",
+  "prevId": "968e3539-dbfb-4ef6-b705-75eb1ee54aee",
+  "version": "7",
+  "dialect": "postgresql",
+  "tables": {
+    "public.admin_audit_logs": {
+      "name": "admin_audit_logs",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "season_id": {
+          "name": "season_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "actor": {
+          "name": "actor",
+          "type": "varchar(64)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "action": {
+          "name": "action",
+          "type": "varchar(96)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "target_type": {
+          "name": "target_type",
+          "type": "varchar(64)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "target_id": {
+          "name": "target_id",
+          "type": "varchar(128)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "request_id": {
+          "name": "request_id",
+          "type": "varchar(128)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "metadata": {
+          "name": "metadata",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'{}'::jsonb"
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "admin_audit_logs_season_created_at_idx": {
+          "name": "admin_audit_logs_season_created_at_idx",
+          "columns": [
+            {
+              "expression": "season_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "created_at",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "admin_audit_logs_action_created_at_idx": {
+          "name": "admin_audit_logs_action_created_at_idx",
+          "columns": [
+            {
+              "expression": "action",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "created_at",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "admin_audit_logs_request_id_idx": {
+          "name": "admin_audit_logs_request_id_idx",
+          "columns": [
+            {
+              "expression": "request_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "admin_audit_logs_season_id_seasons_id_fk": {
+          "name": "admin_audit_logs_season_id_seasons_id_fk",
+          "tableFrom": "admin_audit_logs",
+          "tableTo": "seasons",
+          "columnsFrom": [
+            "season_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.admin_sessions": {
+      "name": "admin_sessions",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "varchar(64)",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "expires_at": {
+          "name": "expires_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "admin_sessions_expires_at_idx": {
+          "name": "admin_sessions_expires_at_idx",
+          "columns": [
+            {
+              "expression": "expires_at",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {
+        "admin_sessions_id_check": {
+          "name": "admin_sessions_id_check",
+          "value": "char_length(\"admin_sessions\".\"id\") = 64"
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "public.players": {
+      "name": "players",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "season_id": {
+          "name": "season_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "team_id": {
+          "name": "team_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "slug": {
+          "name": "slug",
+          "type": "varchar(96)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "external_id": {
+          "name": "external_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "first_name": {
+          "name": "first_name",
+          "type": "varchar(80)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "last_name": {
+          "name": "last_name",
+          "type": "varchar(80)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "display_name": {
+          "name": "display_name",
+          "type": "varchar(120)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "sort_name": {
+          "name": "sort_name",
+          "type": "varchar(120)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "asset_path": {
+          "name": "asset_path",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "is_active": {
+          "name": "is_active",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "players_season_slug_unique": {
+          "name": "players_season_slug_unique",
+          "columns": [
+            {
+              "expression": "season_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "slug",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "players_season_external_id_unique": {
+          "name": "players_season_external_id_unique",
+          "columns": [
+            {
+              "expression": "season_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "external_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "players_season_normalized_display_name_unique": {
+          "name": "players_season_normalized_display_name_unique",
+          "columns": [
+            {
+              "expression": "season_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "lower(regexp_replace(btrim(\"display_name\"), '[[:space:]]+', ' ', 'g'))",
+              "asc": true,
+              "isExpression": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "players_season_sort_name_idx": {
+          "name": "players_season_sort_name_idx",
+          "columns": [
+            {
+              "expression": "season_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "sort_name",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "players_team_id_idx": {
+          "name": "players_team_id_idx",
+          "columns": [
+            {
+              "expression": "team_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "players_season_id_seasons_id_fk": {
+          "name": "players_season_id_seasons_id_fk",
+          "tableFrom": "players",
+          "tableTo": "seasons",
+          "columnsFrom": [
+            "season_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "players_team_id_teams_id_fk": {
+          "name": "players_team_id_teams_id_fk",
+          "tableFrom": "players",
+          "tableTo": "teams",
+          "columnsFrom": [
+            "team_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {
+        "players_slug_check": {
+          "name": "players_slug_check",
+          "value": "\"players\".\"slug\" ~ '^[a-z0-9]+(?:-[a-z0-9]+)*$'"
+        },
+        "players_external_id_check": {
+          "name": "players_external_id_check",
+          "value": "\"players\".\"external_id\" is null or \"players\".\"external_id\" > 0"
+        },
+        "players_asset_path_check": {
+          "name": "players_asset_path_check",
+          "value": "\"players\".\"asset_path\" is null or \"players\".\"asset_path\" like '/player-faces/%'"
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "public.prediction_category_picks": {
+      "name": "prediction_category_picks",
+      "schema": "",
+      "columns": {
+        "prediction_id": {
+          "name": "prediction_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "category": {
+          "name": "category",
+          "type": "varchar(32)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "player_id": {
+          "name": "player_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "team_id": {
+          "name": "team_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "custom_player_name": {
+          "name": "custom_player_name",
+          "type": "varchar(120)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "normalized_custom_player_name": {
+          "name": "normalized_custom_player_name",
+          "type": "varchar(120)",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {
+        "prediction_category_picks_player_id_idx": {
+          "name": "prediction_category_picks_player_id_idx",
+          "columns": [
+            {
+              "expression": "player_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "prediction_category_picks_team_id_idx": {
+          "name": "prediction_category_picks_team_id_idx",
+          "columns": [
+            {
+              "expression": "team_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "prediction_category_picks_prediction_id_predictions_id_fk": {
+          "name": "prediction_category_picks_prediction_id_predictions_id_fk",
+          "tableFrom": "prediction_category_picks",
+          "tableTo": "predictions",
+          "columnsFrom": [
+            "prediction_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "prediction_category_picks_player_id_players_id_fk": {
+          "name": "prediction_category_picks_player_id_players_id_fk",
+          "tableFrom": "prediction_category_picks",
+          "tableTo": "players",
+          "columnsFrom": [
+            "player_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "restrict",
+          "onUpdate": "no action"
+        },
+        "prediction_category_picks_team_id_teams_id_fk": {
+          "name": "prediction_category_picks_team_id_teams_id_fk",
+          "tableFrom": "prediction_category_picks",
+          "tableTo": "teams",
+          "columnsFrom": [
+            "team_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "restrict",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "prediction_category_picks_prediction_category_pk": {
+          "name": "prediction_category_picks_prediction_category_pk",
+          "columns": [
+            "prediction_id",
+            "category"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {
+        "prediction_category_picks_category_check": {
+          "name": "prediction_category_picks_category_check",
+          "value": "\"prediction_category_picks\".\"category\" in ('top_scorer', 'top_assister', 'most_clean_sheets', 'underdog_team', 'overrated_team', 'underdog_player', 'overrated_player')"
+        },
+        "prediction_category_picks_subject_check": {
+          "name": "prediction_category_picks_subject_check",
+          "value": "(\n        \"prediction_category_picks\".\"category\" in ('most_clean_sheets', 'underdog_team', 'overrated_team')\n        and \"prediction_category_picks\".\"team_id\" is not null\n        and \"prediction_category_picks\".\"player_id\" is null\n        and \"prediction_category_picks\".\"custom_player_name\" is null\n        and \"prediction_category_picks\".\"normalized_custom_player_name\" is null\n      ) or (\n        \"prediction_category_picks\".\"category\" in ('top_scorer', 'top_assister', 'underdog_player', 'overrated_player')\n        and \"prediction_category_picks\".\"team_id\" is null\n        and (\n          (\n            \"prediction_category_picks\".\"player_id\" is not null\n            and \"prediction_category_picks\".\"custom_player_name\" is null\n            and \"prediction_category_picks\".\"normalized_custom_player_name\" is null\n          ) or (\n            \"prediction_category_picks\".\"player_id\" is null\n            and \"prediction_category_picks\".\"custom_player_name\" is not null\n            and \"prediction_category_picks\".\"normalized_custom_player_name\" is not null\n            and char_length(\"prediction_category_picks\".\"custom_player_name\") between 2 and 120\n            and char_length(\"prediction_category_picks\".\"normalized_custom_player_name\") between 2 and 120\n          )\n        )\n      )"
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "public.prediction_items": {
+      "name": "prediction_items",
+      "schema": "",
+      "columns": {
+        "prediction_id": {
+          "name": "prediction_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "team_id": {
+          "name": "team_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "predicted_position": {
+          "name": "predicted_position",
+          "type": "smallint",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {
+        "prediction_items_prediction_position_unique": {
+          "name": "prediction_items_prediction_position_unique",
+          "columns": [
+            {
+              "expression": "prediction_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "predicted_position",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "prediction_items_team_id_idx": {
+          "name": "prediction_items_team_id_idx",
+          "columns": [
+            {
+              "expression": "team_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "prediction_items_prediction_id_predictions_id_fk": {
+          "name": "prediction_items_prediction_id_predictions_id_fk",
+          "tableFrom": "prediction_items",
+          "tableTo": "predictions",
+          "columnsFrom": [
+            "prediction_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "prediction_items_team_id_teams_id_fk": {
+          "name": "prediction_items_team_id_teams_id_fk",
+          "tableFrom": "prediction_items",
+          "tableTo": "teams",
+          "columnsFrom": [
+            "team_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "restrict",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "prediction_items_prediction_team_pk": {
+          "name": "prediction_items_prediction_team_pk",
+          "columns": [
+            "prediction_id",
+            "team_id"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {
+        "prediction_items_position_check": {
+          "name": "prediction_items_position_check",
+          "value": "\"prediction_items\".\"predicted_position\" between 1 and 20"
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "public.predictions": {
+      "name": "predictions",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "season_id": {
+          "name": "season_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "participant_name": {
+          "name": "participant_name",
+          "type": "varchar(40)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "normalized_participant_name": {
+          "name": "normalized_participant_name",
+          "type": "varchar(40)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "receipt_token_hash": {
+          "name": "receipt_token_hash",
+          "type": "varchar(64)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "predictions_season_normalized_name_unique": {
+          "name": "predictions_season_normalized_name_unique",
+          "columns": [
+            {
+              "expression": "season_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "normalized_participant_name",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "predictions_receipt_token_hash_unique": {
+          "name": "predictions_receipt_token_hash_unique",
+          "columns": [
+            {
+              "expression": "receipt_token_hash",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "predictions_season_created_at_idx": {
+          "name": "predictions_season_created_at_idx",
+          "columns": [
+            {
+              "expression": "season_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "created_at",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "predictions_season_id_seasons_id_fk": {
+          "name": "predictions_season_id_seasons_id_fk",
+          "tableFrom": "predictions",
+          "tableTo": "seasons",
+          "columnsFrom": [
+            "season_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {
+        "predictions_participant_name_length_check": {
+          "name": "predictions_participant_name_length_check",
+          "value": "char_length(\"predictions\".\"participant_name\") between 2 and 40"
+        },
+        "predictions_normalized_name_length_check": {
+          "name": "predictions_normalized_name_length_check",
+          "value": "char_length(\"predictions\".\"normalized_participant_name\") between 2 and 40"
+        },
+        "predictions_receipt_hash_check": {
+          "name": "predictions_receipt_hash_check",
+          "value": "\"predictions\".\"receipt_token_hash\" is null or char_length(\"predictions\".\"receipt_token_hash\") = 64"
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "public.seasons": {
+      "name": "seasons",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "slug": {
+          "name": "slug",
+          "type": "varchar(32)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "name": {
+          "name": "name",
+          "type": "varchar(80)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "competition_code": {
+          "name": "competition_code",
+          "type": "varchar(16)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "start_year": {
+          "name": "start_year",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "opening_kickoff": {
+          "name": "opening_kickoff",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "submission_deadline": {
+          "name": "submission_deadline",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "submissions_locked": {
+          "name": "submissions_locked",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        },
+        "reveal_predictions": {
+          "name": "reveal_predictions",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        },
+        "active_snapshot_id": {
+          "name": "active_snapshot_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "final_snapshot_id": {
+          "name": "final_snapshot_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "standings_accepted_through": {
+          "name": "standings_accepted_through",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "seasons_slug_unique": {
+          "name": "seasons_slug_unique",
+          "columns": [
+            {
+              "expression": "slug",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "seasons_active_snapshot_id_standings_snapshots_id_fk": {
+          "name": "seasons_active_snapshot_id_standings_snapshots_id_fk",
+          "tableFrom": "seasons",
+          "tableTo": "standings_snapshots",
+          "columnsFrom": [
+            "active_snapshot_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        },
+        "seasons_final_snapshot_id_standings_snapshots_id_fk": {
+          "name": "seasons_final_snapshot_id_standings_snapshots_id_fk",
+          "tableFrom": "seasons",
+          "tableTo": "standings_snapshots",
+          "columnsFrom": [
+            "final_snapshot_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {
+        "seasons_start_year_check": {
+          "name": "seasons_start_year_check",
+          "value": "\"seasons\".\"start_year\" between 1992 and 2200"
+        },
+        "seasons_slug_check": {
+          "name": "seasons_slug_check",
+          "value": "\"seasons\".\"slug\" ~ '^[a-z0-9]+(?:-[a-z0-9]+)*$'"
+        },
+        "seasons_final_active_snapshot_check": {
+          "name": "seasons_final_active_snapshot_check",
+          "value": "\"seasons\".\"final_snapshot_id\" is null or \"seasons\".\"final_snapshot_id\" = \"seasons\".\"active_snapshot_id\""
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "public.security_rate_limits": {
+      "name": "security_rate_limits",
+      "schema": "",
+      "columns": {
+        "scope": {
+          "name": "scope",
+          "type": "varchar(32)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "key_hash": {
+          "name": "key_hash",
+          "type": "varchar(64)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "window_started_at": {
+          "name": "window_started_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "attempt_count": {
+          "name": "attempt_count",
+          "type": "smallint",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "blocked_until": {
+          "name": "blocked_until",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "security_rate_limits_updated_at_idx": {
+          "name": "security_rate_limits_updated_at_idx",
+          "columns": [
+            {
+              "expression": "updated_at",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {
+        "security_rate_limits_scope_key_pk": {
+          "name": "security_rate_limits_scope_key_pk",
+          "columns": [
+            "scope",
+            "key_hash"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {
+        "security_rate_limits_scope_check": {
+          "name": "security_rate_limits_scope_check",
+          "value": "\"security_rate_limits\".\"scope\" in ('admin_login', 'standings_ingest', 'win_streak_create', 'win_streak_pick')"
+        },
+        "security_rate_limits_key_hash_check": {
+          "name": "security_rate_limits_key_hash_check",
+          "value": "char_length(\"security_rate_limits\".\"key_hash\") = 64"
+        },
+        "security_rate_limits_attempt_count_check": {
+          "name": "security_rate_limits_attempt_count_check",
+          "value": "\"security_rate_limits\".\"attempt_count\" between 0 and 32767"
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "public.spotlight_result_aliases": {
+      "name": "spotlight_result_aliases",
+      "schema": "",
+      "columns": {
+        "season_id": {
+          "name": "season_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "normalized_custom_player_name": {
+          "name": "normalized_custom_player_name",
+          "type": "varchar(120)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "custom_player_name": {
+          "name": "custom_player_name",
+          "type": "varchar(120)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "player_id": {
+          "name": "player_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "spotlight_result_aliases_player_idx": {
+          "name": "spotlight_result_aliases_player_idx",
+          "columns": [
+            {
+              "expression": "player_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "spotlight_result_aliases_season_id_seasons_id_fk": {
+          "name": "spotlight_result_aliases_season_id_seasons_id_fk",
+          "tableFrom": "spotlight_result_aliases",
+          "tableTo": "seasons",
+          "columnsFrom": [
+            "season_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "spotlight_result_aliases_player_id_players_id_fk": {
+          "name": "spotlight_result_aliases_player_id_players_id_fk",
+          "tableFrom": "spotlight_result_aliases",
+          "tableTo": "players",
+          "columnsFrom": [
+            "player_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "restrict",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "spotlight_result_aliases_season_name_pk": {
+          "name": "spotlight_result_aliases_season_name_pk",
+          "columns": [
+            "season_id",
+            "normalized_custom_player_name"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {
+        "spotlight_result_aliases_name_check": {
+          "name": "spotlight_result_aliases_name_check",
+          "value": "char_length(\"spotlight_result_aliases\".\"custom_player_name\") between 2 and 120\n        and char_length(\"spotlight_result_aliases\".\"normalized_custom_player_name\") between 2 and 120"
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "public.spotlight_result_items": {
+      "name": "spotlight_result_items",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "snapshot_id": {
+          "name": "snapshot_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "player_id": {
+          "name": "player_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "team_id": {
+          "name": "team_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "metric_value": {
+          "name": "metric_value",
+          "type": "numeric(8, 3)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "outcome_rank": {
+          "name": "outcome_rank",
+          "type": "smallint",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {
+        "spotlight_result_items_snapshot_player_unique": {
+          "name": "spotlight_result_items_snapshot_player_unique",
+          "columns": [
+            {
+              "expression": "snapshot_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "player_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "spotlight_result_items_snapshot_team_unique": {
+          "name": "spotlight_result_items_snapshot_team_unique",
+          "columns": [
+            {
+              "expression": "snapshot_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "team_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "spotlight_result_items_player_idx": {
+          "name": "spotlight_result_items_player_idx",
+          "columns": [
+            {
+              "expression": "player_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "spotlight_result_items_team_idx": {
+          "name": "spotlight_result_items_team_idx",
+          "columns": [
+            {
+              "expression": "team_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "spotlight_result_items_snapshot_id_spotlight_result_snapshots_id_fk": {
+          "name": "spotlight_result_items_snapshot_id_spotlight_result_snapshots_id_fk",
+          "tableFrom": "spotlight_result_items",
+          "tableTo": "spotlight_result_snapshots",
+          "columnsFrom": [
+            "snapshot_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "spotlight_result_items_player_id_players_id_fk": {
+          "name": "spotlight_result_items_player_id_players_id_fk",
+          "tableFrom": "spotlight_result_items",
+          "tableTo": "players",
+          "columnsFrom": [
+            "player_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "restrict",
+          "onUpdate": "no action"
+        },
+        "spotlight_result_items_team_id_teams_id_fk": {
+          "name": "spotlight_result_items_team_id_teams_id_fk",
+          "tableFrom": "spotlight_result_items",
+          "tableTo": "teams",
+          "columnsFrom": [
+            "team_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "restrict",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {
+        "spotlight_result_items_subject_check": {
+          "name": "spotlight_result_items_subject_check",
+          "value": "(\n        \"spotlight_result_items\".\"player_id\" is not null\n        and \"spotlight_result_items\".\"team_id\" is null\n      ) or (\n        \"spotlight_result_items\".\"player_id\" is null\n        and \"spotlight_result_items\".\"team_id\" is not null\n      )"
+        },
+        "spotlight_result_items_metric_check": {
+          "name": "spotlight_result_items_metric_check",
+          "value": "\"spotlight_result_items\".\"metric_value\" >= 0"
+        },
+        "spotlight_result_items_rank_check": {
+          "name": "spotlight_result_items_rank_check",
+          "value": "\"spotlight_result_items\".\"outcome_rank\" between 1 and 1000"
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "public.spotlight_result_snapshot_aliases": {
+      "name": "spotlight_result_snapshot_aliases",
+      "schema": "",
+      "columns": {
+        "snapshot_id": {
+          "name": "snapshot_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "normalized_custom_player_name": {
+          "name": "normalized_custom_player_name",
+          "type": "varchar(120)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "custom_player_name": {
+          "name": "custom_player_name",
+          "type": "varchar(120)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "player_id": {
+          "name": "player_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {
+        "spotlight_result_snapshot_aliases_player_idx": {
+          "name": "spotlight_result_snapshot_aliases_player_idx",
+          "columns": [
+            {
+              "expression": "player_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "spotlight_result_snapshot_aliases_snapshot_id_spotlight_result_snapshots_id_fk": {
+          "name": "spotlight_result_snapshot_aliases_snapshot_id_spotlight_result_snapshots_id_fk",
+          "tableFrom": "spotlight_result_snapshot_aliases",
+          "tableTo": "spotlight_result_snapshots",
+          "columnsFrom": [
+            "snapshot_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "spotlight_result_snapshot_aliases_player_id_players_id_fk": {
+          "name": "spotlight_result_snapshot_aliases_player_id_players_id_fk",
+          "tableFrom": "spotlight_result_snapshot_aliases",
+          "tableTo": "players",
+          "columnsFrom": [
+            "player_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "restrict",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "spotlight_result_snapshot_aliases_snapshot_name_pk": {
+          "name": "spotlight_result_snapshot_aliases_snapshot_name_pk",
+          "columns": [
+            "snapshot_id",
+            "normalized_custom_player_name"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {
+        "spotlight_result_snapshot_aliases_name_check": {
+          "name": "spotlight_result_snapshot_aliases_name_check",
+          "value": "char_length(\"spotlight_result_snapshot_aliases\".\"custom_player_name\") between 2 and 120\n        and char_length(\"spotlight_result_snapshot_aliases\".\"normalized_custom_player_name\") between 2 and 120"
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "public.spotlight_result_snapshots": {
+      "name": "spotlight_result_snapshots",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "season_id": {
+          "name": "season_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "dataset": {
+          "name": "dataset",
+          "type": "varchar(32)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "source": {
+          "name": "source",
+          "type": "varchar(64)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "source_reference": {
+          "name": "source_reference",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "captured_at": {
+          "name": "captured_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "covered_through_rank": {
+          "name": "covered_through_rank",
+          "type": "smallint",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "content_hash": {
+          "name": "content_hash",
+          "type": "varchar(64)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "sealed_at": {
+          "name": "sealed_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "spotlight_result_snapshots_content_idx": {
+          "name": "spotlight_result_snapshots_content_idx",
+          "columns": [
+            {
+              "expression": "season_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "dataset",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "content_hash",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "spotlight_result_snapshots_season_dataset_created_idx": {
+          "name": "spotlight_result_snapshots_season_dataset_created_idx",
+          "columns": [
+            {
+              "expression": "season_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "dataset",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "created_at",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "spotlight_result_snapshots_season_id_seasons_id_fk": {
+          "name": "spotlight_result_snapshots_season_id_seasons_id_fk",
+          "tableFrom": "spotlight_result_snapshots",
+          "tableTo": "seasons",
+          "columnsFrom": [
+            "season_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {
+        "spotlight_result_snapshots_dataset_check": {
+          "name": "spotlight_result_snapshots_dataset_check",
+          "value": "\"spotlight_result_snapshots\".\"dataset\" in ('goals', 'assists', 'clean_sheets', 'player_ratings')"
+        },
+        "spotlight_result_snapshots_coverage_check": {
+          "name": "spotlight_result_snapshots_coverage_check",
+          "value": "\"spotlight_result_snapshots\".\"covered_through_rank\" is null or \"spotlight_result_snapshots\".\"covered_through_rank\" between 1 and 1000"
+        },
+        "spotlight_result_snapshots_content_hash_check": {
+          "name": "spotlight_result_snapshots_content_hash_check",
+          "value": "char_length(\"spotlight_result_snapshots\".\"content_hash\") = 64"
+        },
+        "spotlight_result_snapshots_sealed_at_check": {
+          "name": "spotlight_result_snapshots_sealed_at_check",
+          "value": "\"spotlight_result_snapshots\".\"sealed_at\" is null or \"spotlight_result_snapshots\".\"sealed_at\" >= \"spotlight_result_snapshots\".\"created_at\""
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "public.spotlight_result_states": {
+      "name": "spotlight_result_states",
+      "schema": "",
+      "columns": {
+        "season_id": {
+          "name": "season_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "dataset": {
+          "name": "dataset",
+          "type": "varchar(32)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "working_snapshot_id": {
+          "name": "working_snapshot_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "active_snapshot_id": {
+          "name": "active_snapshot_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "final_snapshot_id": {
+          "name": "final_snapshot_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "spotlight_result_states_season_id_seasons_id_fk": {
+          "name": "spotlight_result_states_season_id_seasons_id_fk",
+          "tableFrom": "spotlight_result_states",
+          "tableTo": "seasons",
+          "columnsFrom": [
+            "season_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "spotlight_result_states_working_snapshot_id_spotlight_result_snapshots_id_fk": {
+          "name": "spotlight_result_states_working_snapshot_id_spotlight_result_snapshots_id_fk",
+          "tableFrom": "spotlight_result_states",
+          "tableTo": "spotlight_result_snapshots",
+          "columnsFrom": [
+            "working_snapshot_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "restrict",
+          "onUpdate": "no action"
+        },
+        "spotlight_result_states_active_snapshot_id_spotlight_result_snapshots_id_fk": {
+          "name": "spotlight_result_states_active_snapshot_id_spotlight_result_snapshots_id_fk",
+          "tableFrom": "spotlight_result_states",
+          "tableTo": "spotlight_result_snapshots",
+          "columnsFrom": [
+            "active_snapshot_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "restrict",
+          "onUpdate": "no action"
+        },
+        "spotlight_result_states_final_snapshot_id_spotlight_result_snapshots_id_fk": {
+          "name": "spotlight_result_states_final_snapshot_id_spotlight_result_snapshots_id_fk",
+          "tableFrom": "spotlight_result_states",
+          "tableTo": "spotlight_result_snapshots",
+          "columnsFrom": [
+            "final_snapshot_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "restrict",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "spotlight_result_states_season_dataset_pk": {
+          "name": "spotlight_result_states_season_dataset_pk",
+          "columns": [
+            "season_id",
+            "dataset"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {
+        "spotlight_result_states_dataset_check": {
+          "name": "spotlight_result_states_dataset_check",
+          "value": "\"spotlight_result_states\".\"dataset\" in ('goals', 'assists', 'clean_sheets', 'player_ratings')"
+        },
+        "spotlight_result_states_final_active_check": {
+          "name": "spotlight_result_states_final_active_check",
+          "value": "\"spotlight_result_states\".\"final_snapshot_id\" is null or \"spotlight_result_states\".\"final_snapshot_id\" = \"spotlight_result_states\".\"active_snapshot_id\""
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "public.standings_import_run_items": {
+      "name": "standings_import_run_items",
+      "schema": "",
+      "columns": {
+        "run_id": {
+          "name": "run_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "ordinal": {
+          "name": "ordinal",
+          "type": "smallint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "team_key": {
+          "name": "team_key",
+          "type": "varchar(64)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "team_id": {
+          "name": "team_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "actual_position": {
+          "name": "actual_position",
+          "type": "smallint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "played_games": {
+          "name": "played_games",
+          "type": "smallint",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "league_points": {
+          "name": "league_points",
+          "type": "smallint",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {
+        "standings_import_run_items_run_team_unique": {
+          "name": "standings_import_run_items_run_team_unique",
+          "columns": [
+            {
+              "expression": "run_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "team_key",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "standings_import_run_items_run_position_unique": {
+          "name": "standings_import_run_items_run_position_unique",
+          "columns": [
+            {
+              "expression": "run_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "actual_position",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "standings_import_run_items_team_id_idx": {
+          "name": "standings_import_run_items_team_id_idx",
+          "columns": [
+            {
+              "expression": "team_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "standings_import_run_items_run_id_standings_import_runs_id_fk": {
+          "name": "standings_import_run_items_run_id_standings_import_runs_id_fk",
+          "tableFrom": "standings_import_run_items",
+          "tableTo": "standings_import_runs",
+          "columnsFrom": [
+            "run_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "standings_import_run_items_team_id_teams_id_fk": {
+          "name": "standings_import_run_items_team_id_teams_id_fk",
+          "tableFrom": "standings_import_run_items",
+          "tableTo": "teams",
+          "columnsFrom": [
+            "team_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "restrict",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "standings_import_run_items_run_ordinal_pk": {
+          "name": "standings_import_run_items_run_ordinal_pk",
+          "columns": [
+            "run_id",
+            "ordinal"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {
+        "standings_import_run_items_ordinal_check": {
+          "name": "standings_import_run_items_ordinal_check",
+          "value": "\"standings_import_run_items\".\"ordinal\" between 1 and 20"
+        },
+        "standings_import_run_items_position_check": {
+          "name": "standings_import_run_items_position_check",
+          "value": "\"standings_import_run_items\".\"actual_position\" between 1 and 20"
+        },
+        "standings_import_run_items_played_games_check": {
+          "name": "standings_import_run_items_played_games_check",
+          "value": "\"standings_import_run_items\".\"played_games\" is null or \"standings_import_run_items\".\"played_games\" between 0 and 38"
+        },
+        "standings_import_run_items_league_points_check": {
+          "name": "standings_import_run_items_league_points_check",
+          "value": "\"standings_import_run_items\".\"league_points\" is null or \"standings_import_run_items\".\"league_points\" between -100 and 114"
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "public.standings_import_runs": {
+      "name": "standings_import_runs",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "season_id": {
+          "name": "season_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "source": {
+          "name": "source",
+          "type": "varchar(64)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "status": {
+          "name": "status",
+          "type": "varchar(16)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "captured_at": {
+          "name": "captured_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "content_hash": {
+          "name": "content_hash",
+          "type": "varchar(64)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "snapshot_id": {
+          "name": "snapshot_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "item_count": {
+          "name": "item_count",
+          "type": "smallint",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "error_code": {
+          "name": "error_code",
+          "type": "varchar(64)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "error_message": {
+          "name": "error_message",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "completed_at": {
+          "name": "completed_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {
+        "standings_import_runs_season_created_at_idx": {
+          "name": "standings_import_runs_season_created_at_idx",
+          "columns": [
+            {
+              "expression": "season_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "created_at",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "standings_import_runs_status_idx": {
+          "name": "standings_import_runs_status_idx",
+          "columns": [
+            {
+              "expression": "status",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "standings_import_runs_snapshot_id_idx": {
+          "name": "standings_import_runs_snapshot_id_idx",
+          "columns": [
+            {
+              "expression": "snapshot_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "standings_import_runs_season_id_seasons_id_fk": {
+          "name": "standings_import_runs_season_id_seasons_id_fk",
+          "tableFrom": "standings_import_runs",
+          "tableTo": "seasons",
+          "columnsFrom": [
+            "season_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "standings_import_runs_snapshot_id_standings_snapshots_id_fk": {
+          "name": "standings_import_runs_snapshot_id_standings_snapshots_id_fk",
+          "tableFrom": "standings_import_runs",
+          "tableTo": "standings_snapshots",
+          "columnsFrom": [
+            "snapshot_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {
+        "standings_import_runs_status_check": {
+          "name": "standings_import_runs_status_check",
+          "value": "\"standings_import_runs\".\"status\" in ('received', 'succeeded', 'rejected', 'duplicate', 'failed')"
+        },
+        "standings_import_runs_item_count_check": {
+          "name": "standings_import_runs_item_count_check",
+          "value": "\"standings_import_runs\".\"item_count\" between 0 and 20"
+        },
+        "standings_import_runs_content_hash_check": {
+          "name": "standings_import_runs_content_hash_check",
+          "value": "\"standings_import_runs\".\"content_hash\" is null or char_length(\"standings_import_runs\".\"content_hash\") = 64"
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "public.standings_items": {
+      "name": "standings_items",
+      "schema": "",
+      "columns": {
+        "snapshot_id": {
+          "name": "snapshot_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "team_id": {
+          "name": "team_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "actual_position": {
+          "name": "actual_position",
+          "type": "smallint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "played_games": {
+          "name": "played_games",
+          "type": "smallint",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "league_points": {
+          "name": "league_points",
+          "type": "smallint",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {
+        "standings_items_snapshot_position_unique": {
+          "name": "standings_items_snapshot_position_unique",
+          "columns": [
+            {
+              "expression": "snapshot_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "actual_position",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "standings_items_team_id_idx": {
+          "name": "standings_items_team_id_idx",
+          "columns": [
+            {
+              "expression": "team_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "standings_items_snapshot_id_standings_snapshots_id_fk": {
+          "name": "standings_items_snapshot_id_standings_snapshots_id_fk",
+          "tableFrom": "standings_items",
+          "tableTo": "standings_snapshots",
+          "columnsFrom": [
+            "snapshot_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "standings_items_team_id_teams_id_fk": {
+          "name": "standings_items_team_id_teams_id_fk",
+          "tableFrom": "standings_items",
+          "tableTo": "teams",
+          "columnsFrom": [
+            "team_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "restrict",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "standings_items_snapshot_team_pk": {
+          "name": "standings_items_snapshot_team_pk",
+          "columns": [
+            "snapshot_id",
+            "team_id"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {
+        "standings_items_position_check": {
+          "name": "standings_items_position_check",
+          "value": "\"standings_items\".\"actual_position\" between 1 and 20"
+        },
+        "standings_items_played_games_check": {
+          "name": "standings_items_played_games_check",
+          "value": "\"standings_items\".\"played_games\" is null or \"standings_items\".\"played_games\" between 0 and 38"
+        },
+        "standings_items_league_points_check": {
+          "name": "standings_items_league_points_check",
+          "value": "\"standings_items\".\"league_points\" is null or \"standings_items\".\"league_points\" between -100 and 114"
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "public.standings_snapshots": {
+      "name": "standings_snapshots",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "season_id": {
+          "name": "season_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "source": {
+          "name": "source",
+          "type": "varchar(64)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "source_reference": {
+          "name": "source_reference",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "captured_at": {
+          "name": "captured_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "source_updated_at": {
+          "name": "source_updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "matchweek": {
+          "name": "matchweek",
+          "type": "smallint",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "is_final": {
+          "name": "is_final",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        },
+        "content_hash": {
+          "name": "content_hash",
+          "type": "varchar(64)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "standings_snapshots_season_content_hash_unique": {
+          "name": "standings_snapshots_season_content_hash_unique",
+          "columns": [
+            {
+              "expression": "season_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "content_hash",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "standings_snapshots_season_captured_at_idx": {
+          "name": "standings_snapshots_season_captured_at_idx",
+          "columns": [
+            {
+              "expression": "season_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "captured_at",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "standings_snapshots_season_final_idx": {
+          "name": "standings_snapshots_season_final_idx",
+          "columns": [
+            {
+              "expression": "season_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "is_final",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "standings_snapshots_season_id_seasons_id_fk": {
+          "name": "standings_snapshots_season_id_seasons_id_fk",
+          "tableFrom": "standings_snapshots",
+          "tableTo": "seasons",
+          "columnsFrom": [
+            "season_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {
+        "standings_snapshots_matchweek_check": {
+          "name": "standings_snapshots_matchweek_check",
+          "value": "\"standings_snapshots\".\"matchweek\" is null or \"standings_snapshots\".\"matchweek\" between 1 and 38"
+        },
+        "standings_snapshots_content_hash_check": {
+          "name": "standings_snapshots_content_hash_check",
+          "value": "char_length(\"standings_snapshots\".\"content_hash\") = 64"
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "public.teams": {
+      "name": "teams",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "season_id": {
+          "name": "season_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "slug": {
+          "name": "slug",
+          "type": "varchar(64)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "external_id": {
+          "name": "external_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "display_name": {
+          "name": "display_name",
+          "type": "varchar(80)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "short_name": {
+          "name": "short_name",
+          "type": "varchar(40)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "sort_name": {
+          "name": "sort_name",
+          "type": "varchar(80)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "crest_url": {
+          "name": "crest_url",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "asset_path": {
+          "name": "asset_path",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "teams_season_slug_unique": {
+          "name": "teams_season_slug_unique",
+          "columns": [
+            {
+              "expression": "season_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "slug",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "teams_season_external_id_unique": {
+          "name": "teams_season_external_id_unique",
+          "columns": [
+            {
+              "expression": "season_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "external_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "teams_season_sort_name_idx": {
+          "name": "teams_season_sort_name_idx",
+          "columns": [
+            {
+              "expression": "season_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "sort_name",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "teams_season_id_seasons_id_fk": {
+          "name": "teams_season_id_seasons_id_fk",
+          "tableFrom": "teams",
+          "tableTo": "seasons",
+          "columnsFrom": [
+            "season_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {
+        "teams_slug_check": {
+          "name": "teams_slug_check",
+          "value": "\"teams\".\"slug\" ~ '^[a-z0-9]+(?:-[a-z0-9]+)*$'"
+        },
+        "teams_external_id_check": {
+          "name": "teams_external_id_check",
+          "value": "\"teams\".\"external_id\" is null or \"teams\".\"external_id\" > 0"
+        },
+        "teams_asset_path_check": {
+          "name": "teams_asset_path_check",
+          "value": "\"teams\".\"asset_path\" like '/%'"
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "public.win_streak_fixtures": {
+      "name": "win_streak_fixtures",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "season_id": {
+          "name": "season_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "round_id": {
+          "name": "round_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "source_fixture_id": {
+          "name": "source_fixture_id",
+          "type": "varchar(192)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "home_team_id": {
+          "name": "home_team_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "away_team_id": {
+          "name": "away_team_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "kickoff_at": {
+          "name": "kickoff_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "result": {
+          "name": "result",
+          "type": "varchar(16)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "win_streak_fixtures_season_source_unique": {
+          "name": "win_streak_fixtures_season_source_unique",
+          "columns": [
+            {
+              "expression": "season_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "source_fixture_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "win_streak_fixtures_season_pairing_unique": {
+          "name": "win_streak_fixtures_season_pairing_unique",
+          "columns": [
+            {
+              "expression": "season_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "home_team_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "away_team_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "win_streak_fixtures_round_idx": {
+          "name": "win_streak_fixtures_round_idx",
+          "columns": [
+            {
+              "expression": "round_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "win_streak_fixtures_home_team_idx": {
+          "name": "win_streak_fixtures_home_team_idx",
+          "columns": [
+            {
+              "expression": "home_team_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "win_streak_fixtures_away_team_idx": {
+          "name": "win_streak_fixtures_away_team_idx",
+          "columns": [
+            {
+              "expression": "away_team_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "win_streak_fixtures_season_id_seasons_id_fk": {
+          "name": "win_streak_fixtures_season_id_seasons_id_fk",
+          "tableFrom": "win_streak_fixtures",
+          "tableTo": "seasons",
+          "columnsFrom": [
+            "season_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "win_streak_fixtures_round_id_win_streak_rounds_id_fk": {
+          "name": "win_streak_fixtures_round_id_win_streak_rounds_id_fk",
+          "tableFrom": "win_streak_fixtures",
+          "tableTo": "win_streak_rounds",
+          "columnsFrom": [
+            "round_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "win_streak_fixtures_home_team_id_teams_id_fk": {
+          "name": "win_streak_fixtures_home_team_id_teams_id_fk",
+          "tableFrom": "win_streak_fixtures",
+          "tableTo": "teams",
+          "columnsFrom": [
+            "home_team_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "restrict",
+          "onUpdate": "no action"
+        },
+        "win_streak_fixtures_away_team_id_teams_id_fk": {
+          "name": "win_streak_fixtures_away_team_id_teams_id_fk",
+          "tableFrom": "win_streak_fixtures",
+          "tableTo": "teams",
+          "columnsFrom": [
+            "away_team_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "restrict",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {
+        "win_streak_fixtures_distinct_teams_check": {
+          "name": "win_streak_fixtures_distinct_teams_check",
+          "value": "\"win_streak_fixtures\".\"home_team_id\" <> \"win_streak_fixtures\".\"away_team_id\""
+        },
+        "win_streak_fixtures_source_id_check": {
+          "name": "win_streak_fixtures_source_id_check",
+          "value": "btrim(\"win_streak_fixtures\".\"source_fixture_id\") <> ''"
+        },
+        "win_streak_fixtures_result_check": {
+          "name": "win_streak_fixtures_result_check",
+          "value": "\"win_streak_fixtures\".\"result\" is null or \"win_streak_fixtures\".\"result\" in ('home_win', 'draw', 'away_win', 'void')"
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "public.win_streak_picks": {
+      "name": "win_streak_picks",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "profile_id": {
+          "name": "profile_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "round_id": {
+          "name": "round_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "fixture_id": {
+          "name": "fixture_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "team_id": {
+          "name": "team_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "picked_at": {
+          "name": "picked_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "deadline_at_pick": {
+          "name": "deadline_at_pick",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "win_streak_picks_profile_round_unique": {
+          "name": "win_streak_picks_profile_round_unique",
+          "columns": [
+            {
+              "expression": "profile_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "round_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "win_streak_picks_round_idx": {
+          "name": "win_streak_picks_round_idx",
+          "columns": [
+            {
+              "expression": "round_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "win_streak_picks_fixture_idx": {
+          "name": "win_streak_picks_fixture_idx",
+          "columns": [
+            {
+              "expression": "fixture_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "win_streak_picks_team_idx": {
+          "name": "win_streak_picks_team_idx",
+          "columns": [
+            {
+              "expression": "team_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "win_streak_picks_profile_id_win_streak_profiles_id_fk": {
+          "name": "win_streak_picks_profile_id_win_streak_profiles_id_fk",
+          "tableFrom": "win_streak_picks",
+          "tableTo": "win_streak_profiles",
+          "columnsFrom": [
+            "profile_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "win_streak_picks_round_id_win_streak_rounds_id_fk": {
+          "name": "win_streak_picks_round_id_win_streak_rounds_id_fk",
+          "tableFrom": "win_streak_picks",
+          "tableTo": "win_streak_rounds",
+          "columnsFrom": [
+            "round_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "restrict",
+          "onUpdate": "no action"
+        },
+        "win_streak_picks_fixture_id_win_streak_fixtures_id_fk": {
+          "name": "win_streak_picks_fixture_id_win_streak_fixtures_id_fk",
+          "tableFrom": "win_streak_picks",
+          "tableTo": "win_streak_fixtures",
+          "columnsFrom": [
+            "fixture_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "restrict",
+          "onUpdate": "no action"
+        },
+        "win_streak_picks_team_id_teams_id_fk": {
+          "name": "win_streak_picks_team_id_teams_id_fk",
+          "tableFrom": "win_streak_picks",
+          "tableTo": "teams",
+          "columnsFrom": [
+            "team_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "restrict",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {
+        "win_streak_picks_deadline_check": {
+          "name": "win_streak_picks_deadline_check",
+          "value": "\"win_streak_picks\".\"picked_at\" < \"win_streak_picks\".\"deadline_at_pick\""
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "public.win_streak_profiles": {
+      "name": "win_streak_profiles",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "season_id": {
+          "name": "season_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "joined_round_id": {
+          "name": "joined_round_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "participant_name": {
+          "name": "participant_name",
+          "type": "varchar(40)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "normalized_participant_name": {
+          "name": "normalized_participant_name",
+          "type": "varchar(40)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "receipt_token_hash": {
+          "name": "receipt_token_hash",
+          "type": "varchar(64)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "win_streak_profiles_season_name_unique": {
+          "name": "win_streak_profiles_season_name_unique",
+          "columns": [
+            {
+              "expression": "season_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "normalized_participant_name",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "win_streak_profiles_receipt_hash_unique": {
+          "name": "win_streak_profiles_receipt_hash_unique",
+          "columns": [
+            {
+              "expression": "receipt_token_hash",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "win_streak_profiles_season_created_idx": {
+          "name": "win_streak_profiles_season_created_idx",
+          "columns": [
+            {
+              "expression": "season_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "created_at",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "win_streak_profiles_joined_round_idx": {
+          "name": "win_streak_profiles_joined_round_idx",
+          "columns": [
+            {
+              "expression": "joined_round_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "win_streak_profiles_season_id_seasons_id_fk": {
+          "name": "win_streak_profiles_season_id_seasons_id_fk",
+          "tableFrom": "win_streak_profiles",
+          "tableTo": "seasons",
+          "columnsFrom": [
+            "season_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "win_streak_profiles_joined_round_id_win_streak_rounds_id_fk": {
+          "name": "win_streak_profiles_joined_round_id_win_streak_rounds_id_fk",
+          "tableFrom": "win_streak_profiles",
+          "tableTo": "win_streak_rounds",
+          "columnsFrom": [
+            "joined_round_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "restrict",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {
+        "win_streak_profiles_participant_name_check": {
+          "name": "win_streak_profiles_participant_name_check",
+          "value": "char_length(\"win_streak_profiles\".\"participant_name\") between 2 and 40"
+        },
+        "win_streak_profiles_normalized_name_check": {
+          "name": "win_streak_profiles_normalized_name_check",
+          "value": "char_length(\"win_streak_profiles\".\"normalized_participant_name\") between 2 and 40"
+        },
+        "win_streak_profiles_receipt_hash_check": {
+          "name": "win_streak_profiles_receipt_hash_check",
+          "value": "\"win_streak_profiles\".\"receipt_token_hash\" ~ '^[0-9a-f]{64}$'"
+        }
+      },
+      "isRLSEnabled": false
+    },
+    "public.win_streak_rounds": {
+      "name": "win_streak_rounds",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "season_id": {
+          "name": "season_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "matchweek": {
+          "name": "matchweek",
+          "type": "smallint",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "pick_deadline": {
+          "name": "pick_deadline",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "fixture_source": {
+          "name": "fixture_source",
+          "type": "varchar(64)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "fixture_source_reference": {
+          "name": "fixture_source_reference",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "fixture_verified_at": {
+          "name": "fixture_verified_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "fixture_content_hash": {
+          "name": "fixture_content_hash",
+          "type": "varchar(64)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "result_source": {
+          "name": "result_source",
+          "type": "varchar(64)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "result_source_reference": {
+          "name": "result_source_reference",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "result_captured_at": {
+          "name": "result_captured_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "result_content_hash": {
+          "name": "result_content_hash",
+          "type": "varchar(64)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "resolved_at": {
+          "name": "resolved_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "win_streak_rounds_season_matchweek_unique": {
+          "name": "win_streak_rounds_season_matchweek_unique",
+          "columns": [
+            {
+              "expression": "season_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "matchweek",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "win_streak_rounds_season_resolution_idx": {
+          "name": "win_streak_rounds_season_resolution_idx",
+          "columns": [
+            {
+              "expression": "season_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "resolved_at",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "matchweek",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "win_streak_rounds_season_id_seasons_id_fk": {
+          "name": "win_streak_rounds_season_id_seasons_id_fk",
+          "tableFrom": "win_streak_rounds",
+          "tableTo": "seasons",
+          "columnsFrom": [
+            "season_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {
+        "win_streak_rounds_matchweek_check": {
+          "name": "win_streak_rounds_matchweek_check",
+          "value": "\"win_streak_rounds\".\"matchweek\" between 2 and 38"
+        },
+        "win_streak_rounds_fixture_source_check": {
+          "name": "win_streak_rounds_fixture_source_check",
+          "value": "btrim(\"win_streak_rounds\".\"fixture_source\") <> '' and btrim(\"win_streak_rounds\".\"fixture_source_reference\") <> ''"
+        },
+        "win_streak_rounds_fixture_hash_check": {
+          "name": "win_streak_rounds_fixture_hash_check",
+          "value": "\"win_streak_rounds\".\"fixture_content_hash\" ~ '^[0-9a-f]{64}$'"
+        },
+        "win_streak_rounds_result_state_check": {
+          "name": "win_streak_rounds_result_state_check",
+          "value": "(\n        \"win_streak_rounds\".\"resolved_at\" is null\n        and \"win_streak_rounds\".\"result_source\" is null\n        and \"win_streak_rounds\".\"result_source_reference\" is null\n        and \"win_streak_rounds\".\"result_captured_at\" is null\n        and \"win_streak_rounds\".\"result_content_hash\" is null\n      ) or (\n        \"win_streak_rounds\".\"resolved_at\" is not null\n        and btrim(\"win_streak_rounds\".\"result_source\") <> ''\n        and btrim(\"win_streak_rounds\".\"result_source_reference\") <> ''\n        and \"win_streak_rounds\".\"result_captured_at\" is not null\n        and \"win_streak_rounds\".\"result_content_hash\" ~ '^[0-9a-f]{64}$'\n        and \"win_streak_rounds\".\"resolved_at\" >= \"win_streak_rounds\".\"result_captured_at\"\n      )"
+        }
+      },
+      "isRLSEnabled": false
+    }
+  },
+  "enums": {},
+  "schemas": {},
+  "sequences": {},
+  "roles": {},
+  "policies": {},
+  "views": {},
+  "_meta": {
+    "columns": {},
+    "schemas": {},
+    "tables": {}
+  }
+}

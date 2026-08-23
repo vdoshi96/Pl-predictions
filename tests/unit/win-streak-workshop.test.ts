@@ -174,7 +174,7 @@ describe("Win Streak workshop fixtures", () => {
     ).toMatchObject({
       awayTeamSlug: "newcastle-united",
       homeTeamSlug: "arsenal",
-      id: "mw22-arsenal-newcastle-united",
+      id: "2026-27-mw22-arsenal-newcastle-united",
     });
   });
 });
@@ -242,7 +242,12 @@ describe("Win Streak workshop state", () => {
     state = resolve(
       state,
       "mw20",
-      [{ fixtureId: "mw20-arsenal-brentford", result: "home" }],
+      [
+        {
+          fixtureId: "2026-27-mw20-arsenal-brentford",
+          result: "home",
+        },
+      ],
       AT.mw20Result,
     );
 
@@ -272,13 +277,21 @@ describe("Win Streak workshop state", () => {
       getRequiredWinStreakResultFixtures(state, "mw20").map(
         (fixture) => fixture.id,
       ),
-    ).toEqual(["mw20-arsenal-brentford", "mw20-sunderland-liverpool"]);
+    ).toEqual([
+      "2026-27-mw20-arsenal-brentford",
+      "2026-27-mw20-sunderland-liverpool",
+    ]);
 
     expect(() =>
       resolve(
         state,
         "mw20",
-        [{ fixtureId: "mw20-arsenal-brentford", result: "home" }],
+        [
+          {
+            fixtureId: "2026-27-mw20-arsenal-brentford",
+            result: "home",
+          },
+        ],
         AT.mw20Result,
       ),
     ).toThrow(
@@ -291,10 +304,16 @@ describe("Win Streak workshop state", () => {
         state,
         "mw20",
         [
-          { fixtureId: "mw20-arsenal-brentford", result: "home" },
-          { fixtureId: "mw20-sunderland-liverpool", result: "away" },
           {
-            fixtureId: "mw20-brighton-and-hove-albion-afc-bournemouth",
+            fixtureId: "2026-27-mw20-arsenal-brentford",
+            result: "home",
+          },
+          {
+            fixtureId: "2026-27-mw20-sunderland-liverpool",
+            result: "away",
+          },
+          {
+            fixtureId: "2026-27-mw20-brighton-and-hove-albion-afc-bournemouth",
             result: "draw",
           },
         ],
@@ -319,7 +338,12 @@ describe("Win Streak workshop state", () => {
     state = resolve(
       state,
       "mw20",
-      [{ fixtureId: "mw20-arsenal-brentford", result: "home" }],
+      [
+        {
+          fixtureId: "2026-27-mw20-arsenal-brentford",
+          result: "home",
+        },
+      ],
       AT.mw20Result,
     );
     state = resolve(state, "mw21", [], AT.mw21Result);
@@ -343,7 +367,12 @@ describe("Win Streak workshop state", () => {
     state = resolve(
       state,
       "mw22",
-      [{ fixtureId: "mw22-arsenal-newcastle-united", result: "void" }],
+      [
+        {
+          fixtureId: "2026-27-mw22-arsenal-newcastle-united",
+          result: "void",
+        },
+      ],
       AT.mw22Result,
     );
 
@@ -366,7 +395,12 @@ describe("Win Streak workshop state", () => {
     state = resolve(
       state,
       "mw23",
-      [{ fixtureId: "mw23-manchester-city-arsenal", result: "draw" }],
+      [
+        {
+          fixtureId: "2026-27-mw23-manchester-city-arsenal",
+          result: "draw",
+        },
+      ],
       AT.mw23Result,
     );
 
@@ -399,21 +433,36 @@ describe("Win Streak workshop state", () => {
     state = resolve(
       state,
       "mw20",
-      [{ fixtureId: "mw20-arsenal-brentford", result: "home" }],
+      [
+        {
+          fixtureId: "2026-27-mw20-arsenal-brentford",
+          result: "home",
+        },
+      ],
       AT.mw20Result,
     );
     state = pick(state, created.profile.id, "mw21", "hull-city", AT.mw21Pick);
     state = resolve(
       state,
       "mw21",
-      [{ fixtureId: "mw21-hull-city-arsenal", result: "home" }],
+      [
+        {
+          fixtureId: "2026-27-mw21-hull-city-arsenal",
+          result: "home",
+        },
+      ],
       AT.mw21Result,
     );
     state = pick(state, created.profile.id, "mw22", "liverpool", AT.mw22Pick);
     state = resolve(
       state,
       "mw22",
-      [{ fixtureId: "mw22-manchester-united-liverpool", result: "home" }],
+      [
+        {
+          fixtureId: "2026-27-mw22-manchester-united-liverpool",
+          result: "home",
+        },
+      ],
       AT.mw22Result,
     );
 
@@ -499,7 +548,12 @@ describe("Win Streak workshop state", () => {
     state = resolve(
       state,
       "mw20",
-      [{ fixtureId: "mw20-arsenal-brentford", result: "home" }],
+      [
+        {
+          fixtureId: "2026-27-mw20-arsenal-brentford",
+          result: "home",
+        },
+      ],
       AT.mw20Result,
     );
 
@@ -611,7 +665,7 @@ describe("Win Streak workshop state", () => {
         {
           fixtures: [
             {
-              fixtureId: "mw20-sunderland-liverpool",
+              fixtureId: "2026-27-mw20-sunderland-liverpool",
               result: "home",
             },
           ],
@@ -641,7 +695,12 @@ describe("Win Streak workshop state", () => {
     state = resolve(
       state,
       "mw20",
-      [{ fixtureId: "mw20-arsenal-brentford", result: "home" }],
+      [
+        {
+          fixtureId: "2026-27-mw20-arsenal-brentford",
+          result: "home",
+        },
+      ],
       AT.mw20Result,
     );
     const corrupt = structuredClone(state);

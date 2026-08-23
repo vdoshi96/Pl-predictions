@@ -243,7 +243,9 @@ describe("official Win Streak fixture refresh", () => {
     const canonicalText = await readFile(canonicalPath, "utf8");
     const sourceHtml = renderOfficialArticle(fullParsedFixtures());
     const fetchSourceHtml = vi.fn(async () => sourceHtml);
-    const writeCanonical = vi.fn(async () => undefined);
+    const writeCanonical = vi.fn(async (serializedSnapshot: string) => {
+      void serializedSnapshot;
+    });
 
     await expect(
       runWinStreakFixtureRefresh({
@@ -272,7 +274,9 @@ describe("official Win Streak fixture refresh", () => {
   });
 
   it("mechanically writes a validated --apply snapshot", async () => {
-    const writeCanonical = vi.fn(async () => undefined);
+    const writeCanonical = vi.fn(async (serializedSnapshot: string) => {
+      void serializedSnapshot;
+    });
 
     await expect(
       runWinStreakFixtureRefresh({

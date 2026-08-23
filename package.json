@@ -30,6 +30,8 @@
     "db:test:seed": "dotenv -e .env.local -- node scripts/run-with-test-database.mjs tsx scripts/seed.ts",
     "players:generate": "tsx scripts/normalize-player-catalogue.ts",
     "players:check": "tsx scripts/normalize-player-catalogue.ts --check",
+    "win-streak:fixtures:apply": "tsx scripts/refresh-win-streak-fixtures.ts --apply",
+    "win-streak:fixtures:check": "tsx scripts/refresh-win-streak-fixtures.ts --check",
     "standings:import": "dotenv -e .env.local -- tsx scripts/import-standings.ts",
     "admin:hash-password": "node scripts/hash-admin-password.mjs",
     "docs:generate": "node scripts/generate-docs-html.mjs",

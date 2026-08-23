@@ -1,7 +1,7 @@
 interface:
   display_name: "Update results"
-  short_description: "Publish reviewed FotMob results provisionally"
-  default_prompt: "Use $update-results to refresh the live-season standings and spotlight results from FotMob."
+  short_description: "Publish reviewed table, spotlight, and Win Streak results"
+  default_prompt: "Use $update-results to check official Win Streak fixtures and refresh reviewed live-season standings, spotlight results, and completed Win Streak outcomes through authenticated admin workflows."
 
 policy:
   allow_implicit_invocation: false

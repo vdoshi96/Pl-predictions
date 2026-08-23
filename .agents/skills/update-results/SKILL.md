@@ -1,21 +1,26 @@
 ---
 name: update-results
 description: >-
-  Pulls current FotMob Premier League table and spotlight stats, then publishes
-  them through the owner admin desk and checks table plus spotlight scoring.
-  Use only when the user explicitly invokes $update-results to refresh live-season
-  standings and spotlight categories.
+  Checks the Win Streak fixture snapshot against official Premier League
+  sources, pulls current FotMob standings and spotlight facts, publishes
+  reviewed results through the owner admin desks, and verifies public scoring.
+  Use only when the user explicitly invokes $update-results to refresh
+  live-season results.
 ---
 
-# Update results (FotMob → admin)
+# Update results
 
-Owner-run reviewed entry: fetch FotMob facts offline, paste them through `/admin/standings` and `/admin/results`, publish provisional snapshots, then verify scoring. Do not add FotMob to the deployed app.
+Owner-run reviewed entry: check official Win Streak fixtures, fetch FotMob facts offline, enter reviewed facts through `/admin/standings`, `/admin/results`, and `/admin/win-streak`, then verify public scoring. Do not add football-source access to the deployed app.
 
 ## Hard stop
 
 Do not:
 
+- apply or rewrite the Win Streak fixture snapshot unless the owner reviews detected drift and explicitly authorizes the change
 - add a runtime football client, scraper, cron, or FotMob call to the Next.js app
+- write Win Streak fixture outcomes directly to the database or through an unauthenticated route
+- advance a Win Streak matchweek with fewer than 10 reviewed fixture outcomes
+- treat a postponed, abandoned, or unresolved fixture as `Void` without explicit owner review
 - print `ADMIN_SECRET`, `ADMIN_PASSWORD_HASH`, `DATABASE_URL`, or any credential
 - use `playwright.config.ts` / `npm run test:e2e` (those fail closed against the live DB)
 - LOCK, REVEAL, or finalize snapshots unless the user asked
@@ -23,20 +28,57 @@ Do not:
 - invent goals, assists, clean sheets, or ratings
 - commit, push, migrate, seed, or deploy as part of this skill
 
-Invoking `$update-results` authorizes live-season admin writes. Confirm the connected DB is the intended season database (prediction count, season slug) before mutating.
+Invoking `$update-results` authorizes reviewed live-season writes through the authenticated standings, spotlight-results, and Win Streak admin workflows. It does not authorize fixture-file changes, code changes, commits, pushes, migrations, seeds, deployments, or other release work. Confirm the connected database is the intended season database by checking the prediction count and season slug before mutating.
 
 ## Checklist
 
 ```
+- [ ] Run the official Win Streak fixture drift check; stop if it reports drift
 - [ ] Fetch FotMob table + goals, assists, team clean sheets, player ratings
 - [ ] Read N (active brackets) and distinct seeded subjects per dataset
 - [ ] Start local Next against .env.local; sign in without logging the password
 - [ ] Paste and save the 20-club table
 - [ ] Seed + fill each spotlight dataset through rank N; publish provisionally
-- [ ] Confirm each dataset has active_snapshot_id; verify /leaderboard and /spotlight
+- [ ] Enter all 10 reviewed outcomes for each completed Win Streak matchweek
+- [ ] Confirm each spotlight dataset has active_snapshot_id
+- [ ] Verify /leaderboard, /spotlight, and public /win-streak results and picks
 ```
 
-## 1. Fetch FotMob
+## Check Win Streak fixtures
+
+Win Streak starts in Matchweek 2. The tracked snapshot contains 370 fixtures across Matchweeks 2-38; Matchweek 1 is outside the contest.
+
+Use the following official Premier League sources:
+
+- Fixture list: `https://www.premierleague.com/en/news/4675097`
+- Final-matchweek timing: `https://www.premierleague.com/en/news/4675508/premier-league-fixture-schedule-released-for-season-202627`
+
+Check the tracked snapshot before you enter results:
+
+```
+npm run win-streak:fixtures:check
+```
+
+The expected result on most runs is no fixture drift. Report the verified 370 fixtures, 37 matchweeks, and retained source-check date.
+
+If the command reports drift, stop before any apply or admin mutation. Summarize the affected matchweeks, pairings, dates, and kickoff times for owner review. Do not interpret source drift as permission to change the snapshot.
+
+If the owner explicitly authorizes the reviewed fixture change, apply it with an ISO check date:
+
+```
+npm run win-streak:fixtures:apply -- --checked-at=YYYY-MM-DD
+```
+
+Then run the drift check again and run the focused fixture-refresh test:
+
+```
+npm run win-streak:fixtures:check
+npx vitest run tests/unit/win-streak-fixture-refresh.test.ts
+```
+
+An authorized apply changes only the reviewed fixture snapshot. Do not commit, push, deploy, migrate, seed, or perform other release work unless the user separately authorizes that work.
+
+## Fetch FotMob
 
 League id `47`. Do not hardcode the season stats id.
 
@@ -62,9 +104,11 @@ Pos Club P Pts
 20 Coventry City 1 0
 ```
 
-## 2. Coverage rules
+## Coverage rules
 
 `N` = `count(*)` from `predictions` for the active season. Every published list must use `coveredThroughRank = N`.
+
+Use the following coverage rules:
 
 | Dataset             | How to fill                                                                                                                                                                                                                                                                                                        |
 | ------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
@@ -76,16 +120,30 @@ No Other-player aliases to match unless custom names exist.
 
 Source = `FotMob`. Source reference = `https://www.fotmob.com/leagues/47/stats/premier-league`. Leave snapshots provisional.
 
-## 3. Drive the admin desk
+## Drive the standings and spotlight admin desks
 
-1. `npm run dev -- --port 3000` with `.env.local`.
-2. Standalone Playwright (`chromium.launch`), **not** the repo Playwright config. Login: `PLAYWRIGHT_ADMIN_PASSWORD` or `ADMIN_SECRET`, username `admin` unless `ADMIN_USERNAME` is set. Never log the secret.
-3. `/admin/standings`: paste table → Parse → Save. Duplicate-active is OK.
-4. `/admin/results`: wait for **Publish gate ready** (kickoff already reveals and closes; do not LOCK).
-5. Per dataset card (`div.rounded-2xl.border.bg-surface` filtered by the heading **Top scorer** / **Top assister** / **Most clean sheets** / **Player ratings**): set source, seed if applicable, paste, Parse, fix unmatched lines, Apply, Review & publish, attest, Publish provisional.
-6. After each publish, wait for **that card's** success text, or query `spotlight_result_states.active_snapshot_id`. Do not `getByText("Provisional result published.")` globally — leftover messages from earlier datasets are false positives. If save succeeded but active is still null, open Review & publish again.
+1. Start `npm run dev -- --port 3000` with `.env.local`.
+2. Open a standalone Playwright session with `chromium.launch`, not `playwright.config.ts`. Sign in with `PLAYWRIGHT_ADMIN_PASSWORD` or `ADMIN_SECRET` and use `admin` unless `ADMIN_USERNAME` is set. Never log the secret.
+3. On `/admin/standings`, paste the table, click **Parse**, and click **Save**. A duplicate-active response is acceptable.
+4. On `/admin/results`, wait for **Publish gate ready**. Kickoff already reveals and closes the game, so do not use `LOCK`.
+5. In each dataset card, set the source, seed when applicable, paste the data, click **Parse**, fix unmatched lines, click **Apply**, click **Review & publish**, attest, and click **Publish provisional**. Locate each `div.rounded-2xl.border.bg-surface` card by its **Top scorer**, **Top assister**, **Most clean sheets**, or **Player ratings** heading.
+6. After each publish, wait for that card's success text or query `spotlight_result_states.active_snapshot_id`. Do not use `getByText("Provisional result published.")` globally because messages from earlier datasets produce false positives. If the save succeeds but the active snapshot is null, open **Review & publish** again.
 
-## 4. Verify scoring
+## Update completed Win Streak results
+
+Use reviewed completed-match facts from the offline source set. The FotMob league response at `https://www.fotmob.com/api/data/leagues?id=47` provides match context; the official Premier League pages in the fixture-check section remain the schedule authority.
+
+For each completed contest matchweek:
+
+1. On `/admin/win-streak`, select the completed matchweek. Do not enter Matchweek 1 because the contest starts in Matchweek 2.
+2. Enter one reviewed outcome for each of the 10 fixtures: **Home win**, **Draw**, **Away win**, or **Void**.
+3. Use **Void** only when the owner confirms that the Win Streak policy treats the fixture as void. A postponement, abandonment, or missing result is not automatically void.
+4. Review all 10 fixture rows before you submit. If any fixture lacks a final reviewed outcome, stop without advancing the matchweek.
+5. Submit through the authenticated admin route and wait for that matchweek's scoped success state. Never replace this workflow with a direct database write.
+
+The all-10-fixture requirement keeps every participant on one shared round and makes opposite-team picks resolve from the same fact.
+
+## Verify public results
 
 Table: `/leaderboard` shows scored totals (not “scoring has not started”), 14 or fewer shared competition ranks, and 5/3/1 club breakdowns. All-zero-played tables stay inactive; one club with `played > 0` is enough.
 
@@ -95,7 +153,11 @@ Spot-check at least one pick against FotMob (for example a rank-1 rating pick ea
 
 Also confirm the public alias `https://pl-predictions-2026.vercel.app/leaderboard` if `.env.local` points at the live season DB.
 
-## 5. Final reply
+Win Streak: open `/win-streak` without an owner session. Confirm that completed fixture outcomes are visible, current and best streaks recalculate, equal best streaks share a competition rank, and the next active matchweek is correct. Verify every participant's current pick or explicit no-pick state. Spot-check a win, a draw or loss, and any void: a win adds one; a draw or loss resets the current streak but preserves the best; a void preserves the streak and does not consume the club.
+
+If `.env.local` points at the live season database, also confirm `https://pl-predictions-2026.vercel.app/win-streak`. Keep this verification read-only.
+
+## Final reply
 
 Return only:
 
@@ -103,7 +165,8 @@ Return only:
 2. N and what was filled beyond seeded subjects
 3. Table top few scores
 4. Spotlight overall leader and one check per category
-5. Confirmation: provisional only; no finalize; no app/runtime FotMob client
+5. Win Streak matchweek updated, all 10 outcomes, explicit voids, next active matchweek, leaderboard, and current-pick checks
+6. Confirmation: table and spotlight snapshots remain provisional; no finalize, LOCK, REVEAL, runtime football client, direct database write, fixture apply without approval, or release work
 
 Then stop.
 
@@ -111,4 +174,4 @@ Then stop.
 
 User: `$update-results`
 
-Agent: reads FotMob GW1 (Arsenal 3–0 Coventry), pastes the 20-club table, publishes four FotMob datasets through rank 14, filling goals/assists with extra top players from that match, pastes all 29 rated players, verifies `/leaderboard` and `/spotlight`, stops.
+Agent: checks the official Win Streak snapshot and reports no drift, reads the completed FotMob matchweek, updates the table and spotlight data, enters all 10 completed Win Streak outcomes through `/admin/win-streak`, verifies `/leaderboard`, `/spotlight`, and `/win-streak`, then stops without release work.

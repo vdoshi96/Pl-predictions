@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="generated-by" content="scripts/generate-docs-html.mjs" />
     <meta name="canonical-source" content="SKILL.md" />
-    <meta name="canonical-source-sha256" content="9c6f6fc275b025e200bc35abe543fec54f4a60bb8d5a39c6c23c0f5c0ba683f6" />
-    <title>Update results (FotMob → admin)</title>
+    <meta name="canonical-source-sha256" content="3a9abb1e3b3953d65f874b110ad745c7e5dc4084493eaec85948090c2279bf3f" />
+    <title>Update results</title>
     <style>
       :root { color-scheme: light dark; font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
       body { margin: 0; background: #f5f5f0; color: #18201c; }
@@ -40,18 +40,23 @@
   <body>
     <main>
       <hr>
-<h2 id="name-update-results-description-pulls-current-fotmob-premier-league-table-and-spotlight-stats-then-publishes-them-through-the-owner-admin-desk-and-checks-table-plus-spotlight-scoring-use-only-when-the-user-explicitly-invokes-update-results-to-refresh-live-season-standings-and-spotlight-categories">name: update-results
+<h2 id="name-update-results-description-checks-the-win-streak-fixture-snapshot-against-official-premier-league-sources-pulls-current-fotmob-standings-and-spotlight-facts-publishes-reviewed-results-through-the-owner-admin-desks-and-verifies-public-scoring-use-only-when-the-user-explicitly-invokes-update-results-to-refresh-live-season-results">name: update-results
 description: &gt;-
-  Pulls current FotMob Premier League table and spotlight stats, then publishes
-  them through the owner admin desk and checks table plus spotlight scoring.
-  Use only when the user explicitly invokes $update-results to refresh live-season
-  standings and spotlight categories.</h2>
-<h1 id="update-results-fotmob-admin">Update results (FotMob → admin)</h1>
-<p>Owner-run reviewed entry: fetch FotMob facts offline, paste them through <code>/admin/standings</code> and <code>/admin/results</code>, publish provisional snapshots, then verify scoring. Do not add FotMob to the deployed app.</p>
+  Checks the Win Streak fixture snapshot against official Premier League
+  sources, pulls current FotMob standings and spotlight facts, publishes
+  reviewed results through the owner admin desks, and verifies public scoring.
+  Use only when the user explicitly invokes $update-results to refresh
+  live-season results.</h2>
+<h1 id="update-results">Update results</h1>
+<p>Owner-run reviewed entry: check official Win Streak fixtures, fetch FotMob facts offline, enter reviewed facts through <code>/admin/standings</code>, <code>/admin/results</code>, and <code>/admin/win-streak</code>, then verify public scoring. Do not add football-source access to the deployed app.</p>
 <h2 id="hard-stop">Hard stop</h2>
 <p>Do not:</p>
 <ul>
+<li>apply or rewrite the Win Streak fixture snapshot unless the owner reviews detected drift and explicitly authorizes the change</li>
 <li>add a runtime football client, scraper, cron, or FotMob call to the Next.js app</li>
+<li>write Win Streak fixture outcomes directly to the database or through an unauthenticated route</li>
+<li>advance a Win Streak matchweek with fewer than 10 reviewed fixture outcomes</li>
+<li>treat a postponed, abandoned, or unresolved fixture as <code>Void</code> without explicit owner review</li>
 <li>print <code>ADMIN_SECRET</code>, <code>ADMIN_PASSWORD_HASH</code>, <code>DATABASE_URL</code>, or any credential</li>
 <li>use <code>playwright.config.ts</code> / <code>npm run test:e2e</code> (those fail closed against the live DB)</li>
 <li>LOCK, REVEAL, or finalize snapshots unless the user asked</li>
@@ -59,16 +64,39 @@ description: &gt;-
 <li>invent goals, assists, clean sheets, or ratings</li>
 <li>commit, push, migrate, seed, or deploy as part of this skill</li>
 </ul>
-<p>Invoking <code>$update-results</code> authorizes live-season admin writes. Confirm the connected DB is the intended season database (prediction count, season slug) before mutating.</p>
+<p>Invoking <code>$update-results</code> authorizes reviewed live-season writes through the authenticated standings, spotlight-results, and Win Streak admin workflows. It does not authorize fixture-file changes, code changes, commits, pushes, migrations, seeds, deployments, or other release work. Confirm the connected database is the intended season database by checking the prediction count and season slug before mutating.</p>
 <h2 id="checklist">Checklist</h2>
-<pre><code>- [ ] Fetch FotMob table + goals, assists, team clean sheets, player ratings
+<pre><code>- [ ] Run the official Win Streak fixture drift check; stop if it reports drift
+- [ ] Fetch FotMob table + goals, assists, team clean sheets, player ratings
 - [ ] Read N (active brackets) and distinct seeded subjects per dataset
 - [ ] Start local Next against .env.local; sign in without logging the password
 - [ ] Paste and save the 20-club table
 - [ ] Seed + fill each spotlight dataset through rank N; publish provisionally
-- [ ] Confirm each dataset has active_snapshot_id; verify /leaderboard and /spotlight
+- [ ] Enter all 10 reviewed outcomes for each completed Win Streak matchweek
+- [ ] Confirm each spotlight dataset has active_snapshot_id
+- [ ] Verify /leaderboard, /spotlight, and public /win-streak results and picks
 </code></pre>
-<h2 id="1-fetch-fotmob">1. Fetch FotMob</h2>
+<h2 id="check-win-streak-fixtures">Check Win Streak fixtures</h2>
+<p>Win Streak starts in Matchweek 2. The tracked snapshot contains 370 fixtures across Matchweeks 2-38; Matchweek 1 is outside the contest.</p>
+<p>Use the following official Premier League sources:</p>
+<ul>
+<li>Fixture list: <code>https://www.premierleague.com/en/news/4675097</code></li>
+<li>Final-matchweek timing: <code>https://www.premierleague.com/en/news/4675508/premier-league-fixture-schedule-released-for-season-202627</code></li>
+</ul>
+<p>Check the tracked snapshot before you enter results:</p>
+<pre><code>npm run win-streak:fixtures:check
+</code></pre>
+<p>The expected result on most runs is no fixture drift. Report the verified 370 fixtures, 37 matchweeks, and retained source-check date.</p>
+<p>If the command reports drift, stop before any apply or admin mutation. Summarize the affected matchweeks, pairings, dates, and kickoff times for owner review. Do not interpret source drift as permission to change the snapshot.</p>
+<p>If the owner explicitly authorizes the reviewed fixture change, apply it with an ISO check date:</p>
+<pre><code>npm run win-streak:fixtures:apply -- --checked-at=YYYY-MM-DD
+</code></pre>
+<p>Then run the drift check again and run the focused fixture-refresh test:</p>
+<pre><code>npm run win-streak:fixtures:check
+npx vitest run tests/unit/win-streak-fixture-refresh.test.ts
+</code></pre>
+<p>An authorized apply changes only the reviewed fixture snapshot. Do not commit, push, deploy, migrate, seed, or perform other release work unless the user separately authorizes that work.</p>
+<h2 id="fetch-fotmob">Fetch FotMob</h2>
 <p>League id <code>47</code>. Do not hardcode the season stats id.</p>
 <pre><code>https://www.fotmob.com/api/data/leagues?id=47
 </code></pre>
@@ -86,8 +114,9 @@ description: &gt;-
 …
 20 Coventry City 1 0
 </code></pre>
-<h2 id="2-coverage-rules">2. Coverage rules</h2>
+<h2 id="coverage-rules">Coverage rules</h2>
 <p><code>N</code> = <code>count(*)</code> from <code>predictions</code> for the active season. Every published list must use <code>coveredThroughRank = N</code>.</p>
+<p>Use the following coverage rules:</p>
 <table>
 <thead>
 <tr>
@@ -110,35 +139,49 @@ description: &gt;-
 </tbody></table>
 <p>No Other-player aliases to match unless custom names exist.</p>
 <p>Source = <code>FotMob</code>. Source reference = <code>https://www.fotmob.com/leagues/47/stats/premier-league</code>. Leave snapshots provisional.</p>
-<h2 id="3-drive-the-admin-desk">3. Drive the admin desk</h2>
+<h2 id="drive-the-standings-and-spotlight-admin-desks">Drive the standings and spotlight admin desks</h2>
 <ol>
-<li><code>npm run dev -- --port 3000</code> with <code>.env.local</code>.</li>
-<li>Standalone Playwright (<code>chromium.launch</code>), <strong>not</strong> the repo Playwright config. Login: <code>PLAYWRIGHT_ADMIN_PASSWORD</code> or <code>ADMIN_SECRET</code>, username <code>admin</code> unless <code>ADMIN_USERNAME</code> is set. Never log the secret.</li>
-<li><code>/admin/standings</code>: paste table → Parse → Save. Duplicate-active is OK.</li>
-<li><code>/admin/results</code>: wait for <strong>Publish gate ready</strong> (kickoff already reveals and closes; do not LOCK).</li>
-<li>Per dataset card (<code>div.rounded-2xl.border.bg-surface</code> filtered by the heading <strong>Top scorer</strong> / <strong>Top assister</strong> / <strong>Most clean sheets</strong> / <strong>Player ratings</strong>): set source, seed if applicable, paste, Parse, fix unmatched lines, Apply, Review &amp; publish, attest, Publish provisional.</li>
-<li>After each publish, wait for <strong>that card&#39;s</strong> success text, or query <code>spotlight_result_states.active_snapshot_id</code>. Do not <code>getByText(&quot;Provisional result published.&quot;)</code> globally — leftover messages from earlier datasets are false positives. If save succeeded but active is still null, open Review &amp; publish again.</li>
+<li>Start <code>npm run dev -- --port 3000</code> with <code>.env.local</code>.</li>
+<li>Open a standalone Playwright session with <code>chromium.launch</code>, not <code>playwright.config.ts</code>. Sign in with <code>PLAYWRIGHT_ADMIN_PASSWORD</code> or <code>ADMIN_SECRET</code> and use <code>admin</code> unless <code>ADMIN_USERNAME</code> is set. Never log the secret.</li>
+<li>On <code>/admin/standings</code>, paste the table, click <strong>Parse</strong>, and click <strong>Save</strong>. A duplicate-active response is acceptable.</li>
+<li>On <code>/admin/results</code>, wait for <strong>Publish gate ready</strong>. Kickoff already reveals and closes the game, so do not use <code>LOCK</code>.</li>
+<li>In each dataset card, set the source, seed when applicable, paste the data, click <strong>Parse</strong>, fix unmatched lines, click <strong>Apply</strong>, click <strong>Review &amp; publish</strong>, attest, and click <strong>Publish provisional</strong>. Locate each <code>div.rounded-2xl.border.bg-surface</code> card by its <strong>Top scorer</strong>, <strong>Top assister</strong>, <strong>Most clean sheets</strong>, or <strong>Player ratings</strong> heading.</li>
+<li>After each publish, wait for that card&#39;s success text or query <code>spotlight_result_states.active_snapshot_id</code>. Do not use <code>getByText(&quot;Provisional result published.&quot;)</code> globally because messages from earlier datasets produce false positives. If the save succeeds but the active snapshot is null, open <strong>Review &amp; publish</strong> again.</li>
 </ol>
-<h2 id="4-verify-scoring">4. Verify scoring</h2>
+<h2 id="update-completed-win-streak-results">Update completed Win Streak results</h2>
+<p>Use reviewed completed-match facts from the offline source set. The FotMob league response at <code>https://www.fotmob.com/api/data/leagues?id=47</code> provides match context; the official Premier League pages in the fixture-check section remain the schedule authority.</p>
+<p>For each completed contest matchweek:</p>
+<ol>
+<li>On <code>/admin/win-streak</code>, select the completed matchweek. Do not enter Matchweek 1 because the contest starts in Matchweek 2.</li>
+<li>Enter one reviewed outcome for each of the 10 fixtures: <strong>Home win</strong>, <strong>Draw</strong>, <strong>Away win</strong>, or <strong>Void</strong>.</li>
+<li>Use <strong>Void</strong> only when the owner confirms that the Win Streak policy treats the fixture as void. A postponement, abandonment, or missing result is not automatically void.</li>
+<li>Review all 10 fixture rows before you submit. If any fixture lacks a final reviewed outcome, stop without advancing the matchweek.</li>
+<li>Submit through the authenticated admin route and wait for that matchweek&#39;s scoped success state. Never replace this workflow with a direct database write.</li>
+</ol>
+<p>The all-10-fixture requirement keeps every participant on one shared round and makes opposite-team picks resolve from the same fact.</p>
+<h2 id="verify-public-results">Verify public results</h2>
 <p>Table: <code>/leaderboard</code> shows scored totals (not “scoring has not started”), 14 or fewer shared competition ranks, and 5/3/1 club breakdowns. All-zero-played tables stay inactive; one club with <code>played &gt; 0</code> is enough.</p>
 <p>Spotlight: <code>/spotlight</code> and <code>?sort=</code> for all seven categories. Accuracy is <code>max(0, N + 1 − outcome rank)</code>. Tied rank 1 earns N. Omitted subjects after a complete publish are outside-range zero and still count as available. Overall should read <code>7 of 7 results available</code>.</p>
 <p>Spot-check at least one pick against FotMob (for example a rank-1 rating pick earns N; a 0-goal seeded scorer inside the N-row list occupies the first 0-goal rank).</p>
 <p>Also confirm the public alias <code>https://pl-predictions-2026.vercel.app/leaderboard</code> if <code>.env.local</code> points at the live season DB.</p>
-<h2 id="5-final-reply">5. Final reply</h2>
+<p>Win Streak: open <code>/win-streak</code> without an owner session. Confirm that completed fixture outcomes are visible, current and best streaks recalculate, equal best streaks share a competition rank, and the next active matchweek is correct. Verify every participant&#39;s current pick or explicit no-pick state. Spot-check a win, a draw or loss, and any void: a win adds one; a draw or loss resets the current streak but preserves the best; a void preserves the streak and does not consume the club.</p>
+<p>If <code>.env.local</code> points at the live season database, also confirm <code>https://pl-predictions-2026.vercel.app/win-streak</code>. Keep this verification read-only.</p>
+<h2 id="final-reply">Final reply</h2>
 <p>Return only:</p>
 <ol>
 <li>FotMob matchweek context (which matches are in the table)</li>
 <li>N and what was filled beyond seeded subjects</li>
 <li>Table top few scores</li>
 <li>Spotlight overall leader and one check per category</li>
-<li>Confirmation: provisional only; no finalize; no app/runtime FotMob client</li>
+<li>Win Streak matchweek updated, all 10 outcomes, explicit voids, next active matchweek, leaderboard, and current-pick checks</li>
+<li>Confirmation: table and spotlight snapshots remain provisional; no finalize, LOCK, REVEAL, runtime football client, direct database write, fixture apply without approval, or release work</li>
 </ol>
 <p>Then stop.</p>
 <h2 id="example">Example</h2>
 <p>User: <code>$update-results</code></p>
-<p>Agent: reads FotMob GW1 (Arsenal 3–0 Coventry), pastes the 20-club table, publishes four FotMob datasets through rank 14, filling goals/assists with extra top players from that match, pastes all 29 rated players, verifies <code>/leaderboard</code> and <code>/spotlight</code>, stops.</p>
+<p>Agent: checks the official Win Streak snapshot and reports no drift, reads the completed FotMob matchweek, updates the table and spotlight data, enters all 10 completed Win Streak outcomes through <code>/admin/win-streak</code>, verifies <code>/leaderboard</code>, <code>/spotlight</code>, and <code>/win-streak</code>, then stops without release work.</p>
 
-      <p class="source">Generated deterministically from <a href="SKILL.md">.agents/skills/update-results/SKILL.md</a>. Canonical SHA-256: <code>9c6f6fc275b025e200bc35abe543fec54f4a60bb8d5a39c6c23c0f5c0ba683f6</code>.</p>
+      <p class="source">Generated deterministically from <a href="SKILL.md">.agents/skills/update-results/SKILL.md</a>. Canonical SHA-256: <code>3a9abb1e3b3953d65f874b110ad745c7e5dc4084493eaec85948090c2279bf3f</code>.</p>
     </main>
   </body>
 </html>

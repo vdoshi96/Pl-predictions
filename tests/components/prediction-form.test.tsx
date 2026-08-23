@@ -1451,7 +1451,11 @@ describe("shared site chrome", () => {
 
     expect(navigation).toBeVisible();
     expect(navigation).toHaveClass("basis-full", "sm:basis-auto");
-    expect(within(navigation).getByRole("list")).toHaveClass("flex");
+    expect(within(navigation).getByRole("list")).toHaveClass(
+      "grid",
+      "grid-cols-5",
+      "sm:flex",
+    );
     expect(homeLink).toHaveAttribute("href", "/");
     expect(homeLink).toHaveClass("min-h-12", "min-w-0");
     expect(screen.getByRole("link", { name: /^table$/i })).toHaveAttribute(
@@ -1461,6 +1465,10 @@ describe("shared site chrome", () => {
     expect(screen.getByRole("link", { name: /^spotlight$/i })).toHaveAttribute(
       "href",
       "/spotlight",
+    );
+    expect(screen.getByRole("link", { name: /^win streak$/i })).toHaveAttribute(
+      "href",
+      "/win-streak",
     );
     expect(screen.getByRole("link", { name: /^rules$/i })).toHaveAttribute(
       "href",

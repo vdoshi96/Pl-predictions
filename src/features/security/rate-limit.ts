@@ -1,13 +1,15 @@
 import "server-only";
 
 import { createHash } from "node:crypto";
+import { isIP } from "node:net";
 import { sql } from "drizzle-orm";
 
 import { getDb } from "@/db/client";
 
 type HeaderReader = Pick<Headers, "get">;
 
-export type SecurityRateLimitScope = "admin_login" | "standings_ingest";
+export type SecurityRateLimitScope =
+  "admin_login" | "standings_ingest" | "win_streak_create" | "win_streak_pick";
 
 function firstForwardedValue(value: string | null): string | null {
   const first = value?.split(",", 1)[0]?.trim();
@@ -23,9 +25,34 @@ function sourceAddress(requestHeaders: HeaderReader): string {
   );
 }
 
+export function normalizeSecurityRateLimitAddress(value: string): string {
+  const address = value.trim().toLowerCase().split("%", 1)[0] ?? "";
+  if (isIP(address) !== 6 || address.includes(".")) return address || "unknown";
+
+  const compressed = address.split("::");
+  if (compressed.length > 2) return address;
+  const leading = compressed[0]?.split(":").filter(Boolean) ?? [];
+  const trailing = compressed[1]?.split(":").filter(Boolean) ?? [];
+  const missing = 8 - leading.length - trailing.length;
+  if (missing < 0 || (compressed.length === 1 && missing !== 0)) return address;
+  const hextets = [
+    ...leading,
+    ...Array.from({ length: missing }, () => "0"),
+    ...trailing,
+  ];
+  if (hextets.length !== 8) return address;
+  return `${hextets
+    .slice(0, 4)
+    .map((part) => Number.parseInt(part, 16).toString(16))
+    .join(":")}::/64`;
+}
+
 function rateLimitKeyHash(requestHeaders: HeaderReader): string {
   return createHash("sha256")
-    .update(sourceAddress(requestHeaders), "utf8")
+    .update(
+      normalizeSecurityRateLimitAddress(sourceAddress(requestHeaders)),
+      "utf8",
+    )
     .digest("hex");
 }
 

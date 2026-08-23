@@ -6,7 +6,7 @@ import { pathToFileURL } from "node:url";
 import { and, asc, count, eq, inArray } from "drizzle-orm";
 import type { BatchItem } from "drizzle-orm/batch";
 
-import { ACTIVE_SEASON } from "@/data";
+import { ACTIVE_SEASON } from "@/data/season";
 import { PREMIER_LEAGUE_2026_27_TEAM_SLUGS } from "@/data/teams";
 import { getDb, type Database } from "@/db/client";
 import {

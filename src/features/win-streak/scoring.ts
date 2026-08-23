@@ -1,10 +1,8 @@
 import {
   WIN_STREAK_MATCHWEEKS,
-  getWinStreakFixtureForTeam,
   getWinStreakTeam,
   isWinStreakMatchweek,
   isWinStreakTeamSlug,
-  type WinStreakFixture,
   type WinStreakMatchweek,
   type WinStreakTeamSlug,
 } from "./fixtures";
@@ -12,6 +10,9 @@ import {
 export type WinStreakResult = "home_win" | "draw" | "away_win" | "void" | null;
 
 export type WinStreakPickFact = {
+  readonly awayTeamSlug: WinStreakTeamSlug;
+  readonly homeTeamSlug: WinStreakTeamSlug;
+  readonly kickoffAt: string;
   readonly matchweek: WinStreakMatchweek;
   readonly result: WinStreakResult;
   readonly teamSlug: WinStreakTeamSlug;
@@ -84,30 +85,26 @@ function nextMatchweek(
 
 function pickOutcome(
   pick: WinStreakPickFact,
-  fixture: WinStreakFixture,
 ): Exclude<WinStreakPickOutcome, "missed"> {
   if (pick.result === null) return "pending";
   if (pick.result === "void") return "void";
   if (pick.result === "draw") return "draw";
 
-  const pickedHomeTeam = fixture.homeTeamSlug === pick.teamSlug;
+  const pickedHomeTeam = pick.homeTeamSlug === pick.teamSlug;
   return (pick.result === "home_win" && pickedHomeTeam) ||
     (pick.result === "away_win" && !pickedHomeTeam)
     ? "win"
     : "loss";
 }
 
-function historyForPick(
-  pick: WinStreakPickFact,
-  fixture: WinStreakFixture,
-): WinStreakHistoryEntry {
-  const isHome = fixture.homeTeamSlug === pick.teamSlug;
+function historyForPick(pick: WinStreakPickFact): WinStreakHistoryEntry {
+  const isHome = pick.homeTeamSlug === pick.teamSlug;
   return {
     isHome,
-    kickoffAt: fixture.kickoffAt,
+    kickoffAt: pick.kickoffAt,
     matchweek: pick.matchweek,
-    opponentTeamSlug: isHome ? fixture.awayTeamSlug : fixture.homeTeamSlug,
-    outcome: pickOutcome(pick, fixture),
+    opponentTeamSlug: isHome ? pick.awayTeamSlug : pick.homeTeamSlug,
+    outcome: pickOutcome(pick),
     result: pick.result,
     teamSlug: pick.teamSlug,
   };
@@ -177,6 +174,12 @@ function validatedPicks(
     if (
       !isWinStreakMatchweek(pick.matchweek) ||
       !isWinStreakTeamSlug(pick.teamSlug) ||
+      !isWinStreakTeamSlug(pick.homeTeamSlug) ||
+      !isWinStreakTeamSlug(pick.awayTeamSlug) ||
+      pick.homeTeamSlug === pick.awayTeamSlug ||
+      (pick.teamSlug !== pick.homeTeamSlug &&
+        pick.teamSlug !== pick.awayTeamSlug) ||
+      Number.isNaN(Date.parse(pick.kickoffAt)) ||
       !resultIsValid(pick.result)
     ) {
       scoringError(`Matchweek ${pick.matchweek} contains an invalid pick.`);
@@ -245,8 +248,7 @@ export function deriveWinStreakParticipant(
       );
     }
 
-    const fixture = getWinStreakFixtureForTeam(matchweek, pick.teamSlug);
-    const entry = historyForPick(pick, fixture);
+    const entry = historyForPick(pick);
     history.push(entry);
     if (entry.outcome === "win") {
       currentStreak += 1;

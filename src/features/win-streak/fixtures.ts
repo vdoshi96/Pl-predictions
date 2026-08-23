@@ -243,21 +243,3 @@ export function getWinStreakTeam(teamSlug: WinStreakTeamSlug): TeamSeed {
   }
   return team;
 }
-
-// Keep the localhost workshop adapter available until its browser-local state
-// is removed. Its four rounds now derive from the same canonical schedule.
-export type WinStreakWorkshopFixture = WinStreakFixture;
-export type WinStreakWorkshopRound = WinStreakRound;
-export const WIN_STREAK_WORKSHOP_ROUNDS = WIN_STREAK_ROUNDS.filter(
-  (round) => round.matchweek >= 20 && round.matchweek <= 23,
-);
-export const WIN_STREAK_WORKSHOP_ROUND_IDS = WIN_STREAK_WORKSHOP_ROUNDS.map(
-  (round) => round.id,
-);
-export const WIN_STREAK_WORKSHOP_SOURCE = {
-  fixtureListUrl:
-    "https://www.premierleague.com/en/news/4675097/all-380-fixtures-for-202627-premier-league-season/",
-  lastFanStandingUrl:
-    "https://www.premierleague.com/en/news/4685390/premier-league-last-fan-standing-202627",
-  verifiedOn: WIN_STREAK_SOURCE.checkedAt,
-} as const;

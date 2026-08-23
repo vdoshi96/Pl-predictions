@@ -34,7 +34,15 @@ function pick(
   teamSlug: WinStreakTeamSlug,
   result: WinStreakResult,
 ): WinStreakPickFact {
-  return { matchweek, result, teamSlug };
+  const fixture = getWinStreakFixtureForTeam(matchweek, teamSlug);
+  return {
+    awayTeamSlug: fixture.awayTeamSlug,
+    homeTeamSlug: fixture.homeTeamSlug,
+    kickoffAt: fixture.kickoffAt,
+    matchweek,
+    result,
+    teamSlug,
+  };
 }
 
 describe("Win Streak scoring", () => {

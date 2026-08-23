@@ -6,7 +6,6 @@ import {
   WIN_STREAK_MATCHWEEKS,
   WIN_STREAK_ROUNDS,
   WIN_STREAK_SOURCE,
-  WIN_STREAK_WORKSHOP_ROUNDS,
   getWinStreakFixtureById,
   getWinStreakFixtureForTeam,
   getWinStreakRound,
@@ -66,11 +65,5 @@ describe("Win Streak canonical fixture adapter", () => {
       matchweek: 2,
     });
     expect(getWinStreakFixtureById(fixture.id)).toBe(fixture);
-  });
-
-  it("retains the four-round localhost workshop view from canonical data", () => {
-    expect(WIN_STREAK_WORKSHOP_ROUNDS.map((round) => round.matchweek)).toEqual([
-      20, 21, 22, 23,
-    ]);
   });
 });

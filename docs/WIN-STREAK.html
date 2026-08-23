@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="generated-by" content="scripts/generate-docs-html.mjs" />
     <meta name="canonical-source" content="WIN-STREAK.md" />
-    <meta name="canonical-source-sha256" content="2cf7e027fb01abee1651a9b9a3fe6b809a1721319adb14083849ac6660b563c0" />
+    <meta name="canonical-source-sha256" content="ea922cf06f8e5c0f4e3a058391c10c0aa0dc33c56dbdfc6da3b455c0a8960e9f" />
     <title>Win Streak</title>
     <style>
       :root { color-scheme: light dark; font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
@@ -45,7 +45,7 @@
 <li><strong>Contest window:</strong> Matchweeks 2–38</li>
 <li><strong>Public route:</strong> <code>/win-streak</code></li>
 <li><strong>Owner results route:</strong> <code>/admin/win-streak</code></li>
-<li><strong>Status:</strong> Release candidate verified locally on August 23, 2026</li>
+<li><strong>Status:</strong> Released and production-verified on August 23, 2026</li>
 </ul>
 <p>Win Streak is a separate Dranx mini game. A participant chooses one club to win in each matchweek. A draw or loss breaks the current streak, but nobody is eliminated: the participant starts another attempt while their personal best remains on the public leaderboard.</p>
 <p>The game uses the site&#39;s existing identity, responsive navigation, semantic colour tokens, buttons, cards, and canonical local club badges. It does not change the season-table prediction game, Spotlight accuracy, or either existing leaderboard.</p>
@@ -128,13 +128,14 @@
 <p>The browser stores no editable Win Streak state in <code>localStorage</code>. Server actions validate typed payloads, require same-origin requests, sample PostgreSQL time for deadlines, rate-limit profile and pick mutations, and retain only the receipt hash. Fixture and result acquisition remain offline owner operations; there is no football API, scraper, webhook, or cron in the deployed application.</p>
 <h2 id="verified-interface">Verified interface</h2>
 <p>The interactive flow was exercised against a production build and isolated Neon database across desktop Chromium, 320-, 390-, and 430-pixel Chromium, and mobile WebKit. It covered anonymous leaderboard access, name creation, immutable confirmation, keyboard selection and dialog dismissal, two profiles with opposing fixture picks, public current picks, reload persistence, name-takeover denial, light/dark mode, official marks, clean console output, no external runtime football requests, and no page-level horizontal overflow. Unit and isolated integration tests cover shared result publication plus the win, reset, void, and missed-round transitions.</p>
+<p><a href="https://github.com/vdoshi96/Pl-predictions/pull/39">PR #39</a> merged as <code>19bf11b4df43f8c3410f704fb278d1d4bdd845b5</code>. Migration <code>0010</code> and only the targeted Win Streak seed produced 37 rounds and 370 fixtures in production with zero profiles, picks, or results. Ready deployment <code>dpl_BTncZC77GmA3EXtaUjAKvfWZvRzP</code> owns the stable production alias. The guarded anonymous production smoke passed desktop Chromium, 390-pixel mobile Chromium, exact 320/430-pixel reflow, and mobile WebKit; final database read-back found no participant writes, and bounded error, fatal, and HTTP 5xx log queries were empty.</p>
 <h3 id="desktop">Desktop</h3>
 <p><img src="assets/qa/win-streak-desktop.png" alt="Win Streak desktop flow with the public leaderboard and current pick"></p>
 <h3 id="mobile">Mobile</h3>
 <p><img src="assets/qa/win-streak-mobile.png" alt="Win Streak mobile flow at 390 pixels"></p>
 <p>The screenshots use isolated QA profiles and data. They are not production participant records.</p>
 
-      <p class="source">Generated deterministically from <a href="WIN-STREAK.md">docs/WIN-STREAK.md</a>. Canonical SHA-256: <code>2cf7e027fb01abee1651a9b9a3fe6b809a1721319adb14083849ac6660b563c0</code>.</p>
+      <p class="source">Generated deterministically from <a href="WIN-STREAK.md">docs/WIN-STREAK.md</a>. Canonical SHA-256: <code>ea922cf06f8e5c0f4e3a058391c10c0aa0dc33c56dbdfc6da3b455c0a8960e9f</code>.</p>
     </main>
   </body>
 </html>

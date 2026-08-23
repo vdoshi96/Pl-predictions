@@ -6,7 +6,7 @@ Production: [https://pl-predictions-2026.vercel.app](https://pl-predictions-2026
 
 GitHub: [https://github.com/vdoshi96/Pl-predictions](https://github.com/vdoshi96/Pl-predictions)
 
-Deployment status: production is public and Ready at the stable alias above. The latest verified production release before Win Streak is directional consensus [PR #33](https://github.com/vdoshi96/Pl-predictions/pull/33), merged as `0cf3caf9602bbbf10b2cf233c6676baf1005e9cc`. Win Streak is a locally verified release candidate pending its additive migration, targeted fixture seed, GitHub merge, and exact deployment verification. Vercel Authentication remains enabled for previews while production remains anonymously accessible. Current and historical evidence is recorded in [docs/QA.md](docs/QA.md).
+Deployment status: production is public and Ready at the stable alias above. Win Streak [PR #39](https://github.com/vdoshi96/Pl-predictions/pull/39) merged as `19bf11b4df43f8c3410f704fb278d1d4bdd845b5`; exact deployment `dpl_BTncZC77GmA3EXtaUjAKvfWZvRzP` is Ready and owns the stable alias. Additive migration `0010` and the targeted 37-round/370-fixture seed are applied and verified. Vercel Authentication remains enabled for previews while production remains anonymously accessible. Current and historical evidence is recorded in [docs/QA.md](docs/QA.md).
 
 ## Brand and local assets
 

@@ -4,7 +4,7 @@
 - **Contest window:** Matchweeks 2–38
 - **Public route:** `/win-streak`
 - **Owner results route:** `/admin/win-streak`
-- **Status:** Release candidate verified locally on August 23, 2026
+- **Status:** Released and production-verified on August 23, 2026
 
 Win Streak is a separate Dranx mini game. A participant chooses one club to win in each matchweek. A draw or loss breaks the current streak, but nobody is eliminated: the participant starts another attempt while their personal best remains on the public leaderboard.
 
@@ -80,6 +80,8 @@ The browser stores no editable Win Streak state in `localStorage`. Server action
 ## Verified interface
 
 The interactive flow was exercised against a production build and isolated Neon database across desktop Chromium, 320-, 390-, and 430-pixel Chromium, and mobile WebKit. It covered anonymous leaderboard access, name creation, immutable confirmation, keyboard selection and dialog dismissal, two profiles with opposing fixture picks, public current picks, reload persistence, name-takeover denial, light/dark mode, official marks, clean console output, no external runtime football requests, and no page-level horizontal overflow. Unit and isolated integration tests cover shared result publication plus the win, reset, void, and missed-round transitions.
+
+[PR #39](https://github.com/vdoshi96/Pl-predictions/pull/39) merged as `19bf11b4df43f8c3410f704fb278d1d4bdd845b5`. Migration `0010` and only the targeted Win Streak seed produced 37 rounds and 370 fixtures in production with zero profiles, picks, or results. Ready deployment `dpl_BTncZC77GmA3EXtaUjAKvfWZvRzP` owns the stable production alias. The guarded anonymous production smoke passed desktop Chromium, 390-pixel mobile Chromium, exact 320/430-pixel reflow, and mobile WebKit; final database read-back found no participant writes, and bounded error, fatal, and HTTP 5xx log queries were empty.
 
 ### Desktop
 

@@ -111,6 +111,235 @@ export const teams = pgTable(
   ],
 );
 
+export const winStreakRounds = pgTable(
+  "win_streak_rounds",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    seasonId: uuid("season_id")
+      .notNull()
+      .references(() => seasons.id, { onDelete: "cascade" }),
+    matchweek: smallint("matchweek").notNull(),
+    pickDeadline: timestamp("pick_deadline", {
+      mode: "date",
+      withTimezone: true,
+    }).notNull(),
+    fixtureSource: varchar("fixture_source", { length: 64 }).notNull(),
+    fixtureSourceReference: text("fixture_source_reference").notNull(),
+    fixtureVerifiedAt: timestamp("fixture_verified_at", {
+      mode: "date",
+      withTimezone: true,
+    }).notNull(),
+    fixtureContentHash: varchar("fixture_content_hash", {
+      length: 64,
+    }).notNull(),
+    resultSource: varchar("result_source", { length: 64 }),
+    resultSourceReference: text("result_source_reference"),
+    resultCapturedAt: timestamp("result_captured_at", {
+      mode: "date",
+      withTimezone: true,
+    }),
+    resultContentHash: varchar("result_content_hash", { length: 64 }),
+    resolvedAt: timestamp("resolved_at", {
+      mode: "date",
+      withTimezone: true,
+    }),
+    createdAt: timestamp("created_at", { mode: "date", withTimezone: true })
+      .defaultNow()
+      .notNull(),
+    updatedAt: timestamp("updated_at", { mode: "date", withTimezone: true })
+      .defaultNow()
+      .notNull(),
+  },
+  (table) => [
+    uniqueIndex("win_streak_rounds_season_matchweek_unique").on(
+      table.seasonId,
+      table.matchweek,
+    ),
+    index("win_streak_rounds_season_resolution_idx").on(
+      table.seasonId,
+      table.resolvedAt,
+      table.matchweek,
+    ),
+    check(
+      "win_streak_rounds_matchweek_check",
+      sql`${table.matchweek} between 2 and 38`,
+    ),
+    check(
+      "win_streak_rounds_fixture_source_check",
+      sql`btrim(${table.fixtureSource}) <> '' and btrim(${table.fixtureSourceReference}) <> ''`,
+    ),
+    check(
+      "win_streak_rounds_fixture_hash_check",
+      sql`${table.fixtureContentHash} ~ '^[0-9a-f]{64}$'`,
+    ),
+    check(
+      "win_streak_rounds_result_state_check",
+      sql`(
+        ${table.resolvedAt} is null
+        and ${table.resultSource} is null
+        and ${table.resultSourceReference} is null
+        and ${table.resultCapturedAt} is null
+        and ${table.resultContentHash} is null
+      ) or (
+        ${table.resolvedAt} is not null
+        and btrim(${table.resultSource}) <> ''
+        and btrim(${table.resultSourceReference}) <> ''
+        and ${table.resultCapturedAt} is not null
+        and ${table.resultContentHash} ~ '^[0-9a-f]{64}$'
+        and ${table.resolvedAt} >= ${table.resultCapturedAt}
+      )`,
+    ),
+  ],
+);
+
+export const winStreakFixtures = pgTable(
+  "win_streak_fixtures",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    seasonId: uuid("season_id")
+      .notNull()
+      .references(() => seasons.id, { onDelete: "cascade" }),
+    roundId: uuid("round_id")
+      .notNull()
+      .references(() => winStreakRounds.id, { onDelete: "cascade" }),
+    sourceFixtureId: varchar("source_fixture_id", { length: 192 }).notNull(),
+    homeTeamId: uuid("home_team_id")
+      .notNull()
+      .references(() => teams.id, { onDelete: "restrict" }),
+    awayTeamId: uuid("away_team_id")
+      .notNull()
+      .references(() => teams.id, { onDelete: "restrict" }),
+    kickoffAt: timestamp("kickoff_at", {
+      mode: "date",
+      withTimezone: true,
+    }).notNull(),
+    result: varchar("result", { length: 16 }),
+    createdAt: timestamp("created_at", { mode: "date", withTimezone: true })
+      .defaultNow()
+      .notNull(),
+    updatedAt: timestamp("updated_at", { mode: "date", withTimezone: true })
+      .defaultNow()
+      .notNull(),
+  },
+  (table) => [
+    uniqueIndex("win_streak_fixtures_season_source_unique").on(
+      table.seasonId,
+      table.sourceFixtureId,
+    ),
+    uniqueIndex("win_streak_fixtures_season_pairing_unique").on(
+      table.seasonId,
+      table.homeTeamId,
+      table.awayTeamId,
+    ),
+    index("win_streak_fixtures_round_idx").on(table.roundId),
+    index("win_streak_fixtures_home_team_idx").on(table.homeTeamId),
+    index("win_streak_fixtures_away_team_idx").on(table.awayTeamId),
+    check(
+      "win_streak_fixtures_distinct_teams_check",
+      sql`${table.homeTeamId} <> ${table.awayTeamId}`,
+    ),
+    check(
+      "win_streak_fixtures_source_id_check",
+      sql`btrim(${table.sourceFixtureId}) <> ''`,
+    ),
+    check(
+      "win_streak_fixtures_result_check",
+      sql`${table.result} is null or ${table.result} in ('home_win', 'draw', 'away_win', 'void')`,
+    ),
+  ],
+);
+
+export const winStreakProfiles = pgTable(
+  "win_streak_profiles",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    seasonId: uuid("season_id")
+      .notNull()
+      .references(() => seasons.id, { onDelete: "cascade" }),
+    joinedRoundId: uuid("joined_round_id")
+      .notNull()
+      .references(() => winStreakRounds.id, { onDelete: "restrict" }),
+    participantName: varchar("participant_name", { length: 40 }).notNull(),
+    normalizedParticipantName: varchar("normalized_participant_name", {
+      length: 40,
+    }).notNull(),
+    receiptTokenHash: varchar("receipt_token_hash", { length: 64 }).notNull(),
+    createdAt: timestamp("created_at", { mode: "date", withTimezone: true })
+      .defaultNow()
+      .notNull(),
+    updatedAt: timestamp("updated_at", { mode: "date", withTimezone: true })
+      .defaultNow()
+      .notNull(),
+  },
+  (table) => [
+    uniqueIndex("win_streak_profiles_season_name_unique").on(
+      table.seasonId,
+      table.normalizedParticipantName,
+    ),
+    uniqueIndex("win_streak_profiles_receipt_hash_unique").on(
+      table.receiptTokenHash,
+    ),
+    index("win_streak_profiles_season_created_idx").on(
+      table.seasonId,
+      table.createdAt,
+    ),
+    index("win_streak_profiles_joined_round_idx").on(table.joinedRoundId),
+    check(
+      "win_streak_profiles_participant_name_check",
+      sql`char_length(${table.participantName}) between 2 and 40`,
+    ),
+    check(
+      "win_streak_profiles_normalized_name_check",
+      sql`char_length(${table.normalizedParticipantName}) between 2 and 40`,
+    ),
+    check(
+      "win_streak_profiles_receipt_hash_check",
+      sql`${table.receiptTokenHash} ~ '^[0-9a-f]{64}$'`,
+    ),
+  ],
+);
+
+export const winStreakPicks = pgTable(
+  "win_streak_picks",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    profileId: uuid("profile_id")
+      .notNull()
+      .references(() => winStreakProfiles.id, { onDelete: "cascade" }),
+    roundId: uuid("round_id")
+      .notNull()
+      .references(() => winStreakRounds.id, { onDelete: "restrict" }),
+    fixtureId: uuid("fixture_id")
+      .notNull()
+      .references(() => winStreakFixtures.id, { onDelete: "restrict" }),
+    teamId: uuid("team_id")
+      .notNull()
+      .references(() => teams.id, { onDelete: "restrict" }),
+    pickedAt: timestamp("picked_at", { mode: "date", withTimezone: true })
+      .defaultNow()
+      .notNull(),
+    deadlineAtPick: timestamp("deadline_at_pick", {
+      mode: "date",
+      withTimezone: true,
+    })
+      .defaultNow()
+      .notNull(),
+  },
+  (table) => [
+    uniqueIndex("win_streak_picks_profile_round_unique").on(
+      table.profileId,
+      table.roundId,
+    ),
+    index("win_streak_picks_round_idx").on(table.roundId),
+    index("win_streak_picks_fixture_idx").on(table.fixtureId),
+    index("win_streak_picks_team_idx").on(table.teamId),
+    check(
+      "win_streak_picks_deadline_check",
+      sql`${table.pickedAt} < ${table.deadlineAtPick}`,
+    ),
+  ],
+);
+
 export const predictions = pgTable(
   "predictions",
   {
@@ -765,7 +994,7 @@ export const securityRateLimits = pgTable(
     index("security_rate_limits_updated_at_idx").on(table.updatedAt),
     check(
       "security_rate_limits_scope_check",
-      sql`${table.scope} in ('admin_login', 'standings_ingest')`,
+      sql`${table.scope} in ('admin_login', 'standings_ingest', 'win_streak_create', 'win_streak_pick')`,
     ),
     check(
       "security_rate_limits_key_hash_check",
@@ -782,6 +1011,14 @@ export type Season = typeof seasons.$inferSelect;
 export type NewSeason = typeof seasons.$inferInsert;
 export type Team = typeof teams.$inferSelect;
 export type NewTeam = typeof teams.$inferInsert;
+export type WinStreakRound = typeof winStreakRounds.$inferSelect;
+export type NewWinStreakRound = typeof winStreakRounds.$inferInsert;
+export type WinStreakFixture = typeof winStreakFixtures.$inferSelect;
+export type NewWinStreakFixture = typeof winStreakFixtures.$inferInsert;
+export type WinStreakProfile = typeof winStreakProfiles.$inferSelect;
+export type NewWinStreakProfile = typeof winStreakProfiles.$inferInsert;
+export type WinStreakPick = typeof winStreakPicks.$inferSelect;
+export type NewWinStreakPick = typeof winStreakPicks.$inferInsert;
 export type Prediction = typeof predictions.$inferSelect;
 export type NewPrediction = typeof predictions.$inferInsert;
 export type PredictionItem = typeof predictionItems.$inferSelect;

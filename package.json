@@ -26,6 +26,7 @@
     "db:generate": "drizzle-kit generate",
     "db:migrate": "dotenv -e .env.local -- drizzle-kit migrate",
     "db:seed": "dotenv -e .env.local -- tsx scripts/seed.ts",
+    "db:seed:win-streak": "dotenv -e .env.local -- tsx scripts/seed-win-streak-fixtures.ts",
     "db:test:migrate": "dotenv -e .env.local -- node scripts/run-with-test-database.mjs drizzle-kit migrate",
     "db:test:seed": "dotenv -e .env.local -- node scripts/run-with-test-database.mjs tsx scripts/seed.ts",
     "players:generate": "tsx scripts/normalize-player-catalogue.ts",

@@ -16,7 +16,7 @@ Owner-run reviewed entry: check official Win Streak fixtures, fetch FotMob facts
 
 Do not:
 
-- apply or rewrite the Win Streak fixture snapshot unless the owner reviews detected drift and explicitly authorizes the change
+- apply ambiguous Win Streak drift: changed clubs, pairings, matchweek membership, or any round that is resolved, has a pick, or has reached either the stored or proposed deadline
 - add a runtime football client, scraper, cron, or FotMob call to the Next.js app
 - write Win Streak fixture outcomes directly to the database or through an unauthenticated route
 - advance a Win Streak matchweek with fewer than 10 reviewed fixture outcomes
@@ -26,14 +26,14 @@ Do not:
 - LOCK, REVEAL, or finalize snapshots unless the user asked
 - seed unplayed players into `player_ratings` at rating `0`
 - invent goals, assists, clean sheets, or ratings
-- commit, push, migrate, seed, or deploy as part of this skill
+- migrate a schema or include unrelated code or documentation in a fixture-drift release
 
-Invoking `$update-results` authorizes reviewed live-season writes through the authenticated standings, spotlight-results, and Win Streak admin workflows. It does not authorize fixture-file changes, code changes, commits, pushes, migrations, seeds, deployments, or other release work. Confirm the connected database is the intended season database by checking the prediction count and season slug before mutating.
+Invoking `$update-results` authorizes reviewed live-season writes through the authenticated standings, spotlight-results, and Win Streak admin workflows. It also authorizes the bounded fixture-drift path below: when the complete official schedule produces only safe future kickoff changes, refresh the canonical snapshot, run the focused checks, publish the fixture-data-only change, run the targeted Win Streak seed, and verify the exact production deployment. It does not authorize schema changes, pairing changes, changes to protected rounds, or unrelated release work. Confirm the connected database is the intended season database by checking the prediction count and season slug before mutating.
 
 ## Checklist
 
 ```
-- [ ] Run the official Win Streak fixture drift check; stop if it reports drift
+- [ ] Run the official Win Streak fixture drift check; sync safe kickoff drift or stop on protected/ambiguous drift
 - [ ] Fetch FotMob table + goals, assists, team clean sheets, player ratings
 - [ ] Read N (active brackets) and distinct seeded subjects per dataset
 - [ ] Start local Next against .env.local; sign in without logging the password
@@ -59,24 +59,32 @@ Check the tracked snapshot before you enter results:
 npm run win-streak:fixtures:check
 ```
 
-The expected result on most runs is no fixture drift. Report the verified 370 fixtures, 37 matchweeks, and retained source-check date.
+The expected result on most runs is no fixture drift. Report the verified 370 fixtures, 37 matchweeks, and retained source-check date. When there is no drift, do not rewrite, seed, commit, or deploy anything for fixtures.
 
-If the command reports drift, stop before any apply or admin mutation. Summarize the affected matchweeks, pairings, dates, and kickoff times for owner review. Do not interpret source drift as permission to change the snapshot.
-
-If the owner explicitly authorizes the reviewed fixture change, apply it with an ISO check date:
+If the command reports drift, pause result-entry mutations while you classify it in a clean isolated worktree. Generate the reviewed candidate with the current ISO check date:
 
 ```
 npm run win-streak:fixtures:apply -- --checked-at=YYYY-MM-DD
 ```
 
-Then run the drift check again and run the focused fixture-refresh test:
+Inspect the exact snapshot diff. The automatic path is allowed only when every football change is a future date, time, `kickoffAt`, or `timeBasis` change for the same canonical fixture ID, home club, away club, and matchweek. Stop and report the exact affected fixtures without seeding or publishing when the candidate changes a club, pairing, fixture ID, or matchweek, or when the targeted seed reports a resolved round, an existing pick, or an old/new deadline that is not in the future.
+
+For safe kickoff-only drift, run:
 
 ```
 npm run win-streak:fixtures:check
-npx vitest run tests/unit/win-streak-fixture-refresh.test.ts
+npx vitest run tests/unit/win-streak-fixture-refresh.test.ts tests/unit/win-streak-fixture-seed.test.ts
+npm run typecheck
+npm run lint
 ```
 
-An authorized apply changes only the reviewed fixture snapshot. Do not commit, push, deploy, migrate, seed, or perform other release work unless the user separately authorizes that work.
+Commit only `src/data/win-streak-fixtures.json` and its directly generated documentation metadata, push the isolated fixture branch, merge it to `main`, and wait for the exact Vercel deployment to become Ready. Against the verified live season database, run only:
+
+```
+npm run db:seed:win-streak
+```
+
+The targeted seed is the production guard: it updates only unresolved, unpicked rounds before both deadlines, preserves all fixture identities, and fails closed otherwise. Verify 37 rounds, 370 fixtures, the affected round hashes and kickoff times, the merged SHA, the Ready deployment, and `/win-streak`. Resume result entry only after this bounded fixture sync is consistent. Do not run a migration or a general database seed.
 
 ## Fetch FotMob
 
@@ -153,7 +161,7 @@ Spot-check at least one pick against FotMob (for example a rank-1 rating pick ea
 
 Also confirm the public alias `https://pl-predictions-2026.vercel.app/leaderboard` if `.env.local` points at the live season DB.
 
-Win Streak: open `/win-streak` without an owner session. Confirm that completed fixture outcomes are visible, current and best streaks recalculate, equal best streaks share a competition rank, and the next active matchweek is correct. Verify every participant's current pick or explicit no-pick state. Spot-check a win, a draw or loss, and any void: a win adds one; a draw or loss resets the current streak but preserves the best; a void preserves the streak and does not consume the club.
+Win Streak: open `/win-streak` without an owner session. Confirm that current and best streaks recalculate, equal best streaks share a competition rank, and the next active matchweek is correct. Verify every participant's public current pick or explicit no-pick state. Spot-check a win, a draw or loss, and any void against the reviewed inputs: a win adds one; a draw or loss resets the current streak but preserves the best; a void preserves the streak and does not consume the club.
 
 If `.env.local` points at the live season database, also confirm `https://pl-predictions-2026.vercel.app/win-streak`. Keep this verification read-only.
 
@@ -166,7 +174,8 @@ Return only:
 3. Table top few scores
 4. Spotlight overall leader and one check per category
 5. Win Streak matchweek updated, all 10 outcomes, explicit voids, next active matchweek, leaderboard, and current-pick checks
-6. Confirmation: table and spotlight snapshots remain provisional; no finalize, LOCK, REVEAL, runtime football client, direct database write, fixture apply without approval, or release work
+6. Fixture check result and any bounded kickoff-only sync, including affected rounds, seed counts, merged SHA, and deployment; otherwise confirmation that no fixture release was needed
+7. Confirmation: table and spotlight snapshots remain provisional; no finalize, LOCK, REVEAL, runtime football client, direct result write, schema migration, protected-round change, or unrelated release work
 
 Then stop.
 
@@ -174,4 +183,4 @@ Then stop.
 
 User: `$update-results`
 
-Agent: checks the official Win Streak snapshot and reports no drift, reads the completed FotMob matchweek, updates the table and spotlight data, enters all 10 completed Win Streak outcomes through `/admin/win-streak`, verifies `/leaderboard`, `/spotlight`, and `/win-streak`, then stops without release work.
+Agent: checks the official Win Streak snapshot. With no drift, it performs no fixture release. With safe future kickoff-only drift, it publishes the bounded snapshot change and targeted seed; protected or ambiguous drift stops for owner review. It then reads the completed FotMob matchweek, updates the table and spotlight data, enters all 10 completed Win Streak outcomes through `/admin/win-streak`, and verifies `/leaderboard`, `/spotlight`, and `/win-streak`.

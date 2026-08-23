@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="generated-by" content="scripts/generate-docs-html.mjs" />
     <meta name="canonical-source" content="DECISIONS.md" />
-    <meta name="canonical-source-sha256" content="59867639a7d5d6fb95c8f88d99ecb2d23988d1cdb65ed88ca1dcf83c274369b6" />
+    <meta name="canonical-source-sha256" content="dc16932b958aa1033b670c42ceb7e1563ee04baf588382281f9b4ad076294b0f" />
     <title>Decisions</title>
     <style>
       :root { color-scheme: light dark; font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
@@ -40,6 +40,11 @@
   <body>
     <main>
       <h1 id="decisions">Decisions</h1>
+<h2 id="2026-08-23-release-win-streak-from-matchweek-2">2026-08-23: Release Win Streak from Matchweek 2</h2>
+<p>Run Win Streak as a separate durable game across Matchweeks 2–38. One confirmed club-to-win pick is immutable for each profile and round. A win adds one to the current streak and keeps that winning club unavailable during the active streak. A draw or loss resets the current streak and unlocks every club. A missed round or void preserves the streak; a void returns that round&#39;s club to the available pool. Late joiners receive no retroactive penalty. Rank only personal best by shared competition rank, alphabetize tied names for deterministic presentation, and show current streak as supporting information.</p>
+<p>Lock the complete round at its earliest persisted fixture kickoff rather than giving later-playing clubs a longer selection window. Display each fixture&#39;s kickoff for context, but use the round deadline and PostgreSQL clock for every profile creation and pick authorization.</p>
+<p>Keep the leaderboard public before any display name is entered, and show each profile&#39;s current-matchweek pick with the fixture. Do not publish receipt tokens or internal identifiers. A 2–40-character display name creates a profile bound to one random browser receipt whose SHA-256 hash is stored. Do not allow name-only resumption or takeover. Accept the explicit no-login tradeoff that losing the cookie makes the profile unrecoverable; cap the season at 500 profiles and rate-limit profile and pick writes.</p>
+<p>Seed all 370 official Matchweek 2–38 fixtures from the Premier League snapshot checked August 23, 2026. Do not make runtime football requests. The recurring update-results workflow must check official fixture drift first. It may automatically prepare only a reviewed kickoff-time correction for a future, unpicked, unresolved fixture; every structural or protected-fixture difference fails closed. Publish a completed round only through the authenticated results desk, with all ten persisted kickoffs elapsed and all ten results committed atomically and immutably.</p>
 <h2 id="2026-08-21-august-20-player-catalogue-and-ui-report-remediation">2026-08-21: August 20 player catalogue and UI-report remediation</h2>
 <p>Use the owner-provided <code>premier-league-players-2026-08-20/</code> handoff as the current repository and production selector source. Normalize all 580 players and copy its 578 verified portraits. Keep null asset paths for Ryan McAidoo and Luc De Fougerolles so <code>PlayerMark</code> renders the generic silhouette. Relative to August 18, require exact parity for five additions, five removals, no intra-league moves, two position corrections, and two restored portraits for existing players. Do not run handoff acquisition scripts, infer result facts, or hotlink images. The owner approved the gated production release and one supported seed on 2026-08-21; the seed completed after the exact application deployment became Ready.</p>
 <p>Implement all 20 findings from the owner-provided Oxalpha UI report as one mobile-first density and interaction pass. Keep the repository&#39;s 56-pixel move-handle requirement while reducing row chrome around it. Debounce local draft writes and flush on page exit, keep player pickers in the mobile viewport, add Home, End, Page Up, and Page Down movement, announce reorders politely, highlight only the first incomplete spotlight category, collapse the review table&#39;s middle positions, compact the public header and leaderboard, align countdown updates to one-second boundaries, export a safe-area viewport, and use named design tokens for repeated colors. Preserve the existing privacy, atomicity, lazy-catalogue, and no-runtime-acquisition boundaries.</p>
@@ -120,7 +125,7 @@
 <h2 id="2026-08-08-production-public-previews-protected">2026-08-08: Production public, previews protected</h2>
 <p>Use the Vercel Authentication boundary <code>preview</code>: the finished production site is public while preview deployments require owner sign-in. This is narrower than disabling deployment protection. The owner explicitly approved the persistent change from all-deployments protection; anonymous production access now returns 200, and the retained preview URL still redirects to Vercel SSO with 302.</p>
 
-      <p class="source">Generated deterministically from <a href="DECISIONS.md">docs/context/DECISIONS.md</a>. Canonical SHA-256: <code>59867639a7d5d6fb95c8f88d99ecb2d23988d1cdb65ed88ca1dcf83c274369b6</code>.</p>
+      <p class="source">Generated deterministically from <a href="DECISIONS.md">docs/context/DECISIONS.md</a>. Canonical SHA-256: <code>dc16932b958aa1033b670c42ceb7e1563ee04baf588382281f9b4ad076294b0f</code>.</p>
     </main>
   </body>
 </html>

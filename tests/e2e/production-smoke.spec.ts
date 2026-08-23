@@ -97,6 +97,7 @@ test("production public routes are mobile-safe and healthy", async ({
   }
   const browserErrors: string[] = [];
   const networkErrors: string[] = [];
+  const runtimeFootballRequests: string[] = [];
   const unexpectedMutationRequests: string[] = [];
   const productionOrigin = new URL(process.env.PLAYWRIGHT_BASE_URL!).origin;
   const isBlockedVercelPreviewToolbar = (text: string) =>
@@ -147,6 +148,13 @@ test("production public routes are mobile-safe and healthy", async ({
   });
   page.on("request", (request) => {
     const requestUrl = new URL(request.url());
+    if (
+      /(?:premierleague\.com|fotmob\.com|transfermarkt\.)$/iu.test(
+        requestUrl.hostname,
+      )
+    ) {
+      runtimeFootballRequests.push(request.url());
+    }
     if (
       requestUrl.origin === productionOrigin &&
       !["GET", "HEAD", "OPTIONS"].includes(request.method())
@@ -400,6 +408,37 @@ test("production public routes are mobile-safe and healthy", async ({
   ).toHaveCount(0);
   await expectNoHorizontalOverflow(page);
 
+  await page.goto("/win-streak");
+  await expect(
+    page.getByRole("heading", { level: 1, name: "Win Streak" }),
+  ).toBeVisible();
+  const winStreakLeaderboard = page.getByTestId("win-streak-leaderboard");
+  await expect(winStreakLeaderboard).toBeVisible();
+  await expect(
+    winStreakLeaderboard.getByRole("heading", {
+      name: "Win Streak leaderboard",
+    }),
+  ).toBeVisible();
+  await expect(
+    winStreakLeaderboard.getByText(
+      "Ranked by personal best. Tied bests share a rank; current picks are visible as soon as they are locked.",
+      { exact: true },
+    ),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("region", { name: "Your Win Streak" }),
+  ).toBeVisible();
+  const winStreakDisplayName = page.getByRole("textbox", {
+    name: "Display name",
+  });
+  if (await winStreakDisplayName.isVisible()) {
+    await expect(winStreakDisplayName).toBeEditable();
+    await expect(
+      page.getByRole("button", { name: "Create profile" }),
+    ).toBeDisabled();
+  }
+  await expectNoHorizontalOverflow(page);
+
   await page.goto("/spotlight?view=entries&sort=overall");
   await expect(
     page.getByRole("heading", { level: 1, name: "Spotlight accuracy" }),
@@ -492,6 +531,10 @@ test("production public routes are mobile-safe and healthy", async ({
 
   expect(browserErrors).toEqual([]);
   expect(networkErrors).toEqual([]);
+  expect(
+    runtimeFootballRequests,
+    "The deployed application must not request a football-data source at runtime.",
+  ).toEqual([]);
   expect(
     unexpectedMutationRequests,
     "The production smoke must not send a same-origin mutation request.",

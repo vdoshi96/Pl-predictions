@@ -1,5 +1,15 @@
 # Session log
 
+## 2026-08-23
+
+- Promoted the browser-local Win Streak workshop into a durable Matchweek 2–38 release candidate. Added 37 rounds and 370 canonical official fixtures, receipt-bound no-login profiles, database-clock pick deadlines, immutable one-per-round picks, derived streak scoring, public current picks, and a public anonymous leaderboard.
+- Added the authenticated `/admin/win-streak` results desk. It resolves only the earliest unresolved round after all ten kickoffs, requires ten explicit outcomes plus reviewed provenance, and publishes the complete round in one immutable audited database transition.
+- Extended the owner-run update-results skill and its generated HTML peer to check official fixture drift before results. No change is a no-op. Only a future, unpicked, unresolved kickoff correction may use the targeted seed path; structural or protected-fixture changes fail closed.
+- Ran the online official fixture check on August 23. It verified all 370 retained fixtures across 37 matchweeks with no drift, so no fixture rewrite or seed ran at that checkpoint.
+- Added migration `0010_win_streak_live.sql`, a targeted production fixture seed, persistent mutation limits, bounded public reads, concurrent-publication consistency checks, and tests for schedule coverage, identity takeover, outcome transitions, shared results, fixture drift, privacy, and atomicity.
+- Passed the full 413-test unit/component suite with 31 guarded skips, all 29 isolated Neon integration tests, ESLint, strict TypeScript, and the Webpack production build. The focused optimized browser matrix passed 16 journeys across desktop Chromium, 320-, 390-, and 430-pixel mobile Chromium, and mobile WebKit, with four intentional project skips. It covered anonymous leaderboard access, public picks, two profiles with opposing fixture picks, keyboard confirmation, persistence, dark mode, and zero horizontal overflow.
+- Matchweek 2 begins on August 28, 2026, so no Win Streak result backfill existed on August 23. Production migration, targeted seed, GitHub merge, deployment, and stable-alias verification remained pending at this release-candidate checkpoint.
+
 ## 2026-08-22
 
 - Released directional season-table consensus deltas through [PR #33](https://github.com/vdoshi96/Pl-predictions/pull/33), merged as `0cf3caf9602bbbf10b2cf233c6676baf1005e9cc`. Every nonzero one-decimal delta uses `▲` or `▼`; only displayed `0.0` remains neutral.

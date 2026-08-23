@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="generated-by" content="scripts/generate-docs-html.mjs" />
     <meta name="canonical-source" content="QA.md" />
-    <meta name="canonical-source-sha256" content="b2b911e79d75f742467c240c7ddf561d6e1a331b9687ac30567281e8e100bc71" />
+    <meta name="canonical-source-sha256" content="eaf50e7efa2f6ad1c5c72ad238b02d7b51e05ce9b8c0f49237f610a96152939c" />
     <title>Quality assurance</title>
     <style>
       :root { color-scheme: light dark; font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
@@ -40,6 +40,42 @@
   <body>
     <main>
       <h1 id="quality-assurance">Quality assurance</h1>
+<h2 id="august-23-win-streak-release-candidate">August 23 Win Streak release candidate</h2>
+<p>Win Streak is locally complete for the production release gate. It begins at Matchweek 2, keeps its leaderboard public before name entry, and publishes each participant&#39;s current-matchweek pick. The screenshots use isolated QA profiles rather than production data.</p>
+<table>
+<thead>
+<tr>
+<th>Gate</th>
+<th>Evidence</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Fixture contract</td>
+<td>The generator parses and validates all 380 official fixtures, then retains Matchweeks 2–38: 37 rounds, 370 unique fixtures, ten fixtures and all 20 clubs per round, canonical team slugs, and normalized hash <code>f756c4790b6b0acd5ee4b351eb06cc53295078716b62018c20868f66a394848a</code>. It retains explicit UK times, defaults date-only weekend and bank-holiday fixtures to 15:00, midweek fixtures to 20:00, and Matchweek 38 to 16:00, then converts <code>Europe/London</code> to UTC. The online <code>win-streak:fixtures:check</code> passed on August 23 with no drift. Matchweek 2 starts August 28, so no result backfill is due.</td>
+</tr>
+<tr>
+<td>Domain and component tests</td>
+<td>The final full unit/component run passed 413 tests with 31 guarded skips across 67 files. Coverage includes parsing, profile switching, name takeover denial, immutable picks, every result transition, club restriction and unlocking, missed and void rounds, shared competition ranks, all 20 marks, keyboard confirmation, public picks, persistence, reset behavior, and fixture-drift safety.</td>
+</tr>
+<tr>
+<td>Database integration</td>
+<td>All 29 isolated Neon integration tests passed across five files after migrations <code>0000</code>–<code>0010</code> and targeted fixture seeding. They cover atomic profile and pick constraints, database-time deadlines, receipt authorization, consistent public reads, safe fixture refresh, exact ten-result publication, immutable replay protection, audit creation, and zero cleanup residue.</td>
+</tr>
+<tr>
+<td>Static and build gates</td>
+<td>ESLint, strict TypeScript, and the Next.js 16 Webpack production build passed. The final aggregate format, documentation-parity, fixture-source, repository-check, and release results are recorded at publication.</td>
+</tr>
+<tr>
+<td>Browser acceptance</td>
+<td>The optimized production-server Win Streak matrix passed 16 journeys with four intentional project skips across desktop Chromium, 320-, 390-, and 430-pixel mobile Chromium, and mobile WebKit. It covers anonymous leaderboard access, name gating, creation, a real Space/Enter/Escape keyboard path, immutable confirmation, public current picks, two profiles with opposite picks in one fixture, takeover denial, reload persistence, dark mode, clean consoles, no runtime football requests, and no horizontal overflow.</td>
+</tr>
+<tr>
+<td>Release boundary</td>
+<td>At this checkpoint no production migration, seed, profile, pick, result, GitHub merge, or deployment had run. Production verification will remain anonymous and read-only; it will not create a fake participant.</td>
+</tr>
+</tbody></table>
+<p><img src="assets/qa/win-streak-desktop.png" alt="Win Streak desktop acceptance"></p>
+<p><img src="assets/qa/win-streak-mobile.png" alt="Win Streak 390-pixel mobile acceptance"></p>
 <h2 id="august-22-directional-consensus-delta-production-release">August 22 directional consensus-delta production release</h2>
 <p><a href="https://github.com/vdoshi96/Pl-predictions/pull/33">PR #33</a> removes the half-place neutral band from the season-table comparison. The displayed one-decimal delta determines direction: positive values use <code>▲</code>, negative values use <code>▼</code>, and only <code>0.0</code> uses the neutral dash.</p>
 <table>
@@ -608,7 +644,7 @@
 <li>overrated player Alysson.</li>
 </ul>
 <p>The final post-release database verification exposed only safe aggregate facts: one parent, 20 child positions, seven category picks, and the sole display name <code>Dranx Test Entry</code>. It found no display name containing Alex or Jordan. It did not print prediction IDs, receipt material, database URLs, private pick subjects, or credentials. Before reveal, the public spotlight page reports one active bracket but does not serialize or display those seven choices.</p>
-<h2 id="current-mobile-walkthrough-sources">Current mobile walkthrough sources</h2>
+<h2 id="august-14-mobile-walkthrough-sources">August 14 mobile walkthrough sources</h2>
 <p>The participant-facing <code>/rules</code> section uses three first-party captures from the current isolated 390 by 844 application flow:</p>
 <ol>
 <li><code>public/how-to-play/step-1-table-mobile.png</code> — ordered club table, reorder handles, display-name field, and continue action.</li>
@@ -616,7 +652,7 @@
 <li><code>public/how-to-play/step-3-review-mobile.png</code> — the complete 20-position and seven-pick review with the final submit action.</li>
 </ol>
 <p>Each image receives two numbered overlay pins at render time. The same numbers and instructions appear as adjacent HTML text, so the annotations remain accessible, selectable, responsive, and understandable without colour. They were captured before the journey&#39;s reversible isolated submission; no production entry was created.</p>
-<h2 id="current-release-evidence-isolated-draft-and-administrator-states">Current release evidence: isolated draft and administrator states</h2>
+<h2 id="august-14-isolated-draft-and-administrator-evidence">August 14 isolated draft and administrator evidence</h2>
 <p>The completed isolated run added four 390 by 844 evidence images. The A–Z, restored-draft, and settings captures include in-image annotations; the results capture intentionally shows a local unsaved edit and the adjacent caption records its no-write boundary.</p>
 <p><strong>Intentional A–Z confirmation:</strong> the accessible dialog explains that the deterministic order is only a blank slate and offers Keep editing or Yes, use A–Z.</p>
 <p><img src="assets/qa/alphabetical-warning-mobile.png" alt="Isolated intentional alphabetical-order confirmation"></p>
@@ -626,7 +662,7 @@
 <p><img src="assets/qa/admin-results-mobile.png" alt="Isolated manual results row edit on mobile"></p>
 <p><strong>Fixed kickoff settings:</strong> the earlier-deadline editor is absent; the seeded countdown, Central baseline, selectable IANA-zone rendering, and separately protected closure actions remain. The capture invoked neither Lock nor Reveal.</p>
 <p><img src="assets/qa/admin-settings-mobile.png" alt="Isolated fixed-kickoff administrator settings on mobile"></p>
-<h2 id="current-production-deployment-and-mobile-evidence">Current production deployment and mobile evidence</h2>
+<h2 id="august-14-production-deployment-and-mobile-evidence">August 14 production deployment and mobile evidence</h2>
 <p>GitHub <a href="https://github.com/vdoshi96/Pl-predictions/pull/19">PR #19</a> merged the remediation into <code>main</code> on 2026-08-14 as <code>9cdad64c285fb66f96d9e11a0b71780008b05160</code>. Vercel deployment <code>dpl_2evvhgizD4spM9QfXKNhvHLEBrgG</code> became Ready at <a href="https://pl-predictions-msrzm2z84-vdoshi96s-projects.vercel.app">https://pl-predictions-msrzm2z84-vdoshi96s-projects.vercel.app</a> and reported that exact merge SHA. The stable <a href="https://pl-predictions-2026.vercel.app">production alias</a> was explicitly assigned to it, and deployment-ID read-back proved the alias resolved to the same deployment.</p>
 <p>The final read-only smoke passed all five browser projects against the immutable URL: desktop Chromium, 390-pixel mobile Chromium, exact 320/430-pixel Chromium reflow, and mobile WebKit. It exercised the public stages without submitting, the table and private spotlight pages, the annotated how-to, administrator sign-in, responsive containment, local imagery, and browser/network/HTTP guards. Its same-origin method guard observed only <code>GET</code>, <code>HEAD</code>, and <code>OPTIONS</code>. Exact-deployment 30-minute queries returned no error records, no fatal records, and no HTTP 500 records.</p>
 <p>The seven production artifacts below were captured and visually inspected for readable type, clear hierarchy, painted local imagery, reachable actions, correct annotations, and absence of clipping. Together with the four isolated state captures above, they formed the August 14 completed-release evidence set. Its deterministic manifest SHA-256 across all 11 PNGs was <code>fc0087cf9073ba43759d82ffea40b9e1fd5088c08112d3c6a32ed4486964f337</code>; the seven production files were later replaced under the newest-evidence rule.</p>
@@ -649,7 +685,7 @@
 <h2 id="security-and-cleanup-boundaries">Security and cleanup boundaries</h2>
 <ul>
 <li>No environment value, receipt token, database URL, administrator credential, or subscription cookie is committed or printed.</li>
-<li>The current remediation&#39;s only production database mutation was the additive <code>0006</code>/<code>0007</code> schema migration described above. It created empty pending states but no result fact, participant prediction, result publication, Lock, or Reveal transition. The August 13 roster release&#39;s supported catalogue seed remains its own dated production history.</li>
+<li>The August 14 remediation&#39;s only production database mutation was the additive <code>0006</code>/<code>0007</code> schema migration described above. It created empty pending states but no result fact, participant prediction, result publication, Lock, or Reveal transition. The August 13 roster release&#39;s supported catalogue seed remains its own dated production history.</li>
 <li>The retained entry followed the same atomic write path as every participant: parent plus 20 table rows plus seven spotlight rows, or nothing.</li>
 <li>Alex/Jordan removal is a code cleanup, not a data deletion. No legitimate production submission was deleted.</li>
 <li>Public pre-reveal output continues to expose only the permitted table-leaderboard projection and complete-bracket count.</li>
@@ -676,7 +712,7 @@
 <li><input checked="" disabled="" type="checkbox"> Regenerate final HTML peers, publish this closeout through <code>main</code>, synchronize local and remote <code>main</code>, and remove completed branch state.</li>
 </ul>
 
-      <p class="source">Generated deterministically from <a href="QA.md">docs/QA.md</a>. Canonical SHA-256: <code>b2b911e79d75f742467c240c7ddf561d6e1a331b9687ac30567281e8e100bc71</code>.</p>
+      <p class="source">Generated deterministically from <a href="QA.md">docs/QA.md</a>. Canonical SHA-256: <code>eaf50e7efa2f6ad1c5c72ad238b02d7b51e05ce9b8c0f49237f610a96152939c</code>.</p>
     </main>
   </body>
 </html>

@@ -14,6 +14,8 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 
 Dranx Prediction League is a mobile-first friends game for the 2026/27 Premier League. A participant completes one immutable three-stage entry: enter a display name and order all 20 clubs, choose seven spotlight predictions, then review and submit. Before submission, a validated season-keyed browser draft preserves progress; an untouched deterministic A–Z table requires explicit acknowledgement. It is one Next.js 16 App Router application deployed on Vercel, with Vercel Marketplace Neon PostgreSQL accessed through Drizzle and the Neon HTTP driver. Public pages, authenticated administrator pages, server actions, the source-neutral standings import endpoint, and the manual results desk live in the same application.
 
+Win Streak is a separate Matchweek 2–38 game in the same application. `/win-streak` keeps its leaderboard public before profile creation and publishes each participant's best streak, current streak, and current-round pick. Playing uses a 2–40-character display name bound to one random browser receipt; there is no login or name-only recovery. Each round locks at its earliest persisted fixture kickoff. Picks are immutable. Wins extend the streak and restrict winning clubs; draws and losses reset and unlock; missed and void rounds preserve. `/admin/win-streak` resolves the earliest completed round through one reviewed, atomic, immutable set of ten outcomes.
+
 The seven spotlight categories are top scorer, top assister, most clean sheets, underdog team, overrated team, underdog player, and overrated player. Player categories use a searchable season catalogue plus an Other-player text fallback; most clean sheets and both team-opinion categories select clubs. The initial homepage HTML and RSC must not contain the player catalogue or portrait paths. Load the catalogue lazily on Stage 2 through the dynamic same-origin `/api/player-catalogue` route, SQL-filter active players for the current season, require at least two normalized search characters, display at most 20 matching rows, announce the total match count, enforce one open popup, and keep Other player available during loading, empty, and error states. There is no runtime football API client, production scraper, image hotlink, or Vercel Cron. Standings enter through the authenticated canonical importer or manual administrator form. Reviewed factual spotlight outcomes enter manually at `/admin/results` as `goals`, `assists`, `clean_sheets`, and shared `player_ratings` versions. The owner confirmed on 2026-08-14 that the required permissions for this player-catalogue workflow have been obtained, including acquisition, storage, redistribution, and production use. Owner-run acquisition may occur offline but must not run inside the deployed application.
 
 The 20 owner-provided club badge PNGs are the canonical local team marks; the original monograms remain rollback-only fallbacks for the first badge release. The owner-provided `premier-league-players-2026-08-20/` snapshot is the current reviewed selector source: 580 players across the 20 clubs, with 578 supplied portrait PNGs and two intentional silhouette fallbacks for Ryan McAidoo and Luc De Fougerolles. Keep Other player available for unavailable or newly added players. This roster import is not an outcome feed; do not infer the five pending result rankings from it or add runtime acquisition.
@@ -25,6 +27,8 @@ The 20 owner-provided club badge PNGs are the canonical local team marks; the or
 - `src/db/` and `drizzle/` — schema, database client, and committed migrations.
 - `src/data/` — reviewed season and 20-club fixtures.
 - `src/features/predictions/categories.ts` and `src/features/scoring/categories.ts` — canonical spotlight taxonomy, accuracy curve, and team expectation formulas.
+- `src/features/win-streak/`, `src/app/win-streak/`, and `src/app/admin/win-streak/` — receipt profiles, picks, derived scoring, public leaderboard, and reviewed results desk.
+- `src/data/win-streak-fixtures.json` and `scripts/refresh-win-streak-fixtures.ts` — official Matchweek 2–38 snapshot and offline drift checker.
 - `scripts/` — seed, standings import, test-database safety wrapper, and documentation generator.
 - `tests/` — unit/component, isolated Neon integration, and Playwright browser suites.
 - `docs/` — canonical architecture, research, QA, decisions, status, and generated HTML peers.
@@ -48,6 +52,10 @@ npm run db:migrate
 npm run db:seed
 npm run db:test:migrate
 npm run db:test:seed
+npm run db:seed:win-streak
+npm run db:test:seed:win-streak
+npm run win-streak:fixtures:check
+npm run win-streak:fixtures:apply
 npm run docs:generate
 npm run docs:check
 ```
@@ -73,9 +81,13 @@ Integration and full browser journeys must use an isolated database. Set `TEST_D
 - Team expectation indexes are `average predicted position - actual position` for underdog and the exact inverse for overrated; rank each list largest first using full precision.
 - Deleting a prediction must cascade through all 20 table items and seven spotlight picks, then allow the normalized display name to submit again. Preserve the deletion audit record.
 - Collect only the participant's chosen display name. Receipt cookies are hashed at rest; admin cookies are HttpOnly, SameSite Strict, and Secure in production.
+- Keep Win Streak receipt tokens and row identifiers out of public projections. The public leaderboard deliberately includes the display name and current-matchweek pick. A missing receipt is anonymous and cannot resume by name.
+- Keep Win Streak at one immutable pick per profile and round. Enforce the earliest-kickoff round deadline with PostgreSQL time, active-round order, fixture membership, winning-club restrictions, a 500-profile cap, and persistent creation/pick limits.
+- Resolve only the earliest unresolved Win Streak round, only after all ten fixture kickoffs, and only with exactly ten reviewed outcomes plus provenance in one atomic audit-bearing transition. Resolved facts cannot change.
+- Check the official fixture source before recurring results work. A no-drift check writes nothing. The targeted seed may change only a future, unpicked, unresolved kickoff for the same fixture, teams, and matchweek; every structural or protected-round change fails closed. Never use the general seed for fixture drift.
 
 ## Definition of done
 
-A change is complete only when relevant unit/component tests, isolated Neon integration tests, TypeScript, ESLint, formatting, documentation parity, production build, and desktop/mobile browser checks pass. Mobile QA must cover the three-stage flow, draft reload, intentional A–Z and reorder, the table leaderboard, the separate spotlight-accuracy page, 320–430px reflow, 56px touch handles, mouse/touch/keyboard reorder, searchable keyboard-accessible category selectors, the Other-player text path, manual results editing, fixed-deadline time-zone display, safe-area actions, long-name wrapping, and no horizontal overflow. Preserve exact cleanup evidence for any QA data.
+A change is complete only when relevant unit/component tests, isolated Neon integration tests, TypeScript, ESLint, formatting, documentation parity, production build, and desktop/mobile browser checks pass. Mobile QA must cover the three-stage flow, draft reload, intentional A–Z and reorder, the table leaderboard, the separate spotlight-accuracy page, Win Streak anonymous access and public picks, 320–430px reflow, 56px touch handles, mouse/touch/keyboard operation, searchable keyboard-accessible category selectors, the Other-player text path, both manual result desks, fixed-deadline time-zone display, safe-area actions, long-name wrapping, and no horizontal overflow. Win Streak QA must also cover fixture coverage and drift, receipt takeover denial, immutable picks, every outcome transition, club unlocking, shared ranking, reload persistence, result atomicity, and no runtime football requests. Preserve exact cleanup evidence for any QA data.
 
 Keep canonical Markdown and generated HTML peers synchronized. Before finishing an iteration, correct stale status/QA documentation, push the feature branch, merge it to GitHub `main`, update local `main` to the same commit, and remove completed worktrees.

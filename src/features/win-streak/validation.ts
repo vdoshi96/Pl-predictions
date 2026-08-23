@@ -4,12 +4,7 @@ import { PREMIER_LEAGUE_2026_27_TEAM_SLUGS } from "@/data/teams";
 import { participantNameSchema } from "@/features/predictions/validation";
 
 const teamSlugSchema = z.enum(PREMIER_LEAGUE_2026_27_TEAM_SLUGS);
-const fixtureResultSchema = z.enum([
-  "home_win",
-  "draw",
-  "away_win",
-  "void",
-]);
+const fixtureResultSchema = z.enum(["home_win", "draw", "away_win", "void"]);
 
 export const createWinStreakProfileInputSchema = z
   .object({
@@ -41,7 +36,9 @@ export const winStreakRoundResultsInputSchema = z
   })
   .strict()
   .superRefine((value, context) => {
-    if (new Set(value.fixtures.map((fixture) => fixture.fixtureId)).size !== 10) {
+    if (
+      new Set(value.fixtures.map((fixture) => fixture.fixtureId)).size !== 10
+    ) {
       context.addIssue({
         code: "custom",
         message: "Provide one result for each fixture.",

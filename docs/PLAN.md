@@ -1,5 +1,17 @@
 # Implementation plan
 
+## August 23 Win Streak live release
+
+1. Replace the local-only Matchweek 20–23 workshop with a durable Matchweek 2–38 game using the official 37-round, 370-fixture snapshot.
+2. Add receipt-bound no-login profiles, one immutable database-clock-guarded pick per round, derived win/reset/void/missed scoring, winning-club restrictions, and shared competition ranking.
+3. Keep the leaderboard public before profile creation and show the current-matchweek pick, opponent, and venue without exposing receipt or database identifiers.
+4. Add an authenticated owner desk that publishes all ten completed-round outcomes atomically, immutably, in matchweek order, with reviewed provenance.
+5. Extend update-results to check official fixture drift first, no-op when unchanged, allow only inspected future/unpicked/unresolved kickoff corrections through the targeted seed, fail closed otherwise, and update completed Win Streak rounds.
+6. Verify formatting, documentation parity, fixture coverage, ESLint, TypeScript, unit/component tests, isolated Neon integration, production build, full local checks, desktop/mobile Chromium, mobile WebKit, both colour schemes, keyboard paths, long names, overflow, console output, and network boundaries.
+7. Run a read-only production preflight, apply only additive migration `0010` and the targeted Win Streak seed, publish through GitHub `main`, wait for the exact Vercel deployment, verify the stable public alias and database aggregates read-only, synchronize local `main`, and remove the completed worktree.
+
+Items 1–5 are implemented. Focused browser, unit/component, integration, lint, type, and build checks pass. Item 6's aggregate repository gate and item 7's production release remain pending at the local release-candidate checkpoint.
+
 ## August 22 adversarial and visual review remediation (release complete; repository closeout pending)
 
 1. Reconcile both supplied reports against current `main` and preserve unrelated primary-worktree changes.

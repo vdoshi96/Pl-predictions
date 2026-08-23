@@ -224,7 +224,9 @@ test("keeps opposite fixture picks shared and prevents name-only takeover", asyn
 
     await takeover.getByLabel("Display name").fill(firstName);
     await takeover.getByRole("button", { name: "Create profile" }).click();
-    await expect(takeover.getByRole("alert")).toContainText("already in use");
+    await expect(
+      takeover.getByRole("alert").filter({ hasText: "already in use" }),
+    ).toContainText("already in use");
     await expect(
       takeover.getByRole("heading", { name: `${firstName}'s streak` }),
     ).toHaveCount(0);

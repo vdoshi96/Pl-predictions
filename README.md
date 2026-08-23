@@ -1,12 +1,12 @@
 # Dranx Prediction League
 
-Dranx Prediction League is an unofficial, mobile-first prediction game for a private invited group. Each participant completes one immutable three-stage entry. The participant enters a display name and orders 20 clubs, chooses seven spotlight predictions, then reviews and submits the package. Before reveal, the table leaderboard shows 0 points and each predicted champion. The other 19 positions and all spotlight picks remain private. After kickoff, table points use the latest valid standings. A separate spotlight page tracks fun accuracy without changing table points.
+Dranx Prediction League is an unofficial, mobile-first prediction game for a private invited group. The original season game uses one immutable three-stage table and Spotlight entry. The separate Win Streak mini game runs from Matchweek 2 through Matchweek 38: choose one club to win, build a personal best, and continue after a failed pick. Its leaderboard is public before profile creation and shows the current-matchweek pick.
 
 Production: [https://pl-predictions-2026.vercel.app](https://pl-predictions-2026.vercel.app)
 
 GitHub: [https://github.com/vdoshi96/Pl-predictions](https://github.com/vdoshi96/Pl-predictions)
 
-Deployment status: production is public and Ready at the stable alias above. The UI-report and August 20 catalogue release shipped through GitHub [PR #21](https://github.com/vdoshi96/Pl-predictions/pull/21), followed by selector and protected-preview smoke fixes in [PR #22](https://github.com/vdoshi96/Pl-predictions/pull/22). PR #22 merged on 2026-08-21 as `947118f5304271b5ae2a824329080b83d4d80723`. Vercel deployment `dpl_J3We57iVsWDMbKSFkoCDTi62mhCz` is Ready at [its immutable URL](https://pl-predictions-9z25e3j3o-vdoshi96s-projects.vercel.app) and owns the stable alias after an explicit alias update and deployment-ID read-back. Vercel Authentication remains enabled for previews; the automated preview smoke uses the project's existing automation bypass without weakening protection. Production remains anonymously accessible. The five-project read-only production smoke, full portrait check, exact-deployment log checks, current visual evidence, and historical releases are recorded in [docs/QA.md](docs/QA.md).
+Deployment status: production is public and Ready at the stable alias above. The latest verified production release before Win Streak is directional consensus [PR #33](https://github.com/vdoshi96/Pl-predictions/pull/33), merged as `0cf3caf9602bbbf10b2cf233c6676baf1005e9cc`. Win Streak is a locally verified release candidate pending its additive migration, targeted fixture seed, GitHub merge, and exact deployment verification. Vercel Authentication remains enabled for previews while production remains anonymously accessible. Current and historical evidence is recorded in [docs/QA.md](docs/QA.md).
 
 ## Brand and local assets
 
@@ -40,9 +40,10 @@ Evidence-only closeout [PR #16](https://github.com/vdoshi96/Pl-predictions/pull/
 - `/` presents the three-stage table, spotlight-pick, and final-review journey, followed by receipt confirmation.
 - `/leaderboard` shows table points only, with a maximum of 100. Before reveal, totals remain 0 and spotlight picks stay private. After scoring starts, each card shows the table score and the champion's current position.
 - `/spotlight` tracks the seven predictions for fun. Users can sort by overall available accuracy or one category. Before reveal it publishes only the complete-bracket count; real picks and accuracy ordering stay private.
+- `/win-streak` is the separate Matchweek 2–38 mini game. Its leaderboard is visible without a profile and publishes best streak, current streak, and the current-round pick. Playing uses a 2–40-character display name plus a secure browser receipt; there is no login or name-only recovery.
 - `/entries/[id]` is private to the receipt browser or administrator before reveal, then becomes the public club-by-club comparison.
 - `/rules` opens with a three-step how-to-play walkthrough using annotated 390 × 844 screenshots captured from the current mobile flow, then explains the table tiers, seven spotlight categories, ranking formulas, privacy boundary, and current data status.
-- `/admin` provides owner-only fixed-kickoff visibility, irreversible closure controls, submission deletion, manual standings, import history, final-table controls, and the five-table manual results desk at `/admin/results`.
+- `/admin` provides owner-only fixed-kickoff visibility, irreversible closure controls, submission deletion, manual standings, import history, final-table controls, the five-table manual results desk at `/admin/results`, and complete-round Win Streak results at `/admin/win-streak`.
 - `/api/player-catalogue` dynamically returns the minimal active-season player display/search shape when Stage 2 first needs it.
 - `/api/automation/standings` accepts a source-neutral, bearer-authenticated snapshot or failure record. It never fetches a football-data service itself.
 
@@ -105,7 +106,11 @@ authenticated import route / local script / admin form
 
 There is no runtime football API client, production scraper, image hotlink, or Vercel Cron. Owner-run acquisition may produce reviewed data offline, but factual spotlight outcomes enter only through the authenticated `/admin/results` desk. Save creates a new immutable working snapshot; publish atomically advances the exact active pointer after permanent submission closure, bracket-count coverage, boundary-tie, and alias checks; finalize pins that exact active version. Manual entry at `/admin/standings` remains the standings fallback.
 
-See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md), [docs/RESEARCH.md](docs/RESEARCH.md), and [docs/QA.md](docs/QA.md) for the detailed design, source decisions, and current evidence.
+Win Streak fixtures are generated offline from the official Premier League schedule, committed as canonical JSON, and seeded into four dedicated tables for rounds, fixtures, receipt-bound profiles, and picks. Public scoring is derived from immutable facts. The authenticated results desk resolves exactly ten fixtures in one ordered atomic transition. The update-results workflow checks official fixture drift first and permits only an inspected kickoff-only correction for a future, unpicked, unresolved fixture through the targeted seed.
+
+Every Win Streak pick in a matchweek locks at that round's earliest persisted fixture kickoff. The PostgreSQL clock is authoritative; choosing a club that plays later does not extend the pick window.
+
+See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md), [docs/RESEARCH.md](docs/RESEARCH.md), [docs/WIN-STREAK.md](docs/WIN-STREAK.md), and [docs/QA.md](docs/QA.md) for the detailed design, rules, source decisions, and current evidence.
 
 ## Stack
 
@@ -169,6 +174,8 @@ npm run admin:hash-password         # read a password from stdin and emit its PB
 npm run check               # complete local verification chain
 npm run docs:generate       # regenerate every Markdown HTML peer
 npm run docs:check          # prove generated HTML is current
+npm run win-streak:fixtures:check # compare the canonical snapshot with the official fixture page
+npm run win-streak:fixtures:apply # write a reviewed candidate snapshot for inspection
 ```
 
 Markdown remains canonical. The documentation generator inventories only Git-tracked or nonignored files through NUL-delimited paths, excludes private handoffs and QA assets, rejects source/output symlinks and unmanaged same-basename HTML, writes peers through same-directory atomic renames, and removes only orphaned HTML carrying a recognized legacy or current generator marker. Source hashes, heading IDs, and local Markdown-to-HTML links are deterministic; focused unit tests enforce those boundaries.
@@ -179,11 +186,13 @@ Database commands:
 npm run db:generate         # generate a migration after an intentional schema change
 npm run db:migrate          # apply committed migrations
 npm run db:seed             # idempotently seed the active season and 20 clubs
+npm run db:seed:win-streak  # seed or safely refresh only the 37 Win Streak rounds and 370 fixtures
 npm run db:test:migrate     # apply migrations only to the isolated test target
 npm run db:test:seed        # seed only the isolated test target
+npm run db:test:seed:win-streak # seed Win Streak only through the isolated safety wrapper
 ```
 
-The committed schema history starts with `drizzle/0000_oval_slyde.sql`. `drizzle/0001_left_iron_fist.sql` adds and backfills the season-level accepted-through standings watermark. `drizzle/0002_breezy_king_cobra.sql` persists and backfills each season's reviewed opening kickoff while preserving the null automatic-deadline sentinel. That nullable deadline field is now legacy compatibility state and is not an application cutoff. `drizzle/0003_fluffy_franklin_richards.sql` adds the season-scoped player catalogue and the seven category-pick rows attached to each prediction. `drizzle/0004_aromatic_kat_farrell.sql` tightens the player-pick subject constraint so a player ID or both normalized custom-name fields are explicitly required. `drizzle/0005_enforce_spotlight_seasons.sql` adds database triggers that prevent a player's club or a category subject from crossing season boundaries. `drizzle/0006_complex_ultimatum.sql` adds the four result-dataset states, immutable snapshot/items, mutable working aliases, publication pointers, cross-season/type checks, and empty pending-state backfill. `drizzle/0007_brainy_harpoon.sql` adds immutable aliases pinned to each snapshot so later working-alias changes cannot rewrite published scoring. These two migrations also seal a snapshot before any pointer may reference it and reject later fact appends. `drizzle/0008_previous_ezekiel_stane.sql` adds revocable administrator sessions and persistent security rate-limit buckets. `drizzle/0009_condemned_nighthawk.sql` enforces final/active standings-pointer consistency, same-season prediction clubs, and immutability or referenced-delete protection for accepted standings facts. Do not edit a migration after it has been applied to production; create a new forward migration.
+The committed schema history starts with `drizzle/0000_oval_slyde.sql`. `drizzle/0001_left_iron_fist.sql` adds and backfills the season-level accepted-through standings watermark. `drizzle/0002_breezy_king_cobra.sql` persists and backfills each season's reviewed opening kickoff while preserving the null automatic-deadline sentinel. That nullable deadline field is now legacy compatibility state and is not an application cutoff. `drizzle/0003_fluffy_franklin_richards.sql` adds the season-scoped player catalogue and the seven category-pick rows attached to each prediction. `drizzle/0004_aromatic_kat_farrell.sql` tightens the player-pick subject constraint so a player ID or both normalized custom-name fields are explicitly required. `drizzle/0005_enforce_spotlight_seasons.sql` adds database triggers that prevent a player's club or a category subject from crossing season boundaries. `drizzle/0006_complex_ultimatum.sql` adds the four result-dataset states, immutable snapshot/items, mutable working aliases, publication pointers, cross-season/type checks, and empty pending-state backfill. `drizzle/0007_brainy_harpoon.sql` adds immutable aliases pinned to each snapshot so later working-alias changes cannot rewrite published scoring. These two migrations also seal a snapshot before any pointer may reference it and reject later fact appends. `drizzle/0008_previous_ezekiel_stane.sql` adds revocable administrator sessions and persistent security rate-limit buckets. `drizzle/0009_condemned_nighthawk.sql` enforces final/active standings-pointer consistency, same-season prediction clubs, and immutability or referenced-delete protection for accepted standings facts. `drizzle/0010_win_streak_live.sql` adds durable Win Streak rounds, fixtures, receipt-bound profiles, immutable picks, safe future fixture refresh constraints, and the two public-mutation rate-limit scopes. Do not edit a migration after it has been applied to production; create a new forward migration.
 
 ## Standings operations
 
@@ -253,6 +262,8 @@ For a new environment:
 7. Deploy production with `vercel deploy --prod` and inspect the production URL/logs.
 8. Run the read-only production smoke. If a production write proof is required, run only the separately gated exact-ID submit/privacy/delete smoke and verify cleanup. Never run the full reveal/standings journey against production.
 
+For an existing production environment, run the official fixture check before Win Streak result work. When it reports no drift, do not rewrite or reseed fixtures. Apply migration `0010`, confirm its exact production target and unchanged existing aggregates, and run only `npm run db:seed:win-streak`; never use the general seed for a fixture refresh. The targeted seed permits an inspected future, unpicked, unresolved kickoff-only correction and fails closed on changed teams, pairings, matchweeks, expired rounds, picks, or results.
+
 No Vercel Cron should be added. Recurring data acquisition belongs to the owner's separate offline Codex automation and must preserve the reviewed-import boundary above.
 
 ## Season rollover and club updates
@@ -265,6 +276,7 @@ The application intentionally has one code-selected active season.
 4. Run fixture, scoring, importer, integration, and browser tests, then seed and verify exactly 20 teams.
 5. If correcting membership after a season has already been seeded, create an explicit data migration. The idempotent seed updates known teams but deliberately does not delete referenced historical rows.
 6. Verify the first Gameweek 1 kickoff from an official source, update the auditable opening-fixture constant, and add a reviewed forward migration/data update for that season's `opening_kickoff`. Do not configure the legacy `submission_deadline`. Never reopen a season after kickoff, manual lock, or early reveal; use the irreversible administrator closure controls if entries must close before kickoff.
+7. Generate a complete official-season Win Streak snapshot, explicitly choose the contest's first matchweek, validate all 20 clubs and ten fixtures per included round, and seed it only after the new season and team rows exist. Preserve old-season rounds and picks rather than recycling identifiers.
 
 ## Current limitations
 
@@ -273,11 +285,13 @@ The application intentionally has one code-selected active season.
 - The owner-provided 2026-08-20 snapshot supplies 580 player options and 578 local portraits. Ryan McAidoo and Luc De Fougerolles use the silhouette fallback, and Other player remains available for unavailable or newly added players.
 - Production currently has active provisional snapshots for all four factual datasets that back the five result views; none was final at the 2026-08-22 release preflight. The owner can review, replace, or finalize them through `/admin/results`. No provider acquisition is built in. The former Alex/Jordan spotlight cards were hard-coded presentation fixtures, not stored submissions; they were retired so `/spotlight` represents only complete real entries.
 - Participants have no accounts and cannot edit an entry. The administrator can delete an erroneous parent entry, cascading through all 20 table rows and seven spotlight picks so it can be resubmitted.
+- Win Streak also has no account. A display name is bound to one secure browser receipt; losing that cookie makes the profile unrecoverable, and typing the same name in another browser cannot claim it. The season is capped at 500 profiles. Its leaderboard and current-matchweek picks are public.
+- Win Streak fixtures are a reviewed static official snapshot rather than a runtime feed. Date-only fixtures use documented UK-time defaults and every run of update-results checks for official drift. Protected or structural drift requires explicit owner review.
 - The opening fixture is reviewed static season data, not a live schedule feed. Because Premier League fixtures can change, the owner must update both the canonical UTC fixture metadata and the persisted season row through a reviewed forward migration before the existing cutoff if the opener moves. A constant-only deploy does not change the database-enforced instant.
 - Season rollover currently requires a reviewed code and seed update.
 
 ## Data and rights attribution
 
-Season membership and club names use the official Premier League 2026/27 table and AGM announcement. On 2026-08-14 the owner confirmed that the required permissions for this player-catalogue workflow have been obtained, including acquisition, storage, redistribution, and production use. Owner-run FotMob or Transfermarkt acquisition may run offline and produce reviewed local snapshots or result payloads. The deployed application does not fetch, scrape, or hotlink football data or images at runtime. FotMob average season rating is the requested metric for both player-opinion categories. The project owner supplied the local club badges and dated player snapshot. The official Premier League logo is not included. The roster import does not supply the five pending outcomes. [docs/RESEARCH.md](docs/RESEARCH.md) records the dated sources and current permission disposition.
+Season membership and club names use the official Premier League 2026/27 table and AGM announcement. Win Streak pairings and timing bases use the official complete fixture list and schedule announcement checked August 23, 2026; fixtures remain subject to change. On 2026-08-14 the owner confirmed that the required permissions for this player-catalogue workflow have been obtained, including acquisition, storage, redistribution, and production use. Owner-run FotMob or Transfermarkt acquisition may run offline and produce reviewed local snapshots or result payloads. The deployed application does not fetch, scrape, or hotlink football data or images at runtime. FotMob average season rating is the requested metric for both player-opinion categories. The project owner supplied the local club badges and dated player snapshot. The official Premier League logo is not included. The roster import does not supply the five pending outcomes. [docs/RESEARCH.md](docs/RESEARCH.md) and [docs/WIN-STREAK.md](docs/WIN-STREAK.md) record the dated sources and current boundaries.
 
 This is an unofficial fan project and is not affiliated with the Premier League. Club names and crests belong to their respective owners.

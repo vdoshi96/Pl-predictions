@@ -64,7 +64,10 @@ describe("Win Streak server actions", () => {
   });
 
   it("fails closed before creation when the rate limit is exhausted", async () => {
-    mocks.rateLimit.mockResolvedValue({ allowed: false, keyHash: "a".repeat(64) });
+    mocks.rateLimit.mockResolvedValue({
+      allowed: false,
+      keyHash: "a".repeat(64),
+    });
     await expect(
       createWinStreakProfileAction({ displayName: "Ada", website: "" }),
     ).resolves.toMatchObject({ ok: false });

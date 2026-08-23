@@ -24,9 +24,9 @@ describe("Win Streak input validation", () => {
   });
 
   it("accepts only canonical season clubs for a pick", () => {
-    expect(
-      winStreakPickInputSchema.parse({ teamSlug: "arsenal" }),
-    ).toEqual({ teamSlug: "arsenal" });
+    expect(winStreakPickInputSchema.parse({ teamSlug: "arsenal" })).toEqual({
+      teamSlug: "arsenal",
+    });
     expect(
       winStreakPickInputSchema.safeParse({ teamSlug: "not-a-club" }).success,
     ).toBe(false);
@@ -35,7 +35,8 @@ describe("Win Streak input validation", () => {
   it("requires one reviewed result for each of ten distinct fixtures", () => {
     const fixtureIds = Array.from(
       { length: 10 },
-      (_, index) => `00000000-0000-4000-8000-${String(index + 1).padStart(12, "0")}`,
+      (_, index) =>
+        `00000000-0000-4000-8000-${String(index + 1).padStart(12, "0")}`,
     );
     const input = {
       capturedAt: "2026-08-31T22:00:00.000Z",

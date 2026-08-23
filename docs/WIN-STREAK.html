@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="generated-by" content="scripts/generate-docs-html.mjs" />
+    <meta name="canonical-source" content="WIN-STREAK.md" />
+    <meta name="canonical-source-sha256" content="2cf7e027fb01abee1651a9b9a3fe6b809a1721319adb14083849ac6660b563c0" />
+    <title>Win Streak</title>
+    <style>
+      :root { color-scheme: light dark; font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+      body { margin: 0; background: #f5f5f0; color: #18201c; }
+      main { box-sizing: border-box; width: min(100% - 2rem, 880px); margin: 2rem auto; padding: clamp(1.25rem, 4vw, 3rem); background: #fff; border: 1px solid #d9ddd8; border-radius: 1rem; box-shadow: 0 18px 60px rgb(22 31 26 / 8%); }
+      h1, h2, h3 { line-height: 1.15; color: #102d22; }
+      h1 { font-size: clamp(2rem, 5vw, 3.25rem); letter-spacing: -.04em; }
+      h2 { margin-top: 2.5rem; padding-top: 1rem; border-top: 1px solid #e2e6e2; }
+      p, li { line-height: 1.7; }
+      a { color: #087854; text-underline-offset: .2em; }
+      code { padding: .12rem .35rem; border-radius: .3rem; background: #edf1ed; font-size: .92em; }
+      pre { overflow-x: auto; padding: 1rem; border-radius: .65rem; background: #111a16; color: #edf8f2; }
+      pre code { padding: 0; background: transparent; }
+      table { display: block; overflow-x: auto; width: 100%; border-collapse: collapse; }
+      th, td { padding: .65rem .8rem; border: 1px solid #d9ddd8; text-align: left; vertical-align: top; }
+      th { background: #edf4ef; }
+      img { max-width: 100%; height: auto; border-radius: .75rem; }
+      blockquote { margin-left: 0; padding-left: 1rem; border-left: .25rem solid #1b9a6c; color: #49564f; }
+      .source { margin-top: 3rem; padding-top: 1rem; border-top: 1px solid #d9ddd8; color: #627069; font-size: .85rem; }
+      @media (prefers-color-scheme: dark) {
+        body { background: #0e1512; color: #e5ebe7; }
+        main { background: #16201b; border-color: #34423a; }
+        h1, h2, h3 { color: #f2fff8; }
+        h2, .source { border-color: #34423a; }
+        a { color: #58ddb0; }
+        code, th { background: #24322b; }
+        th, td { border-color: #3b4b42; }
+        blockquote { color: #b5c2bb; }
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1 id="win-streak">Win Streak</h1>
+<ul>
+<li><strong>Season:</strong> 2026/27 Premier League</li>
+<li><strong>Contest window:</strong> Matchweeks 2–38</li>
+<li><strong>Public route:</strong> <code>/win-streak</code></li>
+<li><strong>Owner results route:</strong> <code>/admin/win-streak</code></li>
+<li><strong>Status:</strong> Release candidate verified locally on August 23, 2026</li>
+</ul>
+<p>Win Streak is a separate Dranx mini game. A participant chooses one club to win in each matchweek. A draw or loss breaks the current streak, but nobody is eliminated: the participant starts another attempt while their personal best remains on the public leaderboard.</p>
+<p>The game uses the site&#39;s existing identity, responsive navigation, semantic colour tokens, buttons, cards, and canonical local club badges. It does not change the season-table prediction game, Spotlight accuracy, or either existing leaderboard.</p>
+<h2 id="joining-and-identity">Joining and identity</h2>
+<p>The public leaderboard is visible without entering a name. To play, a participant enters a display name containing 2–40 characters. The server creates one season profile and places a random receipt in that browser as an HttpOnly, SameSite Strict cookie; only the receipt hash is stored in PostgreSQL.</p>
+<p>There is no account, password, email address, or name-based recovery. A normalized display name can belong to only one profile, and another browser cannot claim or resume it by typing the same name. Clearing or losing the receipt cookie makes that profile unrecoverable unless a future owner-supported recovery process is deliberately added. The release caps the season at 500 profiles and applies persistent creation and pick rate limits.</p>
+<p>The public leaderboard shows every participant&#39;s display name, best streak, current streak, and current-matchweek pick with its opponent and venue. It does not publish receipt tokens, profile identifiers, or database identifiers.</p>
+<h2 id="making-a-pick">Making a pick</h2>
+<p>The contest begins with Matchweek 2. Every pick for a matchweek locks at that round&#39;s earliest persisted fixture kickoff, even when the selected club plays later. The round deadline and PostgreSQL clock are the write authority; a stale browser cannot submit after the deadline.</p>
+<p>Before confirmation, the page shows all ten fixtures and all 20 canonical club marks in one compact picker. A used club remains visible but disabled with a written explanation. The confirmation dialog repeats the club, opponent, venue, matchweek, and deadline. A confirmed pick is immutable.</p>
+<p>Multiple participants may choose the same club. Participants may also choose opposite clubs in the same fixture; the one shared fixture result resolves both picks consistently.</p>
+<h2 id="streak-rules">Streak rules</h2>
+<p>Scores are derived from immutable picks and shared round results.</p>
+<table>
+<thead>
+<tr>
+<th>Round outcome</th>
+<th>Current streak</th>
+<th>Personal best</th>
+<th>Club availability</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Picked club wins</td>
+<td>Add one</td>
+<td>Keep the greater of the old best or new current streak</td>
+<td>Keep every winning club in the active streak unavailable</td>
+</tr>
+<tr>
+<td>Picked club draws</td>
+<td>Reset to zero</td>
+<td>Preserve</td>
+<td>Unlock all clubs</td>
+</tr>
+<tr>
+<td>Picked club loses</td>
+<td>Reset to zero</td>
+<td>Preserve</td>
+<td>Unlock all clubs</td>
+</tr>
+<tr>
+<td>Picked fixture is void</td>
+<td>Preserve</td>
+<td>Preserve</td>
+<td>Return the voided club; retain earlier winning-club restrictions</td>
+</tr>
+<tr>
+<td>Participant misses the round</td>
+<td>Preserve</td>
+<td>Preserve</td>
+<td>Retain earlier winning-club restrictions</td>
+</tr>
+</tbody></table>
+<p>Late joiners start in the active round with no retroactive missed-round penalty. A club becomes restricted only after it wins for that participant&#39;s active streak. Draws and losses reset the streak and clear the entire restricted-club set; missed and void rounds do not.</p>
+<h2 id="leaderboard-rules">Leaderboard rules</h2>
+<ul>
+<li>Rank solely by personal-best streak, highest first.</li>
+<li>Give equal best streaks the same competition rank. Best streaks <code>3, 3, 1</code> receive ranks <code>1, 1, 3</code>.</li>
+<li>Alphabetize tied display names for stable presentation; alphabetical order is not an additional tiebreaker.</li>
+<li>Show current streak and current-matchweek pick as supporting public information. Neither changes rank.</li>
+<li>Keep zero-best profiles visible. A failed pick does not eliminate a participant.</li>
+</ul>
+<h2 id="official-fixture-snapshot">Official fixture snapshot</h2>
+<p>The checked-in snapshot parses and validates all 380 fixtures from the Premier League&#39;s <a href="https://www.premierleague.com/en/news/4675097">complete official 2026/27 fixture list</a>, then retains the 370 Matchweek 2–38 fixtures used by the contest. It also uses the <a href="https://www.premierleague.com/en/news/4675508/premier-league-fixture-schedule-released-for-season-202627">official fixture schedule announcement</a> for the final-matchweek basis. Both sources were checked on August 23, 2026. The normalized fixture hash is <code>f756c4790b6b0acd5ee4b351eb06cc53295078716b62018c20868f66a394848a</code>.</p>
+<p>Published UK kickoff times are retained where the source supplies them. Date-only weekend and bank-holiday fixtures default to 15:00, date-only midweek fixtures default to 20:00, and Matchweek 38 defaults to the league&#39;s published 16:00 simultaneous kickoff. The generator interprets those local values in <code>Europe/London</code> and stores the corresponding UTC instants. These reviewed defaults are schedule placeholders, not invented result facts, and remain subject to official change.</p>
+<p>Matchweek 2 begins with Crystal Palace v Manchester City at <code>2026-08-28T19:00:00.000Z</code>. Matchweek 38 is scheduled for May 30, 2027. Premier League fixtures remain subject to change.</p>
+<p>No deployed request contacts the Premier League or another football-data source. The canonical JSON and seeded database rows are the runtime source. The owner-run update workflow checks the official page offline before ordinary result work:</p>
+<ol>
+<li>No source drift means no fixture file, seed, database, commit, or deployment change.</li>
+<li>A kickoff-only change for a future, unpicked, unresolved fixture may be reviewed, regenerated, tested, released, and applied with the targeted Win Streak seed.</li>
+<li>A club, pairing, matchweek, expired-round, picked-fixture, or resolved-fixture change fails closed for explicit owner review.</li>
+<li>The fixture workflow never runs the general production seed or rewrites result facts.</li>
+</ol>
+<h2 id="result-operations">Result operations</h2>
+<p>The authenticated <code>/admin/win-streak</code> desk exposes only the earliest unresolved round. It requires one explicit <strong>Home win</strong>, <strong>Draw</strong>, <strong>Away win</strong>, or <strong>Void</strong> selection for each of the round&#39;s ten fixtures, a reviewed source URL, the UTC capture time, and an explicit warning acknowledgement when Void is used.</p>
+<p>The server accepts the transition only after all ten persisted fixture kickoffs have passed. One atomic statement verifies the ordered round, updates all ten fixture results, records the round&#39;s source and content hash, writes the audit event, and advances public scoring. Resolved fixture and round facts are immutable. Repeating or racing the transition is a no-op conflict, not a second result publication.</p>
+<p>The owner-run update-results workflow checks fixture drift first and then updates every newly completed Win Streak round through this authenticated desk. On August 23, 2026, Matchweek 2 had not started, so there was no result backfill to perform.</p>
+<h2 id="storage-and-security-boundary">Storage and security boundary</h2>
+<p>The live game adds <code>win_streak_rounds</code>, <code>win_streak_fixtures</code>, <code>win_streak_profiles</code>, and <code>win_streak_picks</code>. Database constraints repeat the season, current-round, one-pick, round-deadline, immutable-club, result-order, and safe-fixture-update rules. Public reads are capped and make up to three consistency attempts so one page cannot combine leaderboard facts from before and after a concurrent round publication.</p>
+<p>The browser stores no editable Win Streak state in <code>localStorage</code>. Server actions validate typed payloads, require same-origin requests, sample PostgreSQL time for deadlines, rate-limit profile and pick mutations, and retain only the receipt hash. Fixture and result acquisition remain offline owner operations; there is no football API, scraper, webhook, or cron in the deployed application.</p>
+<h2 id="verified-interface">Verified interface</h2>
+<p>The interactive flow was exercised against a production build and isolated Neon database across desktop Chromium, 320-, 390-, and 430-pixel Chromium, and mobile WebKit. It covered anonymous leaderboard access, name creation, immutable confirmation, keyboard selection and dialog dismissal, two profiles with opposing fixture picks, public current picks, reload persistence, name-takeover denial, light/dark mode, official marks, clean console output, no external runtime football requests, and no page-level horizontal overflow. Unit and isolated integration tests cover shared result publication plus the win, reset, void, and missed-round transitions.</p>
+<h3 id="desktop">Desktop</h3>
+<p><img src="assets/qa/win-streak-desktop.png" alt="Win Streak desktop flow with the public leaderboard and current pick"></p>
+<h3 id="mobile">Mobile</h3>
+<p><img src="assets/qa/win-streak-mobile.png" alt="Win Streak mobile flow at 390 pixels"></p>
+<p>The screenshots use isolated QA profiles and data. They are not production participant records.</p>
+
+      <p class="source">Generated deterministically from <a href="WIN-STREAK.md">docs/WIN-STREAK.md</a>. Canonical SHA-256: <code>2cf7e027fb01abee1651a9b9a3fe6b809a1721319adb14083849ac6660b563c0</code>.</p>
+    </main>
+  </body>
+</html>

@@ -1,5 +1,22 @@
 # Quality assurance
 
+## August 23 Win Streak release candidate
+
+Win Streak is locally complete for the production release gate. It begins at Matchweek 2, keeps its leaderboard public before name entry, and publishes each participant's current-matchweek pick. The screenshots use isolated QA profiles rather than production data.
+
+| Gate                       | Evidence                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
+| -------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Fixture contract           | The generator parses and validates all 380 official fixtures, then retains Matchweeks 2–38: 37 rounds, 370 unique fixtures, ten fixtures and all 20 clubs per round, canonical team slugs, and normalized hash `f756c4790b6b0acd5ee4b351eb06cc53295078716b62018c20868f66a394848a`. It retains explicit UK times, defaults date-only weekend and bank-holiday fixtures to 15:00, midweek fixtures to 20:00, and Matchweek 38 to 16:00, then converts `Europe/London` to UTC. The online `win-streak:fixtures:check` passed on August 23 with no drift. Matchweek 2 starts August 28, so no result backfill is due. |
+| Domain and component tests | The final full unit/component run passed 413 tests with 31 guarded skips across 67 files. Coverage includes parsing, profile switching, name takeover denial, immutable picks, every result transition, club restriction and unlocking, missed and void rounds, shared competition ranks, all 20 marks, keyboard confirmation, public picks, persistence, reset behavior, and fixture-drift safety.                                                                                                                                                                                                               |
+| Database integration       | All 29 isolated Neon integration tests passed across five files after migrations `0000`–`0010` and targeted fixture seeding. They cover atomic profile and pick constraints, database-time deadlines, receipt authorization, consistent public reads, safe fixture refresh, exact ten-result publication, immutable replay protection, audit creation, and zero cleanup residue.                                                                                                                                                                                                                                  |
+| Static and build gates     | ESLint, strict TypeScript, and the Next.js 16 Webpack production build passed. The final aggregate format, documentation-parity, fixture-source, repository-check, and release results are recorded at publication.                                                                                                                                                                                                                                                                                                                                                                                               |
+| Browser acceptance         | The optimized production-server Win Streak matrix passed 16 journeys with four intentional project skips across desktop Chromium, 320-, 390-, and 430-pixel mobile Chromium, and mobile WebKit. It covers anonymous leaderboard access, name gating, creation, a real Space/Enter/Escape keyboard path, immutable confirmation, public current picks, two profiles with opposite picks in one fixture, takeover denial, reload persistence, dark mode, clean consoles, no runtime football requests, and no horizontal overflow.                                                                                  |
+| Release boundary           | At this checkpoint no production migration, seed, profile, pick, result, GitHub merge, or deployment had run. Production verification will remain anonymous and read-only; it will not create a fake participant.                                                                                                                                                                                                                                                                                                                                                                                                 |
+
+![Win Streak desktop acceptance](assets/qa/win-streak-desktop.png)
+
+![Win Streak 390-pixel mobile acceptance](assets/qa/win-streak-mobile.png)
+
 ## August 22 directional consensus-delta production release
 
 [PR #33](https://github.com/vdoshi96/Pl-predictions/pull/33) removes the half-place neutral band from the season-table comparison. The displayed one-decimal delta determines direction: positive values use `▲`, negative values use `▼`, and only `0.0` uses the neutral dash.
@@ -219,7 +236,7 @@ The retained `Dranx Test Entry` was then submitted through the public three-stag
 
 The final post-release database verification exposed only safe aggregate facts: one parent, 20 child positions, seven category picks, and the sole display name `Dranx Test Entry`. It found no display name containing Alex or Jordan. It did not print prediction IDs, receipt material, database URLs, private pick subjects, or credentials. Before reveal, the public spotlight page reports one active bracket but does not serialize or display those seven choices.
 
-## Current mobile walkthrough sources
+## August 14 mobile walkthrough sources
 
 The participant-facing `/rules` section uses three first-party captures from the current isolated 390 by 844 application flow:
 
@@ -229,7 +246,7 @@ The participant-facing `/rules` section uses three first-party captures from the
 
 Each image receives two numbered overlay pins at render time. The same numbers and instructions appear as adjacent HTML text, so the annotations remain accessible, selectable, responsive, and understandable without colour. They were captured before the journey's reversible isolated submission; no production entry was created.
 
-## Current release evidence: isolated draft and administrator states
+## August 14 isolated draft and administrator evidence
 
 The completed isolated run added four 390 by 844 evidence images. The A–Z, restored-draft, and settings captures include in-image annotations; the results capture intentionally shows a local unsaved edit and the adjacent caption records its no-write boundary.
 
@@ -249,7 +266,7 @@ The completed isolated run added four 390 by 844 evidence images. The A–Z, res
 
 ![Isolated fixed-kickoff administrator settings on mobile](assets/qa/admin-settings-mobile.png)
 
-## Current production deployment and mobile evidence
+## August 14 production deployment and mobile evidence
 
 GitHub [PR #19](https://github.com/vdoshi96/Pl-predictions/pull/19) merged the remediation into `main` on 2026-08-14 as `9cdad64c285fb66f96d9e11a0b71780008b05160`. Vercel deployment `dpl_2evvhgizD4spM9QfXKNhvHLEBrgG` became Ready at [https://pl-predictions-msrzm2z84-vdoshi96s-projects.vercel.app](https://pl-predictions-msrzm2z84-vdoshi96s-projects.vercel.app) and reported that exact merge SHA. The stable [production alias](https://pl-predictions-2026.vercel.app) was explicitly assigned to it, and deployment-ID read-back proved the alias resolved to the same deployment.
 
@@ -292,7 +309,7 @@ GitHub [PR #15](https://github.com/vdoshi96/Pl-predictions/pull/15) merged the A
 ## Security and cleanup boundaries
 
 - No environment value, receipt token, database URL, administrator credential, or subscription cookie is committed or printed.
-- The current remediation's only production database mutation was the additive `0006`/`0007` schema migration described above. It created empty pending states but no result fact, participant prediction, result publication, Lock, or Reveal transition. The August 13 roster release's supported catalogue seed remains its own dated production history.
+- The August 14 remediation's only production database mutation was the additive `0006`/`0007` schema migration described above. It created empty pending states but no result fact, participant prediction, result publication, Lock, or Reveal transition. The August 13 roster release's supported catalogue seed remains its own dated production history.
 - The retained entry followed the same atomic write path as every participant: parent plus 20 table rows plus seven spotlight rows, or nothing.
 - Alex/Jordan removal is a code cleanup, not a data deletion. No legitimate production submission was deleted.
 - Public pre-reveal output continues to expose only the permitted table-leaderboard projection and complete-bracket count.

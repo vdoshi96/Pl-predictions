@@ -4,6 +4,7 @@ import { Check, ChevronDown, Search } from "lucide-react";
 import {
   type KeyboardEvent,
   type ReactNode,
+  useEffect,
   useId,
   useMemo,
   useRef,
@@ -81,7 +82,9 @@ export function SearchablePredictionSelect({
   const otherInputId = `${inputId}-other`;
   const containerRef = useRef<HTMLDivElement>(null);
   const otherInputRef = useRef<HTMLInputElement>(null);
+  const closeTimerRef = useRef<number | null>(null);
   const [uncontrolledExpanded, setUncontrolledExpanded] = useState(false);
+  const [closing, setClosing] = useState(false);
   const [query, setQuery] = useState("");
   const [activeIndex, setActiveIndex] = useState(0);
   const expanded = controlledExpanded ?? uncontrolledExpanded;
@@ -150,6 +153,11 @@ export function SearchablePredictionSelect({
 
   function openPicker() {
     if (disabled) return;
+    if (closeTimerRef.current !== null) {
+      window.clearTimeout(closeTimerRef.current);
+      closeTimerRef.current = null;
+    }
+    setClosing(false);
     setQuery("");
     setActiveIndex(0);
     if (!expanded) onExpandedChange?.(true);
@@ -157,10 +165,35 @@ export function SearchablePredictionSelect({
   }
 
   function closePicker() {
+    if (closeTimerRef.current !== null) {
+      window.clearTimeout(closeTimerRef.current);
+    }
+    setClosing(true);
     if (expanded) onExpandedChange?.(false);
     if (controlledExpanded === undefined) setUncontrolledExpanded(false);
     setQuery("");
+    const configuredDuration = Number.parseFloat(
+      window
+        .getComputedStyle(document.documentElement)
+        .getPropertyValue("--dropdown-close-dur"),
+    );
+    const closeDuration = Number.isFinite(configuredDuration)
+      ? configuredDuration
+      : 150;
+    closeTimerRef.current = window.setTimeout(() => {
+      setClosing(false);
+      closeTimerRef.current = null;
+    }, closeDuration);
   }
+
+  useEffect(
+    () => () => {
+      if (closeTimerRef.current !== null) {
+        window.clearTimeout(closeTimerRef.current);
+      }
+    },
+    [],
+  );
 
   function selectValue(nextValue: Exclude<SelectValue, null>) {
     onChange(nextValue);
@@ -300,12 +333,17 @@ export function SearchablePredictionSelect({
         </button>
       </div>
 
-      {expanded ? (
+      {expanded || closing ? (
         <div
           id={listboxId}
           role="listbox"
+          aria-hidden={closing}
           aria-label={`${label} options`}
-          className="border-border bg-surface fixed inset-x-2 bottom-[max(0.5rem,env(safe-area-inset-bottom))] z-40 max-h-[min(22rem,52dvh)] overflow-y-auto overscroll-contain rounded-2xl border p-1.5 shadow-2xl sm:absolute sm:inset-x-0 sm:top-[calc(100%+0.35rem)] sm:bottom-auto sm:z-30 sm:max-h-72 sm:rounded-xl"
+          className={cn(
+            "t-dropdown border-border bg-surface fixed inset-x-2 bottom-[max(0.5rem,env(safe-area-inset-bottom))] z-40 max-h-[min(22rem,52dvh)] overflow-y-auto overscroll-contain rounded-2xl border p-1.5 shadow-2xl sm:absolute sm:inset-x-0 sm:top-[calc(100%+0.35rem)] sm:bottom-auto sm:z-30 sm:max-h-72 sm:rounded-xl",
+            expanded ? "is-open" : "is-closing",
+          )}
+          data-origin="top-left"
         >
           {queryReady && matchingOptions.length > filteredOptions.length ? (
             <p className="text-muted px-3 py-2 text-xs font-bold">

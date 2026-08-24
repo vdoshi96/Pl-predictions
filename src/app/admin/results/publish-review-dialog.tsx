@@ -38,10 +38,14 @@ export function PublishReviewDialog({
     <div
       aria-label={`Review and publish ${datasetLabel}`}
       aria-modal="true"
-      className="fixed inset-0 z-50 grid place-items-center bg-slate-950/60 p-4"
+      className="t-modal-overlay fixed inset-0 z-50 grid place-items-center bg-slate-950/60 p-4"
+      data-state="open"
       role="dialog"
     >
-      <div className="bg-surface max-h-[85vh] w-full max-w-2xl overflow-y-auto rounded-2xl p-5">
+      <div
+        className="t-modal is-open bg-surface max-h-[85vh] w-full max-w-2xl overflow-y-auto rounded-2xl p-5"
+        data-state="open"
+      >
         <h2 className="text-foreground text-lg font-black">
           Review &amp; publish — {datasetLabel}
         </h2>

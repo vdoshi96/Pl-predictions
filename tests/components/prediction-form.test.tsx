@@ -402,6 +402,9 @@ describe("PredictionForm", () => {
       screen.getByText(/progress will be saved in this browser/i),
     ).toBeVisible();
     expect(screen.getByText(/^not submitted\./i)).toBeVisible();
+    expect(screen.getByTestId("prediction-stage-panel")).toHaveClass(
+      "t-panel-slide",
+    );
   });
 
   it("remembers an intentional A–Z choice in page memory until Reset", () => {

@@ -75,10 +75,10 @@ export function IrreversibleSeasonAction({
               </Button>
             </Dialog.Trigger>
             <Dialog.Portal>
-              <Dialog.Overlay className="bg-brand-strong/75 fixed inset-0 z-50 backdrop-blur-[2px]" />
+              <Dialog.Overlay className="t-modal-overlay bg-brand-strong/75 fixed inset-0 z-50 backdrop-blur-[2px]" />
               <Dialog.Content
                 aria-describedby={`${intent}-season-action-description`}
-                className="border-danger/35 bg-surface fixed inset-x-3 top-1/2 z-50 mx-auto w-auto max-w-lg -translate-y-1/2 rounded-2xl border p-5 shadow-2xl outline-none sm:inset-x-auto sm:left-1/2 sm:w-[min(32rem,calc(100vw-2rem))] sm:-translate-x-1/2"
+                className={`t-modal t-modal-centered-vertical t-modal-centered-responsive border-danger/35 bg-surface fixed inset-x-3 top-1/2 z-50 mx-auto w-auto max-w-lg rounded-2xl border p-5 shadow-2xl outline-none sm:inset-x-auto sm:left-1/2 sm:w-[min(32rem,calc(100vw-2rem))] ${open ? "is-open" : "is-closing"}`}
                 onEscapeKeyDown={(event) => {
                   if (pending) event.preventDefault();
                 }}

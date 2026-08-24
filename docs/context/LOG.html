@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="generated-by" content="scripts/generate-docs-html.mjs" />
     <meta name="canonical-source" content="LOG.md" />
-    <meta name="canonical-source-sha256" content="720a3b65d465729d80189c159744c02483241fb2086e3517f90ccc0f2535075d" />
+    <meta name="canonical-source-sha256" content="965d7fe30d8f17daefbf763af8d56cdec3c51e5add215c4e08fe5b746ccae26d" />
     <title>Session log</title>
     <style>
       :root { color-scheme: light dark; font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
@@ -42,19 +42,44 @@
       <h1 id="session-log">Session log</h1>
 <h2 id="2026-08-23">2026-08-23</h2>
 <ul>
-<li>Promoted the browser-local Win Streak workshop into a durable Matchweek 2–38 production game. Added 37 rounds and 370 canonical official fixtures, receipt-bound no-login profiles, database-clock pick deadlines, immutable one-per-round picks, derived streak scoring, public current picks, and a public anonymous leaderboard.</li>
-<li>Added the authenticated <code>/admin/win-streak</code> results desk. It resolves only the earliest unresolved round after all ten kickoffs, requires ten explicit outcomes plus reviewed provenance, and publishes the complete round in one immutable audited database transition.</li>
-<li>Extended the owner-run update-results skill and its generated HTML peer to check official fixture drift before results. No change is a no-op. Only a future, unpicked, unresolved kickoff correction may use the targeted seed path; structural or protected-fixture changes fail closed.</li>
-<li>Ran the online official fixture check on August 23. It verified all 370 retained fixtures across 37 matchweeks with no drift, so no fixture rewrite or seed ran at that checkpoint.</li>
-<li>Added migration <code>0010_win_streak_live.sql</code>, a targeted production fixture seed, persistent mutation limits, bounded public reads, concurrent-publication consistency checks, and tests for schedule coverage, identity takeover, outcome transitions, shared results, fixture drift, privacy, and atomicity.</li>
-<li>Passed the full 413-test unit/component suite with 31 guarded skips, all 29 isolated Neon integration tests, ESLint, strict TypeScript, and the Webpack production build. The focused optimized browser matrix passed 16 journeys across desktop Chromium, 320-, 390-, and 430-pixel mobile Chromium, and mobile WebKit, with four intentional project skips. It covered anonymous leaderboard access, public picks, two profiles with opposing fixture picks, keyboard confirmation, persistence, dark mode, and zero horizontal overflow.</li>
-<li>Ran the literal <code>CI=1 npm run check</code>. Its first development-server browser phase reproduced the existing Next.js RSC, manifest, Fast Refresh, and router-initialization corruption after every non-browser gate passed. Updated only the aggregate gate to exercise the production build it already creates, while retaining direct <code>npm run test:e2e</code> as the development-server diagnostic path. The corrected check passed uninterrupted: 17 documentation pairs, the player validator, formatting, ESLint, strict TypeScript, 413 unit/component tests with 31 guarded skips, all 29 isolated Neon integration tests, the Webpack production build, 24 pre-kickoff browser journeys with 26 intentional skips, and three post-kickoff journeys with two intentional skips.</li>
-<li>Read back the isolated database after the aggregate run: 37 rounds and 370 fixtures remained; resolved rounds, Win Streak profiles, picks, Win Streak rate limits, post-kickoff predictions, and post-kickoff snapshots were all zero; season pointers remained null and lock/reveal flags remained false. No server remained on port 3100.</li>
-<li>Matchweek 2 begins on August 28, 2026, so no Win Streak result backfill existed on August 23.</li>
-<li>Passed the repeatable-read production preflight at <code>2026-08-23T20:18:10.429Z</code>, WAL <code>0/E8E6438</code>. It found ten known migrations, 14 prediction parents with 280 table rows and 98 spotlight picks, intact standings/result state, false lock/reveal flags, and no Win Streak tables. Applied additive migration <code>0010</code>; read-only postcheck at WAL <code>0/E9185F8</code> verified exact hash <code>ce4aa426b4f91c85de7a126134a59ad8839374cf86cc1a278f17166be6f19134</code>, 28 valid constraints, 19 indexes, 12 triggers, 10 functions, and unchanged existing aggregates.</li>
-<li>Ran only <code>npm run db:seed:win-streak</code>. It inserted 37 rounds and 370 fixtures. Read-only postcheck at WAL <code>0/E979C38</code> verified Matchweeks 2–38, ten fixtures and 20 clubs per round, earliest-kickoff deadlines, zero results/profiles/picks/rate limits, and unchanged original-game, standings, result, audit, and season-flag state.</li>
-<li>Merged <a href="https://github.com/vdoshi96/Pl-predictions/pull/39">PR #39</a> as <code>19bf11b4df43f8c3410f704fb278d1d4bdd845b5</code>. Vercel deployment <code>dpl_BTncZC77GmA3EXtaUjAKvfWZvRzP</code> became Ready at <a href="https://pl-predictions-cdq31rqls-vdoshi96s-projects.vercel.app">its immutable URL</a>. Explicitly assigned the <a href="https://pl-predictions-2026.vercel.app">stable production alias</a> and proved it resolved to that deployment ID.</li>
-<li>Passed the guarded five-browser anonymous production smoke, including <code>/win-streak</code>, with no mutation requests, console errors, or horizontal overflow. Final database read-back found no participant or result writes and unchanged existing aggregates. Bounded exact-deployment error, fatal, and HTTP 5xx log queries returned no records.</li>
+<li><p>Completed an interaction-first UI/UX audit of all 13 public, participant, receipt-only, login, and authenticated administrator routes using desktop and mobile Chromium. The manifest records 117 entries, 47 interaction-first snapshots, 113 screenshots, 35 console reads, and 30 network probes. Production was read-only; participant round trips and administrator previews used the isolated test database.</p>
+</li>
+<li><p>Fixed the Rules walkthrough&#39;s serious <code>scrollable-region-focusable</code> violation and eight-pixel document overflow at 768 pixels by naming and focusing the internal carousel and removing its escaping medium-breakpoint margin. Added shared, reduced-motion-safe state feedback for searchable dropdowns, prediction-stage panels, participant and administrator confirmation dialogs, overlays, and the final success mark.</p>
+</li>
+<li><p>Re-ran every public and administrator route against the optimized local build with zero Critical or Serious axe violations, console warnings, console errors, HTTP errors, or document overflow. Exact responsive sweeps passed at 320, 375, 768, 1,024, 1,280, and 1,920 pixels; offline draft recovery, immutable prediction and Win Streak round trips, focus traps, keyboard operation, and reduced-motion behavior also passed.</p>
+</li>
+<li><p>Cleaned only the isolated audit records by exact normalized names: two prediction parents, 40 table rows, 14 spotlight picks, two Win Streak profiles, and two Win Streak picks. Cascade read-back found zero residue, and Win Streak rate-limit rows plus administrator sessions were zero afterward.</p>
+</li>
+<li><p>Passed the uninterrupted final <code>CI=1 npm run check</code>: parity for 18 documentation pairs, the 580-player/578-portrait validator, formatting, ESLint, strict TypeScript, 414 unit/component tests with 31 guarded skips, all 29 isolated Neon integration tests, the Webpack production build, 24 pre-kickoff browser journeys with 26 intentional routing skips, and three post-kickoff journeys with two intentional skips. The optimized browser server emitted the repository&#39;s documented destination-stream closure messages while every assertion passed.</p>
+</li>
+<li><p>Recorded one unresolved medium product decision: the receipt authorizes a direct private confirmation, but public surfaces intentionally expose no unrevealed entry identifier and therefore cannot rediscover that URL after the success screen. The audit recommends a separately reviewed, privacy-preserving recovery design rather than weakening the existing disclosure boundary.</p>
+</li>
+<li><p>Promoted the browser-local Win Streak workshop into a durable Matchweek 2–38 production game. Added 37 rounds and 370 canonical official fixtures, receipt-bound no-login profiles, database-clock pick deadlines, immutable one-per-round picks, derived streak scoring, public current picks, and a public anonymous leaderboard.</p>
+</li>
+<li><p>Added the authenticated <code>/admin/win-streak</code> results desk. It resolves only the earliest unresolved round after all ten kickoffs, requires ten explicit outcomes plus reviewed provenance, and publishes the complete round in one immutable audited database transition.</p>
+</li>
+<li><p>Extended the owner-run update-results skill and its generated HTML peer to check official fixture drift before results. No change is a no-op. Only a future, unpicked, unresolved kickoff correction may use the targeted seed path; structural or protected-fixture changes fail closed.</p>
+</li>
+<li><p>Ran the online official fixture check on August 23. It verified all 370 retained fixtures across 37 matchweeks with no drift, so no fixture rewrite or seed ran at that checkpoint.</p>
+</li>
+<li><p>Added migration <code>0010_win_streak_live.sql</code>, a targeted production fixture seed, persistent mutation limits, bounded public reads, concurrent-publication consistency checks, and tests for schedule coverage, identity takeover, outcome transitions, shared results, fixture drift, privacy, and atomicity.</p>
+</li>
+<li><p>Passed the full 413-test unit/component suite with 31 guarded skips, all 29 isolated Neon integration tests, ESLint, strict TypeScript, and the Webpack production build. The focused optimized browser matrix passed 16 journeys across desktop Chromium, 320-, 390-, and 430-pixel mobile Chromium, and mobile WebKit, with four intentional project skips. It covered anonymous leaderboard access, public picks, two profiles with opposing fixture picks, keyboard confirmation, persistence, dark mode, and zero horizontal overflow.</p>
+</li>
+<li><p>Ran the literal <code>CI=1 npm run check</code>. Its first development-server browser phase reproduced the existing Next.js RSC, manifest, Fast Refresh, and router-initialization corruption after every non-browser gate passed. Updated only the aggregate gate to exercise the production build it already creates, while retaining direct <code>npm run test:e2e</code> as the development-server diagnostic path. The corrected check passed uninterrupted: 17 documentation pairs, the player validator, formatting, ESLint, strict TypeScript, 413 unit/component tests with 31 guarded skips, all 29 isolated Neon integration tests, the Webpack production build, 24 pre-kickoff browser journeys with 26 intentional skips, and three post-kickoff journeys with two intentional skips.</p>
+</li>
+<li><p>Read back the isolated database after the aggregate run: 37 rounds and 370 fixtures remained; resolved rounds, Win Streak profiles, picks, Win Streak rate limits, post-kickoff predictions, and post-kickoff snapshots were all zero; season pointers remained null and lock/reveal flags remained false. No server remained on port 3100.</p>
+</li>
+<li><p>Matchweek 2 begins on August 28, 2026, so no Win Streak result backfill existed on August 23.</p>
+</li>
+<li><p>Passed the repeatable-read production preflight at <code>2026-08-23T20:18:10.429Z</code>, WAL <code>0/E8E6438</code>. It found ten known migrations, 14 prediction parents with 280 table rows and 98 spotlight picks, intact standings/result state, false lock/reveal flags, and no Win Streak tables. Applied additive migration <code>0010</code>; read-only postcheck at WAL <code>0/E9185F8</code> verified exact hash <code>ce4aa426b4f91c85de7a126134a59ad8839374cf86cc1a278f17166be6f19134</code>, 28 valid constraints, 19 indexes, 12 triggers, 10 functions, and unchanged existing aggregates.</p>
+</li>
+<li><p>Ran only <code>npm run db:seed:win-streak</code>. It inserted 37 rounds and 370 fixtures. Read-only postcheck at WAL <code>0/E979C38</code> verified Matchweeks 2–38, ten fixtures and 20 clubs per round, earliest-kickoff deadlines, zero results/profiles/picks/rate limits, and unchanged original-game, standings, result, audit, and season-flag state.</p>
+</li>
+<li><p>Merged <a href="https://github.com/vdoshi96/Pl-predictions/pull/39">PR #39</a> as <code>19bf11b4df43f8c3410f704fb278d1d4bdd845b5</code>. Vercel deployment <code>dpl_BTncZC77GmA3EXtaUjAKvfWZvRzP</code> became Ready at <a href="https://pl-predictions-cdq31rqls-vdoshi96s-projects.vercel.app">its immutable URL</a>. Explicitly assigned the <a href="https://pl-predictions-2026.vercel.app">stable production alias</a> and proved it resolved to that deployment ID.</p>
+</li>
+<li><p>Passed the guarded five-browser anonymous production smoke, including <code>/win-streak</code>, with no mutation requests, console errors, or horizontal overflow. Final database read-back found no participant or result writes and unchanged existing aggregates. Bounded exact-deployment error, fatal, and HTTP 5xx log queries returned no records.</p>
+</li>
 </ul>
 <h2 id="2026-08-22">2026-08-22</h2>
 <ul>
@@ -323,7 +348,7 @@
 <li>Next handoff: use <code>main</code> as the base for future pull requests. No GitHub access blocker remains for the current repository workflow.</li>
 </ul>
 
-      <p class="source">Generated deterministically from <a href="LOG.md">docs/context/LOG.md</a>. Canonical SHA-256: <code>720a3b65d465729d80189c159744c02483241fb2086e3517f90ccc0f2535075d</code>.</p>
+      <p class="source">Generated deterministically from <a href="LOG.md">docs/context/LOG.md</a>. Canonical SHA-256: <code>965d7fe30d8f17daefbf763af8d56cdec3c51e5add215c4e08fe5b746ccae26d</code>.</p>
     </main>
   </body>
 </html>

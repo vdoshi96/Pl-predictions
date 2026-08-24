@@ -100,7 +100,11 @@ export function HowToPlay() {
         </div>
       </div>
 
-      <ol className="-mx-4 flex snap-x snap-mandatory gap-4 overflow-x-auto px-4 pb-3 sm:-mx-6 sm:px-6 lg:mx-0 lg:grid lg:grid-cols-3 lg:overflow-visible lg:px-0">
+      <ol
+        aria-label="Three-step prediction walkthrough"
+        className="-mx-4 flex snap-x snap-mandatory gap-4 overflow-x-auto px-4 pb-3 focus-visible:rounded-xl lg:mx-0 lg:grid lg:grid-cols-3 lg:overflow-visible lg:px-0"
+        tabIndex={0}
+      >
         {walkthroughSteps.map((walkthrough) => (
           <li
             className="w-[min(82vw,20rem)] shrink-0 snap-center lg:w-auto"

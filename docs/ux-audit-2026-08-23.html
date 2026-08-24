@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="generated-by" content="scripts/generate-docs-html.mjs" />
     <meta name="canonical-source" content="ux-audit-2026-08-23.md" />
-    <meta name="canonical-source-sha256" content="bc9c1a0e39f29462096af7e5fd8f0f4f5ba5efea482a7435049efa6d644117d7" />
+    <meta name="canonical-source-sha256" content="1de80f415ca552d5fc3282549ac36a5b2756d1bb9f1a49d0eb3fc986a597e15a" />
     <title>UX audit: Dranx Prediction League</title>
     <style>
       :root { color-scheme: light dark; font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
@@ -96,10 +96,12 @@ TOP 5 (ranked by impact × ease):
   5. P-2 Calibrated success acknowledgement after submission
 ═══════════════════════════════════════════════════════════
 </code></pre>
-<p><strong>Date:</strong> August 23, 2026<br><strong>Production baseline:</strong> <a href="https://pl-predictions-2026.vercel.app">pl-predictions-2026.vercel.app</a><br><strong>Fixed candidate:</strong> Optimized local production server with an isolated Neon database<br><strong>Persona:</strong> An invited Premier League fan with moderate technical comfort, using a phone while distracted and trying to submit quickly.<br><strong>Browser:</strong> Playwright Chromium, desktop and mobile profiles<br><strong>Viewports:</strong> 320, 375, 390, 768, 900, 1,024, 1,280, 1,440, and 1,920 pixels<br><strong>Reference extract:</strong> None. The existing visual system is the reference.</p>
+<p><strong>Date:</strong> August 23, 2026<br><strong>Production baseline:</strong> <a href="https://pl-predictions-2026.vercel.app">pl-predictions-2026.vercel.app</a><br><strong>Released version:</strong> <a href="https://pl-predictions-2026.vercel.app">Stable production site</a>, deployment <code>dpl_2c3dpxwrtkPhQNbqRRyga8ti3QDb</code><br>
+<strong>Persona:</strong> An invited Premier League fan with moderate technical comfort, using a phone while distracted and trying to submit quickly.<br><strong>Browser:</strong> Playwright Chromium, desktop and mobile profiles<br><strong>Viewports:</strong> 320, 375, 390, 768, 900, 1,024, 1,280, 1,440, and 1,920 pixels<br><strong>Reference extract:</strong> None. The existing visual system is the reference.</p>
 <h2 id="executive-summary">Executive summary</h2>
 <p>The product&#39;s primary flows are coherent, trustworthy, and completable on desktop and mobile. The audit found one serious accessibility failure and one responsive containment failure in the same Rules carousel; both are fixed and verified. Search dropdowns, stage changes, confirmation dialogs, and submission success also have clearer, reduced-motion-safe feedback.</p>
 <p>The remaining concern affects returning participants rather than first-time completion. Before predictions are revealed, the private confirmation URL appears on the success card but isn&#39;t rediscoverable from the home page or leaderboard after the participant leaves it. The audit remains a Conditional Pass until that privacy-sensitive product decision is resolved.</p>
+<p>PR <a href="https://github.com/vdoshi96/Pl-predictions/pull/41">#41</a> passed both Vercel checks and merged as <code>a09798709e461fff511ea4712a3b1a8bb9649f86</code>. The exact merge deployment became Ready at <a href="https://pl-predictions-d35jddef5-vdoshi96s-projects.vercel.app">its immutable URL</a>, passed the guarded five-browser read-only smoke, and then received the stable production alias. A second five-browser smoke passed through the alias. The final 12-route desktop/mobile public audit reported zero axe violations, document overflow, console warnings/errors, or HTTP failures, and the final after screenshots in this report were captured from the stable production site.</p>
 <h2 id="coverage">Coverage</h2>
 <table>
 <thead>
@@ -652,7 +654,7 @@ TOP 5 (ranked by impact × ease):
 <h2 id="hold-this-in-your-hands">Hold this in your hands</h2>
 <p>Dranx feels like a careful competition sheet that has learned how to guide people without becoming heavy. The important choices are visible, the irreversible moments ask for attention, and both games end with an unambiguous public or private result. On a phone, the product handles a surprising amount of information without turning into a cramped desktop table. The audit&#39;s fixed issues were concentrated in one instructional carousel and in the feel of state changes, not in broken core logic. The remaining gap appears only after success: the browser remembers that a participant owns an entry, but the interface can&#39;t help them find it again. Resolve that one privacy-sensitive return path, and the product can move from a cautious recommendation to a straightforward one.</p>
 
-      <p class="source">Generated deterministically from <a href="ux-audit-2026-08-23.md">docs/ux-audit-2026-08-23.md</a>. Canonical SHA-256: <code>bc9c1a0e39f29462096af7e5fd8f0f4f5ba5efea482a7435049efa6d644117d7</code>.</p>
+      <p class="source">Generated deterministically from <a href="ux-audit-2026-08-23.md">docs/ux-audit-2026-08-23.md</a>. Canonical SHA-256: <code>1de80f415ca552d5fc3282549ac36a5b2756d1bb9f1a49d0eb3fc986a597e15a</code>.</p>
     </main>
   </body>
 </html>

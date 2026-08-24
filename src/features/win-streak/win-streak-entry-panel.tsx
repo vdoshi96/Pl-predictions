@@ -313,7 +313,7 @@ function PickReviewDialog({
   return (
     <Dialog.Root open={open} onOpenChange={handleOpenChange}>
       <Dialog.Portal>
-        <Dialog.Overlay className="bg-brand-strong/75 fixed inset-0 z-50 backdrop-blur-[2px]" />
+        <Dialog.Overlay className="t-modal-overlay bg-brand-strong/75 fixed inset-0 z-50 backdrop-blur-[2px]" />
         <Dialog.Content
           aria-busy={pending}
           aria-describedby="win-streak-review-description"
@@ -323,7 +323,7 @@ function PickReviewDialog({
           onInteractOutside={(event) => {
             if (pending) event.preventDefault();
           }}
-          className="border-border bg-surface text-foreground fixed inset-x-2 top-[max(0.5rem,env(safe-area-inset-top))] bottom-[max(0.5rem,env(safe-area-inset-bottom))] z-50 overflow-y-auto rounded-2xl border p-4 shadow-2xl outline-none sm:top-1/2 sm:bottom-auto sm:left-1/2 sm:max-h-[min(42rem,calc(100dvh-2rem))] sm:w-[min(30rem,calc(100vw-2rem))] sm:-translate-x-1/2 sm:-translate-y-1/2 sm:p-6"
+          className={`t-modal t-modal-centered-responsive border-border bg-surface text-foreground fixed inset-x-2 top-[max(0.5rem,env(safe-area-inset-top))] bottom-[max(0.5rem,env(safe-area-inset-bottom))] z-50 overflow-y-auto rounded-2xl border p-4 shadow-2xl outline-none sm:top-1/2 sm:bottom-auto sm:left-1/2 sm:max-h-[min(42rem,calc(100dvh-2rem))] sm:w-[min(30rem,calc(100vw-2rem))] sm:p-6 ${open ? "is-open" : "is-closing"}`}
         >
           <div className="flex items-start justify-between gap-3">
             <div>

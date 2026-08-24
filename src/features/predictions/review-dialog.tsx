@@ -69,7 +69,7 @@ export function ReviewDialog({
   return (
     <Dialog.Root open={open} onOpenChange={handleOpenChange}>
       <Dialog.Portal>
-        <Dialog.Overlay className="bg-brand-strong/75 fixed inset-0 z-50 backdrop-blur-[2px] data-[state=closed]:animate-none motion-reduce:animate-none" />
+        <Dialog.Overlay className="t-modal-overlay bg-brand-strong/75 fixed inset-0 z-50 backdrop-blur-[2px]" />
         <Dialog.Content
           aria-describedby="prediction-review-description"
           onEscapeKeyDown={(event) => {
@@ -78,7 +78,7 @@ export function ReviewDialog({
           onInteractOutside={(event) => {
             if (pending) event.preventDefault();
           }}
-          className="border-border text-foreground bg-surface fixed inset-x-2 top-[max(0.5rem,env(safe-area-inset-top))] bottom-2 z-50 flex flex-col overflow-hidden rounded-2xl border shadow-2xl outline-none sm:inset-x-auto sm:top-1/2 sm:bottom-auto sm:left-1/2 sm:max-h-[min(900px,calc(100dvh-2rem))] sm:w-[min(48rem,calc(100vw-2rem))] sm:-translate-x-1/2 sm:-translate-y-1/2"
+          className={`t-modal t-modal-centered-responsive border-border text-foreground bg-surface fixed inset-x-2 top-[max(0.5rem,env(safe-area-inset-top))] bottom-2 z-50 flex flex-col overflow-hidden rounded-2xl border shadow-2xl outline-none sm:inset-x-auto sm:top-1/2 sm:bottom-auto sm:left-1/2 sm:max-h-[min(900px,calc(100dvh-2rem))] sm:w-[min(48rem,calc(100vw-2rem))] ${open ? "is-open" : "is-closing"}`}
         >
           <div className="border-border flex shrink-0 items-start justify-between gap-3 border-b px-4 py-4 sm:px-6">
             <div className="min-w-0">

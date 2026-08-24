@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="generated-by" content="scripts/generate-docs-html.mjs" />
     <meta name="canonical-source" content="QA.md" />
-    <meta name="canonical-source-sha256" content="9a8901afc08a6ef8a6d685d5f6236e5ecaabc4073667349ecb121df2ac07d4ab" />
+    <meta name="canonical-source-sha256" content="8bb0c4b7633713dd006db481898e853832c51c4b9dd6f1302fbc15c639246d9f" />
     <title>Quality assurance</title>
     <style>
       :root { color-scheme: light dark; font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
@@ -40,6 +40,48 @@
   <body>
     <main>
       <h1 id="quality-assurance">Quality assurance</h1>
+<h2 id="august-23-complete-uiux-audit-and-motion-remediation">August 23 complete UI/UX audit and motion remediation</h2>
+<p>The interaction-first audit covers all 13 user-interface routes across public, receipt-only, authenticated administrator, desktop, and mobile states. The canonical <a href="ux-audit-2026-08-23.html">audit report</a> contains the complete findings, interaction manifest, scenario battery, responsive matrix, and before/after evidence. Production served as the read-only baseline; all participant writes and administrator previews used the isolated test database.</p>
+<table>
+<thead>
+<tr>
+<th>Gate</th>
+<th>Evidence</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Complete product walkthrough</td>
+<td>117 timestamped manifest entries, 47 interaction-first snapshots, 113 screenshots, 35 console reads, and 30 network probes cover prediction submission, receipt authorization, leaderboard reflection, Win Streak creation and immutable pick submission, and all six administrator routes.</td>
+</tr>
+<tr>
+<td>Accessibility and responsive behavior</td>
+<td>The original Rules carousel produced one serious axe violation and eight pixels of document overflow at 768 pixels. The remediated optimized build reports zero Critical or Serious axe violations and exact document containment at 320, 375, 768, 1,024, 1,280, and 1,920 pixels.</td>
+</tr>
+<tr>
+<td>Visual and motion review</td>
+<td>The Impeccable detector reports no warnings in the changed UI. Search surfaces, prediction stages, confirmation dialogs, overlays, and submission success now use shared calibrated motion. Reduced-motion emulation resolves every tested state immediately.</td>
+</tr>
+<tr>
+<td>Component regressions</td>
+<td>Focused tests cover the carousel&#39;s named keyboard target, selector open/close retention and assistive-technology boundary, staged prediction panels, and success acknowledgement. The final full unit run passed 414 tests with 31 guarded skips across 67 passed and five skipped files.</td>
+</tr>
+<tr>
+<td>Aggregate repository gate</td>
+<td>The uninterrupted final <code>CI=1 npm run check</code> passed 18 Markdown/HTML pairs, the 580-player/578-portrait validator, Prettier, ESLint, strict TypeScript, 414 unit/component tests, all 29 isolated Neon integration tests, the Next.js 16 Webpack production build, 24 pre-kickoff browser journeys with 26 intentional routing skips, and three post-kickoff journeys with two intentional skips. The optimized browser server emitted the repository&#39;s documented destination-stream closure messages while every assertion passed.</td>
+</tr>
+<tr>
+<td>Isolated data cleanup</td>
+<td>Exact-name cleanup removed two audit prediction parents with 40 table rows and 14 spotlight picks, plus two audit Win Streak profiles with two picks. Cascades were verified at zero residue; Win Streak rate-limit rows and administrator sessions were also zero after cleanup.</td>
+</tr>
+<tr>
+<td>Open product decision</td>
+<td>A receipt holder can open the private confirmation URL, but cannot rediscover it from public pages after leaving the success card. Any recovery design must preserve the existing rule that unrevealed entry identifiers never enter public HTML or leaderboard projections.</td>
+</tr>
+</tbody></table>
+<p><img src="assets/qa/ux-audit-2026-08-23/rules-desktop-before.png" alt="Rules carousel before desktop remediation"></p>
+<p><img src="assets/qa/ux-audit-2026-08-23/rules-desktop-after.png" alt="Rules carousel after desktop remediation"></p>
+<p><img src="assets/qa/ux-audit-2026-08-23/rules-mobile-before.png" alt="Rules carousel before mobile keyboard focus"></p>
+<p><img src="assets/qa/ux-audit-2026-08-23/rules-mobile-after.png" alt="Rules carousel after mobile keyboard focus"></p>
 <h2 id="august-23-win-streak-production-release">August 23 Win Streak production release</h2>
 <p>Win Streak is released for Matchweeks 2–38. Its leaderboard is public before name entry and publishes each participant&#39;s current-matchweek pick. The screenshots use isolated QA profiles rather than production data.</p>
 <table>
@@ -728,7 +770,7 @@
 <li><input checked="" disabled="" type="checkbox"> Regenerate final HTML peers, publish this closeout through <code>main</code>, synchronize local and remote <code>main</code>, and remove completed branch state.</li>
 </ul>
 
-      <p class="source">Generated deterministically from <a href="QA.md">docs/QA.md</a>. Canonical SHA-256: <code>9a8901afc08a6ef8a6d685d5f6236e5ecaabc4073667349ecb121df2ac07d4ab</code>.</p>
+      <p class="source">Generated deterministically from <a href="QA.md">docs/QA.md</a>. Canonical SHA-256: <code>8bb0c4b7633713dd006db481898e853832c51c4b9dd6f1302fbc15c639246d9f</code>.</p>
     </main>
   </body>
 </html>

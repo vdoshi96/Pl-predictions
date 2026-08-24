@@ -4,7 +4,7 @@ import {
   AlertCircle,
   AlertTriangle,
   ArrowLeft,
-  CheckCircle2,
+  Check,
   LockKeyhole,
   ShieldCheck,
 } from "lucide-react";
@@ -217,6 +217,7 @@ export function PredictionForm({
   const [participantName, setParticipantName] = useState("");
   const [honeypot, setHoneypot] = useState("");
   const [stage, setStage] = useState<"table" | "spotlight">("table");
+  const [stagePanelOpen, setStagePanelOpen] = useState(false);
   const [spotlightPicks, setSpotlightPicks] = useState<SpotlightPicksDraft>({});
   const spotlightPicksRef = useRef<SpotlightPicksDraft>({});
   const [spotlightValidationAttempted, setSpotlightValidationAttempted] =
@@ -696,6 +697,11 @@ export function PredictionForm({
     }
   }, [draftReady, loadPlayerCatalogue, stage]);
 
+  useEffect(() => {
+    const frame = window.requestAnimationFrame(() => setStagePanelOpen(true));
+    return () => window.cancelAnimationFrame(frame);
+  }, [stage]);
+
   useEffect(
     () => () => {
       playerCatalogueAbortRef.current?.abort();
@@ -737,6 +743,7 @@ export function PredictionForm({
     }
     setParticipantName(normalizedName);
     setAlphabeticalWarningOpen(false);
+    setStagePanelOpen(false);
     setStage("spotlight");
     commitDraftSnapshot({
       orderedTeamIds,
@@ -866,7 +873,13 @@ export function PredictionForm({
       <Card className="border-accent overflow-hidden">
         <CardContent className="grid justify-items-center gap-4 px-5 py-10 text-center sm:px-10">
           <span className="bg-mint text-mint-ink grid size-16 place-items-center rounded-2xl">
-            <CheckCircle2 aria-hidden="true" className="size-9" />
+            <span
+              aria-hidden="true"
+              className="t-success-check"
+              data-state="in"
+            >
+              <Check className="size-9" />
+            </span>
           </span>
           <div>
             <Badge variant="success">Prediction submitted</Badge>
@@ -908,195 +921,202 @@ export function PredictionForm({
       className="grid w-full min-w-0 grid-cols-[minmax(0,1fr)] gap-5"
       noValidate
     >
-      {stage === "table" ? (
-        <>
-          <div className="text-rose-ink flex items-center gap-2 text-xs font-black tracking-[0.12em] uppercase">
-            <span className="bg-brand text-accent grid size-7 place-items-center rounded-lg">
-              1
-            </span>
-            Step 1 of 3 · Your table
-          </div>
-          <Card className="overflow-visible" id="submit-prediction">
-            <CardContent className="grid gap-4">
-              <div className="flex items-start gap-3">
-                <span className="bg-sky-soft text-brand-ink grid size-10 shrink-0 place-items-center rounded-xl">
-                  <ShieldCheck aria-hidden="true" className="size-5" />
-                </span>
-                <div className="min-w-0">
-                  <h2 className="text-brand-ink-strong text-lg font-black">
-                    Who is making this prediction?
-                  </h2>
-                  <p className="text-muted mt-1 text-sm leading-5">
-                    Add your display name, then continue to the seven spotlight
-                    picks before the final review.
+      <div
+        className="prediction-stage-panel t-panel-slide grid gap-5"
+        data-open={stagePanelOpen}
+        data-testid="prediction-stage-panel"
+      >
+        {stage === "table" ? (
+          <>
+            <div className="text-rose-ink flex items-center gap-2 text-xs font-black tracking-[0.12em] uppercase">
+              <span className="bg-brand text-accent grid size-7 place-items-center rounded-lg">
+                1
+              </span>
+              Step 1 of 3 · Your table
+            </div>
+            <Card className="overflow-visible" id="submit-prediction">
+              <CardContent className="grid gap-4">
+                <div className="flex items-start gap-3">
+                  <span className="bg-sky-soft text-brand-ink grid size-10 shrink-0 place-items-center rounded-xl">
+                    <ShieldCheck aria-hidden="true" className="size-5" />
+                  </span>
+                  <div className="min-w-0">
+                    <h2 className="text-brand-ink-strong text-lg font-black">
+                      Who is making this prediction?
+                    </h2>
+                    <p className="text-muted mt-1 text-sm leading-5">
+                      Add your display name, then continue to the seven
+                      spotlight picks before the final review.
+                    </p>
+                  </div>
+                </div>
+
+                <div>
+                  <label
+                    htmlFor="participant-name"
+                    className="text-foreground text-sm font-bold"
+                  >
+                    Your display name
+                  </label>
+                  <input
+                    id="participant-name"
+                    name="participantName"
+                    type="text"
+                    value={participantName}
+                    onChange={(event) => {
+                      const nextParticipantName = event.target.value;
+                      setParticipantName(nextParticipantName);
+                      setError(null);
+                    }}
+                    autoComplete="name"
+                    autoCapitalize="words"
+                    enterKeyHint="done"
+                    minLength={2}
+                    maxLength={40}
+                    required
+                    disabled={!draftReady || disabled || pending}
+                    aria-describedby="participant-name-help"
+                    className="border-border text-brand-ink-strong focus:border-accent-lilac focus:ring-accent-blue/30 bg-surface placeholder:text-muted disabled:bg-surface-subtle disabled:text-muted mt-2 min-h-12 w-full rounded-xl border px-3.5 text-base outline-none focus:ring-2 disabled:cursor-not-allowed"
+                    placeholder="e.g. Vishal"
+                  />
+                  <p
+                    id="participant-name-help"
+                    className="text-muted mt-1.5 text-xs leading-5"
+                  >
+                    2–40 characters. This is the only personal information
+                    stored.
                   </p>
                 </div>
-              </div>
 
-              <div>
-                <label
-                  htmlFor="participant-name"
-                  className="text-foreground text-sm font-bold"
+                <div
+                  aria-hidden="true"
+                  className="pointer-events-none absolute -left-[10000px]"
                 >
-                  Your display name
-                </label>
-                <input
-                  id="participant-name"
-                  name="participantName"
-                  type="text"
-                  value={participantName}
-                  onChange={(event) => {
-                    const nextParticipantName = event.target.value;
-                    setParticipantName(nextParticipantName);
-                    setError(null);
-                  }}
-                  autoComplete="name"
-                  autoCapitalize="words"
-                  enterKeyHint="done"
-                  minLength={2}
-                  maxLength={40}
-                  required
-                  disabled={!draftReady || disabled || pending}
-                  aria-describedby="participant-name-help"
-                  className="border-border text-brand-ink-strong focus:border-accent-lilac focus:ring-accent-blue/30 bg-surface placeholder:text-muted disabled:bg-surface-subtle disabled:text-muted mt-2 min-h-12 w-full rounded-xl border px-3.5 text-base outline-none focus:ring-2 disabled:cursor-not-allowed"
-                  placeholder="e.g. Vishal"
-                />
-                <p
-                  id="participant-name-help"
-                  className="text-muted mt-1.5 text-xs leading-5"
-                >
-                  2–40 characters. This is the only personal information stored.
-                </p>
-              </div>
+                  <label htmlFor="prediction-website">
+                    Leave this field empty
+                  </label>
+                  <input
+                    id="prediction-website"
+                    name="website"
+                    type="text"
+                    value={honeypot}
+                    onChange={(event) => setHoneypot(event.target.value)}
+                    autoComplete="off"
+                    tabIndex={-1}
+                  />
+                </div>
 
-              <div
-                aria-hidden="true"
-                className="pointer-events-none absolute -left-[10000px]"
+                {disabled ? (
+                  <p className="border-warning/35 bg-warning-soft text-warning flex items-start gap-2 rounded-xl border p-3 text-sm font-medium">
+                    <LockKeyhole
+                      aria-hidden="true"
+                      className="mt-0.5 size-4 shrink-0"
+                    />
+                    <span>{disabledReason}</span>
+                  </p>
+                ) : null}
+
+                {error ? (
+                  <p
+                    role="alert"
+                    className="border-danger/35 bg-danger-soft text-danger flex items-start gap-2 rounded-xl border p-3 text-sm leading-5 font-medium"
+                  >
+                    <AlertCircle
+                      aria-hidden="true"
+                      className="mt-0.5 size-4 shrink-0"
+                    />
+                    <span>{error}</span>
+                  </p>
+                ) : null}
+              </CardContent>
+            </Card>
+
+            {isAlphabetical ? (
+              <aside
+                aria-labelledby="alphabetical-blank-slate-heading"
+                className="border-warning/35 bg-warning-soft text-warning flex items-start gap-3 rounded-2xl border p-4"
               >
-                <label htmlFor="prediction-website">
-                  Leave this field empty
-                </label>
-                <input
-                  id="prediction-website"
-                  name="website"
-                  type="text"
-                  value={honeypot}
-                  onChange={(event) => setHoneypot(event.target.value)}
-                  autoComplete="off"
-                  tabIndex={-1}
+                <AlertTriangle
+                  aria-hidden="true"
+                  className="text-warning mt-0.5 size-5 shrink-0"
                 />
+                <div>
+                  <h2
+                    id="alphabetical-blank-slate-heading"
+                    className="text-sm font-black"
+                  >
+                    The table starts A–Z as a blank slate
+                  </h2>
+                  <p className="text-warning mt-1 text-sm leading-5">
+                    This is not last season’s table or a suggested prediction.
+                    Reorder the clubs, or confirm the A–Z order when you
+                    continue if it is really your prediction.
+                  </p>
+                </div>
+              </aside>
+            ) : null}
+
+            <PredictionSorter
+              teams={orderedTeams}
+              onChange={handleOrderChange}
+              onReset={() => setAlphabeticalOrderAcknowledged(false)}
+              disabled={!draftReady || disabled || pending}
+            />
+          </>
+        ) : (
+          <>
+            {playerCatalogueStatus === "loading" ? (
+              <p
+                className="border-accent-blue/40 bg-sky-soft text-brand-ink rounded-xl border p-3 text-sm font-bold"
+                role="status"
+              >
+                Loading this season’s player catalogue… Other player remains
+                available while it loads.
+              </p>
+            ) : null}
+            {playerCatalogueMessage ? (
+              <div
+                className="border-warning/35 bg-warning-soft text-warning flex flex-wrap items-center justify-between gap-3 rounded-xl border p-3 text-sm font-bold"
+                role="alert"
+              >
+                <span>{playerCatalogueMessage}</span>
+                {playerCatalogueStatus === "error" ? (
+                  <Button
+                    onClick={() => void loadPlayerCatalogue(true)}
+                    size="sm"
+                    type="button"
+                    variant="secondary"
+                  >
+                    Retry player catalogue
+                  </Button>
+                ) : null}
               </div>
-
-              {disabled ? (
-                <p className="border-warning/35 bg-warning-soft text-warning flex items-start gap-2 rounded-xl border p-3 text-sm font-medium">
-                  <LockKeyhole
-                    aria-hidden="true"
-                    className="mt-0.5 size-4 shrink-0"
-                  />
-                  <span>{disabledReason}</span>
-                </p>
-              ) : null}
-
-              {error ? (
-                <p
-                  role="alert"
-                  className="border-danger/35 bg-danger-soft text-danger flex items-start gap-2 rounded-xl border p-3 text-sm leading-5 font-medium"
-                >
-                  <AlertCircle
-                    aria-hidden="true"
-                    className="mt-0.5 size-4 shrink-0"
-                  />
-                  <span>{error}</span>
-                </p>
-              ) : null}
-            </CardContent>
-          </Card>
-
-          {isAlphabetical ? (
-            <aside
-              aria-labelledby="alphabetical-blank-slate-heading"
-              className="border-warning/35 bg-warning-soft text-warning flex items-start gap-3 rounded-2xl border p-4"
-            >
-              <AlertTriangle
-                aria-hidden="true"
-                className="text-warning mt-0.5 size-5 shrink-0"
-              />
-              <div>
-                <h2
-                  id="alphabetical-blank-slate-heading"
-                  className="text-sm font-black"
-                >
-                  The table starts A–Z as a blank slate
-                </h2>
-                <p className="text-warning mt-1 text-sm leading-5">
-                  This is not last season’s table or a suggested prediction.
-                  Reorder the clubs, or confirm the A–Z order when you continue
-                  if it is really your prediction.
-                </p>
-              </div>
-            </aside>
-          ) : null}
-
-          <PredictionSorter
-            teams={orderedTeams}
-            onChange={handleOrderChange}
-            onReset={() => setAlphabeticalOrderAcknowledged(false)}
-            disabled={!draftReady || disabled || pending}
-          />
-        </>
-      ) : (
-        <>
-          {playerCatalogueStatus === "loading" ? (
-            <p
-              className="border-accent-blue/40 bg-sky-soft text-brand-ink rounded-xl border p-3 text-sm font-bold"
-              role="status"
-            >
-              Loading this season’s player catalogue… Other player remains
-              available while it loads.
-            </p>
-          ) : null}
-          {playerCatalogueMessage ? (
-            <div
-              className="border-warning/35 bg-warning-soft text-warning flex flex-wrap items-center justify-between gap-3 rounded-xl border p-3 text-sm font-bold"
-              role="alert"
-            >
-              <span>{playerCatalogueMessage}</span>
-              {playerCatalogueStatus === "error" ? (
-                <Button
-                  onClick={() => void loadPlayerCatalogue(true)}
-                  size="sm"
-                  type="button"
-                  variant="secondary"
-                >
-                  Retry player catalogue
-                </Button>
-              ) : null}
-            </div>
-          ) : null}
-          <SpotlightPredictionsForm
-            disabled={disabled || pending}
-            invalidCategory={
-              spotlightValidationAttempted
-                ? (incompleteSpotlightCategories[0] ?? null)
-                : null
-            }
-            invalidCount={
-              spotlightValidationAttempted
-                ? incompleteSpotlightCategories.length
-                : 0
-            }
-            onChange={handleSpotlightPicksChange}
-            onSelectorExpandedChange={(category, expanded) =>
-              setExpandedSelectorCategory((current) =>
-                expanded ? category : current === category ? null : current,
-              )
-            }
-            picks={spotlightPicks}
-            players={cataloguePlayers}
-            teams={orderedTeams}
-          />
-        </>
-      )}
+            ) : null}
+            <SpotlightPredictionsForm
+              disabled={disabled || pending}
+              invalidCategory={
+                spotlightValidationAttempted
+                  ? (incompleteSpotlightCategories[0] ?? null)
+                  : null
+              }
+              invalidCount={
+                spotlightValidationAttempted
+                  ? incompleteSpotlightCategories.length
+                  : 0
+              }
+              onChange={handleSpotlightPicksChange}
+              onSelectorExpandedChange={(category, expanded) =>
+                setExpandedSelectorCategory((current) =>
+                  expanded ? category : current === category ? null : current,
+                )
+              }
+              picks={spotlightPicks}
+              players={cataloguePlayers}
+              teams={orderedTeams}
+            />
+          </>
+        )}
+      </div>
 
       {stage === "spotlight" && error && !reviewOpen ? (
         <p
@@ -1128,6 +1148,7 @@ export function PredictionForm({
               aria-label="Back to table"
               className="px-3 sm:min-h-12 sm:px-5 sm:text-base"
               onClick={() => {
+                setStagePanelOpen(false);
                 setStage("table");
                 commitDraftSnapshot({
                   orderedTeamIds,

@@ -43,5 +43,11 @@ describe("HowToPlay", () => {
     expect(
       screen.getByText(/Confirm the champion, seven spotlight picks/iu),
     ).toBeVisible();
+
+    const walkthrough = screen.getByRole("list", {
+      name: "Three-step prediction walkthrough",
+    });
+    expect(walkthrough).toHaveAttribute("tabindex", "0");
+    expect(walkthrough.className).not.toContain("sm:-mx-6");
   });
 });

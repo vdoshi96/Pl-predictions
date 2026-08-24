@@ -1,4 +1,5 @@
 import {
+  act,
   cleanup,
   fireEvent,
   render,
@@ -13,6 +14,7 @@ import { SearchablePredictionSelect } from "@/features/predictions/searchable-pr
 afterEach(() => {
   cleanup();
   vi.restoreAllMocks();
+  vi.useRealTimers();
 });
 
 const playerOptions = Array.from({ length: 25 }, (_, index) => ({
@@ -71,6 +73,7 @@ describe("SearchablePredictionSelect result limits", () => {
   });
 
   it("closes when focus leaves the selector", () => {
+    vi.useFakeTimers();
     const onExpandedChange = vi.fn();
     render(
       <>
@@ -99,8 +102,32 @@ describe("SearchablePredictionSelect result limits", () => {
 
     fireEvent.blur(combobox, { relatedTarget: outsideControl });
 
-    expect(screen.queryByRole("listbox")).not.toBeInTheDocument();
+    expect(screen.getByRole("listbox", { hidden: true })).toHaveClass(
+      "is-closing",
+    );
     expect(onExpandedChange).toHaveBeenLastCalledWith(false);
+
+    act(() => vi.advanceTimersByTime(150));
+    expect(screen.queryByRole("listbox")).not.toBeInTheDocument();
+    vi.useRealTimers();
+  });
+
+  it("marks the open listbox with the shared dropdown transition contract", () => {
+    render(
+      <SearchablePredictionSelect
+        description="Choose a club"
+        emptyMessage="No matching club."
+        label="Most clean sheets"
+        onChange={vi.fn()}
+        options={playerOptions.slice(0, 2)}
+        value={null}
+      />,
+    );
+
+    fireEvent.focus(
+      screen.getByRole("combobox", { name: "Most clean sheets" }),
+    );
+    expect(screen.getByRole("listbox")).toHaveClass("t-dropdown", "is-open");
   });
 
   it("commits a pointer choice before mobile scrolling can cancel click", async () => {

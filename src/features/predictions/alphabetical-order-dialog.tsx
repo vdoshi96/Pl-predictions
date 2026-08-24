@@ -19,8 +19,10 @@ export function AlphabeticalOrderDialog({
   return (
     <Dialog.Root open={open} onOpenChange={onOpenChange}>
       <Dialog.Portal>
-        <Dialog.Overlay className="bg-brand-strong/75 fixed inset-0 z-50 backdrop-blur-[2px] data-[state=closed]:animate-none motion-reduce:animate-none" />
-        <Dialog.Content className="border-border bg-surface fixed top-1/2 left-1/2 z-50 w-[min(28rem,calc(100vw-2rem))] -translate-x-1/2 -translate-y-1/2 rounded-2xl border p-5 shadow-2xl outline-none sm:p-6">
+        <Dialog.Overlay className="t-modal-overlay bg-brand-strong/75 fixed inset-0 z-50 backdrop-blur-[2px]" />
+        <Dialog.Content
+          className={`t-modal t-modal-centered border-border bg-surface fixed top-1/2 left-1/2 z-50 w-[min(28rem,calc(100vw-2rem))] rounded-2xl border p-5 shadow-2xl outline-none sm:p-6 ${open ? "is-open" : "is-closing"}`}
+        >
           <div className="flex items-start justify-between gap-3">
             <span className="bg-warning-soft text-warning grid size-11 shrink-0 place-items-center rounded-xl">
               <AlertTriangle aria-hidden="true" className="size-5" />

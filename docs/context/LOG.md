@@ -1,5 +1,14 @@
 # Session log
 
+## 2026-08-24
+
+- Implemented separate distinct picked-subject pools for underdog player, overrated player, underdog team, and overrated team. Team metrics still use every complete bracket, while each candidate list is category-specific. Player directions filter the same active sealed rating facts independently; a missing picked rating remains pending.
+- Updated the administrator ratings desk to show category-filtered pools, synchronize shared-player edits, seed the union once, ignore unpicked pasted rows with a count, require exact picked-player completeness, and preserve `covered_through_rank = N`. The strengthened 320/430-pixel journey exposed a 526-pixel populated-table overflow; stacked mobile editor rows fixed it.
+- Passed documentation parity for 18 pairs, the 580-player/578-portrait validator, formatting, ESLint, strict TypeScript, 419 unit/component tests with 33 guarded skips, all 31 isolated Neon integration tests, the Webpack production build, and focused desktop/320/430-pixel optimized-browser journeys across Spotlight, entry details, and administrator results.
+- Published through [PR #43](https://github.com/vdoshi96/Pl-predictions/pull/43), which passed both Vercel checks and merged as `0abe166dc043820dc5201c9d6219b52a3fb39742`. Ready deployment `dpl_5znWdTiecQjPMyyS56qBVc4YiAcv` at [its immutable URL](https://pl-predictions-5qo9i5lbh-vdoshi96s-projects.vercel.app) received the [stable production alias](https://pl-predictions-2026.vercel.app), and deployment-ID read-back proved the mapping.
+- Passed the guarded five-browser production smoke with only read-only same-origin methods. A separate raw-SQL computation of the four candidate pools matched 112 rendered assignments across desktop and 390-pixel mobile, including pending missing ratings and exact page containment.
+- Captured production read-only at `2026-08-25T02:23:18.996448Z`, WAL `0/FA28990`. No tracked season row was created or updated after deployment. The 14/280/98 prediction shape, active standings pointer with eight snapshots and 160 facts, exact result pointers with 32 snapshots and 1,883 immutable facts, zero aliases, and 75 existing audits remained intact. Bounded exact-deployment error, fatal, and HTTP-500 queries were empty. No migration, seed, result republish, snapshot transition, or production database mutation ran.
+
 ## 2026-08-23
 
 - Completed an interaction-first UI/UX audit of all 13 public, participant, receipt-only, login, and authenticated administrator routes using desktop and mobile Chromium. The manifest records 117 entries, 47 interaction-first snapshots, 113 screenshots, 35 console reads, and 30 network probes. Production was read-only; participant round trips and administrator previews used the isolated test database.

@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="generated-by" content="scripts/generate-docs-html.mjs" />
     <meta name="canonical-source" content="QA.md" />
-    <meta name="canonical-source-sha256" content="0ea5dedee2c70443bb33dc992a1f11724cba9aa3abb9e11db7de571e8d5c140a" />
+    <meta name="canonical-source-sha256" content="12b8d63ea77646fb90f4adb952cda6729c538881675f9c66135fc8ba0f2d1b1c" />
     <title>Quality assurance</title>
     <style>
       :root { color-scheme: light dark; font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
@@ -66,8 +66,16 @@
 <td>The optimized production-server journey passes desktop Chromium and exact 320- and 430-pixel Chromium. It exercises <code>/spotlight</code>, a revealed <code>/entries/[id]</code> detail, and <code>/admin/results</code>; confirms the two player-rating views contain only their respective picked-player pools after union seeding; and finds no page-level horizontal overflow. The first strengthened run exposed a 526-pixel administrator-table overflow at both mobile widths; stacked mobile editor rows fixed it before the final three-project pass. The server emitted the repository&#39;s documented destination-stream closure diagnostics while all final assertions passed.</td>
 </tr>
 <tr>
-<td>Release boundary</td>
-<td>No schema, migration, seed, result republish, snapshot transition, or production database mutation is required. Local browser setup migrated and seeded only the configured isolated test database. Production deployment and read-only acceptance remain pending.</td>
+<td>GitHub and deployment</td>
+<td><a href="https://github.com/vdoshi96/Pl-predictions/pull/43">PR #43</a> passed both Vercel checks and merged as <code>0abe166dc043820dc5201c9d6219b52a3fb39742</code>. Exact production deployment <code>dpl_5znWdTiecQjPMyyS56qBVc4YiAcv</code> became Ready at <a href="https://pl-predictions-5qo9i5lbh-vdoshi96s-projects.vercel.app">its immutable URL</a>. The documented <a href="https://pl-predictions-2026.vercel.app">stable production alias</a> was explicitly assigned, and deployment-ID read-back proved the mapping.</td>
+</tr>
+<tr>
+<td>Production acceptance</td>
+<td>The guarded anonymous smoke passed desktop Chromium, 390-pixel mobile Chromium, exact 320/430-pixel Chromium reflow, and mobile WebKit with only read-only same-origin methods. A separate raw-SQL recomputation produced all four picked-subject pools directly from revealed picks, the active standings, and the active rating snapshot. It matched 112 rendered entry assignments across desktop and 390-pixel mobile, including pending picked players without ratings, and found exact document containment. Bounded exact-deployment error, fatal, and HTTP-500 log queries returned no records.</td>
+</tr>
+<tr>
+<td>Production immutability</td>
+<td>Read-only capture at <code>2026-08-25T02:23:18.996448Z</code>, WAL <code>0/FA28990</code>, found zero tracked season rows created or updated after the deployment cutoff. The 14 prediction parents, 280 table rows, and 98 category picks remained intact. Standings retained active snapshot <code>53a81348-c10a-52ed-9e84-c100ab7852fb</code>, eight snapshots, and 160 facts. Active/working result pointers remained goals <code>cf8d8f0f-6eef-4f68-aff4-0ba73975d3b7</code>, assists <code>7ab74287-33d0-45ed-8353-2667d3d8eb1f</code>, clean sheets <code>3d973c79-bdbf-487c-896d-2b6d6181e511</code>, and ratings <code>3ce246be-d8fc-40a0-bcdf-94a3734b514d</code>. The database retained 32 result snapshots, 1,883 facts, zero live or pinned aliases, no final pointer, and 75 existing audits. No migration, seed, result republish, snapshot transition, participant write, administrator action, lock, reveal, standings import, or production database mutation ran.</td>
 </tr>
 </tbody></table>
 <h2 id="august-23-complete-uiux-audit-and-motion-remediation">August 23 complete UI/UX audit and motion remediation</h2>
@@ -812,7 +820,7 @@
 <li><input checked="" disabled="" type="checkbox"> Regenerate final HTML peers, publish this closeout through <code>main</code>, synchronize local and remote <code>main</code>, and remove completed branch state.</li>
 </ul>
 
-      <p class="source">Generated deterministically from <a href="QA.md">docs/QA.md</a>. Canonical SHA-256: <code>0ea5dedee2c70443bb33dc992a1f11724cba9aa3abb9e11db7de571e8d5c140a</code>.</p>
+      <p class="source">Generated deterministically from <a href="QA.md">docs/QA.md</a>. Canonical SHA-256: <code>12b8d63ea77646fb90f4adb952cda6729c538881675f9c66135fc8ba0f2d1b1c</code>.</p>
     </main>
   </body>
 </html>

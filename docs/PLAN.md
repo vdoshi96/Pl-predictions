@@ -1,12 +1,14 @@
 # Implementation plan
 
-## Picked-subject opinion rankings (implemented 2026-08-24; release verification pending)
+## Picked-subject opinion rankings (released 2026-08-24)
 
 1. Build a separate distinct picked-subject pool for each player and team opinion category across every active season bracket.
 2. Filter shared player-rating facts and all-bracket team expectation indexes to the relevant pool before assigning competition ranks. Keep a missing picked-player rating pending.
 3. Make the administrator ratings desk show the two category pools, synchronize shared-player edits, filter full-list pastes, and require exactly the union of resolved picked players in new drafts.
 4. Preserve the schema, sealed snapshots, pinned aliases, compare-and-swap transitions, action payloads, current-`N` points curve, and league-wide factual categories.
 5. Verify unit, component, isolated integration, build, documentation parity, and desktop/mobile post-kickoff journeys before release. Then recompute production ranks independently and confirm read-only that result and prediction records did not change.
+
+Items 1–5 are complete. [PR #43](https://github.com/vdoshi96/Pl-predictions/pull/43) merged as `0abe166dc043820dc5201c9d6219b52a3fb39742`; Ready deployment `dpl_5znWdTiecQjPMyyS56qBVc4YiAcv` owns the stable production alias. The five-browser read-only smoke and 112-assignment independent production recomputation pass. Read-only database capture finds no post-deployment writes and preserves the exact prediction, standings, snapshot, fact, alias, audit, and pointer state.
 
 ## August 23 Win Streak live release
 

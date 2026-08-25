@@ -235,6 +235,12 @@ describe("SpotlightResultsDesk", () => {
   it("renders five row-by-row tables and keeps both ratings views synchronized", () => {
     renderDesk();
 
+    expect(
+      screen.getByText(
+        /Goals, assists, and clean sheets must cover exactly rank 2, including boundary ties\. Player ratings must cover every picked opinion player\./u,
+      ),
+    ).toBeVisible();
+
     const resultTables = screen.getAllByRole("table");
     expect(resultTables).toHaveLength(5);
     for (const table of resultTables) {

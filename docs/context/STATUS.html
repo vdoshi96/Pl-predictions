@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="generated-by" content="scripts/generate-docs-html.mjs" />
     <meta name="canonical-source" content="STATUS.md" />
-    <meta name="canonical-source-sha256" content="14c9de3bc5008a7039cd4858f571de49fca6b51e68e5ee1c6d82bca468696250" />
+    <meta name="canonical-source-sha256" content="666b84eaff39bedb5425af6f1f865d4e8888e951e5d54a1e741ec8a0a6426f3e" />
     <title>Status</title>
     <style>
       :root { color-scheme: light dark; font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
@@ -41,6 +41,12 @@
     <main>
       <h1 id="status">Status</h1>
 <ul>
+<li><p>Pending release (2026-08-24): each opinion category now ranks only its distinct picked subjects. Underdog and overrated players use separate filtered views of the active shared rating snapshot. Team expectation indexes still use every complete bracket before their candidate lists are filtered to the relevant team picks. Existing public ranks recalculate at read time without rewriting or republishing sealed result snapshots.</p>
+</li>
+<li><p>Picked-subject local verification: documentation parity for 18 pairs, the 580-player/578-portrait validator, formatting, ESLint, strict TypeScript, 419 unit/component tests with 33 guarded skips, all 31 isolated Neon integration tests, and the Webpack production build pass. A focused optimized-browser matrix passes <code>/spotlight</code>, revealed entry details, and <code>/admin/results</code> at desktop, 320 pixels, and 430 pixels with category-separated rating pools and no page overflow.</p>
+</li>
+<li><p>Picked-subject release boundary: no schema, migration, seed, result snapshot transition, or production database mutation is needed. Deployment and read-only production rank and immutability verification remain pending.</p>
+</li>
 <li><p>Current UI/UX release (2026-08-23): <a href="https://github.com/vdoshi96/Pl-predictions/pull/41">PR #41</a> merged as <code>a09798709e461fff511ea4712a3b1a8bb9649f86</code>. A complete interaction-first audit covers all 13 UI routes with 117 timestamped manifest entries across desktop, mobile, anonymous, receipt-holder, and administrator states. It fixes the Rules carousel&#39;s serious accessibility failure and 768-pixel document overflow, adds keyboard-visible containment, and clarifies searchable-dropdown, prediction-stage, confirmation-dialog, overlay, and success state changes with reduced-motion-safe transitions. The canonical evidence is <code>docs/ux-audit-2026-08-23.md</code> and its generated HTML peer.</p>
 </li>
 <li><p>UI/UX local verification: the uninterrupted <code>CI=1 npm run check</code> passes parity for 18 documentation pairs, the 580-player/578-portrait validator, formatting, ESLint, strict TypeScript, 414 unit/component tests with 31 guarded skips, all 29 isolated Neon integration tests, the Webpack production build, 24 pre-kickoff browser journeys with 26 intentional routing skips, and three post-kickoff journeys with two intentional skips. Separate route, responsive, axe, console, network, offline, reduced-motion, and state-transition probes also pass against the optimized build.</p>
@@ -95,7 +101,7 @@
 </li>
 <li><p>Local catalogue delivery remediation: the initial homepage server path reads explicit season fields and the 20 clubs without querying or serializing the player catalogue. Stage 2 lazily requests the dynamic same-origin catalogue route, which SQL-filters active current-season players and returns the minimal display/search shape. Submission validation queries only player IDs referenced by the submitted picks.</p>
 </li>
-<li><p>Manual result remediation: <code>/admin/results</code> presents top scorer, top assister, club clean sheets, underdog player, and overrated player as five tables backed by four factual datasets. Shared player ratings synchronize the high/low views. Save creates a sealed immutable working snapshot with exact pinned Other-name aliases; publish/finalize/undo use CAS pointers and atomic audits. Publication requires permanent closure/reveal, at least one active bracket, current-<code>N</code> coverage with boundary ties, every relevant alias, and explicit attestation. Missing/unresolved data remains pending; an omitted canonical subject becomes outside-range zero only after a complete snapshot publishes.</p>
+<li><p>Manual result remediation: <code>/admin/results</code> presents top scorer, top assister, club clean sheets, underdog player, and overrated player as five tables backed by four factual datasets. Shared player ratings synchronize category-filtered high/low views. A rating draft contains exactly the union of resolved picked opinion players and requires a rating for each one. Save creates a sealed immutable working snapshot with exact pinned Other-name aliases; publish/finalize/undo use CAS pointers and atomic audits. Publication requires permanent closure/reveal, at least one active bracket, every relevant alias, and explicit attestation. Goals, assists, and clean sheets retain current-<code>N</code> coverage with boundary ties. Missing or unresolved picked ratings remain pending.</p>
 </li>
 <li><p>Administrator paste-entry iteration: <code>/admin/standings</code> accepts a reviewed 20-club text table only after alias resolution, numeric classification, complete-permutation validation, and an active-table diff. <code>/admin/results</code> can seed distinct submitted subjects, parse reviewed integer or rating lists, retain skipped lines for attention, and show an exact draft-versus-published diff before the owner attests. The combined action saves first and publishes the returned immutable snapshot; a publish failure leaves that saved working draft recoverable.</p>
 </li>
@@ -119,7 +125,7 @@
 </li>
 <li><p>Leaderboard and privacy: the main leaderboard uses table points only and has a 100-point maximum. <code>/spotlight</code> tracks separate fun accuracy. Before reveal, identifiers, positions 2–20, spotlight picks, and hidden accuracy ordering remain private. Only complete persisted entries contribute to the bracket count and eventual rankings.</p>
 </li>
-<li><p>Scoring: the predicted champion remains table position 1 without a separate bonus. With <code>N</code> active, nondeleted brackets, spotlight accuracy is <code>max(0, N + 1 - outcome rank)</code> and sums only resolved categories. Equal overall scores share a competition rank. Team underdog uses <code>average predicted position - actual position</code>; overrated uses the inverse.</p>
+<li><p>Scoring: the predicted champion remains table position 1 without a separate bonus. With <code>N</code> active, nondeleted brackets, spotlight accuracy is <code>max(0, N + 1 - outcome rank)</code> and sums only resolved categories. Equal overall scores share a competition rank. Each opinion category ranks only its distinct picked subjects. Team underdog uses <code>average predicted position - actual position</code>; overrated uses the inverse, with indexes still derived from every complete bracket.</p>
 </li>
 <li><p>Production result inputs: the 2026-08-22 read-only preflight found active provisional snapshots for all four factual datasets that back the five result views: six snapshots, 109 items, zero pinned aliases, and no final dataset. The roster snapshot remains selector input rather than an outcome feed; future Other-player spellings still require exact canonical mapping before publication.</p>
 </li>
@@ -141,7 +147,7 @@
 </li>
 </ul>
 
-      <p class="source">Generated deterministically from <a href="STATUS.md">docs/context/STATUS.md</a>. Canonical SHA-256: <code>14c9de3bc5008a7039cd4858f571de49fca6b51e68e5ee1c6d82bca468696250</code>.</p>
+      <p class="source">Generated deterministically from <a href="STATUS.md">docs/context/STATUS.md</a>. Canonical SHA-256: <code>666b84eaff39bedb5425af6f1f865d4e8888e951e5d54a1e741ec8a0a6426f3e</code>.</p>
     </main>
   </body>
 </html>

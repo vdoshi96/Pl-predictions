@@ -9,6 +9,7 @@ import {
   predictionCategoryPicks,
   predictionItems,
   predictions,
+  players,
   seasons,
   standingsItems,
   standingsSnapshots,
@@ -37,11 +38,16 @@ type QaFixture = {
 function spotlightRowsFor(
   predictionId: string,
   seasonTeams: readonly (typeof teams.$inferSelect)[],
+  opinionPlayers: readonly (typeof players.$inferSelect)[],
   label: string,
 ): (typeof predictionCategoryPicks.$inferInsert)[] {
   const [underdogTeam, overratedTeam, cleanSheetsTeam] = seasonTeams;
   if (!underdogTeam || !overratedTeam || !cleanSheetsTeam) {
     throw new Error("Three seeded teams are required for spotlight picks.");
+  }
+  const [underdogPlayer, overratedPlayer] = opinionPlayers;
+  if (!underdogPlayer || !overratedPlayer) {
+    throw new Error("Two seeded players are required for opinion picks.");
   }
 
   return [
@@ -74,14 +80,12 @@ function spotlightRowsFor(
     },
     {
       category: "underdog_player",
-      customPlayerName: `${label} underdog`,
-      normalizedCustomPlayerName: `${label} underdog`.toLowerCase(),
+      playerId: underdogPlayer.id,
       predictionId,
     },
     {
       category: "overrated_player",
-      customPlayerName: `${label} overrated`,
-      normalizedCustomPlayerName: `${label} overrated`.toLowerCase(),
+      playerId: overratedPlayer.id,
       predictionId,
     },
   ];
@@ -257,6 +261,13 @@ test("post-kickoff table and spotlight rankings stay split at desktop and mobile
   expect(seasonTeams).toHaveLength(20);
   expect(seasonTeams[0]?.slug).toBe("arsenal");
   expect(seasonTeams[1]?.slug).toBe("aston-villa");
+  const seasonPlayers = await db
+    .select()
+    .from(players)
+    .where(eq(players.seasonId, originalSeason!.id))
+    .orderBy(asc(players.displayName))
+    .limit(4);
+  expect(seasonPlayers).toHaveLength(4);
 
   const runId = randomUUID();
   const suffix = runId.slice(0, 8);
@@ -312,8 +323,18 @@ test("post-kickoff table and spotlight rankings stay split at desktop and mobile
   await db
     .insert(predictionCategoryPicks)
     .values([
-      ...spotlightRowsFor(predictionIds[0], seasonTeams, `${suffix} exact`),
-      ...spotlightRowsFor(predictionIds[1], seasonTeams, `${suffix} swapped`),
+      ...spotlightRowsFor(
+        predictionIds[0],
+        seasonTeams,
+        seasonPlayers.slice(0, 2),
+        `${suffix} exact`,
+      ),
+      ...spotlightRowsFor(
+        predictionIds[1],
+        seasonTeams,
+        seasonPlayers.slice(2, 4),
+        `${suffix} swapped`,
+      ),
     ]);
   await db.insert(standingsSnapshots).values({
     capturedAt: preKickoffCapturedAt,
@@ -556,5 +577,80 @@ test("post-kickoff table and spotlight rankings stay split at desktop and mobile
       underdogAccuracyEntry.getByText("4", { exact: true }),
     ).toHaveCount(0);
   }
+  await expectNoHorizontalOverflow(page);
+
+  await page.goto(`/entries/${predictionIds[0]}`, {
+    waitUntil: "networkidle",
+  });
+  await expect(
+    page.getByRole("heading", {
+      level: 1,
+      name: `${exactName}'s prediction`,
+    }),
+  ).toBeVisible();
+  await expect(
+    page.getByText(seasonPlayers[0]!.displayName, { exact: true }),
+  ).toBeVisible();
+  await expect(
+    page.getByText(seasonPlayers[1]!.displayName, { exact: true }),
+  ).toBeVisible();
+  await expect(
+    page.getByText("Index +0.5 · Result rank 1 · 2 accuracy pts", {
+      exact: true,
+    }),
+  ).toHaveCount(2);
+  await expectNoHorizontalOverflow(page);
+
+  const adminSecret =
+    process.env.PLAYWRIGHT_ADMIN_PASSWORD ?? process.env.ADMIN_SECRET;
+  expect(
+    adminSecret,
+    "PLAYWRIGHT_ADMIN_PASSWORD or ADMIN_SECRET must be available for E2E",
+  ).toBeTruthy();
+  await page.goto("/admin/login");
+  await page.getByLabel("Username").fill("admin");
+  await page.getByLabel("Password").fill(adminSecret!);
+  await page.getByRole("button", { name: "Sign in securely" }).click();
+  await expect(page).toHaveURL(/\/admin$/u);
+  await page.goto("/admin/results", { waitUntil: "networkidle" });
+  await page.getByRole("button", { name: "Seed picked players" }).click();
+
+  const underdogRatings = page
+    .getByRole("heading", { level: 3, name: "Underdog player ratings" })
+    .locator("xpath=ancestor::section");
+  const overratedRatings = page
+    .getByRole("heading", { level: 3, name: "Overrated player ratings" })
+    .locator("xpath=ancestor::section");
+  await expect(underdogRatings.getByRole("spinbutton")).toHaveCount(2);
+  await expect(overratedRatings.getByRole("spinbutton")).toHaveCount(2);
+  for (const player of [seasonPlayers[0]!, seasonPlayers[2]!]) {
+    await expect(
+      underdogRatings.getByText(
+        new RegExp(`^Selected: ${player.displayName}`, "u"),
+      ),
+    ).toBeVisible();
+    await expect(
+      overratedRatings.getByText(
+        new RegExp(`^Selected: ${player.displayName}`, "u"),
+      ),
+    ).toHaveCount(0);
+  }
+  for (const player of [seasonPlayers[1]!, seasonPlayers[3]!]) {
+    await expect(
+      overratedRatings.getByText(
+        new RegExp(`^Selected: ${player.displayName}`, "u"),
+      ),
+    ).toBeVisible();
+    await expect(
+      underdogRatings.getByText(
+        new RegExp(`^Selected: ${player.displayName}`, "u"),
+      ),
+    ).toHaveCount(0);
+  }
+  await expect(
+    page.getByText("All 4 picked opinion players have a rating.", {
+      exact: true,
+    }),
+  ).toBeVisible();
   await expectNoHorizontalOverflow(page);
 });

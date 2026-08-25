@@ -311,9 +311,9 @@ function EditableResultTable({
           Add row
         </Button>
       </div>
-      <div className="border-border max-w-full overflow-x-auto rounded-xl border">
-        <table className="w-full min-w-[36rem] border-collapse text-left text-sm">
-          <thead className="bg-surface-subtle text-muted text-xs tracking-wide uppercase">
+      <div className="border-border w-full min-w-0 overflow-x-auto rounded-xl border">
+        <table className="w-full border-collapse text-left text-sm sm:min-w-[36rem]">
+          <thead className="bg-surface-subtle text-muted hidden text-xs tracking-wide uppercase sm:table-header-group">
             <tr>
               <th className="w-16 px-3 py-3" scope="col">
                 Rank
@@ -331,9 +331,15 @@ function EditableResultTable({
           </thead>
           <tbody className="divide-y divide-slate-100">
             {ranked.map((row) => (
-              <tr key={row.subjectId}>
-                <td className="text-muted px-3 py-2 font-black">{row.rank}</td>
-                <td className="px-3 py-2">
+              <tr
+                className="grid min-w-0 grid-cols-[2rem_minmax(0,1fr)] gap-x-2 gap-y-3 p-3 sm:table-row sm:p-0"
+                key={row.subjectId}
+              >
+                <td className="text-muted px-0 py-0 pt-1 font-black sm:px-3 sm:py-2">
+                  <span className="sr-only sm:hidden">Rank </span>
+                  {row.rank}
+                </td>
+                <td className="min-w-0 px-0 py-0 sm:px-3 sm:py-2">
                   <SearchablePredictionSelect
                     description="Search this season's reviewed subjects."
                     disabled={disabled}
@@ -349,7 +355,7 @@ function EditableResultTable({
                     value={row.subjectId}
                   />
                 </td>
-                <td className="px-3 py-2">
+                <td className="col-start-2 min-w-0 px-0 py-0 sm:table-cell sm:px-3 sm:py-2">
                   <input
                     aria-label={`${title} ${METRIC_LABELS[dataset]} for ${labelBySubjectId.get(row.subjectId) ?? "subject"}`}
                     className="border-border bg-surface focus:border-accent focus:ring-accent/30 disabled:bg-surface-subtle min-h-11 w-full rounded-xl border px-3 outline-none focus:ring-2"
@@ -366,7 +372,7 @@ function EditableResultTable({
                     value={row.metricValue}
                   />
                 </td>
-                <td className="px-3 py-2 text-right">
+                <td className="col-start-2 px-0 py-0 text-right sm:table-cell sm:px-3 sm:py-2">
                   <Button
                     aria-label={`Remove ${labelBySubjectId.get(row.subjectId) ?? "result row"}`}
                     disabled={disabled}
@@ -386,8 +392,11 @@ function EditableResultTable({
               </tr>
             ))}
             {ranked.length === 0 ? (
-              <tr>
-                <td className="text-muted px-3 py-6 text-center" colSpan={4}>
+              <tr className="block sm:table-row">
+                <td
+                  className="text-muted block px-3 py-6 text-center sm:table-cell"
+                  colSpan={4}
+                >
                   Add the first reviewed row.
                 </td>
               </tr>
@@ -1091,9 +1100,10 @@ export function SpotlightResultsDesk({
               <h2 className="text-foreground font-black">Publication gate</h2>
               <p className="text-muted mt-1 text-sm leading-6">
                 {seasonName} has {bracketCount} submitted bracket
-                {bracketCount === 1 ? "" : "s"}. Every published list must be
-                complete through exactly rank {bracketCount || "N"}, including
-                boundary ties.
+                {bracketCount === 1 ? "" : "s"}. Goals, assists, and clean
+                sheets must cover exactly rank {bracketCount || "N"}, including
+                boundary ties. Player ratings must cover every picked opinion
+                player.
               </p>
             </div>
             <Badge

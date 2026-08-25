@@ -804,9 +804,9 @@ describe.runIf(enabled)("spotlight result transitions", () => {
     expect(
       assignments.get(predictionIds[3])?.get("overrated_player"),
     ).toMatchObject({
-      accuracyPoints: 0,
-      metricLabel: "Outside lowest 4",
-      resultRank: 5,
+      accuracyPoints: 3,
+      metricLabel: "Rating 9.123",
+      resultRank: 2,
     });
     expect(outcomeLeaders.liveCategories).toEqual(
       expect.arrayContaining([
@@ -827,14 +827,29 @@ describe.runIf(enabled)("spotlight result transitions", () => {
       subject: "player",
     });
 
-    await db.delete(predictions).where(eq(predictions.id, predictionIds[1]));
+    const singleEntryAssignments = await getManualResultAssignments(
+      seasonId,
+      [predictionIds[3]],
+      4,
+    );
+    expect(
+      singleEntryAssignments.get(predictionIds[3])?.get("underdog_player"),
+    ).toMatchObject({ accuracyPoints: 3, resultRank: 2 });
+    expect(
+      singleEntryAssignments.get(predictionIds[3])?.get("overrated_player"),
+    ).toMatchObject({ accuracyPoints: 3, resultRank: 2 });
+
+    await db.delete(predictions).where(eq(predictions.id, predictionIds[3]));
     const afterDeletion = await getManualResultAssignments(
       seasonId,
-      [predictionIds[0], predictionIds[2], predictionIds[3]],
+      [predictionIds[0], predictionIds[1], predictionIds[2]],
       3,
     );
     expect(
       afterDeletion.get(predictionIds[0])?.get("top_scorer"),
+    ).toMatchObject({ accuracyPoints: 3, resultRank: 1 });
+    expect(
+      afterDeletion.get(predictionIds[0])?.get("overrated_player"),
     ).toMatchObject({ accuracyPoints: 3, resultRank: 1 });
   });
 

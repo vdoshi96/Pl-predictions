@@ -14,7 +14,7 @@ import {
   assignSharedRanks,
   calculateTeamExpectationIndexes,
   isStandingsScoringActive,
-  rankTeamExpectationIndexes,
+  rankPickedTeamExpectationIndexes,
   scoreCategoryRank,
   scorePredictionIfActive,
   type RankedLeaderboardEntry,
@@ -116,11 +116,18 @@ type PredictionItemForConsensus = {
   teamId: string;
 };
 
+type TeamOpinionPick = Readonly<{
+  category: "overrated_team" | "underdog_team";
+  predictionId: string;
+  teamId: string;
+}>;
+
 function buildRankedTeamResults(
   entryIds: readonly string[],
   itemsByPrediction: ReadonlyMap<string, readonly PredictionItemForConsensus[]>,
   actualTable: readonly { actualPosition: number; teamId: string }[],
   scoringActive: boolean,
+  teamOpinionPicks: readonly TeamOpinionPick[],
 ): RankedTeamResults {
   const expectationIndexes = scoringActive
     ? calculateTeamExpectationIndexes(
@@ -131,15 +138,25 @@ function buildRankedTeamResults(
 
   return {
     overratedByTeamId: new Map(
-      rankTeamExpectationIndexes(expectationIndexes, "overrated").map(
-        (item) => [
-          item.teamId,
-          { index: item.overratedIndex, rank: item.rank },
-        ],
-      ),
+      rankPickedTeamExpectationIndexes(
+        expectationIndexes,
+        teamOpinionPicks.flatMap((pick) =>
+          pick.category === "overrated_team" ? [pick.teamId] : [],
+        ),
+        "overrated",
+      ).map((item) => [
+        item.teamId,
+        { index: item.overratedIndex, rank: item.rank },
+      ]),
     ),
     underdogByTeamId: new Map(
-      rankTeamExpectationIndexes(expectationIndexes, "underdog").map((item) => [
+      rankPickedTeamExpectationIndexes(
+        expectationIndexes,
+        teamOpinionPicks.flatMap((pick) =>
+          pick.category === "underdog_team" ? [pick.teamId] : [],
+        ),
+        "underdog",
+      ).map((item) => [
         item.teamId,
         { index: item.underdogIndex, rank: item.rank },
       ]),
@@ -260,12 +277,13 @@ export async function getEntrySpotlightPicksWithAccuracy({
         db
           .select({
             category: predictionCategoryPicks.category,
+            predictionId: predictionCategoryPicks.predictionId,
             teamId: predictionCategoryPicks.teamId,
           })
           .from(predictionCategoryPicks)
           .where(
             and(
-              eq(predictionCategoryPicks.predictionId, predictionId),
+              inArray(predictionCategoryPicks.predictionId, entryIds),
               inArray(predictionCategoryPicks.category, [
                 "underdog_team",
                 "overrated_team",
@@ -286,9 +304,22 @@ export async function getEntrySpotlightPicksWithAccuracy({
     itemsByPrediction,
     actualTable,
     teamScoringActive,
+    teamPickRows.flatMap((pick) =>
+      pick.teamId &&
+      (pick.category === "underdog_team" || pick.category === "overrated_team")
+        ? [
+            {
+              category: pick.category,
+              predictionId: pick.predictionId,
+              teamId: pick.teamId,
+            },
+          ]
+        : [],
+    ),
   );
   const resultByCategory = new Map(
     teamPickRows.flatMap((pick) => {
+      if (pick.predictionId !== predictionId) return [];
       const result = availableTeamResult(
         pick.category,
         pick.teamId,
@@ -552,6 +583,18 @@ export async function getLeaderboardView(): Promise<LeaderboardView> {
     itemsByPrediction,
     actualTable,
     scoringActive,
+    teamSpotlightRows.flatMap((pick) =>
+      pick.teamId &&
+      (pick.category === "underdog_team" || pick.category === "overrated_team")
+        ? [
+            {
+              category: pick.category,
+              predictionId: pick.predictionId,
+              teamId: pick.teamId,
+            },
+          ]
+        : [],
+    ),
   );
   const rankedTeamPicksByPredictionId = manualResultAssignments;
 

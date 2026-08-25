@@ -30,8 +30,6 @@ import {
   type CategoryOutcomeLeader,
 } from "@/features/results/queries";
 import { getActiveSeasonContext } from "@/features/seasons/queries";
-import { getSeasonTableView } from "@/features/standings/season-table";
-import { formatExpectationIndex } from "@/features/standings/season-table-view";
 import { formatChicagoUtcDateTime } from "@/shared/format";
 
 export const metadata: Metadata = { title: "Spotlight accuracy" };
@@ -132,43 +130,31 @@ export default async function SpotlightPage({
     })
   ) {
     const { season } = await getActiveSeasonContext();
-    const [outcomes, aliases, seasonTable] = await Promise.all([
+    const [outcomes, aliases] = await Promise.all([
       getCategoryOutcomeLeaders(season.id, view.entries.length),
       getActiveSpotlightAliasResolutions(season.id),
-      getSeasonTableView(),
     ]);
     Object.assign(categoryLeaders, outcomes.leaders);
     liveCategories = [...outcomes.liveCategories];
     categoryBoards = buildSpotlightCategoryBoard(entries, { aliases });
 
-    if (seasonTable.consensusActive) {
-      liveCategories.push("underdog_team", "overrated_team");
-      const overachiever = seasonTable.callouts.overachiever;
-      const underachiever = seasonTable.callouts.underachiever;
-      if (overachiever) {
-        categoryLeaders.underdog_team = {
-          assetPath: overachiever.team.assetPath,
-          category: "underdog_team",
-          displayName: overachiever.team.displayName,
-          metricLabel: formatExpectationIndex(
-            overachiever.avgPredicted - overachiever.actualPosition,
-          ),
-          shortName: overachiever.team.shortName,
-          subject: "team",
-        };
-      }
-      if (underachiever) {
-        categoryLeaders.overrated_team = {
-          assetPath: underachiever.team.assetPath,
-          category: "overrated_team",
-          displayName: underachiever.team.displayName,
-          metricLabel: formatExpectationIndex(
-            underachiever.actualPosition - underachiever.avgPredicted,
-          ),
-          shortName: underachiever.team.shortName,
-          subject: "team",
-        };
-      }
+    for (const category of ["underdog_team", "overrated_team"] as const) {
+      const board = categoryBoards.find(
+        (candidate) => candidate.category === category,
+      );
+      const leader = board?.rows.find(
+        (row) => row.resultStatus === "ranked" && row.resultRank === 1,
+      );
+      if (!leader || !leader.metricLabel) continue;
+      liveCategories.push(category);
+      categoryLeaders[category] = {
+        assetPath: leader.assetPath,
+        category,
+        displayName: leader.displayName,
+        metricLabel: leader.metricLabel,
+        shortName: leader.shortName,
+        subject: "team",
+      };
     }
   }
 

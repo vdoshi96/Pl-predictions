@@ -23,7 +23,7 @@ import {
   isSpotlightResultDataset,
   SPOTLIGHT_RESULT_DATASETS,
 } from "@/features/results";
-import { getPickedSubjectsByDataset } from "@/features/results/seed-queries";
+import { getPickedSubjectsByCategory } from "@/features/results/seed-queries";
 import {
   getActiveSeasonContext,
   getSeasonTeams,
@@ -101,7 +101,7 @@ export default async function AdminResultsPage() {
       })
       .from(spotlightResultAliases)
       .where(eq(spotlightResultAliases.seasonId, season.id)),
-    getPickedSubjectsByDataset(season.id),
+    getPickedSubjectsByCategory(season.id, { resolveAliases: false }),
   ]);
 
   const stateByDataset = new Map(

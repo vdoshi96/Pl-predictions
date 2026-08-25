@@ -11,9 +11,13 @@ import {
   predictionCategoryPicks,
   predictions,
   seasons,
+  spotlightResultAliases,
   teams,
 } from "@/db/schema";
-import { getPickedSubjectsByDataset } from "@/features/results/seed-queries";
+import {
+  getPickedSubjectsByCategory,
+  getPickedSubjectsByDataset,
+} from "@/features/results/seed-queries";
 
 import { assertIsolatedDatabaseEnvironment } from "../test-environment-safety";
 
@@ -186,6 +190,17 @@ describe.runIf(enabled)("getPickedSubjectsByDataset", () => {
     );
   });
 
+  it("keeps opinion-player picks separate by category", async () => {
+    const picked = await getPickedSubjectsByCategory(seasonId);
+    expect([...picked.underdog_player].sort()).toEqual(
+      [haalandId, wilsonId].sort(),
+    );
+    expect([...picked.overrated_player].sort()).toEqual(
+      [haalandId, wilsonId].sort(),
+    );
+    expect([...picked.top_scorer].sort()).toEqual([haalandId, salahId].sort());
+  });
+
   it("excludes Other-player spellings that have no resolved player id", async () => {
     const predictionId = randomUUID();
     await getDb()
@@ -206,5 +221,33 @@ describe.runIf(enabled)("getPickedSubjectsByDataset", () => {
     const picked = await getPickedSubjectsByDataset(seasonId);
     expect(picked.goals).not.toContain("zlatan");
     expect([...picked.goals].sort()).toEqual([haalandId, salahId].sort());
+  });
+
+  it("includes an Other-player pick after the owner resolves its alias", async () => {
+    const predictionId = randomUUID();
+    await getDb()
+      .insert(predictions)
+      .values({
+        id: predictionId,
+        normalizedParticipantName: `seed alias ${predictionId.slice(0, 8)}`,
+        participantName: `Seed Alias ${predictionId.slice(0, 8)}`,
+        seasonId,
+      });
+    await getDb().insert(predictionCategoryPicks).values({
+      category: "underdog_player",
+      customPlayerName: "Resolved Other",
+      normalizedCustomPlayerName: "resolved other",
+      predictionId,
+    });
+    await getDb().insert(spotlightResultAliases).values({
+      customPlayerName: "Resolved Other",
+      normalizedCustomPlayerName: "resolved other",
+      playerId: salahId,
+      seasonId,
+    });
+
+    const picked = await getPickedSubjectsByCategory(seasonId);
+    expect(picked.underdog_player).toContain(salahId);
+    expect(picked.overrated_player).not.toContain(salahId);
   });
 });

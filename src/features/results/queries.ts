@@ -5,6 +5,7 @@ import { and, eq, inArray, isNotNull } from "drizzle-orm";
 import { getDb } from "@/db/client";
 import {
   predictionCategoryPicks,
+  predictions,
   players,
   spotlightResultItems,
   spotlightResultSnapshotAliases,
@@ -129,28 +130,59 @@ export async function getCategoryOutcomeLeaders(
   if (snapshots.length === 0) {
     return { leaders: {}, liveCategories: [] };
   }
-  const itemRows = await db
-    .select({
-      metricValue: spotlightResultItems.metricValue,
-      outcomeRank: spotlightResultItems.outcomeRank,
-      playerAssetPath: players.assetPath,
-      playerDisplayName: players.displayName,
-      playerId: spotlightResultItems.playerId,
-      snapshotId: spotlightResultItems.snapshotId,
-      teamAssetPath: teams.assetPath,
-      teamDisplayName: teams.displayName,
-      teamId: spotlightResultItems.teamId,
-      teamShortName: teams.shortName,
-    })
-    .from(spotlightResultItems)
-    .leftJoin(players, eq(players.id, spotlightResultItems.playerId))
-    .leftJoin(teams, eq(teams.id, spotlightResultItems.teamId))
-    .where(
-      inArray(
-        spotlightResultItems.snapshotId,
-        snapshots.map((snapshot) => snapshot.id),
+  const [itemRows, pickRows, aliasRows] = await Promise.all([
+    db
+      .select({
+        metricValue: spotlightResultItems.metricValue,
+        outcomeRank: spotlightResultItems.outcomeRank,
+        playerAssetPath: players.assetPath,
+        playerDisplayName: players.displayName,
+        playerId: spotlightResultItems.playerId,
+        snapshotId: spotlightResultItems.snapshotId,
+        teamAssetPath: teams.assetPath,
+        teamDisplayName: teams.displayName,
+        teamId: spotlightResultItems.teamId,
+        teamShortName: teams.shortName,
+      })
+      .from(spotlightResultItems)
+      .leftJoin(players, eq(players.id, spotlightResultItems.playerId))
+      .leftJoin(teams, eq(teams.id, spotlightResultItems.teamId))
+      .where(
+        inArray(
+          spotlightResultItems.snapshotId,
+          snapshots.map((snapshot) => snapshot.id),
+        ),
       ),
-    );
+    db
+      .select({
+        category: predictionCategoryPicks.category,
+        normalizedCustomPlayerName:
+          predictionCategoryPicks.normalizedCustomPlayerName,
+        playerId: predictionCategoryPicks.playerId,
+        predictionId: predictionCategoryPicks.predictionId,
+        teamId: predictionCategoryPicks.teamId,
+      })
+      .from(predictionCategoryPicks)
+      .innerJoin(
+        predictions,
+        eq(predictions.id, predictionCategoryPicks.predictionId),
+      )
+      .where(eq(predictions.seasonId, seasonId)),
+    db
+      .select({
+        normalizedCustomPlayerName:
+          spotlightResultSnapshotAliases.normalizedCustomPlayerName,
+        playerId: spotlightResultSnapshotAliases.playerId,
+        snapshotId: spotlightResultSnapshotAliases.snapshotId,
+      })
+      .from(spotlightResultSnapshotAliases)
+      .where(
+        inArray(
+          spotlightResultSnapshotAliases.snapshotId,
+          snapshots.map((snapshot) => snapshot.id),
+        ),
+      ),
+  ]);
   const itemsBySnapshot = new Map<string, typeof itemRows>();
   for (const item of itemRows) {
     const group = itemsBySnapshot.get(item.snapshotId) ?? [];
@@ -160,24 +192,63 @@ export async function getCategoryOutcomeLeaders(
   const leaders: Partial<Record<PredictionCategory, CategoryOutcomeLeader>> =
     {};
   const liveCategories = snapshots.flatMap((snapshot) =>
-    categoriesForDataset(snapshot.dataset),
+    snapshot.dataset === "player_ratings"
+      ? []
+      : categoriesForDataset(snapshot.dataset),
   );
 
   for (const snapshot of snapshots) {
     const items = itemsBySnapshot.get(snapshot.id) ?? [];
     for (const category of categoriesForDataset(snapshot.dataset)) {
+      const aliasPlayerIdByName = new Map(
+        aliasRows.flatMap((alias) =>
+          alias.snapshotId === snapshot.id
+            ? [[alias.normalizedCustomPlayerName, alias.playerId] as const]
+            : [],
+        ),
+      );
+      const eligiblePlayerIds = new Set(
+        pickRows.flatMap((pick) => {
+          if (
+            pick.category !== category ||
+            (category !== "underdog_player" && category !== "overrated_player")
+          ) {
+            return [];
+          }
+          const subject = subjectIdForPick(
+            {
+              ...pick,
+              category,
+            },
+            aliasPlayerIdByName,
+          );
+          return subject.identityResolved && subject.id ? [subject.id] : [];
+        }),
+      );
       const leader =
         category === "overrated_player"
           ? rankMetricItems(
               items.flatMap((item) =>
-                item.playerId
+                item.playerId && eligiblePlayerIds.has(item.playerId)
                   ? [{ id: item.playerId, item, metric: item.metricValue }]
                   : [],
               ),
               "ascending",
             ).find((item) => item.rank === 1)?.item
-          : items.find((item) => item.outcomeRank === 1);
+          : category === "underdog_player"
+            ? rankMetricItems(
+                items.flatMap((item) =>
+                  item.playerId && eligiblePlayerIds.has(item.playerId)
+                    ? [{ id: item.playerId, item, metric: item.metricValue }]
+                    : [],
+                ),
+                "descending",
+              ).find((item) => item.rank === 1)?.item
+            : items.find((item) => item.outcomeRank === 1);
       if (!leader) continue;
+      if (category === "underdog_player" || category === "overrated_player") {
+        liveCategories.push(category);
+      }
       const subject = leader.playerId ? "player" : "team";
       const displayName =
         subject === "player"
@@ -292,6 +363,45 @@ export function buildManualResultAssignments({
     string,
     Map<PredictionCategory, ResolvedSpotlightResult>
   >();
+  const ratingSnapshot = snapshotByDataset.get("player_ratings");
+  const rankedRatingByCategory = new Map<
+    "overrated_player" | "underdog_player",
+    Map<string, { item: ActiveResultItem; rank: number }>
+  >();
+  if (ratingSnapshot) {
+    const snapshotAliases =
+      aliasPlayerIdBySnapshot.get(ratingSnapshot.id) ?? new Map();
+    const ratingItems = itemsBySnapshot.get(ratingSnapshot.id) ?? [];
+    for (const category of ["underdog_player", "overrated_player"] as const) {
+      const eligiblePlayerIds = new Set(
+        picks.flatMap((pick) => {
+          if (pick.category !== category) return [];
+          const subject = subjectIdForPick(pick, snapshotAliases);
+          return subject.identityResolved && subject.id ? [subject.id] : [];
+        }),
+      );
+      const ranked = rankMetricItems(
+        ratingItems.flatMap((item) =>
+          item.playerId && eligiblePlayerIds.has(item.playerId)
+            ? [
+                {
+                  id: item.playerId,
+                  item,
+                  metric: item.metricValue,
+                },
+              ]
+            : [],
+        ),
+        category === "overrated_player" ? "ascending" : "descending",
+      );
+      rankedRatingByCategory.set(
+        category,
+        new Map(
+          ranked.map(({ id, item, rank }) => [id, { item, rank }] as const),
+        ),
+      );
+    }
+  }
 
   for (const pick of picks) {
     const dataset = RESULT_DATASET_BY_CATEGORY[pick.category];
@@ -307,26 +417,15 @@ export function buildManualResultAssignments({
 
     let matchingItem: ActiveResultItem | undefined;
     let outcomeRank: number | undefined;
-    if (pick.category === "overrated_player") {
-      const ascending = rankMetricItems(
-        datasetItems.flatMap((item) =>
-          item.playerId
-            ? [
-                {
-                  id: item.playerId,
-                  item,
-                  metric: item.metricValue,
-                },
-              ]
-            : [],
-        ),
-        "ascending",
-      );
-      const ranked = ascending.find((item) => item.id === subjectId);
-      if (ranked && ranked.rank <= snapshot.coveredThroughRank) {
-        matchingItem = ranked.item;
-        outcomeRank = ranked.rank;
-      }
+    if (
+      pick.category === "underdog_player" ||
+      pick.category === "overrated_player"
+    ) {
+      if (!subjectId) continue;
+      const ranked = rankedRatingByCategory.get(pick.category)?.get(subjectId);
+      if (!ranked) continue;
+      matchingItem = ranked.item;
+      outcomeRank = ranked.rank;
     } else {
       matchingItem = datasetItems.find(
         (item) => (item.playerId ?? item.teamId) === subjectId,
@@ -421,7 +520,11 @@ export async function getManualResultAssignments(
         teamId: predictionCategoryPicks.teamId,
       })
       .from(predictionCategoryPicks)
-      .where(inArray(predictionCategoryPicks.predictionId, [...predictionIds])),
+      .innerJoin(
+        predictions,
+        eq(predictions.id, predictionCategoryPicks.predictionId),
+      )
+      .where(eq(predictions.seasonId, seasonId)),
     db
       .select({
         normalizedCustomPlayerName:
@@ -443,11 +546,17 @@ export async function getManualResultAssignments(
       : [],
   );
 
-  return buildManualResultAssignments({
+  const assignments = buildManualResultAssignments({
     activeBracketCount,
     aliases: aliasRows,
     items: itemRows,
     picks,
     snapshots,
   });
+  const requestedPredictionIds = new Set(predictionIds);
+  return new Map(
+    [...assignments].filter(([predictionId]) =>
+      requestedPredictionIds.has(predictionId),
+    ),
+  );
 }

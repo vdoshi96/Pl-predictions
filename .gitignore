@@ -5,8 +5,12 @@
 /coverage
 /playwright-report
 /test-results
-/output/playwright
+# Local QA captures and review inputs. Release evidence belongs under docs/qa/.
+/output/
 /.playwright-cli
+
+# Local concept explorations that are not canonical project documentation.
+/codex-minigames.html
 
 # Private owner-provided player handoffs; preserve locally and never stage.
 /premier-league-players-2026-08-08/
@@ -30,6 +34,9 @@
 .DS_Store
 *.tsbuildinfo
 next-env.d.ts
+
+# Editor-specific workflow copies; canonical project skills live in .agents/.
+/.cursor/
 
 # Marketplace-installed global agent material is not project source. Track only
 # the project-owned update-results skill.

@@ -100,3 +100,15 @@ export function rankTeamExpectationIndexes(
     "descending",
   );
 }
+
+export function rankPickedTeamExpectationIndexes(
+  indexes: readonly TeamExpectationIndex[],
+  pickedTeamIds: readonly string[],
+  category: "overrated" | "underdog",
+) {
+  const eligibleTeamIds = new Set(pickedTeamIds);
+  return rankTeamExpectationIndexes(
+    indexes.filter((item) => eligibleTeamIds.has(item.teamId)),
+    category,
+  );
+}

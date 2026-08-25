@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="generated-by" content="scripts/generate-docs-html.mjs" />
     <meta name="canonical-source" content="DECISIONS.md" />
-    <meta name="canonical-source-sha256" content="dc16932b958aa1033b670c42ceb7e1563ee04baf588382281f9b4ad076294b0f" />
+    <meta name="canonical-source-sha256" content="0ada138192b24acb1cdba14c5ea1a69b61efe39c842c6dcb5b9540c7af7bfcd3" />
     <title>Decisions</title>
     <style>
       :root { color-scheme: light dark; font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
@@ -40,6 +40,10 @@
   <body>
     <main>
       <h1 id="decisions">Decisions</h1>
+<h2 id="2026-08-24-opinion-categories-rank-only-picked-subjects">2026-08-24: Opinion categories rank only picked subjects</h2>
+<p>Rank each opinion category within its own distinct picked-subject pool. Underdog-player picks compete only with other underdog-player picks, overrated-player picks compete only with other overrated-player picks, and the two team categories follow the same separation. Repeated picks create one ranked subject. A subject picked in both directions belongs independently to both pools.</p>
+<p>Continue calculating each club&#39;s expectation index from every complete table prediction, then filter the ranking candidates to the relevant team-opinion picks. Keep one shared factual rating value for each player, but filter the active immutable rating snapshot before ranking each player-opinion pool. Unpicked factual rows cannot affect an opinion rank. A picked player without a fact in a legacy active snapshot remains pending rather than becoming an outside-range zero.</p>
+<p>Apply the rule on read so deployment recalculates existing public ranks without changing, republishing, or finalizing an immutable result snapshot. New player-rating drafts contain exactly the union of resolved picked players across both opinion categories and require every picked player to have a rating. Keep the snapshot&#39;s current bracket count in <code>covered_through_rank</code> for pointer and audit compatibility. The <code>N</code>-based accuracy curve, competition ties, full-precision metrics, and league-wide goals, assists, and clean-sheets rankings do not change. This decision supersedes the opinion-category ranking universes in the 2026-08-08 scoring decisions while preserving their formulas and history.</p>
 <h2 id="2026-08-23-release-win-streak-from-matchweek-2">2026-08-23: Release Win Streak from Matchweek 2</h2>
 <p>Run Win Streak as a separate durable game across Matchweeks 2–38. One confirmed club-to-win pick is immutable for each profile and round. A win adds one to the current streak and keeps that winning club unavailable during the active streak. A draw or loss resets the current streak and unlocks every club. A missed round or void preserves the streak; a void returns that round&#39;s club to the available pool. Late joiners receive no retroactive penalty. Rank only personal best by shared competition rank, alphabetize tied names for deterministic presentation, and show current streak as supporting information.</p>
 <p>Lock the complete round at its earliest persisted fixture kickoff rather than giving later-playing clubs a longer selection window. Display each fixture&#39;s kickoff for context, but use the round deadline and PostgreSQL clock for every profile creation and pick authorization.</p>
@@ -125,7 +129,7 @@
 <h2 id="2026-08-08-production-public-previews-protected">2026-08-08: Production public, previews protected</h2>
 <p>Use the Vercel Authentication boundary <code>preview</code>: the finished production site is public while preview deployments require owner sign-in. This is narrower than disabling deployment protection. The owner explicitly approved the persistent change from all-deployments protection; anonymous production access now returns 200, and the retained preview URL still redirects to Vercel SSO with 302.</p>
 
-      <p class="source">Generated deterministically from <a href="DECISIONS.md">docs/context/DECISIONS.md</a>. Canonical SHA-256: <code>dc16932b958aa1033b670c42ceb7e1563ee04baf588382281f9b4ad076294b0f</code>.</p>
+      <p class="source">Generated deterministically from <a href="DECISIONS.md">docs/context/DECISIONS.md</a>. Canonical SHA-256: <code>0ada138192b24acb1cdba14c5ea1a69b61efe39c842c6dcb5b9540c7af7bfcd3</code>.</p>
     </main>
   </body>
 </html>

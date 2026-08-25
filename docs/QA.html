@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="generated-by" content="scripts/generate-docs-html.mjs" />
     <meta name="canonical-source" content="QA.md" />
-    <meta name="canonical-source-sha256" content="d8ed277135c10a8ba19314c04405e88ab61daa873b91f9fa831536e2a452df0a" />
+    <meta name="canonical-source-sha256" content="0ea5dedee2c70443bb33dc992a1f11724cba9aa3abb9e11db7de571e8d5c140a" />
     <title>Quality assurance</title>
     <style>
       :root { color-scheme: light dark; font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
@@ -40,6 +40,36 @@
   <body>
     <main>
       <h1 id="quality-assurance">Quality assurance</h1>
+<h2 id="august-24-picked-subject-opinion-rankings">August 24 picked-subject opinion rankings</h2>
+<p>The four opinion categories now rank within separate category-specific pools of distinct picked subjects. Team expectation indexes still use every complete bracket, and player ratings still come from the active sealed factual snapshot. The implementation filters those inputs at read time, so existing ranks can change without rewriting a result snapshot.</p>
+<table>
+<thead>
+<tr>
+<th>Gate</th>
+<th>Evidence</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Test-first behavior</td>
+<td>The focused pre-implementation run failed six assertions for unpicked-subject influence and missing-rating handling. The completed unit/component suite passes 419 tests with 33 guarded skips across 67 passed and five skipped files. Coverage includes duplicate picks, separate category pools, shared competition ties, opposite rating directions, unchanged current-<code>N</code> points, exact rating-draft subjects, synchronized edits, filtered paste, completeness copy, and publish rejection.</td>
+</tr>
+<tr>
+<td>Isolated database</td>
+<td>All 31 integration tests pass across five files. The opinion-category cases prove that unpicked and opposite-category subjects cannot affect a rank, resolved Other aliases join only the relevant pool, missing picked ratings stay pending, entry details use the global season pool, and deleting the sole pick recalculates eligibility. The fail-closed runner targeted the configured isolated Neon database.</td>
+</tr>
+<tr>
+<td>Static and build gates</td>
+<td>Documentation parity passes for 18 Markdown/HTML pairs. The 580-player/578-portrait validator, Prettier, ESLint, strict TypeScript, and the Next.js 16 Webpack production build pass.</td>
+</tr>
+<tr>
+<td>Focused browser acceptance</td>
+<td>The optimized production-server journey passes desktop Chromium and exact 320- and 430-pixel Chromium. It exercises <code>/spotlight</code>, a revealed <code>/entries/[id]</code> detail, and <code>/admin/results</code>; confirms the two player-rating views contain only their respective picked-player pools after union seeding; and finds no page-level horizontal overflow. The first strengthened run exposed a 526-pixel administrator-table overflow at both mobile widths; stacked mobile editor rows fixed it before the final three-project pass. The server emitted the repository&#39;s documented destination-stream closure diagnostics while all final assertions passed.</td>
+</tr>
+<tr>
+<td>Release boundary</td>
+<td>No schema, migration, seed, result republish, snapshot transition, or production database mutation is required. Local browser setup migrated and seeded only the configured isolated test database. Production deployment and read-only acceptance remain pending.</td>
+</tr>
+</tbody></table>
 <h2 id="august-23-complete-uiux-audit-and-motion-remediation">August 23 complete UI/UX audit and motion remediation</h2>
 <p>The interaction-first audit covers all 13 user-interface routes across public, receipt-only, authenticated administrator, desktop, and mobile states. The canonical <a href="ux-audit-2026-08-23.html">audit report</a> contains the complete findings, interaction manifest, scenario battery, responsive matrix, and before/after evidence. Production served as the read-only baseline; all participant writes and administrator previews used the isolated test database.</p>
 <table>
@@ -782,7 +812,7 @@
 <li><input checked="" disabled="" type="checkbox"> Regenerate final HTML peers, publish this closeout through <code>main</code>, synchronize local and remote <code>main</code>, and remove completed branch state.</li>
 </ul>
 
-      <p class="source">Generated deterministically from <a href="QA.md">docs/QA.md</a>. Canonical SHA-256: <code>d8ed277135c10a8ba19314c04405e88ab61daa873b91f9fa831536e2a452df0a</code>.</p>
+      <p class="source">Generated deterministically from <a href="QA.md">docs/QA.md</a>. Canonical SHA-256: <code>0ea5dedee2c70443bb33dc992a1f11724cba9aa3abb9e11db7de571e8d5c140a</code>.</p>
     </main>
   </body>
 </html>

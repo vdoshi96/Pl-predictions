@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="generated-by" content="scripts/generate-docs-html.mjs" />
     <meta name="canonical-source" content="SOURCES.md" />
-    <meta name="canonical-source-sha256" content="cd22ca8068a1d24b45285ffda5998bc2a2a4e4f45ca3287ce2647d63efe78d6f" />
+    <meta name="canonical-source-sha256" content="d713e611e6f82bb278e8e27af59e9206ad94d318a7a588f10d1d7c33d46a324f" />
     <title>Sources</title>
     <style>
       :root { color-scheme: light dark; font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
@@ -96,6 +96,7 @@
 <h2 id="spotlight-outcome-authority-and-pending-inputs">Spotlight outcome authority and pending inputs</h2>
 <ul>
 <li>The owner clarified that spotlight accuracy never changes the table leaderboard. The table maximum remains 100. Let <code>N</code> be the current number of active, nondeleted season brackets. Accuracy points are <code>max(0, N + 1 - outcome rank)</code>. Overall accuracy excludes pending categories. A resolved zero-point result still counts as available. Equal overall scores share a competition rank. Category sorts use outcome rank from low to high and put pending entries last.</li>
+<li>The owner clarified on 2026-08-24 that each underdog and overrated category ranks only the distinct players or clubs picked for that category. Unpicked subjects in standings or factual rating snapshots do not affect opinion-category ranks. Existing immutable snapshots remain unchanged and supply only the facts for picked subjects.</li>
 <li>Team expectation data is internal: average each club&#39;s predicted position across the remaining valid submissions, then compare it with the active validated standings. Underdog is average prediction minus actual position; overrated is the inverse.</li>
 <li>The requested player-opinion metric is FotMob average season rating, descending for underdog and ascending for overrated. The owner may acquire it through an authorized offline workflow. There is no runtime FotMob client, scraper, scheduled job, or stored provider credential.</li>
 <li>The owner has supplied the dated 580-player selector catalogue and 578 portrait PNGs. The handoff does not include reviewed top-scorer, assists, clean-sheets, or player-rating rankings. Do not infer or fabricate these results.</li>
@@ -105,7 +106,7 @@
 <p>Current official Next.js, React, Node.js/Vercel runtime, Tailwind CSS, dnd-kit, Neon, Drizzle, Vercel Marketplace/Git integration, Vercel Authentication, and GitHub documentation informed the pinned stack and deployment flow. Exact links, decisions, caveats, rejected alternatives, and failure behavior are recorded in <code>docs/RESEARCH.md</code>.</p>
 <p>Implementation and current checked-out behavior remain authoritative when a historical note differs.</p>
 
-      <p class="source">Generated deterministically from <a href="SOURCES.md">docs/context/SOURCES.md</a>. Canonical SHA-256: <code>cd22ca8068a1d24b45285ffda5998bc2a2a4e4f45ca3287ce2647d63efe78d6f</code>.</p>
+      <p class="source">Generated deterministically from <a href="SOURCES.md">docs/context/SOURCES.md</a>. Canonical SHA-256: <code>d713e611e6f82bb278e8e27af59e9206ad94d318a7a588f10d1d7c33d46a324f</code>.</p>
     </main>
   </body>
 </html>

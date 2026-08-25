@@ -5,6 +5,7 @@ import {
   calculateTeamExpectationIndexes,
   isStandingsScoringActive,
   rankMetricItems,
+  rankPickedTeamExpectationIndexes,
   rankTeamExpectationIndexes,
   scoreCategoryRank,
   scoreClub,
@@ -161,6 +162,54 @@ describe("spotlight category scoring", () => {
         (item) => item.teamId,
       ),
     ).toEqual(["unexpected-low-finisher", "unexpected-high-finisher"]);
+  });
+
+  it("ranks each opinion team category only among its distinct picks", () => {
+    const indexes = [
+      {
+        actualPosition: 1,
+        averagePredictedPosition: 10,
+        overratedIndex: -9,
+        teamId: "unpicked-best-underdog",
+        underdogIndex: 9,
+      },
+      {
+        actualPosition: 4,
+        averagePredictedPosition: 10,
+        overratedIndex: -6,
+        teamId: "picked-underdog",
+        underdogIndex: 6,
+      },
+      {
+        actualPosition: 15,
+        averagePredictedPosition: 5,
+        overratedIndex: 10,
+        teamId: "unpicked-most-overrated",
+        underdogIndex: -10,
+      },
+      {
+        actualPosition: 12,
+        averagePredictedPosition: 5,
+        overratedIndex: 7,
+        teamId: "picked-overrated",
+        underdogIndex: -7,
+      },
+    ];
+
+    expect(
+      rankPickedTeamExpectationIndexes(
+        indexes,
+        ["picked-underdog"],
+        "underdog",
+      ).map(({ teamId, rank }) => ({ rank, teamId })),
+    ).toEqual([{ rank: 1, teamId: "picked-underdog" }]);
+    expect(
+      rankPickedTeamExpectationIndexes(
+        indexes,
+        ["picked-overrated"],
+        "overrated",
+      ).map(({ teamId, rank }) => ({ rank, teamId })),
+    ).toEqual([{ rank: 1, teamId: "picked-overrated" }]);
   });
 
   it("ranks player ratings descending for underdogs and ascending for overrated players", () => {

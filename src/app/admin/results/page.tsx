@@ -23,7 +23,7 @@ import {
   isSpotlightResultDataset,
   SPOTLIGHT_RESULT_DATASETS,
 } from "@/features/results";
-import { getPickedSubjectsByDataset } from "@/features/results/seed-queries";
+import { getPickedSubjectsByCategory } from "@/features/results/seed-queries";
 import {
   getActiveSeasonContext,
   getSeasonTeams,
@@ -101,7 +101,7 @@ export default async function AdminResultsPage() {
       })
       .from(spotlightResultAliases)
       .where(eq(spotlightResultAliases.seasonId, season.id)),
-    getPickedSubjectsByDataset(season.id),
+    getPickedSubjectsByCategory(season.id, { resolveAliases: false }),
   ]);
 
   const stateByDataset = new Map(
@@ -276,8 +276,8 @@ export default async function AdminResultsPage() {
   );
 
   return (
-    <main className="page-shell w-full flex-1 py-6 sm:py-10">
-      <div className="grid gap-5">
+    <main className="page-shell min-w-0 flex-1 py-6 sm:py-10">
+      <div className="grid min-w-0 gap-5">
         <div>
           <Badge variant="accent">Manual reviewed outcomes</Badge>
           <h1 className="text-foreground mt-3 text-3xl font-black tracking-tight sm:text-4xl">

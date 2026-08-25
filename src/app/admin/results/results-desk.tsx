@@ -102,7 +102,7 @@ type ResultDeskProps = Readonly<{
   aliases: readonly ResultDeskAlias[];
   bracketCount: number;
   datasets: readonly ResultDeskDataset[];
-  pickedSubjects: Readonly<Record<SpotlightResultDataset, readonly string[]>>;
+  pickedSubjects: Readonly<Record<PredictionCategory, readonly string[]>>;
   players: readonly ResultDeskSubject[];
   publishReady: boolean;
   seasonName: string;
@@ -163,10 +163,12 @@ function rankedRows(
 }
 
 function DatasetMetadata({
+  coverageReadOnly = false,
   dataset,
   disabled,
   onChange,
 }: {
+  coverageReadOnly?: boolean;
   dataset: EditableDataset;
   disabled: boolean;
   onChange: (patch: Partial<EditableDataset>) => void;
@@ -207,10 +209,10 @@ function DatasetMetadata({
         />
       </label>
       <label className="text-foreground grid gap-1 text-sm font-bold">
-        Complete through rank
+        {coverageReadOnly ? "Bracket count recorded" : "Complete through rank"}
         <input
           className="border-border bg-surface focus:border-accent focus:ring-accent/30 disabled:bg-surface-subtle min-h-11 rounded-xl border px-3 font-normal outline-none focus:ring-2"
-          disabled={disabled}
+          disabled={disabled || coverageReadOnly}
           min={1}
           onChange={(event) =>
             onChange({
@@ -309,9 +311,9 @@ function EditableResultTable({
           Add row
         </Button>
       </div>
-      <div className="border-border max-w-full overflow-x-auto rounded-xl border">
-        <table className="w-full min-w-[36rem] border-collapse text-left text-sm">
-          <thead className="bg-surface-subtle text-muted text-xs tracking-wide uppercase">
+      <div className="border-border w-full min-w-0 overflow-x-auto rounded-xl border">
+        <table className="w-full border-collapse text-left text-sm sm:min-w-[36rem]">
+          <thead className="bg-surface-subtle text-muted hidden text-xs tracking-wide uppercase sm:table-header-group">
             <tr>
               <th className="w-16 px-3 py-3" scope="col">
                 Rank
@@ -329,9 +331,15 @@ function EditableResultTable({
           </thead>
           <tbody className="divide-y divide-slate-100">
             {ranked.map((row) => (
-              <tr key={row.subjectId}>
-                <td className="text-muted px-3 py-2 font-black">{row.rank}</td>
-                <td className="px-3 py-2">
+              <tr
+                className="grid min-w-0 grid-cols-[2rem_minmax(0,1fr)] gap-x-2 gap-y-3 p-3 sm:table-row sm:p-0"
+                key={row.subjectId}
+              >
+                <td className="text-muted px-0 py-0 pt-1 font-black sm:px-3 sm:py-2">
+                  <span className="sr-only sm:hidden">Rank </span>
+                  {row.rank}
+                </td>
+                <td className="min-w-0 px-0 py-0 sm:px-3 sm:py-2">
                   <SearchablePredictionSelect
                     description="Search this season's reviewed subjects."
                     disabled={disabled}
@@ -347,7 +355,7 @@ function EditableResultTable({
                     value={row.subjectId}
                   />
                 </td>
-                <td className="px-3 py-2">
+                <td className="col-start-2 min-w-0 px-0 py-0 sm:table-cell sm:px-3 sm:py-2">
                   <input
                     aria-label={`${title} ${METRIC_LABELS[dataset]} for ${labelBySubjectId.get(row.subjectId) ?? "subject"}`}
                     className="border-border bg-surface focus:border-accent focus:ring-accent/30 disabled:bg-surface-subtle min-h-11 w-full rounded-xl border px-3 outline-none focus:ring-2"
@@ -364,7 +372,7 @@ function EditableResultTable({
                     value={row.metricValue}
                   />
                 </td>
-                <td className="px-3 py-2 text-right">
+                <td className="col-start-2 px-0 py-0 text-right sm:table-cell sm:px-3 sm:py-2">
                   <Button
                     aria-label={`Remove ${labelBySubjectId.get(row.subjectId) ?? "result row"}`}
                     disabled={disabled}
@@ -384,8 +392,11 @@ function EditableResultTable({
               </tr>
             ))}
             {ranked.length === 0 ? (
-              <tr>
-                <td className="text-muted px-3 py-6 text-center" colSpan={4}>
+              <tr className="block sm:table-row">
+                <td
+                  className="text-muted block px-3 py-6 text-center sm:table-cell"
+                  colSpan={4}
+                >
                   Add the first reviewed row.
                 </td>
               </tr>
@@ -418,17 +429,44 @@ export function SpotlightResultsDesk({
   >(
     () =>
       Object.fromEntries(
-        initialDatasets.map((dataset) => [
-          dataset.dataset,
-          {
-            ...dataset,
-            capturedAt: toUtcInputValue(dataset.capturedAt),
-            dirty: false,
-            rows: [...dataset.rows],
-            sourceReference: dataset.sourceReference ?? "",
-          },
-        ]),
-      ) as Record<SpotlightResultDataset, EditableDataset>,
+        initialDatasets.map((dataset) => {
+          const pickedRatingIds = new Set([
+            ...pickedSubjects.underdog_player,
+            ...pickedSubjects.overrated_player,
+            ...aliases.flatMap((alias) =>
+              alias.playerId &&
+              alias.categories.some(
+                (category) =>
+                  category === "underdog_player" ||
+                  category === "overrated_player",
+              )
+                ? [alias.playerId]
+                : [],
+            ),
+          ]);
+          const rows =
+            dataset.dataset === "player_ratings"
+              ? dataset.rows.filter((row) => pickedRatingIds.has(row.subjectId))
+              : [...dataset.rows];
+          const publishedRows =
+            dataset.dataset === "player_ratings"
+              ? dataset.publishedRows.filter((row) =>
+                  pickedRatingIds.has(row.subjectId),
+                )
+              : [...dataset.publishedRows];
+          return [
+            dataset.dataset,
+            {
+              ...dataset,
+              capturedAt: toUtcInputValue(dataset.capturedAt),
+              dirty: false,
+              publishedRows,
+              rows,
+              sourceReference: dataset.sourceReference ?? "",
+            },
+          ] satisfies [SpotlightResultDataset, EditableDataset];
+        }),
+      ) as unknown as Record<SpotlightResultDataset, EditableDataset>,
   );
   const [aliasPlayerIdByName, setAliasPlayerIdByName] = useState(
     () =>
@@ -517,10 +555,56 @@ export function SpotlightResultsDesk({
     );
   }
 
+  function pickedSubjectIdsForCategory(category: PredictionCategory) {
+    const subjectIds = new Set(pickedSubjects[category]);
+    for (const alias of aliases) {
+      if (!alias.categories.includes(category)) continue;
+      const playerId = savedAliasPlayerIdByName.get(
+        alias.normalizedCustomPlayerName,
+      );
+      if (playerId) subjectIds.add(playerId);
+    }
+    return [...subjectIds];
+  }
+
+  function pickedSubjectIdsForDataset(dataset: SpotlightResultDataset) {
+    switch (dataset) {
+      case "goals":
+        return pickedSubjectIdsForCategory("top_scorer");
+      case "assists":
+        return pickedSubjectIdsForCategory("top_assister");
+      case "clean_sheets":
+        return pickedSubjectIdsForCategory("most_clean_sheets");
+      case "player_ratings":
+        return [
+          ...new Set([
+            ...pickedSubjectIdsForCategory("underdog_player"),
+            ...pickedSubjectIdsForCategory("overrated_player"),
+          ]),
+        ];
+    }
+  }
+
+  function pickedRatingCoverage() {
+    const eligible = new Set(pickedSubjectIdsForDataset("player_ratings"));
+    const present = new Set(
+      datasets.player_ratings.rows.map((row) => row.subjectId),
+    );
+    return {
+      complete:
+        eligible.size > 0 &&
+        eligible.size === present.size &&
+        [...eligible].every((subjectId) => present.has(subjectId)),
+      eligibleCount: eligible.size,
+      ratedCount: [...eligible].filter((subjectId) => present.has(subjectId))
+        .length,
+    };
+  }
+
   function seedFromSubmissions(datasetName: SpotlightResultDataset) {
     const dataset = datasets[datasetName];
     const present = new Set(dataset.rows.map((row) => row.subjectId));
-    const additions = pickedSubjects[datasetName]
+    const additions = pickedSubjectIdsForDataset(datasetName)
       .filter((subjectId) => !present.has(subjectId))
       .map((subjectId) => ({ metricValue: 0, subjectId }));
     if (additions.length === 0) return;
@@ -537,13 +621,44 @@ export function SpotlightResultsDesk({
     const bySubject = new Map(
       dataset.rows.map((row) => [row.subjectId, row.metricValue] as const),
     );
-    for (const row of incoming) bySubject.set(row.subjectId, row.metricValue);
+    const eligibleRatingIds = new Set(
+      pickedSubjectIdsForDataset("player_ratings"),
+    );
+    const applicable =
+      datasetName === "player_ratings"
+        ? incoming.filter((row) => eligibleRatingIds.has(row.subjectId))
+        : incoming;
+    for (const row of applicable) bySubject.set(row.subjectId, row.metricValue);
     updateDataset(datasetName, {
       rows: [...bySubject].map(([subjectId, metricValue]) => ({
         metricValue,
         subjectId,
       })),
     });
+    if (datasetName === "player_ratings") {
+      const ignoredCount = incoming.length - applicable.length;
+      setMessages((current) => ({
+        ...current,
+        [datasetName]: {
+          message: `${applicable.length} picked-player ${applicable.length === 1 ? "rating" : "ratings"} applied.${ignoredCount > 0 ? ` ${ignoredCount} unpicked ${ignoredCount === 1 ? "row was" : "rows were"} ignored.` : ""}`,
+          ok: true,
+        },
+      }));
+    }
+  }
+
+  function updateRatingRowsForCategory(
+    category: "overrated_player" | "underdog_player",
+    rows: readonly EditableResultRow[],
+  ) {
+    const categorySubjectIds = new Set(pickedSubjectIdsForCategory(category));
+    const nextBySubjectId = new Map(
+      datasets.player_ratings.rows
+        .filter((row) => !categorySubjectIds.has(row.subjectId))
+        .map((row) => [row.subjectId, row] as const),
+    );
+    for (const row of rows) nextBySubjectId.set(row.subjectId, row);
+    updateDataset("player_ratings", { rows: [...nextBySubjectId.values()] });
   }
 
   async function saveAndPublish(datasetName: SpotlightResultDataset) {
@@ -840,10 +955,13 @@ export function SpotlightResultsDesk({
       !dataset.dirty &&
       dataset.pointers.workingSnapshotId !== null &&
       dataset.pointers.activeSnapshotId === dataset.pointers.workingSnapshotId;
+    const ratingDraftIncomplete =
+      datasetName === "player_ratings" && !pickedRatingCoverage().complete;
     const reviewBlocked =
       !publishReady ||
       bracketCount < 1 ||
       dataset.coveredThroughRank !== bracketCount ||
+      ratingDraftIncomplete ||
       unchangedActiveDraft ||
       finalized;
     const message = messages[datasetName];
@@ -864,7 +982,7 @@ export function SpotlightResultsDesk({
         <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center sm:justify-end">
           <Button
             className="w-full sm:w-auto"
-            disabled={Boolean(busyKey) || finalized}
+            disabled={Boolean(busyKey) || finalized || ratingDraftIncomplete}
             onClick={() => runDatasetAction(datasetName, "save")}
             variant="secondary"
           >
@@ -904,8 +1022,10 @@ export function SpotlightResultsDesk({
                   Exact ID: <code className="break-all">{active.id}</code>
                 </p>
                 <p>
-                  {active.source} · {active.itemCount} rows · complete through
-                  rank {active.coveredThroughRank}
+                  {active.source} · {active.itemCount} rows ·{" "}
+                  {datasetName === "player_ratings"
+                    ? `recorded for ${active.coveredThroughRank} brackets`
+                    : `complete through rank ${active.coveredThroughRank}`}
                 </p>
                 <p>{formatChicagoUtcDateTime(active.capturedAt)}</p>
               </div>
@@ -980,9 +1100,10 @@ export function SpotlightResultsDesk({
               <h2 className="text-foreground font-black">Publication gate</h2>
               <p className="text-muted mt-1 text-sm leading-6">
                 {seasonName} has {bracketCount} submitted bracket
-                {bracketCount === 1 ? "" : "s"}. Every published list must be
-                complete through exactly rank {bracketCount || "N"}, including
-                boundary ties.
+                {bracketCount === 1 ? "" : "s"}. Goals, assists, and clean
+                sheets must cover exactly rank {bracketCount || "N"}, including
+                boundary ties. Player ratings must cover every picked opinion
+                player.
               </p>
             </div>
             <Badge
@@ -1088,6 +1209,7 @@ export function SpotlightResultsDesk({
             </Badge>
           </div>
           <DatasetMetadata
+            coverageReadOnly
             dataset={ratings}
             disabled={Boolean(ratings.pointers.finalSnapshotId)}
             onChange={(patch) => updateDataset("player_ratings", patch)}
@@ -1096,27 +1218,47 @@ export function SpotlightResultsDesk({
             dataset="player_ratings"
             direction="descending"
             disabled={Boolean(ratings.pointers.finalSnapshotId)}
-            onRowsChange={(rows) => updateDataset("player_ratings", { rows })}
-            rows={ratings.rows}
-            subjects={availablePlayers}
+            onRowsChange={(rows) =>
+              updateRatingRowsForCategory("underdog_player", rows)
+            }
+            rows={ratings.rows.filter((row) =>
+              pickedSubjectIdsForCategory("underdog_player").includes(
+                row.subjectId,
+              ),
+            )}
+            subjects={availablePlayers.filter((player) =>
+              pickedSubjectIdsForCategory("underdog_player").includes(
+                player.id,
+              ),
+            )}
             title="Underdog player ratings"
           />
           <EditableResultTable
             dataset="player_ratings"
             direction="ascending"
             disabled={Boolean(ratings.pointers.finalSnapshotId)}
-            onRowsChange={(rows) => updateDataset("player_ratings", { rows })}
-            rows={ratings.rows}
-            subjects={availablePlayers}
+            onRowsChange={(rows) =>
+              updateRatingRowsForCategory("overrated_player", rows)
+            }
+            rows={ratings.rows.filter((row) =>
+              pickedSubjectIdsForCategory("overrated_player").includes(
+                row.subjectId,
+              ),
+            )}
+            subjects={availablePlayers.filter((player) =>
+              pickedSubjectIdsForCategory("overrated_player").includes(
+                player.id,
+              ),
+            )}
             title="Overrated player ratings"
           />
           {(() => {
-            const coverage = evaluateCoverage(ratings.rows, bracketCount);
+            const coverage = pickedRatingCoverage();
             return (
               <p className="text-muted text-xs font-semibold" role="status">
                 {coverage.complete
-                  ? `Coverage complete through rank ${coverage.coveredThroughRank}.`
-                  : `Short by ${coverage.shortfall} row${coverage.shortfall === 1 ? "" : "s"} of rank ${bracketCount}.`}
+                  ? `All ${coverage.eligibleCount} picked opinion ${coverage.eligibleCount === 1 ? "player has" : "players have"} a rating.`
+                  : `${coverage.ratedCount} of ${coverage.eligibleCount} picked opinion players have ratings.`}
               </p>
             );
           })()}
@@ -1129,7 +1271,7 @@ export function SpotlightResultsDesk({
               size="sm"
               variant="secondary"
             >
-              Seed from submissions
+              Seed picked players
             </Button>
           </div>
           <ResultsPastePanel
@@ -1289,21 +1431,20 @@ export function SpotlightResultsDesk({
       </Card>
       {reviewDataset ? (
         <PublishReviewDialog
-          attestationSentence={`I attest that ${reviewDataset === "player_ratings" ? "both the highest- and lowest-rated" : "all"} rows through rank ${bracketCount || "N"}, including boundary ties, are present in this exact draft.`}
-          boundaryWarnings={[
-            ...findBoundaryTieWarnings(
-              datasets[reviewDataset].rows,
-              bracketCount,
-              "descending",
-            ),
-            ...(reviewDataset === "player_ratings"
-              ? findBoundaryTieWarnings(
+          attestationSentence={
+            reviewDataset === "player_ratings"
+              ? "I attest that every picked underdog-player and overrated-player subject has a reviewed rating in this exact draft."
+              : `I attest that all rows through rank ${bracketCount || "N"}, including boundary ties, are present in this exact draft.`
+          }
+          boundaryWarnings={
+            reviewDataset === "player_ratings"
+              ? []
+              : findBoundaryTieWarnings(
                   datasets[reviewDataset].rows,
                   bracketCount,
-                  "ascending",
+                  "descending",
                 )
-              : []),
-          ]}
+          }
           busy={busyKey === `${reviewDataset}:review-publish`}
           coveredThroughRank={
             evaluateCoverage(datasets[reviewDataset].rows, bracketCount)

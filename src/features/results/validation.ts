@@ -164,6 +164,29 @@ export function assertPublishableCoverage(
   }
 }
 
+export function assertPickedRatingSubjects(
+  rows: readonly SpotlightResultDraftRow[],
+  pickedSubjectIds: readonly string[],
+): void {
+  const rowIds = new Set(rows.map((row) => row.subjectId));
+  const pickedIds = new Set(pickedSubjectIds);
+  const missing = [...pickedIds].filter((subjectId) => !rowIds.has(subjectId));
+  if (missing.length > 0) {
+    throw new PublicError(
+      "BAD_REQUEST",
+      `Add ratings for every picked opinion player. ${missing.length} ${missing.length === 1 ? "player is" : "players are"} missing.`,
+    );
+  }
+
+  const unpicked = [...rowIds].filter((subjectId) => !pickedIds.has(subjectId));
+  if (unpicked.length > 0) {
+    throw new PublicError(
+      "BAD_REQUEST",
+      `Remove unpicked players from the rating draft. ${unpicked.length} ${unpicked.length === 1 ? "row is" : "rows are"} outside the picked-player pools.`,
+    );
+  }
+}
+
 export function parseSpotlightResultDraft(
   input: unknown,
 ): SpotlightResultDraftInput {

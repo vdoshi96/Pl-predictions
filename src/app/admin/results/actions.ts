@@ -22,6 +22,7 @@ import { normalizedDisplayTextKey } from "@/features/predictions/normalization";
 import { customPlayerNameSchema } from "@/features/predictions/validation";
 import {
   applyResultPointerTransition,
+  assertPickedRatingSubjects,
   assertPublishableCoverage,
   buildFinalizeResultQuery,
   buildPublishResultQuery,
@@ -39,6 +40,7 @@ import {
   type SpotlightResultActionResult,
   type SpotlightResultDraftInput,
 } from "@/features/results";
+import { getPickedSubjectsByCategory } from "@/features/results/seed-queries";
 import { getActiveSeasonContext } from "@/features/seasons/queries";
 import { PublicError, safeErrorMessage } from "@/shared/errors";
 import { getSeasonAccess } from "@/shared/policy";
@@ -126,6 +128,15 @@ export async function saveSpotlightResultDraft(
       );
     }
     await assertSubjectsBelongToSeason(parsed, season.id);
+    if (parsed.dataset === "player_ratings") {
+      const pickedByCategory = await getPickedSubjectsByCategory(season.id);
+      assertPickedRatingSubjects(parsed.rows, [
+        ...new Set([
+          ...pickedByCategory.underdog_player,
+          ...pickedByCategory.overrated_player,
+        ]),
+      ]);
+    }
     const definition = getResultDatasetDefinition(parsed.dataset);
     const db = getDb();
     await db
@@ -297,15 +308,26 @@ export async function publishSpotlightResult(
       })
       .from(spotlightResultItems)
       .where(eq(spotlightResultItems.snapshotId, parsed.workingSnapshotId));
-    assertPublishableCoverage(
-      parsed.dataset,
-      itemRows.map((row) => ({
-        metricValue: row.metricValue,
-        subjectId: row.playerId ?? row.teamId ?? "",
-      })),
-      snapshot.coveredThroughRank,
-      subjectCountRow?.value ?? 0,
-    );
+    const draftRows = itemRows.map((row) => ({
+      metricValue: row.metricValue,
+      subjectId: row.playerId ?? row.teamId ?? "",
+    }));
+    if (parsed.dataset === "player_ratings") {
+      const pickedByCategory = await getPickedSubjectsByCategory(season.id);
+      assertPickedRatingSubjects(draftRows, [
+        ...new Set([
+          ...pickedByCategory.underdog_player,
+          ...pickedByCategory.overrated_player,
+        ]),
+      ]);
+    } else {
+      assertPublishableCoverage(
+        parsed.dataset,
+        draftRows,
+        snapshot.coveredThroughRank,
+        subjectCountRow?.value ?? 0,
+      );
+    }
     const audit = await getAdminAuditMetadata();
     const applied = await applyResultPointerTransition(
       db,

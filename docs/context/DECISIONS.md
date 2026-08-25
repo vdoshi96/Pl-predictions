@@ -1,5 +1,13 @@
 # Decisions
 
+## 2026-08-24: Opinion categories rank only picked subjects
+
+Rank each opinion category within its own distinct picked-subject pool. Underdog-player picks compete only with other underdog-player picks, overrated-player picks compete only with other overrated-player picks, and the two team categories follow the same separation. Repeated picks create one ranked subject. A subject picked in both directions belongs independently to both pools.
+
+Continue calculating each club's expectation index from every complete table prediction, then filter the ranking candidates to the relevant team-opinion picks. Keep one shared factual rating value for each player, but filter the active immutable rating snapshot before ranking each player-opinion pool. Unpicked factual rows cannot affect an opinion rank. A picked player without a fact in a legacy active snapshot remains pending rather than becoming an outside-range zero.
+
+Apply the rule on read so deployment recalculates existing public ranks without changing, republishing, or finalizing an immutable result snapshot. New player-rating drafts contain exactly the union of resolved picked players across both opinion categories and require every picked player to have a rating. Keep the snapshot's current bracket count in `covered_through_rank` for pointer and audit compatibility. The `N`-based accuracy curve, competition ties, full-precision metrics, and league-wide goals, assists, and clean-sheets rankings do not change. This decision supersedes the opinion-category ranking universes in the 2026-08-08 scoring decisions while preserving their formulas and history.
+
 ## 2026-08-23: Release Win Streak from Matchweek 2
 
 Run Win Streak as a separate durable game across Matchweeks 2–38. One confirmed club-to-win pick is immutable for each profile and round. A win adds one to the current streak and keeps that winning club unavailable during the active streak. A draw or loss resets the current streak and unlocks every club. A missed round or void preserves the streak; a void returns that round's club to the available pool. Late joiners receive no retroactive penalty. Rank only personal best by shared competition rank, alphabetize tied names for deterministic presentation, and show current streak as supporting information.

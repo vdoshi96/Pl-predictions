@@ -44,6 +44,7 @@ export type SpotlightBoardRow = Readonly<{
   displayName: string;
   identityKey: string;
   isOther: boolean;
+  metricLabel: string | null;
   pickers: readonly Readonly<{
     backgroundColor: string;
     id: string;
@@ -153,6 +154,7 @@ export function buildSpotlightCategoryBoard(
         displayName: group.alias?.displayName ?? group.pick.displayName,
         identityKey,
         isOther: group.isOther,
+        metricLabel: group.result.metricLabel ?? null,
         pickers: group.pickers,
         resultRank: group.result.resultRank ?? null,
         resultStatus: group.result.resultStatus ?? "pending",

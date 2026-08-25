@@ -1,5 +1,13 @@
 # Implementation plan
 
+## Picked-subject opinion rankings (implemented 2026-08-24; release verification pending)
+
+1. Build a separate distinct picked-subject pool for each player and team opinion category across every active season bracket.
+2. Filter shared player-rating facts and all-bracket team expectation indexes to the relevant pool before assigning competition ranks. Keep a missing picked-player rating pending.
+3. Make the administrator ratings desk show the two category pools, synchronize shared-player edits, filter full-list pastes, and require exactly the union of resolved picked players in new drafts.
+4. Preserve the schema, sealed snapshots, pinned aliases, compare-and-swap transitions, action payloads, current-`N` points curve, and league-wide factual categories.
+5. Verify unit, component, isolated integration, build, documentation parity, and desktop/mobile post-kickoff journeys before release. Then recompute production ranks independently and confirm read-only that result and prediction records did not change.
+
 ## August 23 Win Streak live release
 
 1. Replace the local-only Matchweek 20–23 workshop with a durable Matchweek 2–38 game using the official 37-round, 370-fixture snapshot.
@@ -92,7 +100,7 @@ Core implementation work proceeds autonomously. The only accepted blockers are a
 5. Require two normalized search characters, announce the total number of matches, render no more than 20 matching player rows, enforce a single open popup, and hide the sticky review action while it is open. Preserve keyboard operation, selected-value presentation, and the custom Other-player path.
 6. Reject structurally invalid submissions before club or catalogue reads, then validate only the active player IDs referenced by the submitted spotlight picks. Remove duplicate broad season reads from public leaderboard paths while preserving the scoring inputs they require.
 7. Add `/admin/results` with five tables backed by sealed immutable versions of `goals`, `assists`, `clean_sheets`, and shared `player_ratings`. Pin exact custom-name aliases per snapshot, preserve inactive result-only players outside the participant catalogue, and use CAS working/active/final pointers with atomic audits.
-8. Block result publication until permanent closure/reveal, at least one current bracket, exact `N` coverage plus boundary ties, every relevant Other alias, and explicit owner attestation. Keep missing/unresolved datasets pending; resolve omitted canonical subjects outside range at zero only after coverage publishes.
+8. Block result publication until permanent closure/reveal, at least one current bracket, every relevant Other alias, and explicit owner attestation. Require exact `N` coverage plus boundary ties for goals, assists, and clean sheets, and require exactly every picked opinion player for ratings. Keep missing/unresolved datasets pending; resolve omitted canonical subjects outside range at zero only for the three league-wide datasets after coverage publishes.
 9. Make persisted `opening_kickoff` the sole timed submission cutoff. Keep the legacy nullable `submission_deadline` column only for schema and migration compatibility; remove its seed, environment, runtime-policy, administrator-editing, and atomic-insert behavior. Permit earlier closure only through irreversible typed `LOCK` or `REVEAL`, both of which reveal predictions and permanently close submissions.
 10. Remove implementation/process language from ordinary play pages while keeping the exact accuracy formula and plain pending semantics on Rules.
 11. Cover draft corruption/restoration/clearing, A–Z intent, initial HTML and RSC privacy, lazy catalogue timing, bounded single-popup selectors, result ties/aliases/snapshot sealing/CAS races, fixed-deadline DST and closure races, targeted player validation, and post-lock atomic rejection.

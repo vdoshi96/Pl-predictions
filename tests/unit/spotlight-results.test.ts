@@ -6,6 +6,7 @@ import { buildManualResultAssignments } from "@/features/results/queries";
 import {
   applyResultPointerTransition,
   assertPublishableCoverage,
+  assertPickedRatingSubjects,
   buildFinalizeResultQuery,
   buildPublishResultQuery,
   buildCreateResultOnlyPlayerQuery,
@@ -67,6 +68,22 @@ describe("spotlight result validation", () => {
     expect(() =>
       assertPublishableCoverage("player_ratings", rows, 3, 3),
     ).not.toThrow();
+  });
+
+  it("requires new rating drafts to contain exactly the picked players", () => {
+    const rows = [
+      { metricValue: 9, subjectId: playerA },
+      { metricValue: 7, subjectId: playerB },
+    ];
+    expect(() =>
+      assertPickedRatingSubjects(rows, [playerA, playerB]),
+    ).not.toThrow();
+    expect(() => assertPickedRatingSubjects(rows, [playerA, playerC])).toThrow(
+      "Add ratings for every picked opinion player",
+    );
+    expect(() => assertPickedRatingSubjects(rows, [playerA])).toThrow(
+      "Remove unpicked players",
+    );
   });
 
   it("allows a complete finite subject population when N is larger", () => {
@@ -169,27 +186,27 @@ describe("spotlight result resolution", () => {
     ).toMatchObject({ metricLabel: "Rating 7.123" });
   });
 
-  it("scores synchronized ratings in opposite directions and leaves unknown Other names pending", () => {
+  it("ranks synchronized ratings within separate category-specific pick pools", () => {
     const assignments = buildManualResultAssignments({
       activeBracketCount: 3,
       aliases: [],
       items: [
         {
-          metricValue: 9,
+          metricValue: 7,
           outcomeRank: 1,
           playerId: playerA,
           snapshotId,
           teamId: null,
         },
         {
-          metricValue: 7,
+          metricValue: 9,
           outcomeRank: 2,
           playerId: playerB,
           snapshotId,
           teamId: null,
         },
         {
-          metricValue: 5,
+          metricValue: 6,
           outcomeRank: 3,
           playerId: playerC,
           snapshotId,
@@ -235,6 +252,38 @@ describe("spotlight result resolution", () => {
       },
     );
     expect(assignments.get(predictionA)?.has("top_scorer")).toBe(false);
+  });
+
+  it("keeps a picked rating pending when the active snapshot has no fact", () => {
+    const assignments = buildManualResultAssignments({
+      activeBracketCount: 2,
+      aliases: [],
+      items: [
+        {
+          metricValue: 9,
+          outcomeRank: 1,
+          playerId: playerA,
+          snapshotId,
+          teamId: null,
+        },
+      ],
+      picks: [
+        {
+          category: "underdog_player",
+          normalizedCustomPlayerName: null,
+          playerId: playerB,
+          predictionId: predictionA,
+          teamId: null,
+        },
+      ],
+      snapshots: [
+        { coveredThroughRank: 2, dataset: "player_ratings", id: snapshotId },
+      ],
+    });
+
+    expect(
+      assignments.get(predictionA)?.get("underdog_player"),
+    ).toBeUndefined();
   });
 
   it("resolves Other names from each immutable snapshot instead of a live alias", () => {

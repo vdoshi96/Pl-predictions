@@ -44,6 +44,7 @@ vi.mock("@/app/admin/results/actions", () => ({
 const playerA = "00000000-0000-4000-8000-00000000000a";
 const playerB = "00000000-0000-4000-8000-00000000000b";
 const playerC = "00000000-0000-4000-8000-00000000000c";
+const playerD = "00000000-0000-4000-8000-00000000000f";
 const teamA = "00000000-0000-4000-8000-00000000000d";
 const teamB = "00000000-0000-4000-8000-00000000000e";
 const snapshotIds = {
@@ -54,10 +55,13 @@ const snapshotIds = {
 } as const;
 
 const pickedSubjects = {
-  assists: [],
-  clean_sheets: [],
-  goals: [playerC],
-  player_ratings: [playerC],
+  most_clean_sheets: [],
+  overrated_player: [playerA, playerB],
+  overrated_team: [],
+  top_assister: [],
+  top_scorer: [playerC],
+  underdog_player: [playerA, playerC],
+  underdog_team: [],
 } as const;
 
 const datasets: ResultDeskDataset[] = [
@@ -172,6 +176,12 @@ function renderDesk(datasetInput = datasets) {
           label: "Casey — CHE",
           names: ["Casey"],
         },
+        {
+          active: true,
+          id: playerD,
+          label: "Devon — NEW",
+          names: ["Devon"],
+        },
       ]}
       publishReady
       seasonName="2026/27 Premier League"
@@ -225,6 +235,12 @@ describe("SpotlightResultsDesk", () => {
   it("renders five row-by-row tables and keeps both ratings views synchronized", () => {
     renderDesk();
 
+    expect(
+      screen.getByText(
+        /Goals, assists, and clean sheets must cover exactly rank 2, including boundary ties\. Player ratings must cover every picked opinion player\./u,
+      ),
+    ).toBeVisible();
+
     const resultTables = screen.getAllByRole("table");
     expect(resultTables).toHaveLength(5);
     for (const table of resultTables) {
@@ -243,22 +259,89 @@ describe("SpotlightResultsDesk", () => {
 
     fireEvent.change(underdogRating, { target: { value: "8.5" } });
     expect(overratedRating).toHaveValue(8.5);
+    expect(
+      screen.queryByRole("spinbutton", {
+        name: /Underdog player ratings Season rating for Bea/,
+      }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole("spinbutton", {
+        name: /Overrated player ratings Season rating for Casey/,
+      }),
+    ).not.toBeInTheDocument();
+  });
+
+  it("seeds the union of both opinion-player pools into one shared draft", () => {
+    renderDesk();
+    const ratingsCard = screen
+      .getByRole("heading", { level: 2, name: "Player ratings" })
+      .closest(".rounded-2xl");
+    expect(ratingsCard).not.toBeNull();
+
+    fireEvent.click(
+      within(ratingsCard as HTMLElement).getByRole("button", {
+        name: "Seed picked players",
+      }),
+    );
+
+    expect(
+      screen.getByRole("spinbutton", {
+        name: /Underdog player ratings Season rating for Casey/,
+      }),
+    ).toHaveValue(0);
+    expect(
+      screen.queryByRole("spinbutton", {
+        name: /Overrated player ratings Season rating for Casey/,
+      }),
+    ).not.toBeInTheDocument();
+  });
+
+  it("applies only picked players from a full pasted ratings list", async () => {
+    renderDesk();
+    const ratingsCard = screen
+      .getByRole("heading", { level: 2, name: "Player ratings" })
+      .closest(".rounded-2xl");
+    expect(ratingsCard).not.toBeNull();
+    const ratings = within(ratingsCard as HTMLElement);
+
+    fireEvent.change(
+      ratings.getByRole("textbox", { name: "Paste player ratings list" }),
+      { target: { value: "Alice 8.25\nDevon 9.75" } },
+    );
+    fireEvent.click(ratings.getByRole("button", { name: "Parse list" }));
+    fireEvent.click(ratings.getByRole("button", { name: "Apply 2 rows" }));
+
+    expect(
+      await screen.findByText(
+        "1 picked-player rating applied. 1 unpicked row was ignored.",
+      ),
+    ).toBeVisible();
+    expect(
+      ratings.queryByRole("spinbutton", {
+        name: /Season rating for Devon/,
+      }),
+    ).not.toBeInTheDocument();
   });
 
   it("saves the shared ratings rows once from either synchronized view", async () => {
     renderDesk();
-    fireEvent.change(
-      screen.getByRole("spinbutton", {
-        name: /Overrated player ratings Season rating for Alice/,
-      }),
-      { target: { value: "8.25" } },
-    );
     const ratingsHeading = screen.getByRole("heading", {
       level: 2,
       name: "Player ratings",
     });
     const ratingsCard = ratingsHeading.closest(".rounded-2xl");
     expect(ratingsCard).not.toBeNull();
+    fireEvent.click(
+      within(ratingsCard as HTMLElement).getByRole("button", {
+        name: "Seed picked players",
+      }),
+    );
+    fireEvent.change(
+      screen.getByRole("spinbutton", {
+        name: /Overrated player ratings Season rating for Alice/,
+      }),
+      { target: { value: "8.25" } },
+    );
     fireEvent.click(
       within(ratingsCard as HTMLElement).getByRole("button", {
         name: "Save draft",

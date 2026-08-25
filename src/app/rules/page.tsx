@@ -34,19 +34,19 @@ const spotlightRules = [
   ["Most clean sheets", "A club pick, ranked by the club clean-sheets list."],
   [
     "Underdog team",
-    "Average predicted finish minus actual finish; the largest positive index ranks first.",
+    "Among underdog-team picks, average predicted finish minus actual finish; the largest index ranks first.",
   ],
   [
     "Overrated team",
-    "Actual finish minus average predicted finish; the largest positive index ranks first.",
+    "Among overrated-team picks, actual finish minus average predicted finish; the largest index ranks first.",
   ],
   [
     "Underdog player",
-    "FotMob average season ratings ranked from highest to lowest.",
+    "Underdog-player picks ranked by reviewed average season rating from highest to lowest.",
   ],
   [
     "Overrated player",
-    "FotMob average season ratings ranked from lowest to highest.",
+    "Overrated-player picks ranked by reviewed average season rating from lowest to highest.",
   ],
 ] as const;
 
@@ -132,7 +132,8 @@ export default function RulesPage() {
                   brackets, an occupied result rank earns max(0, N + 1 − rank)
                   accuracy points. Rank 1 earns N, rank 2 earns N − 1, and ranks
                   after N earn 0. Equal outcomes share the same result rank and
-                  accuracy points.
+                  accuracy points. Each underdog and overrated category ranks
+                  only the distinct subjects picked for that category.
                 </p>
               </div>
             </div>
@@ -173,7 +174,9 @@ export default function RulesPage() {
                 If Manchester United’s average predicted finish is 2.4 and its
                 actual position is 10th, its underdog index is 2.4 − 10 = −7.6,
                 while its overrated index is 10 − 2.4 = +7.6. Indexes keep full
-                precision for ranking and are rounded only for display.
+                precision for ranking and are rounded only for display. The
+                underdog list includes only underdog-team picks, and the
+                overrated list includes only overrated-team picks.
               </p>
             </div>
           </CardContent>

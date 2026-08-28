@@ -50,7 +50,7 @@ Late joiners start in the active round with no retroactive missed-round penalty.
 
 ## Official fixture snapshot
 
-The checked-in snapshot parses and validates all 380 fixtures from the Premier League's [complete official 2026/27 fixture list](https://www.premierleague.com/en/news/4675097), then retains the 370 Matchweek 2–38 fixtures used by the contest. It also uses the [official fixture schedule announcement](https://www.premierleague.com/en/news/4675508/premier-league-fixture-schedule-released-for-season-202627) for the final-matchweek basis. Both sources were checked on August 23, 2026. The normalized fixture hash is `f756c4790b6b0acd5ee4b351eb06cc53295078716b62018c20868f66a394848a`.
+The checked-in snapshot parses and validates all 380 fixtures from the Premier League's [complete official 2026/27 fixture list](https://www.premierleague.com/en/news/4675097), then retains the 370 Matchweek 2–38 fixtures used by the contest. It also uses the [official fixture schedule announcement](https://www.premierleague.com/en/news/4675508/premier-league-fixture-schedule-released-for-season-202627) for the final-matchweek basis. Both sources were checked on August 28, 2026. The normalized fixture hash is `0e8e868e2a53d31a57a568ffdffa1b0dccaec14f1e3a38ad3e93092e61998a0c`.
 
 Published UK kickoff times are retained where the source supplies them. Date-only weekend and bank-holiday fixtures default to 15:00, date-only midweek fixtures default to 20:00, and Matchweek 38 defaults to the league's published 16:00 simultaneous kickoff. The generator interprets those local values in `Europe/London` and stores the corresponding UTC instants. These reviewed defaults are schedule placeholders, not invented result facts, and remain subject to official change.
 

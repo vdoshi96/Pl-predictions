@@ -1,12 +1,12 @@
 # Sources
 
-External-source notes were checked on 2026-08-08. The current owner handoff and application-import boundary were updated on 2026-08-21. The Win Streak fixture source was checked on 2026-08-23.
+External-source notes were checked on 2026-08-08. The current owner handoff and application-import boundary were updated on 2026-08-21. The Win Streak fixture source was checked on 2026-08-28.
 
 ## Win Streak fixture authority
 
-- [Complete official 2026/27 fixture list](https://www.premierleague.com/en/news/4675097), checked 2026-08-23: canonical club pairings and matchweek membership for the 37-round, 370-fixture Matchweek 2–38 snapshot. The page states that fixtures are subject to change.
-- [Official fixture schedule announcement](https://www.premierleague.com/en/news/4675508/premier-league-fixture-schedule-released-for-season-202627), checked 2026-08-23: the final-matchweek simultaneous kickoff basis and the league's fixture-change context.
-- Checked-in normalized fixture hash: `f756c4790b6b0acd5ee4b351eb06cc53295078716b62018c20868f66a394848a`.
+- [Complete official 2026/27 fixture list](https://www.premierleague.com/en/news/4675097), checked 2026-08-28: canonical club pairings and matchweek membership for the 37-round, 370-fixture Matchweek 2–38 snapshot. The page states that fixtures are subject to change.
+- [Official fixture schedule announcement](https://www.premierleague.com/en/news/4675508/premier-league-fixture-schedule-released-for-season-202627), checked 2026-08-28: the final-matchweek simultaneous kickoff basis and the league's fixture-change context.
+- Checked-in normalized fixture hash: `0e8e868e2a53d31a57a568ffdffa1b0dccaec14f1e3a38ad3e93092e61998a0c`.
 - Pick-deadline derivation: each seeded round locks at the earliest persisted kickoff among its ten official fixtures. A selected club's later kickoff does not extend that round's pick window.
 - Timing normalization: parse and validate all 380 listed fixtures, retain Matchweeks 2–38, use published UK kickoff times when present, default date-only weekend and bank-holiday fixtures to 15:00, date-only midweek fixtures to 20:00, and Matchweek 38 to 16:00, then convert from `Europe/London` to UTC. The defaults remain subject to the official drift check.
 - Runtime boundary: the deployed application reads only checked-in and seeded fixture facts. It never requests the Premier League or another football source at runtime.

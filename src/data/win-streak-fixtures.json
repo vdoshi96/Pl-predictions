@@ -374,16 +374,6 @@
           "timeBasis": "weekend-default"
         },
         {
-          "awayTeamSlug": "sunderland",
-          "homeTeamSlug": "manchester-city",
-          "id": "2026-27-mw05-manchester-city-sunderland",
-          "kickoffAt": "2026-09-19T14:00:00.000Z",
-          "localDate": "2026-09-19",
-          "localTime": "15:00",
-          "matchweek": 5,
-          "timeBasis": "weekend-default"
-        },
-        {
           "awayTeamSlug": "hull-city",
           "homeTeamSlug": "newcastle-united",
           "id": "2026-27-mw05-newcastle-united-hull-city",
@@ -407,6 +397,16 @@
           "awayTeamSlug": "liverpool",
           "homeTeamSlug": "afc-bournemouth",
           "id": "2026-27-mw05-afc-bournemouth-liverpool",
+          "kickoffAt": "2026-09-20T13:00:00.000Z",
+          "localDate": "2026-09-20",
+          "localTime": "14:00",
+          "matchweek": 5,
+          "timeBasis": "explicit"
+        },
+        {
+          "awayTeamSlug": "sunderland",
+          "homeTeamSlug": "manchester-city",
+          "id": "2026-27-mw05-manchester-city-sunderland",
           "kickoffAt": "2026-09-20T13:00:00.000Z",
           "localDate": "2026-09-20",
           "localTime": "14:00",
@@ -3895,10 +3895,10 @@
   "schemaVersion": 1,
   "season": "2026/27",
   "source": {
-    "checkedAt": "2026-08-23",
+    "checkedAt": "2026-08-28",
     "finalMatchweekTimingUrl": "https://www.premierleague.com/en/news/4675508/premier-league-fixture-schedule-released-for-season-202627",
     "fixtureListUrl": "https://www.premierleague.com/en/news/4675097",
-    "normalizedFixtureSha256": "f756c4790b6b0acd5ee4b351eb06cc53295078716b62018c20868f66a394848a",
+    "normalizedFixtureSha256": "0e8e868e2a53d31a57a568ffdffa1b0dccaec14f1e3a38ad3e93092e61998a0c",
     "subjectToChange": true
   },
   "timeZone": "Europe/London"

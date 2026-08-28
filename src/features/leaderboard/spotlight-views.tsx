@@ -43,13 +43,18 @@ function SubjectMark({
 
 function ResultChip({
   accuracyPoints,
+  category,
   resultRank,
   resultStatus,
-}: SpotlightCategoryBoard["rows"][number]) {
+}: SpotlightCategoryBoard["rows"][number] & {
+  category: PredictionCategory;
+}) {
   if (resultStatus === "pending") {
+    const unavailableRating =
+      category === "underdog_player" || category === "overrated_player";
     return (
       <span className="bg-warning-soft text-warning rounded-lg px-2 py-1 text-[0.68rem] font-black whitespace-nowrap">
-        Pending
+        {unavailableRating ? "N/A" : "Pending"}
       </span>
     );
   }
@@ -186,7 +191,7 @@ export function SpotlightCategoriesView({
                       </span>
                     </div>
                   </div>
-                  <ResultChip {...row} />
+                  <ResultChip {...row} category={board.category} />
                 </div>
               ))}
             </div>
@@ -215,8 +220,12 @@ function matrixCellClass(pick: SpotlightPickDisplay): string {
 
 function matrixResult(pick: SpotlightPickDisplay): string {
   if (pick.resultStatus === "outside-range") return "Outside range";
-  if (pick.resultRank === undefined || pick.resultRank === null)
-    return "Pending";
+  if (pick.resultRank === undefined || pick.resultRank === null) {
+    return pick.category === "underdog_player" ||
+      pick.category === "overrated_player"
+      ? "N/A"
+      : "Pending";
+  }
   const points = pick.accuracyPoints ?? 0;
   return `Rank ${pick.resultRank} · ${points} ${points === 1 ? "pt" : "pts"}`;
 }

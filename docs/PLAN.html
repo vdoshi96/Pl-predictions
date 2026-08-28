@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="generated-by" content="scripts/generate-docs-html.mjs" />
     <meta name="canonical-source" content="PLAN.md" />
-    <meta name="canonical-source-sha256" content="a98c9e7f176ca02a6b4fe7fa3791ab91a641499b76b33ab0899e14c20606dad4" />
+    <meta name="canonical-source-sha256" content="eef3d9f96c8f0c92245ae85059048cca4db8cfd5953ed68c45979ba1610ebf60" />
     <title>Implementation plan</title>
     <style>
       :root { color-scheme: light dark; font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
@@ -44,7 +44,7 @@
 <ol>
 <li>Build a separate distinct picked-subject pool for each player and team opinion category across every active season bracket.</li>
 <li>Filter shared player-rating facts and all-bracket team expectation indexes to the relevant pool before assigning competition ranks. Keep a missing picked-player rating pending.</li>
-<li>Make the administrator ratings desk show the two category pools, synchronize shared-player edits, filter full-list pastes, and require exactly the union of resolved picked players in new drafts.</li>
+<li>Make the administrator ratings desk show the two category pools, synchronize shared-player edits, filter full-list pastes, and accept a nonempty reviewed subset of resolved picked players in new drafts.</li>
 <li>Preserve the schema, sealed snapshots, pinned aliases, compare-and-swap transitions, action payloads, current-<code>N</code> points curve, and league-wide factual categories.</li>
 <li>Verify unit, component, isolated integration, build, documentation parity, and desktop/mobile post-kickoff journeys before release. Then recompute production ranks independently and confirm read-only that result and prediction records did not change.</li>
 </ol>
@@ -138,7 +138,7 @@
 <li>Require two normalized search characters, announce the total number of matches, render no more than 20 matching player rows, enforce a single open popup, and hide the sticky review action while it is open. Preserve keyboard operation, selected-value presentation, and the custom Other-player path.</li>
 <li>Reject structurally invalid submissions before club or catalogue reads, then validate only the active player IDs referenced by the submitted spotlight picks. Remove duplicate broad season reads from public leaderboard paths while preserving the scoring inputs they require.</li>
 <li>Add <code>/admin/results</code> with five tables backed by sealed immutable versions of <code>goals</code>, <code>assists</code>, <code>clean_sheets</code>, and shared <code>player_ratings</code>. Pin exact custom-name aliases per snapshot, preserve inactive result-only players outside the participant catalogue, and use CAS working/active/final pointers with atomic audits.</li>
-<li>Block result publication until permanent closure/reveal, at least one current bracket, every relevant Other alias, and explicit owner attestation. Require exact <code>N</code> coverage plus boundary ties for goals, assists, and clean sheets, and require exactly every picked opinion player for ratings. Keep missing/unresolved datasets pending; resolve omitted canonical subjects outside range at zero only for the three league-wide datasets after coverage publishes.</li>
+<li>Block result publication until permanent closure/reveal, at least one current bracket, every relevant Other alias, and explicit owner attestation. Require exact <code>N</code> coverage plus boundary ties for goals, assists, and clean sheets. For ratings, require a nonempty reviewed subset of picked opinion players, reject unpicked rows, and display omitted picked players as N/A without scoring them. Keep missing or unresolved datasets pending; resolve omitted canonical subjects outside range at zero only for the three league-wide datasets after coverage publishes.</li>
 <li>Make persisted <code>opening_kickoff</code> the sole timed submission cutoff. Keep the legacy nullable <code>submission_deadline</code> column only for schema and migration compatibility; remove its seed, environment, runtime-policy, administrator-editing, and atomic-insert behavior. Permit earlier closure only through irreversible typed <code>LOCK</code> or <code>REVEAL</code>, both of which reveal predictions and permanently close submissions.</li>
 <li>Remove implementation/process language from ordinary play pages while keeping the exact accuracy formula and plain pending semantics on Rules.</li>
 <li>Cover draft corruption/restoration/clearing, A–Z intent, initial HTML and RSC privacy, lazy catalogue timing, bounded single-popup selectors, result ties/aliases/snapshot sealing/CAS races, fixed-deadline DST and closure races, targeted player validation, and post-lock atomic rejection.</li>
@@ -146,7 +146,7 @@
 </ol>
 <p>Items 1–12 are implemented and released. The migration-first production gate passed before code publication: read-only preflight succeeded, additive <code>0006</code>/<code>0007</code> were applied while the old application remained compatible, and a read-only rollback postcheck proved the expected empty pending state. Feature <a href="https://github.com/vdoshi96/Pl-predictions/pull/19">PR #19</a> merged as <code>9cdad64c285fb66f96d9e11a0b71780008b05160</code>; exact-SHA Vercel deployment <code>dpl_2evvhgizD4spM9QfXKNhvHLEBrgG</code> became Ready and was explicitly assigned to the stable alias. The guarded five-project read-only production smoke passed, its 11-image evidence set was visually inspected and retained, and bounded exact-deployment error/fatal/HTTP-500 queries were empty. The clean merged feature worktree and all enumerated temporary screenshot, HTTPS, Playwright, and evidence directories were removed after the promoted-evidence audit. The three isolated databases remain deliberately retained because <code>DROP DATABASE</code> is destructive, not locally recoverable, and lacks direct owner authorization; no Neon recovery operation was requested. Evidence-PR merge, local-main synchronization, and removal of this closeout worktree remain.</p>
 
-      <p class="source">Generated deterministically from <a href="PLAN.md">docs/PLAN.md</a>. Canonical SHA-256: <code>a98c9e7f176ca02a6b4fe7fa3791ab91a641499b76b33ab0899e14c20606dad4</code>.</p>
+      <p class="source">Generated deterministically from <a href="PLAN.md">docs/PLAN.md</a>. Canonical SHA-256: <code>eef3d9f96c8f0c92245ae85059048cca4db8cfd5953ed68c45979ba1610ebf60</code>.</p>
     </main>
   </body>
 </html>

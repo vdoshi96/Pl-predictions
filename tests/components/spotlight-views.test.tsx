@@ -35,6 +35,18 @@ const entries: SpotlightAccuracyEntry[] = [
         subject: "player",
         teamId: null,
       },
+      {
+        accuracyPoints: null,
+        assetPath: null,
+        category: "underdog_player",
+        displayName: "Unrated Player",
+        label: "Underdog player",
+        playerId: "player-unrated",
+        resultRank: null,
+        shortName: null,
+        subject: "player",
+        teamId: null,
+      },
     ],
   },
   {
@@ -89,6 +101,7 @@ describe("spotlight category and matrix views", () => {
     expect(within(board).getAllByText("Result pending")).toHaveLength(6);
     expect(within(board).getByText("Result rank 1 · 2 pts")).toBeVisible();
     expect(within(board).getByText("Outside range · 0 pts")).toBeVisible();
+    expect(within(board).getByText("N/A")).toBeVisible();
     expect(within(board).getByText("Other")).toBeVisible();
   });
 
@@ -103,6 +116,7 @@ describe("spotlight category and matrix views", () => {
     );
     expect(within(table).getByText("Rank 1 · 2 pts")).toBeVisible();
     expect(within(table).getByText("Outside range")).toBeVisible();
+    expect(within(table).getByText("N/A")).toBeVisible();
     expect(within(table).getAllByRole("rowheader")[0]).toHaveClass(
       "sticky",
       "left-0",

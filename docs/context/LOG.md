@@ -1,5 +1,9 @@
 # Session log
 
+## 2026-08-28
+
+- Accepted the owner decision to publish reviewed player-rating subsets. The admin desk permits a nonempty subset of picked opinion players, rejects unpicked rows, and explains how many omitted players will publish as N/A. Public opinion-player views label missing ratings N/A and continue to exclude them from accuracy scoring.
+
 ## 2026-08-24
 
 - Implemented separate distinct picked-subject pools for underdog player, overrated player, underdog team, and overrated team. Team metrics still use every complete bracket, while each candidate list is category-specific. Player directions filter the same active sealed rating facts independently; a missing picked rating remains pending.

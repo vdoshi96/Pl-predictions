@@ -955,13 +955,14 @@ export function SpotlightResultsDesk({
       !dataset.dirty &&
       dataset.pointers.workingSnapshotId !== null &&
       dataset.pointers.activeSnapshotId === dataset.pointers.workingSnapshotId;
-    const ratingDraftIncomplete =
-      datasetName === "player_ratings" && !pickedRatingCoverage().complete;
+    const ratingDraftEmpty =
+      datasetName === "player_ratings" &&
+      pickedRatingCoverage().ratedCount === 0;
     const reviewBlocked =
       !publishReady ||
       bracketCount < 1 ||
       dataset.coveredThroughRank !== bracketCount ||
-      ratingDraftIncomplete ||
+      ratingDraftEmpty ||
       unchangedActiveDraft ||
       finalized;
     const message = messages[datasetName];
@@ -982,7 +983,7 @@ export function SpotlightResultsDesk({
         <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center sm:justify-end">
           <Button
             className="w-full sm:w-auto"
-            disabled={Boolean(busyKey) || finalized || ratingDraftIncomplete}
+            disabled={Boolean(busyKey) || finalized || ratingDraftEmpty}
             onClick={() => runDatasetAction(datasetName, "save")}
             variant="secondary"
           >
@@ -1102,8 +1103,8 @@ export function SpotlightResultsDesk({
                 {seasonName} has {bracketCount} submitted bracket
                 {bracketCount === 1 ? "" : "s"}. Goals, assists, and clean
                 sheets must cover exactly rank {bracketCount || "N"}, including
-                boundary ties. Player ratings must cover every picked opinion
-                player.
+                boundary ties. Player ratings may include the reviewed subset of
+                picked opinion players; missing ratings publish as N/A.
               </p>
             </div>
             <Badge
@@ -1257,8 +1258,8 @@ export function SpotlightResultsDesk({
             return (
               <p className="text-muted text-xs font-semibold" role="status">
                 {coverage.complete
-                  ? `All ${coverage.eligibleCount} picked opinion ${coverage.eligibleCount === 1 ? "player has" : "players have"} a rating.`
-                  : `${coverage.ratedCount} of ${coverage.eligibleCount} picked opinion players have ratings.`}
+                  ? `All ${coverage.eligibleCount} picked opinion ${coverage.eligibleCount === 1 ? "player has" : "players have"} a reviewed rating.`
+                  : `${coverage.ratedCount} of ${coverage.eligibleCount} picked opinion players have reviewed ratings. The other ${coverage.eligibleCount - coverage.ratedCount} will publish as N/A.`}
               </p>
             );
           })()}

@@ -73,7 +73,10 @@ export function SpotlightPickGrid({
               </span>
             ) : (
               <span className="text-muted mt-0.5 block text-[0.65rem] leading-4 font-semibold">
-                Result rank pending
+                {pick.category === "underdog_player" ||
+                pick.category === "overrated_player"
+                  ? "Rating N/A"
+                  : "Result rank pending"}
               </span>
             )}
           </div>

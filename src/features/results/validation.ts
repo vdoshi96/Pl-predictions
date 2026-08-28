@@ -170,14 +170,6 @@ export function assertPickedRatingSubjects(
 ): void {
   const rowIds = new Set(rows.map((row) => row.subjectId));
   const pickedIds = new Set(pickedSubjectIds);
-  const missing = [...pickedIds].filter((subjectId) => !rowIds.has(subjectId));
-  if (missing.length > 0) {
-    throw new PublicError(
-      "BAD_REQUEST",
-      `Add ratings for every picked opinion player. ${missing.length} ${missing.length === 1 ? "player is" : "players are"} missing.`,
-    );
-  }
-
   const unpicked = [...rowIds].filter((subjectId) => !pickedIds.has(subjectId));
   if (unpicked.length > 0) {
     throw new PublicError(

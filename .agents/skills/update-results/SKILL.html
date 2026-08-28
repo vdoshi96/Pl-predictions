@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="generated-by" content="scripts/generate-docs-html.mjs" />
     <meta name="canonical-source" content="SKILL.md" />
-    <meta name="canonical-source-sha256" content="a5a6ec54ab6d52a056859baf02f1918b89e3185a9ee0afb9b503cdcc003ced75" />
+    <meta name="canonical-source-sha256" content="3ee29af74c4c9834e866e7f86ffe4fc5859e1c7222d514cfbf98affce07fae7a" />
     <title>Update results</title>
     <style>
       :root { color-scheme: light dark; font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
@@ -139,7 +139,7 @@ npm run lint
 </tr>
 <tr>
 <td><code>player_ratings</code></td>
-<td>Paste every FotMob-rated player (high and low). Need at least <code>min(2N, season player count)</code> rows. Do <strong>not</strong> seed unplayed catalogue picks at <code>0</code> — that falsely ranks them as most overrated. Unplayed picks resolve as outside-range zero after publish.</td>
+<td>Paste the reviewed FotMob-rated picked players. The desk filters out unpicked rows and accepts a nonempty reviewed subset. Do <strong>not</strong> seed unplayed catalogue picks at <code>0</code> — that falsely ranks them as most overrated. A picked player without a reviewed rating publishes as N/A, stays unavailable, and contributes no accuracy points.</td>
 </tr>
 </tbody></table>
 <p>No Other-player aliases to match unless custom names exist.</p>
@@ -166,7 +166,7 @@ npm run lint
 <p>The all-10-fixture requirement keeps every participant on one shared round and makes opposite-team picks resolve from the same fact.</p>
 <h2 id="verify-public-results">Verify public results</h2>
 <p>Table: <code>/leaderboard</code> shows scored totals (not “scoring has not started”), 14 or fewer shared competition ranks, and 5/3/1 club breakdowns. All-zero-played tables stay inactive; one club with <code>played &gt; 0</code> is enough.</p>
-<p>Spotlight: <code>/spotlight</code> and <code>?sort=</code> for all seven categories. Accuracy is <code>max(0, N + 1 − outcome rank)</code>. Tied rank 1 earns N. Omitted subjects after a complete publish are outside-range zero and still count as available. Overall should read <code>7 of 7 results available</code>.</p>
+<p>Spotlight: <code>/spotlight</code> and <code>?sort=</code> for all seven categories. Accuracy is <code>max(0, N + 1 − outcome rank)</code>. Tied rank 1 earns N. Omitted subjects after a complete goals, assists, or clean-sheets publish are outside-range zero and still count as available. A picked player omitted from the reviewed rating subset displays as N/A and does not count as available. Overall availability can therefore differ by entry.</p>
 <p>Spot-check at least one pick against FotMob (for example a rank-1 rating pick earns N; a 0-goal seeded scorer inside the N-row list occupies the first 0-goal rank).</p>
 <p>Also confirm the public alias <code>https://pl-predictions-2026.vercel.app/leaderboard</code> if <code>.env.local</code> points at the live season DB.</p>
 <p>Win Streak: open <code>/win-streak</code> without an owner session. Confirm that current and best streaks recalculate, equal best streaks share a competition rank, and the next active matchweek is correct. Verify every participant&#39;s public current pick or explicit no-pick state. Spot-check a win, a draw or loss, and any void against the reviewed inputs: a win adds one; a draw or loss resets the current streak but preserves the best; a void preserves the streak and does not consume the club.</p>

@@ -70,7 +70,7 @@ describe("spotlight result validation", () => {
     ).not.toThrow();
   });
 
-  it("requires new rating drafts to contain exactly the picked players", () => {
+  it("allows reviewed rating subsets but rejects unpicked players", () => {
     const rows = [
       { metricValue: 9, subjectId: playerA },
       { metricValue: 7, subjectId: playerB },
@@ -78,9 +78,9 @@ describe("spotlight result validation", () => {
     expect(() =>
       assertPickedRatingSubjects(rows, [playerA, playerB]),
     ).not.toThrow();
-    expect(() => assertPickedRatingSubjects(rows, [playerA, playerC])).toThrow(
-      "Add ratings for every picked opinion player",
-    );
+    expect(() =>
+      assertPickedRatingSubjects(rows.slice(0, 1), [playerA, playerC]),
+    ).not.toThrow();
     expect(() => assertPickedRatingSubjects(rows, [playerA])).toThrow(
       "Remove unpicked players",
     );

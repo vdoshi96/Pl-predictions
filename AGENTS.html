@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="generated-by" content="scripts/generate-docs-html.mjs" />
     <meta name="canonical-source" content="AGENTS.md" />
-    <meta name="canonical-source-sha256" content="604b8ccbea58a308fc5287e4d1c2bf6236c41bae9dc8ee5114903cdad8debbac" />
+    <meta name="canonical-source-sha256" content="ab597657dbd734aa501bbac220d771095b5533ec5261d09a628199e3bb6befc1" />
     <title>This is NOT the Next.js you know</title>
     <style>
       :root { color-scheme: light dark; font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
@@ -99,7 +99,7 @@ npm run docs:check
 <li>Import only complete known-team standings permutations; failures must preserve the last accepted table.</li>
 <li>Finalization and undo operations must compare-and-swap the exact active/final snapshot.</li>
 <li>Result facts and pinned aliases are inserted only during snapshot construction. Seal the snapshot before any working/active/final pointer may reference it; sealed snapshots, items, and pinned aliases must reject update, delete, and append. Saving, pointer transition, and audit writes stay atomic and stale attempts preserve the last good active version.</li>
-<li>Publish a manual result only after permanent closure/reveal, at least one active bracket, relevant pinned Other aliases, and explicit owner attestation. Goals, assists, and clean sheets require exact current-<code>N</code> coverage including boundary ties. <code>player_ratings</code> must contain exactly every distinct player picked for either opinion-player category. A picked opinion player without a reviewed rating stays pending. After attested coverage, omitted canonical subjects in the other factual datasets are outside-range zero and still count as available.</li>
+<li>Publish a manual result only after permanent closure/reveal, at least one active bracket, relevant pinned Other aliases, and explicit owner attestation. Goals, assists, and clean sheets require exact current-<code>N</code> coverage including boundary ties. <code>player_ratings</code> may contain the nonempty reviewed subset of distinct players picked for either opinion-player category and must reject unpicked rows. A picked opinion player without a reviewed rating displays as N/A, stays unavailable, and contributes no accuracy points. After attested coverage, omitted canonical subjects in the other factual datasets are outside-range zero and still count as available.</li>
 <li>Goals, assists, and club clean sheets are nonnegative whole numbers. The shared player-rating facts are numeric values from 0 through 10 with at most three decimal places; rank the exact stored values without pre-ranking rounding and render enough precision to explain distinct ranks.</li>
 <li>Derive totals rather than persisting editable scores. The main leaderboard uses table points only and is capped at 100. Spotlight accuracy is separate and never changes table points. Let <code>N</code> be the current number of active, nondeleted season brackets. Accuracy points are <code>max(0, N + 1 - occupied outcome rank)</code>. Overall accuracy sums only resolved categories. A resolved zero-point result still counts as available. Pending outcomes remain unavailable. Equal overall scores share a competition rank.</li>
 <li>Team expectation indexes are <code>average predicted position - actual position</code> for underdog and the exact inverse for overrated. Calculate each index from every complete bracket, then rank only the distinct clubs picked for that opinion category, largest first using full precision.</li>
@@ -114,7 +114,7 @@ npm run docs:check
 <p>A change is complete only when relevant unit/component tests, isolated Neon integration tests, TypeScript, ESLint, formatting, documentation parity, production build, and desktop/mobile browser checks pass. Mobile QA must cover the three-stage flow, draft reload, intentional A–Z and reorder, the table leaderboard, the separate spotlight-accuracy page, Win Streak anonymous access and public picks, 320–430px reflow, 56px touch handles, mouse/touch/keyboard operation, searchable keyboard-accessible category selectors, the Other-player text path, both manual result desks, fixed-deadline time-zone display, safe-area actions, long-name wrapping, and no horizontal overflow. Win Streak QA must also cover fixture coverage and drift, receipt takeover denial, immutable picks, every outcome transition, club unlocking, shared ranking, reload persistence, result atomicity, and no runtime football requests. Preserve exact cleanup evidence for any QA data.</p>
 <p>Keep canonical Markdown and generated HTML peers synchronized. Before finishing an iteration, correct stale status/QA documentation, push the feature branch, merge it to GitHub <code>main</code>, update local <code>main</code> to the same commit, and remove completed worktrees.</p>
 
-      <p class="source">Generated deterministically from <a href="AGENTS.md">AGENTS.md</a>. Canonical SHA-256: <code>604b8ccbea58a308fc5287e4d1c2bf6236c41bae9dc8ee5114903cdad8debbac</code>.</p>
+      <p class="source">Generated deterministically from <a href="AGENTS.md">AGENTS.md</a>. Canonical SHA-256: <code>ab597657dbd734aa501bbac220d771095b5533ec5261d09a628199e3bb6befc1</code>.</p>
     </main>
   </body>
 </html>

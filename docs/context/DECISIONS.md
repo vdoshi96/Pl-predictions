@@ -1,12 +1,18 @@
 # Decisions
 
+## 2026-08-28: Publish reviewed rating subsets with N/A omissions
+
+Allow a nonempty reviewed subset of the distinct picked opinion players in a player-rating snapshot. Continue rejecting unpicked rating rows. A picked player without a reviewed rating remains unavailable, contributes no accuracy points, and displays as N/A instead of receiving a fabricated zero or rank. Rank each opinion-player category only from its rated picked players.
+
+Keep the exact rating value shared when a player appears in both opinion categories. Keep `covered_through_rank` equal to the current bracket count for snapshot and audit compatibility. This decision supersedes only the complete-picked-player requirement from August 24; the immutable snapshot, pinned alias, category-specific ranking, and no-runtime-acquisition rules remain unchanged.
+
 ## 2026-08-24: Opinion categories rank only picked subjects
 
 Rank each opinion category within its own distinct picked-subject pool. Underdog-player picks compete only with other underdog-player picks, overrated-player picks compete only with other overrated-player picks, and the two team categories follow the same separation. Repeated picks create one ranked subject. A subject picked in both directions belongs independently to both pools.
 
 Continue calculating each club's expectation index from every complete table prediction, then filter the ranking candidates to the relevant team-opinion picks. Keep one shared factual rating value for each player, but filter the active immutable rating snapshot before ranking each player-opinion pool. Unpicked factual rows cannot affect an opinion rank. A picked player without a fact in a legacy active snapshot remains pending rather than becoming an outside-range zero.
 
-Apply the rule on read so deployment recalculates existing public ranks without changing, republishing, or finalizing an immutable result snapshot. New player-rating drafts contain exactly the union of resolved picked players across both opinion categories and require every picked player to have a rating. Keep the snapshot's current bracket count in `covered_through_rank` for pointer and audit compatibility. The `N`-based accuracy curve, competition ties, full-precision metrics, and league-wide goals, assists, and clean-sheets rankings do not change. This decision supersedes the opinion-category ranking universes in the 2026-08-08 scoring decisions while preserving their formulas and history.
+Apply the rule on read so deployment recalculates existing public ranks without changing, republishing, or finalizing an immutable result snapshot. The August 28 decision supersedes this decision's original complete-picked-player draft requirement. Keep the snapshot's current bracket count in `covered_through_rank` for pointer and audit compatibility. The `N`-based accuracy curve, competition ties, full-precision metrics, and league-wide goals, assists, and clean-sheets rankings do not change. This decision supersedes the opinion-category ranking universes in the 2026-08-08 scoring decisions while preserving their formulas and history.
 
 ## 2026-08-23: Release Win Streak from Matchweek 2
 

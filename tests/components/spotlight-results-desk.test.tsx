@@ -237,7 +237,7 @@ describe("SpotlightResultsDesk", () => {
 
     expect(
       screen.getByText(
-        /Goals, assists, and clean sheets must cover exactly rank 2, including boundary ties\. Player ratings must cover every picked opinion player\./u,
+        /Goals, assists, and clean sheets must cover exactly rank 2, including boundary ties\. Player ratings may include the reviewed subset of picked opinion players; missing ratings publish as N\/A\./u,
       ),
     ).toBeVisible();
 
@@ -321,6 +321,24 @@ describe("SpotlightResultsDesk", () => {
         name: /Season rating for Devon/,
       }),
     ).not.toBeInTheDocument();
+  });
+
+  it("allows a reviewed ratings subset to be saved and published", async () => {
+    renderDesk();
+    const ratingsCard = screen
+      .getByRole("heading", { level: 2, name: "Player ratings" })
+      .closest(".rounded-2xl");
+    expect(ratingsCard).not.toBeNull();
+    const ratings = within(ratingsCard as HTMLElement);
+
+    expect(
+      ratings.getByText(
+        "2 of 3 picked opinion players have reviewed ratings. The other 1 will publish as N/A.",
+      ),
+    ).toBeVisible();
+    expect(
+      ratings.getByRole("button", { name: "Review & publish" }),
+    ).toBeEnabled();
   });
 
   it("saves the shared ratings rows once from either synchronized view", async () => {

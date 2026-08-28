@@ -118,11 +118,11 @@ Pos Club P Pts
 
 Use the following coverage rules:
 
-| Dataset             | How to fill                                                                                                                                                                                                                                                                                                        |
-| ------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `goals` / `assists` | Seed from submissions. Set FotMob leaders to their real totals. Keep seeded names at factual `0` if they have none. If distinct subjects `< N`, add other current FotMob top players (same match/stat list) until there are **exactly N rows**. Extra `0` rows that straddle rank N trip the boundary-tie warning. |
-| `clean_sheets`      | Paste all 20 clubs. Only clubs with a FotMob clean sheet get `1+`; the rest are `0`.                                                                                                                                                                                                                               |
-| `player_ratings`    | Paste every FotMob-rated player (high and low). Need at least `min(2N, season player count)` rows. Do **not** seed unplayed catalogue picks at `0` — that falsely ranks them as most overrated. Unplayed picks resolve as outside-range zero after publish.                                                        |
+| Dataset             | How to fill                                                                                                                                                                                                                                                                                                                                |
+| ------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `goals` / `assists` | Seed from submissions. Set FotMob leaders to their real totals. Keep seeded names at factual `0` if they have none. If distinct subjects `< N`, add other current FotMob top players (same match/stat list) until there are **exactly N rows**. Extra `0` rows that straddle rank N trip the boundary-tie warning.                         |
+| `clean_sheets`      | Paste all 20 clubs. Only clubs with a FotMob clean sheet get `1+`; the rest are `0`.                                                                                                                                                                                                                                                       |
+| `player_ratings`    | Paste the reviewed FotMob-rated picked players. The desk filters out unpicked rows and accepts a nonempty reviewed subset. Do **not** seed unplayed catalogue picks at `0` — that falsely ranks them as most overrated. A picked player without a reviewed rating publishes as N/A, stays unavailable, and contributes no accuracy points. |
 
 No Other-player aliases to match unless custom names exist.
 
@@ -155,7 +155,7 @@ The all-10-fixture requirement keeps every participant on one shared round and m
 
 Table: `/leaderboard` shows scored totals (not “scoring has not started”), 14 or fewer shared competition ranks, and 5/3/1 club breakdowns. All-zero-played tables stay inactive; one club with `played > 0` is enough.
 
-Spotlight: `/spotlight` and `?sort=` for all seven categories. Accuracy is `max(0, N + 1 − outcome rank)`. Tied rank 1 earns N. Omitted subjects after a complete publish are outside-range zero and still count as available. Overall should read `7 of 7 results available`.
+Spotlight: `/spotlight` and `?sort=` for all seven categories. Accuracy is `max(0, N + 1 − outcome rank)`. Tied rank 1 earns N. Omitted subjects after a complete goals, assists, or clean-sheets publish are outside-range zero and still count as available. A picked player omitted from the reviewed rating subset displays as N/A and does not count as available. Overall availability can therefore differ by entry.
 
 Spot-check at least one pick against FotMob (for example a rank-1 rating pick earns N; a 0-goal seeded scorer inside the N-row list occupies the first 0-goal rank).
 

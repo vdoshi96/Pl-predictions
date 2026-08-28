@@ -374,6 +374,11 @@ export default async function SpotlightPage({
                 const selectedOutsideRange =
                   selectedPick?.resultStatus === "outside-range";
                 const selectedAccuracyPoints = selectedPick?.accuracyPoints;
+                const selectedRatingUnavailable =
+                  (sort === "underdog_player" || sort === "overrated_player") &&
+                  !selectedOutsideRange &&
+                  (selectedResultRank === null ||
+                    selectedResultRank === undefined);
                 const displayedRank =
                   sort === "overall"
                     ? hasAvailableResults
@@ -391,7 +396,9 @@ export default async function SpotlightPage({
                 const rankLabel = selectedDefinition
                   ? selectedOutsideRange
                     ? `${selectedDefinition.label} outside the published result range`
-                    : `${selectedDefinition.label} result rank ${selectedResultRank ?? "pending"}`
+                    : selectedRatingUnavailable
+                      ? `${selectedDefinition.label} rating not available`
+                      : `${selectedDefinition.label} result rank ${selectedResultRank ?? "pending"}`
                   : hasAvailableResults
                     ? `Accuracy rank ${entry.accuracyRank}`
                     : "Accuracy rank pending";
@@ -423,7 +430,9 @@ export default async function SpotlightPage({
                             {selectedDefinition
                               ? selectedOutsideRange
                                 ? `${selectedDefinition.label} ${selectedPick?.metricLabel}`
-                                : `${selectedDefinition.label} result rank ${selectedResultRank ?? "pending"}`
+                                : selectedRatingUnavailable
+                                  ? `${selectedDefinition.label} rating N/A`
+                                  : `${selectedDefinition.label} result rank ${selectedResultRank ?? "pending"}`
                               : `${entry.availableCategoryCount} of 7 results available`}
                           </span>
                         </div>
@@ -433,7 +442,9 @@ export default async function SpotlightPage({
                           </strong>
                           <span className="text-muted text-[0.65rem] font-bold tracking-wide uppercase">
                             {displayedScore === "—"
-                              ? "result pending"
+                              ? selectedRatingUnavailable
+                                ? "rating N/A"
+                                : "result pending"
                               : "accuracy points"}
                           </span>
                         </div>

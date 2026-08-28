@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="generated-by" content="scripts/generate-docs-html.mjs" />
     <meta name="canonical-source" content="STATUS.md" />
-    <meta name="canonical-source-sha256" content="ee57f6c14a765ddb43b46c39df1f1b3ef572cb78c9409fea47e523030c765dcb" />
+    <meta name="canonical-source-sha256" content="78f6a918a462c0866f7e590527afa23b9321cc65b5ae482b62ada3b95dca532a" />
     <title>Status</title>
     <style>
       :root { color-scheme: light dark; font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
@@ -101,7 +101,7 @@
 </li>
 <li><p>Local catalogue delivery remediation: the initial homepage server path reads explicit season fields and the 20 clubs without querying or serializing the player catalogue. Stage 2 lazily requests the dynamic same-origin catalogue route, which SQL-filters active current-season players and returns the minimal display/search shape. Submission validation queries only player IDs referenced by the submitted picks.</p>
 </li>
-<li><p>Manual result remediation: <code>/admin/results</code> presents top scorer, top assister, club clean sheets, underdog player, and overrated player as five tables backed by four factual datasets. Shared player ratings synchronize category-filtered high/low views. A rating draft contains exactly the union of resolved picked opinion players and requires a rating for each one. Save creates a sealed immutable working snapshot with exact pinned Other-name aliases; publish/finalize/undo use CAS pointers and atomic audits. Publication requires permanent closure/reveal, at least one active bracket, every relevant alias, and explicit attestation. Goals, assists, and clean sheets retain current-<code>N</code> coverage with boundary ties. Missing or unresolved picked ratings remain pending.</p>
+<li><p>Manual result remediation: <code>/admin/results</code> presents top scorer, top assister, club clean sheets, underdog player, and overrated player as five tables backed by four factual datasets. Shared player ratings synchronize category-filtered high/low views. A rating draft accepts the nonempty reviewed subset of resolved picked opinion players and rejects unpicked rows. Save creates a sealed immutable working snapshot with exact pinned Other-name aliases; publish/finalize/undo use CAS pointers and atomic audits. Publication requires permanent closure/reveal, at least one active bracket, every relevant alias, and explicit owner attestation. Goals, assists, and clean sheets retain current-<code>N</code> coverage with boundary ties. Missing or unresolved picked ratings display as N/A and remain unavailable for scoring.</p>
 </li>
 <li><p>Administrator paste-entry iteration: <code>/admin/standings</code> accepts a reviewed 20-club text table only after alias resolution, numeric classification, complete-permutation validation, and an active-table diff. <code>/admin/results</code> can seed distinct submitted subjects, parse reviewed integer or rating lists, retain skipped lines for attention, and show an exact draft-versus-published diff before the owner attests. The combined action saves first and publishes the returned immutable snapshot; a publish failure leaves that saved working draft recoverable.</p>
 </li>
@@ -147,7 +147,7 @@
 </li>
 </ul>
 
-      <p class="source">Generated deterministically from <a href="STATUS.md">docs/context/STATUS.md</a>. Canonical SHA-256: <code>ee57f6c14a765ddb43b46c39df1f1b3ef572cb78c9409fea47e523030c765dcb</code>.</p>
+      <p class="source">Generated deterministically from <a href="STATUS.md">docs/context/STATUS.md</a>. Canonical SHA-256: <code>78f6a918a462c0866f7e590527afa23b9321cc65b5ae482b62ada3b95dca532a</code>.</p>
     </main>
   </body>
 </html>

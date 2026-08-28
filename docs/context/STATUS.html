@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="generated-by" content="scripts/generate-docs-html.mjs" />
     <meta name="canonical-source" content="STATUS.md" />
-    <meta name="canonical-source-sha256" content="78f6a918a462c0866f7e590527afa23b9321cc65b5ae482b62ada3b95dca532a" />
+    <meta name="canonical-source-sha256" content="34ee9f6c4dbb7c0a146a4435a4fc3168676afa2fcdf00d93897b2de9feacc8de" />
     <title>Status</title>
     <style>
       :root { color-scheme: light dark; font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
@@ -41,6 +41,14 @@
     <main>
       <h1 id="status">Status</h1>
 <ul>
+<li><p>Current release (2026-08-28): <a href="https://github.com/vdoshi96/Pl-predictions/pull/46">PR #46</a> merged reviewed rating subsets and public N/A presentation as <code>e852d717ed6af12cd54916e5e0ec5475abce3f98</code>. A player omitted from the reviewed rating snapshot remains unavailable and contributes no points; no zero or sentinel fact is stored. Exact production deployment <code>dpl_5bVFdeCYjckhPwPWe2gSHYMo6YMi</code> is Ready at <a href="https://pl-predictions-hdaopixm0-vdoshi96s-projects.vercel.app">its immutable URL</a> and owns the automatic main/project aliases.</p>
+</li>
+<li><p>Rating publication: production snapshot <code>3bd5c440-0add-4de2-800c-e5757e21efea</code> is sealed, active, working, provisional, sourced to FotMob, and records <code>N = 14</code>. All 15 stored picked-player ratings match the reviewed source. Seven of 22 picked players have no reviewed rating and display as N/A: Alejandro Garnacho, Amad Diallo, Brian Madjo, Carlos Baleba, Liam Delap, Martin Dúbravka, and Omar Marmoush. The exact deployment renders both opinion-player categories live, the seven N/A rows without ranks or points, Keshav first overall with 90 points, and entry availability from six to seven results.</p>
+</li>
+<li><p>Verification boundary: documentation parity, the player-catalogue validator, formatting, ESLint, strict TypeScript, 422 unit/component tests, the exact four-test Spotlight integration suite, and the Webpack production build pass. The aggregate integration/browser gate also exposed stale Win Streak tests that assume Matchweek 2 remains open after its real PostgreSQL deadline; two database cases and related profile-creation journeys fail for that unrelated date condition. No schema migration, fixture change, direct result write, finalization, LOCK, or REVEAL ran.</p>
+</li>
+<li><p>Vercel routing: <code>pl-predictions-2026.vercel.app</code> remains manually pinned to August 24 deployment <code>dpl_5znWdTiecQjPMyyS56qBVc4YiAcv</code>. GitHub main deployments correctly move <code>pl-predictions-vdoshi96s-projects.vercel.app</code> and <code>pl-predictions-git-main-vdoshi96s-projects.vercel.app</code>, but Vercel does not move the separately assigned <code>pl-predictions-2026</code> alias automatically. Reassign that alias only with explicit owner approval.</p>
+</li>
 <li><p>Current release (2026-08-24): <a href="https://github.com/vdoshi96/Pl-predictions/pull/43">PR #43</a> merged picked-subject opinion rankings as <code>0abe166dc043820dc5201c9d6219b52a3fb39742</code>. Each opinion category now ranks only its distinct picked subjects. Underdog and overrated players use separate filtered views of the active shared rating snapshot. Team expectation indexes still use every complete bracket before their candidate lists are filtered to the relevant team picks. Existing public ranks recalculate at read time without rewriting or republishing sealed result snapshots.</p>
 </li>
 <li><p>Picked-subject local verification: documentation parity for 18 pairs, the 580-player/578-portrait validator, formatting, ESLint, strict TypeScript, 419 unit/component tests with 33 guarded skips, all 31 isolated Neon integration tests, and the Webpack production build pass. A focused optimized-browser matrix passes <code>/spotlight</code>, revealed entry details, and <code>/admin/results</code> at desktop, 320 pixels, and 430 pixels with category-separated rating pools and no page overflow.</p>
@@ -147,7 +155,7 @@
 </li>
 </ul>
 
-      <p class="source">Generated deterministically from <a href="STATUS.md">docs/context/STATUS.md</a>. Canonical SHA-256: <code>78f6a918a462c0866f7e590527afa23b9321cc65b5ae482b62ada3b95dca532a</code>.</p>
+      <p class="source">Generated deterministically from <a href="STATUS.md">docs/context/STATUS.md</a>. Canonical SHA-256: <code>34ee9f6c4dbb7c0a146a4435a4fc3168676afa2fcdf00d93897b2de9feacc8de</code>.</p>
     </main>
   </body>
 </html>

@@ -3,6 +3,8 @@
 ## 2026-08-28
 
 - Accepted the owner decision to publish reviewed player-rating subsets. The admin desk permits a nonempty subset of picked opinion players, rejects unpicked rows, and explains how many omitted players will publish as N/A. Public opinion-player views label missing ratings N/A and continue to exclude them from accuracy scoring.
+- Published the implementation through [PR #46](https://github.com/vdoshi96/Pl-predictions/pull/46) as `e852d717ed6af12cd54916e5e0ec5475abce3f98`; exact Ready deployment `dpl_5bVFdeCYjckhPwPWe2gSHYMo6YMi` serves the automatic project and main aliases. The separately assigned `pl-predictions-2026.vercel.app` alias remains on August 24 deployment `dpl_5znWdTiecQjPMyyS56qBVc4YiAcv` pending explicit owner approval to move it.
+- Published sealed provisional player-rating snapshot `3bd5c440-0add-4de2-800c-e5757e21efea` through the authenticated admin desk. Read-only reconciliation matched all 15 reviewed facts, retained seven unrated picked players as absent N/A values, and confirmed 22 picked players, `N = 14`, active equals working, and no final pointer. Exact-deployment browser checks verified every category, Keshav's 90-point overall lead, mixed six-of-seven and seven-of-seven availability, and the unchanged two-entry Win Streak state.
 
 ## 2026-08-24
 

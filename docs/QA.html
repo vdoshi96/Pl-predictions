@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="generated-by" content="scripts/generate-docs-html.mjs" />
     <meta name="canonical-source" content="QA.md" />
-    <meta name="canonical-source-sha256" content="dd7ff111d0a5a15e78b2c662e195e264019e4af5202c1684dc1d61ce4358eaca" />
+    <meta name="canonical-source-sha256" content="80c19e2cf63410aa6dc09a1190c63a9e3f55f92338bfc01848c486ce067f78ee" />
     <title>Quality assurance</title>
     <style>
       :root { color-scheme: light dark; font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
@@ -40,6 +40,36 @@
   <body>
     <main>
       <h1 id="quality-assurance">Quality assurance</h1>
+<h2 id="august-29-production-results-and-stable-routing">August 29 production results and stable routing</h2>
+<p>The owner-run update publishes reviewed provisional facts after the fixture and live-match gates pass. The shared production address is a project domain that follows successful deployments from GitHub <code>main</code>.</p>
+<table>
+<thead>
+<tr>
+<th>Gate</th>
+<th>Evidence</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Fixture preflight</td>
+<td><code>npm run win-streak:fixtures:check</code> verified 370 fixtures across 37 matchweeks with no drift and no write. FotMob reported no active match. Five of 10 Matchweek 2 fixtures were final, so the all-10 Win Streak gate correctly prevented a partial round update.</td>
+</tr>
+<tr>
+<td>Production publication</td>
+<td>The authenticated administrator workflow published 20 standings rows, 14 scorer rows, 14 assister rows, 20 clean-sheet rows, and 17 reviewed ratings. Goals, assists, and clean sheets retain <code>covered_through_rank = 14</code>. Five picked players remain absent and display as N/A. No final pointer moved.</td>
+</tr>
+<tr>
+<td>Database reconciliation</td>
+<td>Independent read-only queries matched every published source value and competition rank. Active equals working for sealed goals snapshot <code>8821c142-2e97-4341-9e0a-3af20dc5c6f4</code>, assists <code>f41817f7-aeab-475d-bc50-5e5f0754a03a</code>, clean sheets <code>8853ce2a-5c0f-4042-9593-426eed7f3bd9</code>, and ratings <code>a3e9b0af-a195-4aba-adc5-aa74042f9ea8</code>. All final pointers remain <code>NULL</code>.</td>
+</tr>
+<tr>
+<td>Local and production browser</td>
+<td>Both rendered sites returned <code>200</code>, showed 14 table and Spotlight entries, and supported every category sort. Ajay leads the table with 37 points. Keshav leads Spotlight with 87 points. Nine entries have seven available results, and five have six. The player views visibly contain six underdog-pick and four overrated-pick N/A occurrences. Win Streak shows two profiles at 0.</td>
+</tr>
+<tr>
+<td>Stable production domain</td>
+<td>Vercel stores <code>pl-predictions-2026.vercel.app</code> as a verified project domain with no Git branch or custom-environment override. The project uses GitHub repository <code>vdoshi96/Pl-predictions</code>, production branch <code>main</code>, automatic Git deployments, and automatic custom-domain assignment. After conversion, the shared domain resolved from stale deployment <code>dpl_5znWdTiecQjPMyyS56qBVc4YiAcv</code> to current production deployment <code>dpl_Fsrr1CrYfymai5uWne83wrBEio1K</code>. The closeout merge verifies the next automatic move.</td>
+</tr>
+</tbody></table>
 <h2 id="august-28-reviewed-rating-subsets">August 28 reviewed rating subsets</h2>
 <p>The production rating workflow publishes reviewed facts without fabricating values for players who have not received a rating. Missing picked players display as N/A and remain absent from ranks and accuracy totals.</p>
 <table>
@@ -854,7 +884,7 @@
 <li><input checked="" disabled="" type="checkbox"> Regenerate final HTML peers, publish this closeout through <code>main</code>, synchronize local and remote <code>main</code>, and remove completed branch state.</li>
 </ul>
 
-      <p class="source">Generated deterministically from <a href="QA.md">docs/QA.md</a>. Canonical SHA-256: <code>dd7ff111d0a5a15e78b2c662e195e264019e4af5202c1684dc1d61ce4358eaca</code>.</p>
+      <p class="source">Generated deterministically from <a href="QA.md">docs/QA.md</a>. Canonical SHA-256: <code>80c19e2cf63410aa6dc09a1190c63a9e3f55f92338bfc01848c486ce067f78ee</code>.</p>
     </main>
   </body>
 </html>

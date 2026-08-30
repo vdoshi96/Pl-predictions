@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="generated-by" content="scripts/generate-docs-html.mjs" />
     <meta name="canonical-source" content="STATUS.md" />
-    <meta name="canonical-source-sha256" content="6a6daa0b37d1e7eda105e075be7f4a3f19fc555add405eec6502e69bdcc0fbfa" />
+    <meta name="canonical-source-sha256" content="72e9a9ca61dff96c8561bcd1655fe00fe75d0f26d9dba9f65c6473b04ade7679" />
     <title>Status</title>
     <style>
       :root { color-scheme: light dark; font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
@@ -41,13 +41,15 @@
     <main>
       <h1 id="status">Status</h1>
 <ul>
-<li><p>Current production data (2026-08-29): the authenticated owner workflow published fresh FotMob standings and sealed provisional snapshots for goals, assists, clean sheets, and player ratings. The season has <code>N = 14</code> brackets. Active snapshot IDs are goals <code>8821c142-2e97-4341-9e0a-3af20dc5c6f4</code>, assists <code>f41817f7-aeab-475d-bc50-5e5f0754a03a</code>, clean sheets <code>8853ce2a-5c0f-4042-9593-426eed7f3bd9</code>, and ratings <code>a3e9b0af-a195-4aba-adc5-aa74042f9ea8</code>. Every active snapshot is also the sealed working snapshot, and every final pointer remains <code>NULL</code>.</p>
+<li><p>Current production data (2026-08-30): the authenticated owner workflow published the 20-club FotMob table and sealed provisional snapshots for goals, assists, clean sheets, and player ratings. The season has <code>N = 14</code> brackets. Active snapshot IDs are goals <code>5c8287d4-2443-446a-8ce3-7fe39e134f8c</code>, assists <code>43c1084b-4dc9-4347-a0b0-8ae8c327de7a</code>, clean sheets <code>367f4e8b-64fa-496f-8507-b6ba6c5dcec4</code>, and ratings <code>496bbada-9393-447e-a9f5-1e419b2ed625</code>. Every active snapshot is the sealed working snapshot, and every final pointer remains <code>NULL</code>.</p>
 </li>
 <li><p>Rating availability: 17 of 22 distinct picked opinion players have reviewed ratings. Alejandro Garnacho, Amad Diallo, Brian Madjo, Carlos Baleba, and Martin Dúbravka remain absent from the rating snapshot and display as N/A without a rank or accuracy points.</p>
 </li>
-<li><p>Public results: <a href="https://pl-predictions-2026.vercel.app">the production site</a> renders 14 leaderboard entries with Ajay first on 37 table points. It renders all seven Spotlight categories with Keshav first on 87 accuracy points, nine entries with seven available results, and five entries with six available results. The two player-rating views render six underdog-pick and four overrated-pick N/A occurrences. Win Streak remains unresolved at 0 because only five of 10 Matchweek 2 fixtures are final.</p>
+<li><p>Public results: <a href="https://pl-predictions-2026.vercel.app">the production site</a> renders Angad first on 36 table points, with Keer second on 33 and Ajay and Aravind sharing third on 32. Aravind and Keshav share the Spotlight lead with 80 accuracy points. All seven category boards are live; five picked players remain N/A in the rating views.</p>
 </li>
-<li><p>Vercel routing: <code>pl-predictions-2026.vercel.app</code> is a verified project production domain with no branch override. The project remains connected to <code>vdoshi96/Pl-predictions</code>, production branch <code>main</code>, with automatic custom-domain assignment enabled. <a href="https://github.com/vdoshi96/Pl-predictions/pull/48">PR #48</a> merged as <code>19188058dec7d91c4418da9a32bf8abe075280f2</code>; Vercel created Ready production deployment <code>dpl_7KcMtha9qXnribCCVyoFRRXApdRh</code> and assigned the shared domain automatically without a manual alias command.</p>
+<li><p>Win Streak: nine of 10 Matchweek 2 fixtures are final. Aston Villa-Arsenal remains scheduled for August 31, 2026, so the round stays unresolved and locked with no stored outcomes or voids. Rohan Tejaswi and Vishal Doshi share first at 0, and both public current picks remain Manchester United.</p>
+</li>
+<li><p>Fixture and routing verification: the official check retained 370 fixtures across 37 matchweeks with the August 28 source date and no drift. No fixture release or targeted seed ran. Before this documentation closeout, <code>pl-predictions-2026.vercel.app</code> resolved to Ready production deployment <code>dpl_D6fxyz1ixQ5DGRDXc9rbYpvuurwJ</code>; anonymous desktop and 390-pixel checks returned <code>200</code> without console errors, failed requests, mutation requests, or horizontal overflow.</p>
 </li>
 <li><p>Current release (2026-08-28): <a href="https://github.com/vdoshi96/Pl-predictions/pull/46">PR #46</a> merged reviewed rating subsets and public N/A presentation as <code>e852d717ed6af12cd54916e5e0ec5475abce3f98</code>. A player omitted from the reviewed rating snapshot remains unavailable and contributes no points; no zero or sentinel fact is stored. Exact production deployment <code>dpl_5bVFdeCYjckhPwPWe2gSHYMo6YMi</code> is Ready at <a href="https://pl-predictions-hdaopixm0-vdoshi96s-projects.vercel.app">its immutable URL</a> and owns the automatic main/project aliases.</p>
 </li>
@@ -163,7 +165,7 @@
 </li>
 </ul>
 
-      <p class="source">Generated deterministically from <a href="STATUS.md">docs/context/STATUS.md</a>. Canonical SHA-256: <code>6a6daa0b37d1e7eda105e075be7f4a3f19fc555add405eec6502e69bdcc0fbfa</code>.</p>
+      <p class="source">Generated deterministically from <a href="STATUS.md">docs/context/STATUS.md</a>. Canonical SHA-256: <code>72e9a9ca61dff96c8561bcd1655fe00fe75d0f26d9dba9f65c6473b04ade7679</code>.</p>
     </main>
   </body>
 </html>

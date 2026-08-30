@@ -1,5 +1,18 @@
 # Quality assurance
 
+## August 30 production results
+
+The owner-run update published reviewed Matchweek 1 and partial Matchweek 2 facts without advancing the incomplete Win Streak round.
+
+| Gate                        | Evidence                                                                                                                                                                                                                                                                                                                                                                        |
+| --------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Fixture and match preflight | `npm run win-streak:fixtures:check` verified 370 fixtures across 37 matchweeks with no drift or write. FotMob reported nine of 10 Matchweek 2 fixtures final. Aston Villa-Arsenal remains scheduled for August 31, 2026, so the all-10 gate prevented a partial Win Streak transition.                                                                                          |
+| Production publication      | The authenticated administrator workflow published 20 standings rows, 14 scorer rows, 14 assister rows, 20 clean-sheet rows, and 17 reviewed ratings. Goals, assists, and clean sheets record `covered_through_rank = 14`. Five picked players remain absent from the rating facts and display as N/A.                                                                          |
+| Database reconciliation     | Read-only comparison found zero source mismatches. Active equals working for sealed goals snapshot `5c8287d4-2443-446a-8ce3-7fe39e134f8c`, assists `43c1084b-4dc9-4347-a0b0-8ae8c327de7a`, clean sheets `367f4e8b-64fa-496f-8507-b6ba6c5dcec4`, and ratings `496bbada-9393-447e-a9f5-1e419b2ed625`. Every final pointer remains `NULL`.                                         |
+| Production browser          | Ready deployment `dpl_D6fxyz1ixQ5DGRDXc9rbYpvuurwJ` served the stable domain during data verification. The table shows Angad at 36, Keer at 33, and Ajay and Aravind at 32. Aravind and Keshav share the 80-point Spotlight lead. Every category board is live. Desktop and 390-pixel checks found no console errors, HTTP failures, mutation requests, or horizontal overflow. |
+| Win Streak boundary         | Matchweek 2 remains unresolved with 10 stored fixtures, zero results, two picks, and no voids. The public leaderboard shows Rohan Tejaswi and Vishal Doshi tied at 0, each with a Manchester United pick. No Win Streak result mutation ran.                                                                                                                                    |
+| Release boundary            | No fixture rewrite, targeted seed, runtime football client, direct result write, schema migration, finalization, `LOCK`, `REVEAL`, protected-round change, or unrelated application change ran.                                                                                                                                                                                 |
+
 ## August 29 production results and stable routing
 
 The owner-run update publishes reviewed provisional facts after the fixture and live-match gates pass. The shared production address is a project domain that follows successful deployments from GitHub `main`.

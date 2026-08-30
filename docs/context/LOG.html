@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="generated-by" content="scripts/generate-docs-html.mjs" />
     <meta name="canonical-source" content="LOG.md" />
-    <meta name="canonical-source-sha256" content="3d8b9aa55d0c60e163ee7883919eae5663beb96ad6b4448271980f0d0c0a5b6c" />
+    <meta name="canonical-source-sha256" content="dc5e5e4f4b5239b7410498d6d84231e715ee3660f00881f05ddc70a99dc2c726" />
     <title>Session log</title>
     <style>
       :root { color-scheme: light dark; font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
@@ -40,6 +40,16 @@
   <body>
     <main>
       <h1 id="session-log">Session log</h1>
+<h2 id="2026-08-30">2026-08-30</h2>
+<ul>
+<li>Verified the official Win Streak source with no drift: 370 fixtures across 37 matchweeks and the retained August 28 source date. No fixture rewrite, release, or targeted production seed ran.</li>
+<li>Confirmed production season <code>2026-27</code>, <code>N = 14</code>, 20 clubs, 37 Win Streak rounds, 370 fixtures, null final pointers, and zero resolved Win Streak rounds before mutation.</li>
+<li>Resolved FotMob season metadata dynamically to <code>2026/2027</code> and stats path <code>stats/47/season/36781/</code>. Published the 20-club standings table and provisional goals, assists, clean-sheets, and player-ratings snapshots through the authenticated administrator desks.</li>
+<li>Reconciled every active fact with zero mismatches. Goals snapshot <code>5c8287d4-2443-446a-8ce3-7fe39e134f8c</code>, assists <code>43c1084b-4dc9-4347-a0b0-8ae8c327de7a</code>, clean sheets <code>367f4e8b-64fa-496f-8507-b6ba6c5dcec4</code>, and ratings <code>496bbada-9393-447e-a9f5-1e419b2ed625</code> are sealed, active, working, provisional, and sourced to FotMob. Five picked players remain unavailable as N/A.</li>
+<li>Kept Matchweek 2 unresolved because Aston Villa-Arsenal is not final. Nine reviewed fixtures are complete, but the all-10 gate forbids a partial transition. No outcome or void was stored.</li>
+<li>Verified the stable production domain on Ready deployment <code>dpl_D6fxyz1ixQ5DGRDXc9rbYpvuurwJ</code>. The rendered table is led by Angad on 36 points; Aravind and Keshav share the 80-point Spotlight lead. Both Win Streak profiles remain tied at 0 with Manchester United picks. Desktop and 390-pixel checks returned <code>200</code> without console errors, failed requests, mutation requests, or horizontal overflow.</li>
+<li>Preserved the release boundary: no finalization, <code>LOCK</code>, <code>REVEAL</code>, runtime football client, direct result write, schema migration, protected-round change, or unrelated application work ran.</li>
+</ul>
 <h2 id="2026-08-28">2026-08-28</h2>
 <ul>
 <li>Accepted the owner decision to publish reviewed player-rating subsets. The admin desk permits a nonempty subset of picked opinion players, rejects unpicked rows, and explains how many omitted players will publish as N/A. Public opinion-player views label missing ratings N/A and continue to exclude them from accuracy scoring.</li>
@@ -367,7 +377,7 @@
 <li>Next handoff: use <code>main</code> as the base for future pull requests. No GitHub access blocker remains for the current repository workflow.</li>
 </ul>
 
-      <p class="source">Generated deterministically from <a href="LOG.md">docs/context/LOG.md</a>. Canonical SHA-256: <code>3d8b9aa55d0c60e163ee7883919eae5663beb96ad6b4448271980f0d0c0a5b6c</code>.</p>
+      <p class="source">Generated deterministically from <a href="LOG.md">docs/context/LOG.md</a>. Canonical SHA-256: <code>dc5e5e4f4b5239b7410498d6d84231e715ee3660f00881f05ddc70a99dc2c726</code>.</p>
     </main>
   </body>
 </html>

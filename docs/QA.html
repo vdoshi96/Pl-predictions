@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="generated-by" content="scripts/generate-docs-html.mjs" />
     <meta name="canonical-source" content="QA.md" />
-    <meta name="canonical-source-sha256" content="1661a7e40f2dadf3a31c1f1c0088860a80c99fd08a058e951c98a59dd92cb574" />
+    <meta name="canonical-source-sha256" content="a0aafcf2cb8948ba6b5dcbba8ce765350f98b7671c1036c0db0a21de675dcbf7" />
     <title>Quality assurance</title>
     <style>
       :root { color-scheme: light dark; font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
@@ -40,6 +40,40 @@
   <body>
     <main>
       <h1 id="quality-assurance">Quality assurance</h1>
+<h2 id="august-30-production-results">August 30 production results</h2>
+<p>The owner-run update published reviewed Matchweek 1 and partial Matchweek 2 facts without advancing the incomplete Win Streak round.</p>
+<table>
+<thead>
+<tr>
+<th>Gate</th>
+<th>Evidence</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Fixture and match preflight</td>
+<td><code>npm run win-streak:fixtures:check</code> verified 370 fixtures across 37 matchweeks with no drift or write. FotMob reported nine of 10 Matchweek 2 fixtures final. Aston Villa-Arsenal remains scheduled for August 31, 2026, so the all-10 gate prevented a partial Win Streak transition.</td>
+</tr>
+<tr>
+<td>Production publication</td>
+<td>The authenticated administrator workflow published 20 standings rows, 14 scorer rows, 14 assister rows, 20 clean-sheet rows, and 17 reviewed ratings. Goals, assists, and clean sheets record <code>covered_through_rank = 14</code>. Five picked players remain absent from the rating facts and display as N/A.</td>
+</tr>
+<tr>
+<td>Database reconciliation</td>
+<td>Read-only comparison found zero source mismatches. Active equals working for sealed goals snapshot <code>5c8287d4-2443-446a-8ce3-7fe39e134f8c</code>, assists <code>43c1084b-4dc9-4347-a0b0-8ae8c327de7a</code>, clean sheets <code>367f4e8b-64fa-496f-8507-b6ba6c5dcec4</code>, and ratings <code>496bbada-9393-447e-a9f5-1e419b2ed625</code>. Every final pointer remains <code>NULL</code>.</td>
+</tr>
+<tr>
+<td>Production browser</td>
+<td>Ready deployment <code>dpl_D6fxyz1ixQ5DGRDXc9rbYpvuurwJ</code> served the stable domain during data verification. The table shows Angad at 36, Keer at 33, and Ajay and Aravind at 32. Aravind and Keshav share the 80-point Spotlight lead. Every category board is live. Desktop and 390-pixel checks found no console errors, HTTP failures, mutation requests, or horizontal overflow.</td>
+</tr>
+<tr>
+<td>Win Streak boundary</td>
+<td>Matchweek 2 remains unresolved with 10 stored fixtures, zero results, two picks, and no voids. The public leaderboard shows Rohan Tejaswi and Vishal Doshi tied at 0, each with a Manchester United pick. No Win Streak result mutation ran.</td>
+</tr>
+<tr>
+<td>Release boundary</td>
+<td>No fixture rewrite, targeted seed, runtime football client, direct result write, schema migration, finalization, <code>LOCK</code>, <code>REVEAL</code>, protected-round change, or unrelated application change ran.</td>
+</tr>
+</tbody></table>
 <h2 id="august-29-production-results-and-stable-routing">August 29 production results and stable routing</h2>
 <p>The owner-run update publishes reviewed provisional facts after the fixture and live-match gates pass. The shared production address is a project domain that follows successful deployments from GitHub <code>main</code>.</p>
 <table>
@@ -884,7 +918,7 @@
 <li><input checked="" disabled="" type="checkbox"> Regenerate final HTML peers, publish this closeout through <code>main</code>, synchronize local and remote <code>main</code>, and remove completed branch state.</li>
 </ul>
 
-      <p class="source">Generated deterministically from <a href="QA.md">docs/QA.md</a>. Canonical SHA-256: <code>1661a7e40f2dadf3a31c1f1c0088860a80c99fd08a058e951c98a59dd92cb574</code>.</p>
+      <p class="source">Generated deterministically from <a href="QA.md">docs/QA.md</a>. Canonical SHA-256: <code>a0aafcf2cb8948ba6b5dcbba8ce765350f98b7671c1036c0db0a21de675dcbf7</code>.</p>
     </main>
   </body>
 </html>

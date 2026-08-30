@@ -1,5 +1,15 @@
 # Session log
 
+## 2026-08-30
+
+- Verified the official Win Streak source with no drift: 370 fixtures across 37 matchweeks and the retained August 28 source date. No fixture rewrite, release, or targeted production seed ran.
+- Confirmed production season `2026-27`, `N = 14`, 20 clubs, 37 Win Streak rounds, 370 fixtures, null final pointers, and zero resolved Win Streak rounds before mutation.
+- Resolved FotMob season metadata dynamically to `2026/2027` and stats path `stats/47/season/36781/`. Published the 20-club standings table and provisional goals, assists, clean-sheets, and player-ratings snapshots through the authenticated administrator desks.
+- Reconciled every active fact with zero mismatches. Goals snapshot `5c8287d4-2443-446a-8ce3-7fe39e134f8c`, assists `43c1084b-4dc9-4347-a0b0-8ae8c327de7a`, clean sheets `367f4e8b-64fa-496f-8507-b6ba6c5dcec4`, and ratings `496bbada-9393-447e-a9f5-1e419b2ed625` are sealed, active, working, provisional, and sourced to FotMob. Five picked players remain unavailable as N/A.
+- Kept Matchweek 2 unresolved because Aston Villa-Arsenal is not final. Nine reviewed fixtures are complete, but the all-10 gate forbids a partial transition. No outcome or void was stored.
+- Verified the stable production domain on Ready deployment `dpl_D6fxyz1ixQ5DGRDXc9rbYpvuurwJ`. The rendered table is led by Angad on 36 points; Aravind and Keshav share the 80-point Spotlight lead. Both Win Streak profiles remain tied at 0 with Manchester United picks. Desktop and 390-pixel checks returned `200` without console errors, failed requests, mutation requests, or horizontal overflow.
+- Preserved the release boundary: no finalization, `LOCK`, `REVEAL`, runtime football client, direct result write, schema migration, protected-round change, or unrelated application work ran.
+
 ## 2026-08-28
 
 - Accepted the owner decision to publish reviewed player-rating subsets. The admin desk permits a nonempty subset of picked opinion players, rejects unpicked rows, and explains how many omitted players will publish as N/A. Public opinion-player views label missing ratings N/A and continue to exclude them from accuracy scoring.

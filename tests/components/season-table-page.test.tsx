@@ -178,6 +178,43 @@ describe("season table landing", () => {
     ).toHaveClass("sr-only");
   });
 
+  it("scales delta color intensity with the distance from consensus", async () => {
+    const deltas = [0.9, -2.5, 3.2, -6.6, 16.6];
+    const intensities = ["subtle", "mild", "moderate", "strong", "extreme"];
+
+    render(
+      await SeasonTablePage({
+        view: view({
+          consensusActive: true,
+          rows: deltas.map((delta, index) => ({
+            actualPosition: index + 1,
+            avgPredicted: index + 1 + delta,
+            delta,
+            leaguePoints: 3,
+            team: {
+              ...team,
+              displayName: `Team ${index + 1}`,
+              id: `team-${index + 1}`,
+            },
+          })),
+          snapshot: {
+            capturedAt: new Date("2026-08-22T12:00:00.000Z"),
+            isFinal: false,
+            matchweek: 1,
+          },
+        }),
+      }),
+    );
+
+    deltas.forEach((delta, index) => {
+      const arrow = delta > 0 ? "▲" : "▼";
+      expect(
+        screen.getByText(`${arrow} ${Math.abs(delta).toFixed(1)}`)
+          .parentElement,
+      ).toHaveAttribute("data-intensity", intensities[index]);
+    });
+  });
+
   it("uses Home for the root navigation item", () => {
     render(<SiteHeader />);
     expect(screen.getByRole("link", { name: "Home" })).toHaveAttribute(

@@ -146,53 +146,81 @@ export function SpotlightCategoriesView({
             </div>
             <div>
               {board.rows.map((row) => (
-                <div
-                  className="border-surface-lilac-border grid min-h-16 grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-2 border-b px-4 py-2.5 last:border-b-0"
+                <details
+                  className="group border-surface-lilac-border border-b last:border-b-0"
                   key={row.identityKey}
                 >
-                  <SubjectMark
-                    assetPath={row.assetPath}
-                    displayName={row.displayName}
-                    shortName={row.shortName}
-                    subject={row.subject}
-                  />
-                  <div className="min-w-0">
-                    <strong className="text-foreground block text-xs font-black [overflow-wrap:anywhere]">
-                      {row.displayName}{" "}
-                      {row.isOther ? (
-                        <Badge className="ml-1 min-h-5 px-1.5 py-0 text-[0.58rem]">
-                          Other
-                        </Badge>
-                      ) : null}
-                    </strong>
-                    <div className="mt-1 flex flex-wrap items-center gap-2">
-                      <span
-                        className="flex"
-                        aria-label={`${row.count} pickers`}
-                      >
-                        {row.pickers.slice(0, 5).map((picker, index) => (
-                          <span
-                            aria-label={picker.participantName}
-                            className={`grid size-6 place-items-center rounded-full border-2 border-white text-[0.55rem] font-black text-white ${index === 0 ? "" : "-ml-1.5"}`}
-                            key={picker.id}
-                            style={{ backgroundColor: picker.backgroundColor }}
-                          >
-                            {picker.initials}
-                          </span>
-                        ))}
-                        {row.count > 5 ? (
-                          <span className="bg-surface-subtle text-muted -ml-1.5 grid min-w-6 place-items-center rounded-full border-2 border-white px-1 text-[0.55rem] font-black">
-                            +{row.count - 5}
-                          </span>
-                        ) : null}
+                  <summary className="focus-visible:ring-accent-blue grid min-h-16 cursor-pointer list-none grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-2 px-4 py-2.5 outline-none focus-visible:ring-2 focus-visible:ring-inset [&::-webkit-details-marker]:hidden">
+                    <SubjectMark
+                      assetPath={row.assetPath}
+                      displayName={row.displayName}
+                      shortName={row.shortName}
+                      subject={row.subject}
+                    />
+                    <span className="min-w-0">
+                      <strong className="text-foreground flex items-center gap-1.5 text-xs font-black [overflow-wrap:anywhere]">
+                        <span>
+                          {row.displayName}{" "}
+                          {row.isOther ? (
+                            <Badge className="ml-1 min-h-5 px-1.5 py-0 text-[0.58rem]">
+                              Other
+                            </Badge>
+                          ) : null}
+                        </span>
+                        <span
+                          aria-hidden="true"
+                          className="text-muted inline-block shrink-0 transition-transform group-open:rotate-180"
+                        >
+                          ⌄
+                        </span>
+                      </strong>
+                      <span className="mt-1 flex flex-wrap items-center gap-2">
+                        <span
+                          className="flex"
+                          aria-label={`${row.count} pickers`}
+                        >
+                          {row.pickers.slice(0, 5).map((picker, index) => (
+                            <span
+                              aria-label={picker.participantName}
+                              className={`grid size-6 place-items-center rounded-full border-2 border-white text-[0.55rem] font-black text-white ${index === 0 ? "" : "-ml-1.5"}`}
+                              key={picker.id}
+                              style={{
+                                backgroundColor: picker.backgroundColor,
+                              }}
+                            >
+                              {picker.initials}
+                            </span>
+                          ))}
+                          {row.count > 5 ? (
+                            <span className="bg-surface-subtle text-muted -ml-1.5 grid min-w-6 place-items-center rounded-full border-2 border-white px-1 text-[0.55rem] font-black">
+                              +{row.count - 5}
+                            </span>
+                          ) : null}
+                        </span>
+                        <span className="text-muted text-[0.68rem] font-bold">
+                          {row.count} of {entryCount} · Select to see names
+                        </span>
                       </span>
-                      <span className="text-muted text-[0.68rem] font-bold">
-                        {row.count} of {entryCount}
-                      </span>
-                    </div>
+                    </span>
+                    <ResultChip {...row} category={board.category} />
+                  </summary>
+                  <div className="border-surface-lilac-border bg-surface-subtle border-t border-dashed px-4 py-3">
+                    <h3 className="text-muted text-[0.62rem] font-black tracking-wider uppercase">
+                      Predicted by
+                    </h3>
+                    <ul className="mt-1 grid gap-x-4 sm:grid-cols-2">
+                      {row.pickers.map((picker) => (
+                        <li key={picker.id}>
+                          <LeaderboardEntryLink
+                            className="text-xs"
+                            entryId={picker.id}
+                            participantName={picker.participantName}
+                          />
+                        </li>
+                      ))}
+                    </ul>
                   </div>
-                  <ResultChip {...row} category={board.category} />
-                </div>
+                </details>
               ))}
             </div>
           </Card>

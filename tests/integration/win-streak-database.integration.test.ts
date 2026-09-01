@@ -84,7 +84,7 @@ async function activeWinStreakFixture() {
 }
 
 describe.runIf(enabled)("Win Streak database", () => {
-  it("creates a current-round profile and authenticates one atomic pick", async () => {
+  it("creates or resumes a current-round profile and authenticates the latest receipt", async () => {
     await seedWinStreakFixtures();
     const { db, season } = await activeWinStreakFixture();
     const profileId = randomUUID();
@@ -99,12 +99,29 @@ describe.runIf(enabled)("Win Streak database", () => {
         receiptTokenHash,
         seasonId: season.id,
       }),
-    ).resolves.toBe(true);
+    ).resolves.toEqual({
+      displayName: `Atomic ${profileId.slice(0, 8)}`,
+      profileId,
+    });
+
+    const resumedReceiptTokenHash = "b".repeat(64);
+    await expect(
+      insertWinStreakProfileAtomically(db, {
+        id: randomUUID(),
+        normalizedParticipantName: `atomic ${profileId.slice(0, 8)}`,
+        participantName: `ATOMIC ${profileId.slice(0, 8)}`,
+        receiptTokenHash: resumedReceiptTokenHash,
+        seasonId: season.id,
+      }),
+    ).resolves.toEqual({
+      displayName: `Atomic ${profileId.slice(0, 8)}`,
+      profileId,
+    });
     await expect(
       insertWinStreakPickAtomically(db, {
         id: randomUUID(),
         profileId,
-        receiptTokenHash: "f".repeat(64),
+        receiptTokenHash,
         teamSlug: "arsenal",
       }),
     ).resolves.toBe(false);
@@ -112,7 +129,7 @@ describe.runIf(enabled)("Win Streak database", () => {
       insertWinStreakPickAtomically(db, {
         id: randomUUID(),
         profileId,
-        receiptTokenHash,
+        receiptTokenHash: resumedReceiptTokenHash,
         teamSlug: "arsenal",
       }),
     ).resolves.toBe(true);
@@ -124,6 +141,43 @@ describe.runIf(enabled)("Win Streak database", () => {
         teamSlug: "chelsea",
       }),
     ).rejects.toThrow();
+  }, 30_000);
+
+  it("rotates an existing profile receipt without changing its identity", async () => {
+    await seedWinStreakFixtures();
+    const { db, round, season } = await activeWinStreakFixture();
+    const profileId = randomUUID();
+    const nameSuffix = profileId.slice(0, 8);
+    createdProfileIds.add(profileId);
+
+    await db.insert(winStreakProfiles).values({
+      id: profileId,
+      joinedRoundId: round.id,
+      normalizedParticipantName: `receipt resume ${nameSuffix}`,
+      participantName: `Receipt Resume ${nameSuffix}`,
+      receiptTokenHash: "a".repeat(64),
+      seasonId: season.id,
+    });
+    await db
+      .update(winStreakProfiles)
+      .set({ receiptTokenHash: "b".repeat(64) })
+      .where(eq(winStreakProfiles.id, profileId));
+
+    const [profile] = await db
+      .select({
+        joinedRoundId: winStreakProfiles.joinedRoundId,
+        normalizedParticipantName: winStreakProfiles.normalizedParticipantName,
+        participantName: winStreakProfiles.participantName,
+        receiptTokenHash: winStreakProfiles.receiptTokenHash,
+      })
+      .from(winStreakProfiles)
+      .where(eq(winStreakProfiles.id, profileId));
+    expect(profile).toEqual({
+      joinedRoundId: round.id,
+      normalizedParticipantName: `receipt resume ${nameSuffix}`,
+      participantName: `Receipt Resume ${nameSuffix}`,
+      receiptTokenHash: "b".repeat(64),
+    });
   }, 30_000);
 
   it("seeds the canonical schedule idempotently without duplicating rows", async () => {

@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="generated-by" content="scripts/generate-docs-html.mjs" />
     <meta name="canonical-source" content="QA.md" />
-    <meta name="canonical-source-sha256" content="a21b53df4105ad04b0f08899f52b14fe8af0f7aa69ed1ad685473b4908526152" />
+    <meta name="canonical-source-sha256" content="e66d71a6ffc4bebdd86e0a689884cc62ade4e630e9390e19c3ff117e2c0cb09c" />
     <title>Quality assurance</title>
     <style>
       :root { color-scheme: light dark; font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
@@ -40,6 +40,36 @@
   <body>
     <main>
       <h1 id="quality-assurance">Quality assurance</h1>
+<h2 id="september-1-win-streak-display-name-resumption">September 1 Win Streak display-name resumption</h2>
+<p>Win Streak accepts the same normalized display name after cookie loss and rotates the receipt for the existing profile. The profile identity, joined round, history, and immutable picks remain unchanged.</p>
+<table>
+<thead>
+<tr>
+<th>Gate</th>
+<th>Evidence</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Red-green regression</td>
+<td>Focused service, atomic-query, action, and production-UI tests failed against the receipt-only behavior, then passed after display-name resumption was implemented. The full unit and component run passed 423 tests with 32 guarded skips across 72 files.</td>
+</tr>
+<tr>
+<td>Isolated database migration</td>
+<td>Migration <code>0011_win_streak_name_resume.sql</code> applied to the configured isolated Neon test database. A focused integration test rotated one synthetic profile receipt and verified that its display name, normalized name, and joined round remained unchanged; cleanup removed the synthetic profile.</td>
+</tr>
+<tr>
+<td>Static and production build</td>
+<td>Prettier, ESLint, strict TypeScript, documentation parity for 18 Markdown and HTML pairs, and the Next.js 16.3 Webpack production build passed.</td>
+</tr>
+<tr>
+<td>Browser-test boundary</td>
+<td>The Playwright journey now expects display-name resumption from a cookie-free browser. The dated aggregate browser fixture still leaves Matchweek 2 unresolved after its real PostgreSQL deadline, so the profile-creation journey cannot run without changing immutable test-round state. No production browser claim is made from that blocked fixture.</td>
+</tr>
+<tr>
+<td>Release boundary</td>
+<td>This local verification did not apply migration <code>0011</code> to production, merge the branch, deploy the application, mutate Win Streak results or fixtures, or change participant picks.</td>
+</tr>
+</tbody></table>
 <h2 id="august-31-production-results">August 31 production results</h2>
 <p>The owner-run update published reviewed Matchweek 2 facts, resolved the completed Win Streak round atomically, and verified the live public views.</p>
 <table>
@@ -956,7 +986,7 @@
 <li><input checked="" disabled="" type="checkbox"> Regenerate final HTML peers, publish this closeout through <code>main</code>, synchronize local and remote <code>main</code>, and remove completed branch state.</li>
 </ul>
 
-      <p class="source">Generated deterministically from <a href="QA.md">docs/QA.md</a>. Canonical SHA-256: <code>a21b53df4105ad04b0f08899f52b14fe8af0f7aa69ed1ad685473b4908526152</code>.</p>
+      <p class="source">Generated deterministically from <a href="QA.md">docs/QA.md</a>. Canonical SHA-256: <code>e66d71a6ffc4bebdd86e0a689884cc62ade4e630e9390e19c3ff117e2c0cb09c</code>.</p>
     </main>
   </body>
 </html>

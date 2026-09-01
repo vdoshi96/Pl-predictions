@@ -102,7 +102,7 @@ export async function createWinStreakProfile(
   const profileId = randomUUID();
   const receiptToken = createWinStreakReceiptToken();
   try {
-    const inserted = await insertWinStreakProfileAtomically(getDb(), {
+    const profile = await insertWinStreakProfileAtomically(getDb(), {
       id: profileId,
       normalizedParticipantName: normalizedParticipantNameKey(
         parsed.data.displayName,
@@ -111,29 +111,28 @@ export async function createWinStreakProfile(
       receiptTokenHash: hashWinStreakReceiptToken(receiptToken),
       seasonId: season.id,
     });
-    if (!inserted) {
+    if (!profile) {
       throw new PublicError(
         "SUBMISSIONS_CLOSED",
         "Win Streak cannot accept another profile right now.",
       );
     }
+    return {
+      displayName: profile.displayName,
+      profileId: profile.profileId,
+      receiptToken,
+    };
   } catch (error) {
     if (error instanceof PublicError) throw error;
     const fact = databaseErrorFact(error);
     if (fact?.code === "23505") {
       throw new PublicError(
         "CONFLICT",
-        "That display name is already in use. Choose another name.",
+        "We could not continue with that Win Streak profile. Try again.",
       );
     }
     throw error;
   }
-
-  return {
-    displayName: parsed.data.displayName,
-    profileId,
-    receiptToken,
-  };
 }
 
 export async function submitWinStreakPick(input: unknown): Promise<{

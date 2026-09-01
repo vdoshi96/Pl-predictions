@@ -56,7 +56,7 @@ async function expectNoHorizontalOverflow(page: Page) {
 
 async function createProfile(page: Page, displayName: string) {
   await page.getByLabel("Display name").fill(displayName);
-  await page.getByRole("button", { name: "Create profile" }).click();
+  await page.getByRole("button", { name: "Continue to profile" }).click();
   await expect(
     page.getByRole("heading", { name: `${displayName}'s streak` }),
   ).toBeVisible();
@@ -198,7 +198,7 @@ test("creates a browser profile, locks a public pick, and resumes after reload",
   }
 });
 
-test("keeps opposite fixture picks shared and prevents name-only takeover", async ({
+test("keeps opposite fixture picks shared and resumes a name after cookie loss", async ({
   baseURL,
   browser,
 }, testInfo) => {
@@ -223,13 +223,13 @@ test("keeps opposite fixture picks shared and prevents name-only takeover", asyn
     await confirmPick(second, "Manchester City");
 
     await takeover.getByLabel("Display name").fill(firstName);
-    await takeover.getByRole("button", { name: "Create profile" }).click();
-    await expect(
-      takeover.getByRole("alert").filter({ hasText: "already in use" }),
-    ).toContainText("already in use");
+    await takeover.getByRole("button", { name: "Continue to profile" }).click();
     await expect(
       takeover.getByRole("heading", { name: `${firstName}'s streak` }),
-    ).toHaveCount(0);
+    ).toBeVisible();
+    await expect(
+      takeover.getByRole("heading", { name: "Pick locked: Crystal Palace" }),
+    ).toBeVisible();
 
     await first.reload();
     const leaderboard = first.getByTestId("win-streak-leaderboard");

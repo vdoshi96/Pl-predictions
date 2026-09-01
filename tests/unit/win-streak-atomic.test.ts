@@ -19,7 +19,7 @@ const profileInput = {
 };
 
 describe("atomic Win Streak writes", () => {
-  it("locks the current unresolved round before sampling the profile join clock", () => {
+  it("locks the current unresolved round and creates or resumes by normalized name", () => {
     const rendered = new PgDialect().sqlToQuery(
       buildCreateWinStreakProfileQuery(profileInput),
     );
@@ -30,6 +30,11 @@ describe("atomic Win Streak writes", () => {
     expect(statement).toContain('clock_timestamp() as "checked_at"');
     expect(statement).toContain('"checked_at" < "pick_deadline"');
     expect(statement).toContain('insert into "win_streak_profiles"');
+    expect(statement).toContain("on conflict");
+    expect(statement).toContain('do update set "receipt_token_hash" =');
+    expect(statement).toContain(
+      'returning "id" as "profileId", "participant_name" as "displayName"',
+    );
     expect(statement).toContain('select count(*) from "win_streak_profiles"');
     expect(rendered.params).toContain(WIN_STREAK_PROFILE_LIMIT);
     expect(rendered.params).toContain(profileInput.seasonId);
@@ -58,7 +63,7 @@ describe("atomic Win Streak writes", () => {
     expect(rendered.params).toContain(input.teamSlug);
   });
 
-  it("returns false when either guarded insert loses eligibility", async () => {
+  it("returns null when profile eligibility or pick eligibility is lost", async () => {
     const execute = vi
       .fn()
       .mockResolvedValueOnce({ rows: [] })
@@ -67,7 +72,7 @@ describe("atomic Win Streak writes", () => {
 
     await expect(
       insertWinStreakProfileAtomically(db, profileInput),
-    ).resolves.toBe(false);
+    ).resolves.toBeNull();
     await expect(
       insertWinStreakPickAtomically(db, {
         id: "00000000-0000-4000-8000-000000000003",

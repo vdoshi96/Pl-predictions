@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="generated-by" content="scripts/generate-docs-html.mjs" />
     <meta name="canonical-source" content="WIN-STREAK.md" />
-    <meta name="canonical-source-sha256" content="60e8f1eb5934b120c4d57a9eac304977825f74f2f0a6ae89425e4ddc4ffac518" />
+    <meta name="canonical-source-sha256" content="7e6b43dff1f2c2a6acff98a84712a4b9b76584cc7bc898e0217beb962d9b262f" />
     <title>Win Streak</title>
     <style>
       :root { color-scheme: light dark; font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
@@ -51,7 +51,7 @@
 <p>The game uses the site&#39;s existing identity, responsive navigation, semantic colour tokens, buttons, cards, and canonical local club badges. It does not change the season-table prediction game, Spotlight accuracy, or either existing leaderboard.</p>
 <h2 id="joining-and-identity">Joining and identity</h2>
 <p>The public leaderboard is visible without entering a name. To play, a participant enters a display name containing 2–40 characters. The server creates one season profile and places a random receipt in that browser as an HttpOnly, SameSite Strict cookie; only the receipt hash is stored in PostgreSQL.</p>
-<p>There is no account, password, email address, or name-based recovery. A normalized display name can belong to only one profile, and another browser cannot claim or resume it by typing the same name. Clearing or losing the receipt cookie makes that profile unrecoverable unless a future owner-supported recovery process is deliberately added. The release caps the season at 500 profiles and applies persistent creation and pick rate limits.</p>
+<p>There is no account, password, or email address. A normalized display name belongs to one season profile. If the browser loses its receipt cookie, enter the same display name to resume the profile. The server rotates the receipt, so the latest browser that enters the name becomes the receipt holder. The release caps the season at 500 profiles and applies persistent creation and pick rate limits.</p>
 <p>The public leaderboard shows every participant&#39;s display name, best streak, current streak, and current-matchweek pick with its opponent and venue. It does not publish receipt tokens, profile identifiers, or database identifiers.</p>
 <h2 id="making-a-pick">Making a pick</h2>
 <p>The contest begins with Matchweek 2. Every pick for a matchweek locks at that round&#39;s earliest persisted fixture kickoff, even when the selected club plays later. The round deadline and PostgreSQL clock are the write authority; a stale browser cannot submit after the deadline.</p>
@@ -125,9 +125,9 @@
 <p>The owner-run update-results workflow checks fixture drift first and then updates every newly completed Win Streak round through this authenticated desk. On August 23, 2026, Matchweek 2 had not started, so there was no result backfill to perform.</p>
 <h2 id="storage-and-security-boundary">Storage and security boundary</h2>
 <p>The live game adds <code>win_streak_rounds</code>, <code>win_streak_fixtures</code>, <code>win_streak_profiles</code>, and <code>win_streak_picks</code>. Database constraints repeat the season, current-round, one-pick, round-deadline, immutable-club, result-order, and safe-fixture-update rules. Public reads are capped and make up to three consistency attempts so one page cannot combine leaderboard facts from before and after a concurrent round publication.</p>
-<p>The browser stores no editable Win Streak state in <code>localStorage</code>. Server actions validate typed payloads, require same-origin requests, sample PostgreSQL time for deadlines, rate-limit profile and pick mutations, and retain only the receipt hash. Fixture and result acquisition remain offline owner operations; there is no football API, scraper, webhook, or cron in the deployed application.</p>
+<p>The browser stores no editable Win Streak state in <code>localStorage</code>. Server actions validate typed payloads, require same-origin requests, sample PostgreSQL time for deadlines, rate-limit profile and pick mutations, and retain only the active receipt hash. Re-entering an existing normalized display name rotates that hash without changing the profile or its picks. Fixture and result acquisition remain offline owner operations; there is no football API, scraper, webhook, or cron in the deployed application.</p>
 <h2 id="verified-interface">Verified interface</h2>
-<p>The interactive flow was exercised against a production build and isolated Neon database across desktop Chromium, 320-, 390-, and 430-pixel Chromium, and mobile WebKit. It covered anonymous leaderboard access, name creation, immutable confirmation, keyboard selection and dialog dismissal, two profiles with opposing fixture picks, public current picks, reload persistence, name-takeover denial, light/dark mode, official marks, clean console output, no external runtime football requests, and no page-level horizontal overflow. Unit and isolated integration tests cover shared result publication plus the win, reset, void, and missed-round transitions.</p>
+<p>The interactive flow is exercised against a production build and isolated Neon database across desktop Chromium, 320-, 390-, and 430-pixel Chromium, and mobile WebKit. It covers anonymous leaderboard access, name creation, immutable confirmation, keyboard selection and dialog dismissal, two profiles with opposing fixture picks, public current picks, reload persistence, display-name resumption after cookie loss, light and dark modes, official marks, clean console output, no external runtime football requests, and no page-level horizontal overflow. Unit and isolated integration tests cover receipt rotation, shared result publication, and the win, reset, void, and missed-round transitions.</p>
 <p><a href="https://github.com/vdoshi96/Pl-predictions/pull/39">PR #39</a> merged as <code>19bf11b4df43f8c3410f704fb278d1d4bdd845b5</code>. Migration <code>0010</code> and only the targeted Win Streak seed produced 37 rounds and 370 fixtures in production with zero profiles, picks, or results. Ready deployment <code>dpl_BTncZC77GmA3EXtaUjAKvfWZvRzP</code> owns the stable production alias. The guarded anonymous production smoke passed desktop Chromium, 390-pixel mobile Chromium, exact 320/430-pixel reflow, and mobile WebKit; final database read-back found no participant writes, and bounded error, fatal, and HTTP 5xx log queries were empty.</p>
 <h3 id="desktop">Desktop</h3>
 <p><img src="assets/qa/win-streak-desktop.png" alt="Win Streak desktop flow with the public leaderboard and current pick"></p>
@@ -135,7 +135,7 @@
 <p><img src="assets/qa/win-streak-mobile.png" alt="Win Streak mobile flow at 390 pixels"></p>
 <p>The screenshots use isolated QA profiles and data. They are not production participant records.</p>
 
-      <p class="source">Generated deterministically from <a href="WIN-STREAK.md">docs/WIN-STREAK.md</a>. Canonical SHA-256: <code>60e8f1eb5934b120c4d57a9eac304977825f74f2f0a6ae89425e4ddc4ffac518</code>.</p>
+      <p class="source">Generated deterministically from <a href="WIN-STREAK.md">docs/WIN-STREAK.md</a>. Canonical SHA-256: <code>7e6b43dff1f2c2a6acff98a84712a4b9b76584cc7bc898e0217beb962d9b262f</code>.</p>
     </main>
   </body>
 </html>

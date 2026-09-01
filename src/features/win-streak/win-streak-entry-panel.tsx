@@ -122,7 +122,7 @@ function NameGate({
             </h3>
             <p className="text-muted mt-1 text-sm leading-6">
               {canJoin
-                ? "Choose the public display name you want on the leaderboard. This browser will remember your profile—there is no account or password."
+                ? "Enter your public display name to create or resume your profile. There is no account or password."
                 : activeRound
                   ? "This matchweek is locked. You can join when the next round opens after results are reviewed."
                   : "The contest has finished for this season."}
@@ -161,8 +161,8 @@ function NameGate({
                 id="win-streak-display-name-help"
                 className="text-muted mt-1.5 text-xs leading-5"
               >
-                2–40 characters. An existing name cannot be claimed from a
-                different browser.
+                2–40 characters. Re-enter the same name if this browser has lost
+                its cookie.
               </p>
             </div>
             {message ? (
@@ -179,7 +179,7 @@ function NameGate({
               size="lg"
               type="submit"
             >
-              {pending ? "Creating profile…" : "Create profile"}
+              {pending ? "Opening profile…" : "Continue to profile"}
             </Button>
           </form>
         ) : null}

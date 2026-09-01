@@ -6,7 +6,7 @@ Production: [https://pl-predictions-2026.vercel.app](https://pl-predictions-2026
 
 GitHub: [https://github.com/vdoshi96/Pl-predictions](https://github.com/vdoshi96/Pl-predictions)
 
-Deployment status: production is public and Ready at the stable alias above. Win Streak display-name recovery [PR #53](https://github.com/vdoshi96/Pl-predictions/pull/53) merged as `a038433d233b13670bf198116f69d7eb4f852026`; exact deployment `dpl_CEbpBm4GvARMbfXg2qDaG66c1JEX` is Ready and owns the stable alias. Additive migrations `0010` and `0011` plus the targeted 37-round/370-fixture seed are applied and verified. Vercel Authentication remains enabled for previews while production remains anonymously accessible. Current and historical evidence is recorded in [docs/QA.md](docs/QA.md).
+Deployment status: production is public and Ready at the stable alias above, which follows `main`. Win Streak display-name recovery [PR #53](https://github.com/vdoshi96/Pl-predictions/pull/53) merged as `a038433d233b13670bf198116f69d7eb4f852026`; exact application deployment `dpl_CEbpBm4GvARMbfXg2qDaG66c1JEX` was Ready and served the stable alias during release verification. Additive migrations `0010` and `0011` plus the targeted 37-round/370-fixture seed are applied and verified. Vercel Authentication remains enabled for previews while production remains anonymously accessible. Current and historical evidence is recorded in [docs/QA.md](docs/QA.md).
 
 ## Brand and local assets
 

@@ -178,9 +178,9 @@ describe("season table landing", () => {
     ).toHaveClass("sr-only");
   });
 
-  it("scales delta color intensity with the distance from consensus", async () => {
-    const deltas = [0.9, -2.5, 3.2, -6.6, 16.6];
-    const intensities = ["subtle", "mild", "moderate", "strong", "extreme"];
+  it("maps below and above consensus gaps onto a diverging color scale", async () => {
+    const deltas = [-6.6, -2.5, -0.9, 0, 0.9, 2.5, 6.6];
+    const bands = ["far", "slight", "near", "neutral", "near", "slight", "far"];
 
     render(
       await SeasonTablePage({
@@ -207,11 +207,11 @@ describe("season table landing", () => {
     );
 
     deltas.forEach((delta, index) => {
-      const arrow = delta > 0 ? "▲" : "▼";
+      const arrow = delta === 0 ? "‒" : delta > 0 ? "▲" : "▼";
       expect(
         screen.getByText(`${arrow} ${Math.abs(delta).toFixed(1)}`)
           .parentElement,
-      ).toHaveAttribute("data-intensity", intensities[index]);
+      ).toHaveAttribute("data-band", bands[index]);
     });
   });
 

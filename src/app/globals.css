@@ -182,105 +182,55 @@ a {
   color: var(--muted);
 }
 
-.consensus-delta[data-direction="positive"][data-intensity="subtle"] {
-  background: #e7f8ef;
-  color: #0a6248;
+.consensus-delta[data-direction="negative"][data-band="near"] {
+  background: #ffe6c7;
+  color: #7a3400;
 }
 
-.consensus-delta[data-direction="positive"][data-intensity="mild"] {
-  background: #c8f3dc;
-  color: #07573f;
+.consensus-delta[data-direction="negative"][data-band="slight"] {
+  background: #f8b7c6;
+  color: #6d0828;
 }
 
-.consensus-delta[data-direction="positive"][data-intensity="moderate"] {
-  background: #91e5b9;
-  color: #064b36;
-}
-
-.consensus-delta[data-direction="positive"][data-intensity="strong"] {
-  background: #4bd98f;
-  color: #063d2e;
-}
-
-.consensus-delta[data-direction="positive"][data-intensity="extreme"] {
-  background: #00bd68;
-  color: #052d22;
-}
-
-.consensus-delta[data-direction="negative"][data-intensity="subtle"] {
-  background: #fae9f0;
-  color: #8f0033;
-}
-
-.consensus-delta[data-direction="negative"][data-intensity="mild"] {
-  background: #f7cada;
-  color: #79002b;
-}
-
-.consensus-delta[data-direction="negative"][data-intensity="moderate"] {
-  background: #ef91b3;
-  color: #570020;
-}
-
-.consensus-delta[data-direction="negative"][data-intensity="strong"] {
-  background: #e45688;
-  color: #380015;
-}
-
-.consensus-delta[data-direction="negative"][data-intensity="extreme"] {
-  background: #be215d;
+.consensus-delta[data-direction="negative"][data-band="far"] {
+  background: #9f174d;
   color: #fff;
 }
 
+.consensus-delta[data-direction="positive"][data-band="near"] {
+  background: #fff0a8;
+  color: #5c4500;
+}
+
+.consensus-delta[data-direction="positive"][data-band="slight"] {
+  background: #b9efcf;
+  color: #07563f;
+}
+
+.consensus-delta[data-direction="positive"][data-band="far"] {
+  background: #08764d;
+  color: #f3fff8;
+}
+
 @media (prefers-color-scheme: dark) {
-  .consensus-delta[data-direction="positive"][data-intensity="subtle"] {
-    background: #14352a;
-    color: #98f8c9;
+  .consensus-delta[data-direction="negative"][data-band="near"] {
+    background: #5b2d0d;
+    color: #ffd4a0;
   }
 
-  .consensus-delta[data-direction="positive"][data-intensity="mild"] {
-    background: #125039;
-    color: #b8ffda;
+  .consensus-delta[data-direction="negative"][data-band="slight"] {
+    background: #6a1734;
+    color: #ffd3df;
   }
 
-  .consensus-delta[data-direction="positive"][data-intensity="moderate"] {
-    background: #0e6a46;
-    color: #dcffec;
+  .consensus-delta[data-direction="positive"][data-band="near"] {
+    background: #584800;
+    color: #fff1a8;
   }
 
-  .consensus-delta[data-direction="positive"][data-intensity="strong"] {
-    background: #078252;
-    color: #f3fff8;
-  }
-
-  .consensus-delta[data-direction="positive"][data-intensity="extreme"] {
-    background: #00b567;
-    color: #062f23;
-  }
-
-  .consensus-delta[data-direction="negative"][data-intensity="subtle"] {
-    background: #3d1628;
-    color: #ff9ec2;
-  }
-
-  .consensus-delta[data-direction="negative"][data-intensity="mild"] {
-    background: #581a35;
-    color: #ffc3da;
-  }
-
-  .consensus-delta[data-direction="negative"][data-intensity="moderate"] {
-    background: #761d44;
-    color: #ffdae7;
-  }
-
-  .consensus-delta[data-direction="negative"][data-intensity="strong"] {
-    background: #981f53;
-    color: #fff0f6;
-  }
-
-  .consensus-delta[data-direction="negative"][data-intensity="extreme"] {
-    background: #bd2866;
-    color: #fff;
+  .consensus-delta[data-direction="positive"][data-band="slight"] {
+    background: #125038;
+    color: #caffdf;
   }
 }
 

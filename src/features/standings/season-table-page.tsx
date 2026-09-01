@@ -29,16 +29,13 @@ function DeltaChip({ delta }: { delta: number | null }) {
   const magnitude = Math.abs(roundedDelta);
   const neutral = roundedDelta === 0;
   const positive = roundedDelta > 0;
-  const intensity =
-    magnitude >= 10
-      ? "extreme"
-      : magnitude >= 6
-        ? "strong"
-        : magnitude >= 3
-          ? "moderate"
-          : magnitude >= 1
-            ? "mild"
-            : "subtle";
+  const band = neutral
+    ? "neutral"
+    : magnitude >= 6
+      ? "far"
+      : magnitude >= 1
+        ? "slight"
+        : "near";
   const visible = `${neutral ? "‒" : positive ? "▲" : "▼"} ${formatConsensusValue(magnitude)}`;
   const description = neutral
     ? `${formatConsensusValue(magnitude)} places from the league's average prediction`
@@ -48,7 +45,7 @@ function DeltaChip({ delta }: { delta: number | null }) {
     <span
       className="consensus-delta inline-flex min-h-7 items-center rounded-lg px-2 text-xs font-black whitespace-nowrap"
       data-direction={neutral ? "neutral" : positive ? "positive" : "negative"}
-      data-intensity={neutral ? "neutral" : intensity}
+      data-band={band}
     >
       <span aria-hidden="true">{visible}</span>
       <span className="sr-only">{description}</span>

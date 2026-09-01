@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="generated-by" content="scripts/generate-docs-html.mjs" />
     <meta name="canonical-source" content="LOG.md" />
-    <meta name="canonical-source-sha256" content="dc5e5e4f4b5239b7410498d6d84231e715ee3660f00881f05ddc70a99dc2c726" />
+    <meta name="canonical-source-sha256" content="8354a7cf05c35b748444b5292b230058e2dec19da166c0fcacf737c24a657591" />
     <title>Session log</title>
     <style>
       :root { color-scheme: light dark; font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
@@ -40,6 +40,17 @@
   <body>
     <main>
       <h1 id="session-log">Session log</h1>
+<h2 id="2026-08-31">2026-08-31</h2>
+<ul>
+<li>Verified the official Win Streak source with no drift: 370 fixtures across 37 matchweeks and the retained August 28 source date. No fixture rewrite, release, or targeted production seed ran.</li>
+<li>Confirmed production season <code>2026-27</code>, <code>N = 14</code>, 20 clubs, 37 Win Streak rounds, 370 fixtures, null final pointers, and zero resolved Win Streak rounds before mutation.</li>
+<li>Resolved FotMob season metadata dynamically to <code>2026/2027</code> and stats path <code>stats/47/season/36781/</code>. Published the 20-club standings table and provisional goals, assists, clean-sheets, and player-ratings snapshots through the authenticated administrator desks.</li>
+<li>Reconciled the sealed active and working pointers: goals <code>fc93b34a-77d6-41ae-bc35-fcbd95e600a0</code>, assists <code>114b6a29-1b8c-46a7-8714-c9b9a1b1cfc7</code>, clean sheets <code>b1e038a1-cf6b-4ac8-bfe1-7c241b81e388</code>, and ratings <code>e364b977-b15e-4ef0-ba54-790e99af1b51</code>. Four picked players remain unavailable as N/A.</li>
+<li>Published all 10 reviewed Matchweek 2 outcomes atomically with no voids. Both existing Manchester United picks won, so Rohan Tejaswi and Vishal Doshi share first with current and best streaks of one. Matchweek 3 is open, and both profiles show no current pick.</li>
+<li>Verified the stable production domain on Ready deployment <code>dpl_HLqSB2C8vJpyMUpEeajMhY8YBabd</code>. The rendered table is led by Adi Ashok on 39 points, and Keshav leads Spotlight with 82 points. Anonymous desktop and 390-pixel browser checks returned <code>200</code> without console warnings or failed application requests.</li>
+<li>Recorded a follow-up defect: Next.js 16.3 rejects the current <code>/admin/win-streak</code> server-action module because the <code>&quot;use server&quot;</code> file also exports a client initial-state object. A temporary local-only module split enabled the authenticated action and was removed after the successful write; no application source change remained.</li>
+<li>Preserved the release boundary: no finalization, <code>LOCK</code>, <code>REVEAL</code>, runtime football client, direct result write, schema migration, fixture seed, protected-round change, or unrelated application release ran.</li>
+</ul>
 <h2 id="2026-08-30">2026-08-30</h2>
 <ul>
 <li>Verified the official Win Streak source with no drift: 370 fixtures across 37 matchweeks and the retained August 28 source date. No fixture rewrite, release, or targeted production seed ran.</li>
@@ -377,7 +388,7 @@
 <li>Next handoff: use <code>main</code> as the base for future pull requests. No GitHub access blocker remains for the current repository workflow.</li>
 </ul>
 
-      <p class="source">Generated deterministically from <a href="LOG.md">docs/context/LOG.md</a>. Canonical SHA-256: <code>dc5e5e4f4b5239b7410498d6d84231e715ee3660f00881f05ddc70a99dc2c726</code>.</p>
+      <p class="source">Generated deterministically from <a href="LOG.md">docs/context/LOG.md</a>. Canonical SHA-256: <code>8354a7cf05c35b748444b5292b230058e2dec19da166c0fcacf737c24a657591</code>.</p>
     </main>
   </body>
 </html>

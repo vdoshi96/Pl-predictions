@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="generated-by" content="scripts/generate-docs-html.mjs" />
     <meta name="canonical-source" content="STATUS.md" />
-    <meta name="canonical-source-sha256" content="28863ba95d4f5ed2107a5bcf1c7203979249b706c4ab00671e7658ca1b845b2f" />
+    <meta name="canonical-source-sha256" content="37f4b43cf75941daba22719667f96b474f03e7ab7fce3aeee5a19b2d667780ee" />
     <title>Status</title>
     <style>
       :root { color-scheme: light dark; font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
@@ -41,11 +41,11 @@
     <main>
       <h1 id="status">Status</h1>
 <ul>
-<li><p>Pending Win Streak release (2026-09-01): branch <code>vishal/win-streak-name-resume</code> lets a participant enter the same normalized display name after cookie loss. The server rotates the receipt for the existing profile while preserving its identity, joined round, history, and immutable picks. Migration <code>0011_win_streak_name_resume.sql</code> changes only the profile trigger&#39;s receipt-rotation allowance.</p>
+<li><p>Current Win Streak recovery release (2026-09-01): <a href="https://github.com/vdoshi96/Pl-predictions/pull/53">PR #53</a> merged as <code>a038433d233b13670bf198116f69d7eb4f852026</code>. A participant can enter the same normalized display name after cookie loss. The server rotates the receipt for the existing profile while preserving its identity, joined round, history, and immutable picks.</p>
 </li>
-<li><p>Win Streak resumption verification: 423 unit and component tests, the focused isolated Neon receipt-rotation integration test, Prettier, ESLint, strict TypeScript, documentation parity for 18 pairs, and the Next.js 16.3 Webpack production build pass. Preview deployment <code>dpl_7oesxgcnVmQHk4tUSnkLii5Ujk5M</code> is Ready and renders Matchweek 3 with the create-or-resume copy. The Playwright journey is updated, but the dated aggregate browser fixture still leaves Matchweek 2 unresolved after its real PostgreSQL deadline.</p>
+<li><p>Win Streak resumption verification: 423 unit and component tests, the focused isolated Neon receipt-rotation integration test, Prettier, ESLint, strict TypeScript, documentation parity for 18 pairs, and the Next.js 16.3 Webpack production build pass. The guarded read-only production smoke passed desktop Chromium, 390-pixel mobile Chromium, exact 320/430-pixel reflow, and mobile WebKit. Exact deployment <code>dpl_CEbpBm4GvARMbfXg2qDaG66c1JEX</code> is Ready and owns the stable alias; its bounded error-log scan is clean.</p>
 </li>
-<li><p>Production migration boundary: a bounded preflight confirmed that migration <code>0011</code> was pending and recorded the existing Win Streak aggregates. The migration applied successfully. The postcheck confirmed that it was recorded and that existing profiles, picks, fixtures, and results were unchanged. The feature branch is not merged or deployed to production.</p>
+<li><p>Production migration boundary: migration <code>0011_win_streak_name_resume.sql</code> applied successfully before the application release. Postchecks confirmed that it was recorded and that existing profiles, picks, fixtures, and results were unchanged.</p>
 </li>
 <li><p>Current production data (2026-08-31): the authenticated owner workflow published the 20-club FotMob table and sealed provisional snapshots for goals, assists, clean sheets, and player ratings. The season has <code>N = 14</code> brackets. Active snapshot IDs are goals <code>fc93b34a-77d6-41ae-bc35-fcbd95e600a0</code>, assists <code>114b6a29-1b8c-46a7-8714-c9b9a1b1cfc7</code>, clean sheets <code>b1e038a1-cf6b-4ac8-bfe1-7c241b81e388</code>, and ratings <code>e364b977-b15e-4ef0-ba54-790e99af1b51</code>. Every active snapshot is the sealed working snapshot, and every final pointer remains <code>NULL</code>.</p>
 </li>
@@ -173,7 +173,7 @@
 </li>
 </ul>
 
-      <p class="source">Generated deterministically from <a href="STATUS.md">docs/context/STATUS.md</a>. Canonical SHA-256: <code>28863ba95d4f5ed2107a5bcf1c7203979249b706c4ab00671e7658ca1b845b2f</code>.</p>
+      <p class="source">Generated deterministically from <a href="STATUS.md">docs/context/STATUS.md</a>. Canonical SHA-256: <code>37f4b43cf75941daba22719667f96b474f03e7ab7fce3aeee5a19b2d667780ee</code>.</p>
     </main>
   </body>
 </html>

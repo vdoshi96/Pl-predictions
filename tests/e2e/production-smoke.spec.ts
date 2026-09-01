@@ -434,7 +434,7 @@ test("production public routes are mobile-safe and healthy", async ({
   if (await winStreakDisplayName.isVisible()) {
     await expect(winStreakDisplayName).toBeEditable();
     await expect(
-      page.getByRole("button", { name: "Create profile" }),
+      page.getByRole("button", { name: "Continue to profile" }),
     ).toBeDisabled();
   }
   await expectNoHorizontalOverflow(page);

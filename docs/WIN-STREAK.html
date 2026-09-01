@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="generated-by" content="scripts/generate-docs-html.mjs" />
     <meta name="canonical-source" content="WIN-STREAK.md" />
-    <meta name="canonical-source-sha256" content="7e6b43dff1f2c2a6acff98a84712a4b9b76584cc7bc898e0217beb962d9b262f" />
+    <meta name="canonical-source-sha256" content="ac8b17186882c3e8ca15881d851e93a610d10d13d2a300eae7b1749992227f92" />
     <title>Win Streak</title>
     <style>
       :root { color-scheme: light dark; font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
@@ -129,13 +129,14 @@
 <h2 id="verified-interface">Verified interface</h2>
 <p>The interactive flow is exercised against a production build and isolated Neon database across desktop Chromium, 320-, 390-, and 430-pixel Chromium, and mobile WebKit. It covers anonymous leaderboard access, name creation, immutable confirmation, keyboard selection and dialog dismissal, two profiles with opposing fixture picks, public current picks, reload persistence, display-name resumption after cookie loss, light and dark modes, official marks, clean console output, no external runtime football requests, and no page-level horizontal overflow. Unit and isolated integration tests cover receipt rotation, shared result publication, and the win, reset, void, and missed-round transitions.</p>
 <p><a href="https://github.com/vdoshi96/Pl-predictions/pull/39">PR #39</a> merged as <code>19bf11b4df43f8c3410f704fb278d1d4bdd845b5</code>. Migration <code>0010</code> and only the targeted Win Streak seed produced 37 rounds and 370 fixtures in production with zero profiles, picks, or results. Ready deployment <code>dpl_BTncZC77GmA3EXtaUjAKvfWZvRzP</code> owns the stable production alias. The guarded anonymous production smoke passed desktop Chromium, 390-pixel mobile Chromium, exact 320/430-pixel reflow, and mobile WebKit; final database read-back found no participant writes, and bounded error, fatal, and HTTP 5xx log queries were empty.</p>
+<p><a href="https://github.com/vdoshi96/Pl-predictions/pull/53">PR #53</a> added display-name resumption after cookie loss and merged as <code>a038433d233b13670bf198116f69d7eb4f852026</code>. Migration <code>0011</code> permits receipt-hash rotation without changing profile identity or picks. Ready deployment <code>dpl_CEbpBm4GvARMbfXg2qDaG66c1JEX</code> owns the stable production alias. The guarded five-browser read-only smoke passed, the bounded error-log scan was clean, and production data remained unchanged.</p>
 <h3 id="desktop">Desktop</h3>
 <p><img src="assets/qa/win-streak-desktop.png" alt="Win Streak desktop flow with the public leaderboard and current pick"></p>
 <h3 id="mobile">Mobile</h3>
 <p><img src="assets/qa/win-streak-mobile.png" alt="Win Streak mobile flow at 390 pixels"></p>
 <p>The screenshots use isolated QA profiles and data. They are not production participant records.</p>
 
-      <p class="source">Generated deterministically from <a href="WIN-STREAK.md">docs/WIN-STREAK.md</a>. Canonical SHA-256: <code>7e6b43dff1f2c2a6acff98a84712a4b9b76584cc7bc898e0217beb962d9b262f</code>.</p>
+      <p class="source">Generated deterministically from <a href="WIN-STREAK.md">docs/WIN-STREAK.md</a>. Canonical SHA-256: <code>ac8b17186882c3e8ca15881d851e93a610d10d13d2a300eae7b1749992227f92</code>.</p>
     </main>
   </body>
 </html>

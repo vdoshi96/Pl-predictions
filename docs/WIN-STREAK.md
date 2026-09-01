@@ -83,6 +83,8 @@ The interactive flow is exercised against a production build and isolated Neon d
 
 [PR #39](https://github.com/vdoshi96/Pl-predictions/pull/39) merged as `19bf11b4df43f8c3410f704fb278d1d4bdd845b5`. Migration `0010` and only the targeted Win Streak seed produced 37 rounds and 370 fixtures in production with zero profiles, picks, or results. Ready deployment `dpl_BTncZC77GmA3EXtaUjAKvfWZvRzP` owns the stable production alias. The guarded anonymous production smoke passed desktop Chromium, 390-pixel mobile Chromium, exact 320/430-pixel reflow, and mobile WebKit; final database read-back found no participant writes, and bounded error, fatal, and HTTP 5xx log queries were empty.
 
+[PR #53](https://github.com/vdoshi96/Pl-predictions/pull/53) added display-name resumption after cookie loss and merged as `a038433d233b13670bf198116f69d7eb4f852026`. Migration `0011` permits receipt-hash rotation without changing profile identity or picks. Ready deployment `dpl_CEbpBm4GvARMbfXg2qDaG66c1JEX` owns the stable production alias. The guarded five-browser read-only smoke passed, the bounded error-log scan was clean, and production data remained unchanged.
+
 ### Desktop
 
 ![Win Streak desktop flow with the public leaderboard and current pick](assets/qa/win-streak-desktop.png)

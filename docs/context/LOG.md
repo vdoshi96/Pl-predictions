@@ -1,5 +1,16 @@
 # Session log
 
+## 2026-08-31
+
+- Verified the official Win Streak source with no drift: 370 fixtures across 37 matchweeks and the retained August 28 source date. No fixture rewrite, release, or targeted production seed ran.
+- Confirmed production season `2026-27`, `N = 14`, 20 clubs, 37 Win Streak rounds, 370 fixtures, null final pointers, and zero resolved Win Streak rounds before mutation.
+- Resolved FotMob season metadata dynamically to `2026/2027` and stats path `stats/47/season/36781/`. Published the 20-club standings table and provisional goals, assists, clean-sheets, and player-ratings snapshots through the authenticated administrator desks.
+- Reconciled the sealed active and working pointers: goals `fc93b34a-77d6-41ae-bc35-fcbd95e600a0`, assists `114b6a29-1b8c-46a7-8714-c9b9a1b1cfc7`, clean sheets `b1e038a1-cf6b-4ac8-bfe1-7c241b81e388`, and ratings `e364b977-b15e-4ef0-ba54-790e99af1b51`. Four picked players remain unavailable as N/A.
+- Published all 10 reviewed Matchweek 2 outcomes atomically with no voids. Both existing Manchester United picks won, so Rohan Tejaswi and Vishal Doshi share first with current and best streaks of one. Matchweek 3 is open, and both profiles show no current pick.
+- Verified the stable production domain on Ready deployment `dpl_HLqSB2C8vJpyMUpEeajMhY8YBabd`. The rendered table is led by Adi Ashok on 39 points, and Keshav leads Spotlight with 82 points. Anonymous desktop and 390-pixel browser checks returned `200` without console warnings or failed application requests.
+- Recorded a follow-up defect: Next.js 16.3 rejects the current `/admin/win-streak` server-action module because the `"use server"` file also exports a client initial-state object. A temporary local-only module split enabled the authenticated action and was removed after the successful write; no application source change remained.
+- Preserved the release boundary: no finalization, `LOCK`, `REVEAL`, runtime football client, direct result write, schema migration, fixture seed, protected-round change, or unrelated application release ran.
+
 ## 2026-08-30
 
 - Verified the official Win Streak source with no drift: 370 fixtures across 37 matchweeks and the retained August 28 source date. No fixture rewrite, release, or targeted production seed ran.

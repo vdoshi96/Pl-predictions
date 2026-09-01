@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="generated-by" content="scripts/generate-docs-html.mjs" />
     <meta name="canonical-source" content="QA.md" />
-    <meta name="canonical-source-sha256" content="a0aafcf2cb8948ba6b5dcbba8ce765350f98b7671c1036c0db0a21de675dcbf7" />
+    <meta name="canonical-source-sha256" content="a84d6d31e83f392df9ec5762e68065277b8413d8bebfecd969fd30e06b5c9fd4" />
     <title>Quality assurance</title>
     <style>
       :root { color-scheme: light dark; font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
@@ -40,6 +40,44 @@
   <body>
     <main>
       <h1 id="quality-assurance">Quality assurance</h1>
+<h2 id="august-31-production-results">August 31 production results</h2>
+<p>The owner-run update published reviewed Matchweek 2 facts, resolved the completed Win Streak round atomically, and verified the live public views.</p>
+<table>
+<thead>
+<tr>
+<th>Gate</th>
+<th>Evidence</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Fixture and match preflight</td>
+<td><code>npm run win-streak:fixtures:check</code> verified 370 fixtures across 37 matchweeks with no drift or write. FotMob reported all 10 Matchweek 2 fixtures final, including Aston Villa 0-1 Arsenal.</td>
+</tr>
+<tr>
+<td>Production publication</td>
+<td>The authenticated administrator workflow published 20 standings rows, 14 scorer rows, 14 assister rows, 20 clean-sheet rows, and 18 reviewed ratings. Goals, assists, and clean sheets record <code>covered_through_rank = 14</code>. Four picked players remain absent from the rating facts and display as N/A.</td>
+</tr>
+<tr>
+<td>Database reconciliation</td>
+<td>Active equals working for sealed goals snapshot <code>fc93b34a-77d6-41ae-bc35-fcbd95e600a0</code>, assists <code>114b6a29-1b8c-46a7-8714-c9b9a1b1cfc7</code>, clean sheets <code>b1e038a1-cf6b-4ac8-bfe1-7c241b81e388</code>, and ratings <code>e364b977-b15e-4ef0-ba54-790e99af1b51</code>. Every final pointer remains <code>NULL</code>. Source checks include Bruno Fernandes at three goals, Rayan Cherki at two assists, Arsenal at two clean sheets, and Bruno Fernandes at an 8.630 rating.</td>
+</tr>
+<tr>
+<td>Win Streak transition</td>
+<td>The authenticated action stored exactly 10 Matchweek 2 outcomes in one transition: six decisive home or away wins and four draws, with no voids. Both Manchester United picks won. The database and public page show Rohan Tejaswi and Vishal Doshi tied first with current and best streaks of one, Matchweek 3 open, and no current picks.</td>
+</tr>
+<tr>
+<td>Production browser</td>
+<td>Ready deployment <code>dpl_HLqSB2C8vJpyMUpEeajMhY8YBabd</code> served the stable domain during data verification. The table shows Adi Ashok at 39, Angad at 38, and Aravind at 36. Keshav leads Spotlight with 82 points. Every category board is live. Desktop and 390-pixel checks found no console warnings or failed application requests.</td>
+</tr>
+<tr>
+<td>Administrator-path defect</td>
+<td>Next.js 16.3 rejects the tracked <code>/admin/win-streak</code> server-action module because its <code>&quot;use server&quot;</code> file exports a client initial-state object. A temporary local-only module split let the same authenticated action run against the verified live database. The tracked source was restored afterward. Fix the export before the next Win Streak result run.</td>
+</tr>
+<tr>
+<td>Release boundary</td>
+<td>No fixture rewrite, targeted seed, runtime football client, direct result write, schema migration, finalization, <code>LOCK</code>, <code>REVEAL</code>, protected-round change, or unrelated application release ran.</td>
+</tr>
+</tbody></table>
 <h2 id="august-30-production-results">August 30 production results</h2>
 <p>The owner-run update published reviewed Matchweek 1 and partial Matchweek 2 facts without advancing the incomplete Win Streak round.</p>
 <table>
@@ -918,7 +956,7 @@
 <li><input checked="" disabled="" type="checkbox"> Regenerate final HTML peers, publish this closeout through <code>main</code>, synchronize local and remote <code>main</code>, and remove completed branch state.</li>
 </ul>
 
-      <p class="source">Generated deterministically from <a href="QA.md">docs/QA.md</a>. Canonical SHA-256: <code>a0aafcf2cb8948ba6b5dcbba8ce765350f98b7671c1036c0db0a21de675dcbf7</code>.</p>
+      <p class="source">Generated deterministically from <a href="QA.md">docs/QA.md</a>. Canonical SHA-256: <code>a84d6d31e83f392df9ec5762e68065277b8413d8bebfecd969fd30e06b5c9fd4</code>.</p>
     </main>
   </body>
 </html>

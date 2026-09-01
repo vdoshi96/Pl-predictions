@@ -219,8 +219,13 @@ a {
   }
 
   .consensus-delta[data-direction="negative"][data-band="slight"] {
-    background: #6a1734;
+    background: #7a1738;
     color: #ffd3df;
+  }
+
+  .consensus-delta[data-direction="negative"][data-band="far"] {
+    background: #3d0618;
+    color: #ffe5ee;
   }
 
   .consensus-delta[data-direction="positive"][data-band="near"] {
@@ -229,8 +234,13 @@ a {
   }
 
   .consensus-delta[data-direction="positive"][data-band="slight"] {
-    background: #125038;
-    color: #caffdf;
+    background: #176b4a;
+    color: #d4ffe5;
+  }
+
+  .consensus-delta[data-direction="positive"][data-band="far"] {
+    background: #043c27;
+    color: #e5fff0;
   }
 }
 

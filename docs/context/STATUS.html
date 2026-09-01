@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="generated-by" content="scripts/generate-docs-html.mjs" />
     <meta name="canonical-source" content="STATUS.md" />
-    <meta name="canonical-source-sha256" content="1a4043904b05644e21c676cc11c926abbffacbea6eb5709650cb4d9b66c1b900" />
+    <meta name="canonical-source-sha256" content="2701efa96af72beaf3ea66f77ff2de1b3e842cd8cf2a7dd3434abdc5cc0d7ffa" />
     <title>Status</title>
     <style>
       :root { color-scheme: light dark; font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
@@ -42,6 +42,8 @@
       <h1 id="status">Status</h1>
 <ul>
 <li><p>Current season-table delta scale (2026-09-01): The <strong>vs consensus</strong> chips use a six-color diverging scale based on the signed displayed gap. A negative gap progresses from orange within 0.9 places of consensus, through red from 1.0 through 5.9 places, to deep red at 6.0 places or farther. A positive gap progresses from yellow within 0.9 places of consensus, through light green from 1.0 through 5.9 places, to deep green at 6.0 places or farther. An exact displayed tie remains neutral. Direction arrows, numeric gaps, and screen-reader descriptions remain the primary non-color cues.</p>
+</li>
+<li><p>Dark-mode depth correction: The far red and green chip backgrounds have lower measured relative luminance than their slight counterparts. A regression test enforces both relationships. Local dark-mode Chromium confirms that <code>▼ 13.9</code> is darker than <code>▼ 1.2</code> and that <code>▲ 6.6</code> is darker than <code>▲ 3.2</code>, while every changed foreground and background pair exceeds the 4.5:1 WCAG AA contrast requirement.</p>
 </li>
 <li><p>Six-color scale release: <a href="https://github.com/vdoshi96/Pl-predictions/pull/59">PR #59</a> merged as <code>81671c5a66839c4e21c7bdd24e1a9d678bff4533</code>. Exact production deployment <code>dpl_8hG85jGpAaBDHGz8EHDpjyXjWvKe</code> is Ready and served the stable alias during verification. The focused component suite covers all three distance bands in both directions and the neutral state. Local desktop Chromium, 390-pixel Chromium in light and dark modes, and stable-production 390-pixel Chromium confirm the six computed color roles, exact mobile-width reflow, and no horizontal overflow. Every chip foreground and background pair exceeds the 4.5:1 WCAG AA contrast requirement. The bounded production error-log scan is clean.</p>
 </li>
@@ -183,7 +185,7 @@
 </li>
 </ul>
 
-      <p class="source">Generated deterministically from <a href="STATUS.md">docs/context/STATUS.md</a>. Canonical SHA-256: <code>1a4043904b05644e21c676cc11c926abbffacbea6eb5709650cb4d9b66c1b900</code>.</p>
+      <p class="source">Generated deterministically from <a href="STATUS.md">docs/context/STATUS.md</a>. Canonical SHA-256: <code>2701efa96af72beaf3ea66f77ff2de1b3e842cd8cf2a7dd3434abdc5cc0d7ffa</code>.</p>
     </main>
   </body>
 </html>

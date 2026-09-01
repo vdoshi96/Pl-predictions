@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="generated-by" content="scripts/generate-docs-html.mjs" />
     <meta name="canonical-source" content="QA.md" />
-    <meta name="canonical-source-sha256" content="e66d71a6ffc4bebdd86e0a689884cc62ade4e630e9390e19c3ff117e2c0cb09c" />
+    <meta name="canonical-source-sha256" content="fec9c4b3505ac8a26b4754f1a73020256ee2ec47d5380dbb362fa8ae4db7295c" />
     <title>Quality assurance</title>
     <style>
       :root { color-scheme: light dark; font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
@@ -62,12 +62,16 @@
 <td>Prettier, ESLint, strict TypeScript, documentation parity for 18 Markdown and HTML pairs, and the Next.js 16.3 Webpack production build passed.</td>
 </tr>
 <tr>
+<td>Production migration</td>
+<td>A bounded preflight confirmed that migration <code>0011</code> was pending and recorded the existing Win Streak aggregates. The migration applied successfully. The postcheck confirmed that it was recorded and that the existing profiles, picks, fixtures, and results were unchanged.</td>
+</tr>
+<tr>
 <td>Browser-test boundary</td>
 <td>The Playwright journey now expects display-name resumption from a cookie-free browser. The dated aggregate browser fixture still leaves Matchweek 2 unresolved after its real PostgreSQL deadline, so the profile-creation journey cannot run without changing immutable test-round state. No production browser claim is made from that blocked fixture.</td>
 </tr>
 <tr>
 <td>Release boundary</td>
-<td>This local verification did not apply migration <code>0011</code> to production, merge the branch, deploy the application, mutate Win Streak results or fixtures, or change participant picks.</td>
+<td>Migration <code>0011</code> is applied to production, but the application branch is not merged or deployed to production. Verification did not mutate Win Streak results, fixtures, profiles, or picks.</td>
 </tr>
 </tbody></table>
 <h2 id="august-31-production-results">August 31 production results</h2>
@@ -986,7 +990,7 @@
 <li><input checked="" disabled="" type="checkbox"> Regenerate final HTML peers, publish this closeout through <code>main</code>, synchronize local and remote <code>main</code>, and remove completed branch state.</li>
 </ul>
 
-      <p class="source">Generated deterministically from <a href="QA.md">docs/QA.md</a>. Canonical SHA-256: <code>e66d71a6ffc4bebdd86e0a689884cc62ade4e630e9390e19c3ff117e2c0cb09c</code>.</p>
+      <p class="source">Generated deterministically from <a href="QA.md">docs/QA.md</a>. Canonical SHA-256: <code>fec9c4b3505ac8a26b4754f1a73020256ee2ec47d5380dbb362fa8ae4db7295c</code>.</p>
     </main>
   </body>
 </html>

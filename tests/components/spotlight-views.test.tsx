@@ -1,4 +1,10 @@
-import { cleanup, render, screen, within } from "@testing-library/react";
+import {
+  cleanup,
+  fireEvent,
+  render,
+  screen,
+  within,
+} from "@testing-library/react";
 import { afterEach, describe, expect, it } from "vitest";
 
 import {
@@ -103,6 +109,44 @@ describe("spotlight category and matrix views", () => {
     expect(within(board).getByText("Outside range · 0 pts")).toBeVisible();
     expect(within(board).getByText("N/A")).toBeVisible();
     expect(within(board).getByText("Other")).toBeVisible();
+  });
+
+  it("reveals full predictor names from each category-row disclosure", () => {
+    const sharedPlayerEntries: SpotlightAccuracyEntry[] = [
+      entries[0]!,
+      {
+        ...entries[0]!,
+        id: "entry-grace",
+        participantName: "Grace Hopper",
+      },
+    ];
+
+    render(
+      <SpotlightCategoriesView
+        boards={buildSpotlightCategoryBoard(sharedPlayerEntries)}
+        entryCount={2}
+        leaders={{}}
+        liveCategories={[]}
+      />,
+    );
+
+    const playerDisclosure = screen
+      .getByText("Star Striker", { selector: "summary strong > span" })
+      .closest("details");
+
+    expect(playerDisclosure).not.toBeNull();
+    expect(playerDisclosure).not.toHaveAttribute("open");
+    fireEvent.click(playerDisclosure!.querySelector("summary")!);
+    expect(playerDisclosure).toHaveAttribute("open");
+    expect(
+      within(playerDisclosure!).getByText("Predicted by"),
+    ).toBeInTheDocument();
+    expect(
+      within(playerDisclosure!).getByRole("link", { name: "Ada" }),
+    ).toHaveAttribute("href", "/entries/entry-ada");
+    expect(
+      within(playerDisclosure!).getByRole("link", { name: "Grace Hopper" }),
+    ).toHaveAttribute("href", "/entries/entry-grace");
   });
 
   it("renders the taxonomy matrix with a sticky entry column and pending-safe cells", () => {

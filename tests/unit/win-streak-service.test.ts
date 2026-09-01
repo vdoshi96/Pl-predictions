@@ -36,7 +36,10 @@ beforeEach(() => {
     databaseNow: new Date("2026-08-23T12:00:00.000Z"),
     season: { id: seasonId },
   });
-  mocks.insertProfile.mockResolvedValue(true);
+  mocks.insertProfile.mockResolvedValue({
+    displayName: "Ada",
+    profileId: "00000000-0000-4000-8000-000000000003",
+  });
   mocks.insertPick.mockResolvedValue(true);
   mocks.readReceipt.mockResolvedValue({
     profileId: "00000000-0000-4000-8000-000000000002",
@@ -46,6 +49,10 @@ beforeEach(() => {
 
 describe("Win Streak public service", () => {
   it("creates a normalized profile with a hashed receipt", async () => {
+    mocks.insertProfile.mockResolvedValue({
+      displayName: "Ada LOVELACE",
+      profileId: "00000000-0000-4000-8000-000000000003",
+    });
     const created = await createWinStreakProfile({
       displayName: "  Ada   LOVELACE  ",
       website: "",
@@ -67,6 +74,24 @@ describe("Win Streak public service", () => {
     );
   });
 
+  it("resumes an existing normalized display name with a fresh receipt", async () => {
+    mocks.insertProfile.mockResolvedValue({
+      displayName: "Ada Lovelace",
+      profileId: "00000000-0000-4000-8000-000000000004",
+    });
+
+    const resumed = await createWinStreakProfile({
+      displayName: "  ADA   LOVELACE ",
+      website: "",
+    });
+
+    expect(resumed).toMatchObject({
+      displayName: "Ada Lovelace",
+      profileId: "00000000-0000-4000-8000-000000000004",
+      receiptToken: expect.stringMatching(/^[A-Za-z0-9_-]{43}$/u),
+    });
+  });
+
   it("rejects malformed and bot input before database access", async () => {
     await expect(
       createWinStreakProfile({ displayName: "a", website: "" }),
@@ -77,15 +102,15 @@ describe("Win Streak public service", () => {
     expect(mocks.getActiveSeasonContext).not.toHaveBeenCalled();
   });
 
-  it("returns a name conflict without leaking database errors", async () => {
+  it("does not leak unexpected database conflicts", async () => {
     mocks.insertProfile.mockRejectedValue({ code: "23505" });
     await expect(
       createWinStreakProfile({ displayName: "Ada", website: "" }),
-    ).rejects.toThrow("already in use");
+    ).rejects.toThrow("could not continue");
   });
 
   it("fails closed when the current round or bounded profile pool is unavailable", async () => {
-    mocks.insertProfile.mockResolvedValue(false);
+    mocks.insertProfile.mockResolvedValue(null);
     await expect(
       createWinStreakProfile({ displayName: "Ada", website: "" }),
     ).rejects.toThrow("cannot accept another profile right now");

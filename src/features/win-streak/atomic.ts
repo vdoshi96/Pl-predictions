@@ -23,6 +23,11 @@ export type AtomicWinStreakPickInput = {
   teamSlug: WinStreakTeamSlug;
 };
 
+export type ClaimedWinStreakProfile = {
+  displayName: string;
+  profileId: string;
+};
+
 export function buildCreateWinStreakProfileQuery(
   input: AtomicWinStreakProfileInput,
 ): SQL {
@@ -64,22 +69,36 @@ export function buildCreateWinStreakProfileQuery(
     from "checked_round"
     where "checked_at" < "pick_deadline"
       and (
-        select count(*)
-        from "win_streak_profiles"
-        where "season_id" = "checked_round"."season_id"
-      ) < ${WIN_STREAK_PROFILE_LIMIT}
-    returning "id"
+        exists (
+          select 1
+          from "win_streak_profiles"
+          where "season_id" = "checked_round"."season_id"
+            and "normalized_participant_name" = ${input.normalizedParticipantName}
+        )
+        or (
+          select count(*)
+          from "win_streak_profiles"
+          where "season_id" = "checked_round"."season_id"
+        ) < ${WIN_STREAK_PROFILE_LIMIT}
+      )
+    on conflict ("season_id", "normalized_participant_name")
+    do update set
+      "receipt_token_hash" = excluded."receipt_token_hash",
+      "updated_at" = clock_timestamp()
+    returning
+      "id" as "profileId",
+      "participant_name" as "displayName"
   `;
 }
 
 export async function insertWinStreakProfileAtomically(
   db: Database,
   input: AtomicWinStreakProfileInput,
-): Promise<boolean> {
-  const result = await db.execute<{ id: string }>(
+): Promise<ClaimedWinStreakProfile | null> {
+  const result = await db.execute<ClaimedWinStreakProfile>(
     buildCreateWinStreakProfileQuery(input),
   );
-  return result.rows.length === 1;
+  return result.rows[0] ?? null;
 }
 
 export function buildAtomicWinStreakPickQuery(

@@ -1,5 +1,11 @@
 # Decisions
 
+## 2026-09-01: Resume Win Streak by display name
+
+Treat Win Streak as an honor-system game for a trusted group. If a browser has no valid receipt, a participant can enter the same normalized display name to resume the existing season profile. The server rotates the stored receipt hash and gives the requesting browser a replacement HttpOnly cookie. The latest browser to resume the name becomes the receipt holder.
+
+Keep the profile identity, joined round, history, and one immutable pick per round unchanged. Continue to validate the display name, require same-origin server actions, enforce the current-round deadline, and apply existing creation and pick rate limits. This decision supersedes the name-takeover denial and unrecoverable-cookie clauses in the August 23, 2026, decision.
+
 ## 2026-08-28: Publish reviewed rating subsets with N/A omissions
 
 Allow a nonempty reviewed subset of the distinct picked opinion players in a player-rating snapshot. Continue rejecting unpicked rating rows. A picked player without a reviewed rating remains unavailable, contributes no accuracy points, and displays as N/A instead of receiving a fabricated zero or rank. Rank each opinion-player category only from its rated picked players.
@@ -20,7 +26,7 @@ Run Win Streak as a separate durable game across Matchweeks 2–38. One confirme
 
 Lock the complete round at its earliest persisted fixture kickoff rather than giving later-playing clubs a longer selection window. Display each fixture's kickoff for context, but use the round deadline and PostgreSQL clock for every profile creation and pick authorization.
 
-Keep the leaderboard public before any display name is entered, and show each profile's current-matchweek pick with the fixture. Do not publish receipt tokens or internal identifiers. A 2–40-character display name creates a profile bound to one random browser receipt whose SHA-256 hash is stored. Do not allow name-only resumption or takeover. Accept the explicit no-login tradeoff that losing the cookie makes the profile unrecoverable; cap the season at 500 profiles and rate-limit profile and pick writes.
+Keep the leaderboard public before any display name is entered, and show each profile's current-matchweek pick with the fixture. Do not publish receipt tokens or internal identifiers. A 2–40-character display name creates a profile bound to one random browser receipt whose SHA-256 hash is stored. The September 1, 2026, display-name resumption decision supersedes the original name-takeover denial and unrecoverable-cookie clauses. Cap the season at 500 profiles, and rate-limit profile and pick writes.
 
 Seed all 370 official Matchweek 2–38 fixtures from the Premier League snapshot checked August 23, 2026. Do not make runtime football requests. The recurring update-results workflow must check official fixture drift first. It may automatically prepare only a reviewed kickoff-time correction for a future, unpicked, unresolved fixture; every structural or protected-fixture difference fails closed. Publish a completed round only through the authenticated results desk, with all ten persisted kickoffs elapsed and all ten results committed atomically and immutably.
 

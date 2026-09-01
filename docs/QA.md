@@ -1,5 +1,18 @@
 # Quality assurance
 
+## September 1 Win Streak display-name resumption
+
+Win Streak accepts the same normalized display name after cookie loss and rotates the receipt for the existing profile. The profile identity, joined round, history, and immutable picks remain unchanged.
+
+| Gate                        | Evidence                                                                                                                                                                                                                                                                                                                                                  |
+| --------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Red-green regression        | Focused service, atomic-query, action, and production-UI tests failed against the receipt-only behavior, then passed after display-name resumption was implemented. The full unit and component run passed 423 tests with 32 guarded skips across 72 files.                                                                                               |
+| Isolated database migration | Migration `0011_win_streak_name_resume.sql` applied to the configured isolated Neon test database. A focused integration test rotated one synthetic profile receipt and verified that its display name, normalized name, and joined round remained unchanged; cleanup removed the synthetic profile.                                                      |
+| Static and production build | Prettier, ESLint, strict TypeScript, documentation parity for 18 Markdown and HTML pairs, and the Next.js 16.3 Webpack production build passed.                                                                                                                                                                                                           |
+| Production migration        | A bounded preflight confirmed that migration `0011` was pending and recorded the existing Win Streak aggregates. The migration applied successfully. The postcheck confirmed that it was recorded and that the existing profiles, picks, fixtures, and results were unchanged.                                                                            |
+| Browser-test boundary       | The Playwright journey now expects display-name resumption from a cookie-free browser. The dated aggregate browser fixture still leaves Matchweek 2 unresolved after its real PostgreSQL deadline, so the profile-creation journey cannot run without changing immutable test-round state. No production browser claim is made from that blocked fixture. |
+| Release boundary            | Migration `0011` is applied to production, but the application branch is not merged or deployed to production. Verification did not mutate Win Streak results, fixtures, profiles, or picks.                                                                                                                                                              |
+
 ## August 31 production results
 
 The owner-run update published reviewed Matchweek 2 facts, resolved the completed Win Streak round atomically, and verified the live public views.

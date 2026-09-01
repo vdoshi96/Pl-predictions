@@ -200,12 +200,14 @@ describe("production Win Streak entry panel", () => {
     );
 
     expect(
-      screen.getByRole("button", { name: /create.*profile/iu }),
+      screen.getByRole("button", { name: /continue.*profile/iu }),
     ).toBeDisabled();
     fireEvent.change(screen.getByLabelText("Display name"), {
       target: { value: "Vishal" },
     });
-    fireEvent.click(screen.getByRole("button", { name: /create.*profile/iu }));
+    fireEvent.click(
+      screen.getByRole("button", { name: /continue.*profile/iu }),
+    );
 
     await waitFor(() =>
       expect(actions.createProfileAction).toHaveBeenCalledWith({

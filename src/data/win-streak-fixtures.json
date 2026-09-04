@@ -364,16 +364,6 @@
           "timeBasis": "weekend-default"
         },
         {
-          "awayTeamSlug": "crystal-palace",
-          "homeTeamSlug": "leeds-united",
-          "id": "2026-27-mw05-leeds-united-crystal-palace",
-          "kickoffAt": "2026-09-19T14:00:00.000Z",
-          "localDate": "2026-09-19",
-          "localTime": "15:00",
-          "matchweek": 5,
-          "timeBasis": "weekend-default"
-        },
-        {
           "awayTeamSlug": "hull-city",
           "homeTeamSlug": "newcastle-united",
           "id": "2026-27-mw05-newcastle-united-hull-city",
@@ -397,6 +387,16 @@
           "awayTeamSlug": "liverpool",
           "homeTeamSlug": "afc-bournemouth",
           "id": "2026-27-mw05-afc-bournemouth-liverpool",
+          "kickoffAt": "2026-09-20T13:00:00.000Z",
+          "localDate": "2026-09-20",
+          "localTime": "14:00",
+          "matchweek": 5,
+          "timeBasis": "explicit"
+        },
+        {
+          "awayTeamSlug": "crystal-palace",
+          "homeTeamSlug": "leeds-united",
+          "id": "2026-27-mw05-leeds-united-crystal-palace",
           "kickoffAt": "2026-09-20T13:00:00.000Z",
           "localDate": "2026-09-20",
           "localTime": "14:00",
@@ -817,9 +817,9 @@
           "awayTeamSlug": "fulham",
           "homeTeamSlug": "aston-villa",
           "id": "2026-27-mw09-aston-villa-fulham",
-          "kickoffAt": "2026-11-01T14:00:00.000Z",
-          "localDate": "2026-11-01",
-          "localTime": "14:00",
+          "kickoffAt": "2026-10-31T20:00:00.000Z",
+          "localDate": "2026-10-31",
+          "localTime": "20:00",
           "matchweek": 9,
           "timeBasis": "explicit"
         },
@@ -3895,10 +3895,10 @@
   "schemaVersion": 1,
   "season": "2026/27",
   "source": {
-    "checkedAt": "2026-08-28",
+    "checkedAt": "2026-09-04",
     "finalMatchweekTimingUrl": "https://www.premierleague.com/en/news/4675508/premier-league-fixture-schedule-released-for-season-202627",
     "fixtureListUrl": "https://www.premierleague.com/en/news/4675097",
-    "normalizedFixtureSha256": "0e8e868e2a53d31a57a568ffdffa1b0dccaec14f1e3a38ad3e93092e61998a0c",
+    "normalizedFixtureSha256": "4234ac0bafe0076acaaee1839fa20cadacfccae748b3a601b604b7e22550ce19",
     "subjectToChange": true
   },
   "timeZone": "Europe/London"

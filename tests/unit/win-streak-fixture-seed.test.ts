@@ -30,7 +30,7 @@ describe("Win Streak fixture database seed", () => {
       canonicalFixtureSnapshot.source.fixtureListUrl,
     );
     expect(prepared.sourceVerifiedAt).toEqual(
-      new Date("2026-08-28T00:00:00.000Z"),
+      new Date("2026-09-04T00:00:00.000Z"),
     );
   });
 

@@ -225,6 +225,10 @@ The review page exposes the full entry before the irreversible submission. Keep 
 
 Sorting rows have 56px minimum height and retain touch, pointer, and keyboard controls. Theme, reduced-motion, focus, long-name wrapping, and safe-area behavior apply to these interactions as well as read-only views.
 
+### Annotated walkthrough
+
+Walkthrough screenshots use static imports so their content-hashed media URLs change when the image content changes. Preserve this delivery pattern when replacing captures to avoid showing an outdated optimized image. Keep alt text, captions, and numbered markers aligned with the visible controls and full-page review.
+
 ## Do's and Don'ts
 
 ### Do

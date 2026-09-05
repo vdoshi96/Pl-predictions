@@ -463,7 +463,7 @@ test("production public routes are mobile-safe and healthy", async ({
     ).toBeVisible();
     await expect(spotlightLeaderboard).toHaveCount(0);
   }
-  await expect(page.getByText(/^\d+ active brackets?$/u)).toBeVisible();
+  await expect(page.getByText(/^\d+ active entr(?:y|ies)$/u)).toBeVisible();
   await expectNoHorizontalOverflow(page);
   if (captureMobileEvidence) {
     if (predictionsRevealed) {
@@ -490,11 +490,14 @@ test("production public routes are mobile-safe and healthy", async ({
   await expect(
     page.getByRole("heading", { name: "How to play in three steps" }),
   ).toBeVisible();
-  const walkthroughScreenshots = page.getByRole("img", {
-    name: /Mobile .* screen/u,
+  const walkthroughScreenshots = page.locator("#how-to-play").getByRole("img", {
+    name: /^Mobile /u,
   });
   await expect(walkthroughScreenshots).toHaveCount(3);
   for (const screenshot of await walkthroughScreenshots.all()) {
+    expect(
+      decodeURIComponent((await screenshot.getAttribute("src")) ?? ""),
+    ).toContain("/_next/static/media/");
     await screenshot.scrollIntoViewIfNeeded();
     await expect
       .poll(() =>
@@ -507,6 +510,12 @@ test("production public routes are mobile-safe and healthy", async ({
       )
       .toBe(true);
   }
+  await expect(
+    page.getByText(
+      "Review all 20 club positions and all seven spotlight picks before submitting.",
+      { exact: true },
+    ),
+  ).toBeVisible();
   await expectNoHorizontalOverflow(page);
   if (captureMobileEvidence) {
     await page.locator("#how-to-play").screenshot({

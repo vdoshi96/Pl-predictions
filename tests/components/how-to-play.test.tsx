@@ -41,7 +41,9 @@ describe("HowToPlay", () => {
     ).toBeVisible();
     expect(screen.getByText(/Complete all seven categories/iu)).toBeVisible();
     expect(
-      screen.getByText(/Confirm the champion, seven spotlight picks/iu),
+      screen.getByText(
+        /Review all 20 club positions and all seven spotlight picks/iu,
+      ),
     ).toBeVisible();
 
     const walkthrough = screen.getByRole("list", {

@@ -5,7 +5,6 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 
 import { ConfirmSubmitButton } from "@/components/confirm-submit-button";
-import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { getDb } from "@/db/client";
 import {
@@ -64,12 +63,17 @@ export default async function AdminSubmissionsPage({
     pickCountRows.map((row) => [row.predictionId, row.pickCount] as const),
   );
 
+  const query =
+    typeof params.q === "string" ? params.q.trim().slice(0, 80) : "";
+  const filteredRows = rows.filter((row) =>
+    row.participantName.toLocaleLowerCase().includes(query.toLocaleLowerCase()),
+  );
+
   return (
-    <main className="page-shell w-full flex-1 py-6 sm:py-10">
-      <div className="grid gap-5">
+    <main id="main-content" className="page-shell w-full flex-1 py-6 sm:py-10">
+      <div className="grid min-w-0 grid-cols-1 gap-5">
         <div>
-          <Badge variant="accent">Immutable entries</Badge>
-          <h1 className="text-foreground mt-3 text-3xl font-black tracking-tight sm:text-4xl">
+          <h1 className="text-foreground text-3xl font-bold tracking-tight sm:text-4xl">
             Submissions
           </h1>
           <p className="text-muted mt-2 max-w-2xl text-sm leading-6">
@@ -98,27 +102,57 @@ export default async function AdminSubmissionsPage({
           </p>
         ) : null}
 
-        {rows.length === 0 ? (
+        <form
+          action="/admin/submissions"
+          className="flex flex-wrap items-end gap-3"
+        >
+          <label className="grid min-w-0 flex-1 gap-2 text-sm font-semibold">
+            Search submissions
+            <input
+              name="q"
+              type="search"
+              defaultValue={query}
+              maxLength={80}
+              className="border-border bg-surface min-h-11 w-full rounded-lg border px-3"
+              placeholder="Display name"
+            />
+          </label>
+          <button
+            className="bg-brand min-h-11 rounded-lg px-4 text-sm font-semibold text-white"
+            type="submit"
+          >
+            Search
+          </button>
+          <span className="text-muted py-3 text-xs">
+            {filteredRows.length} of {rows.length} entries
+          </span>
+        </form>
+        {filteredRows.length === 0 ? (
           <Card>
             <CardContent className="py-10 text-center">
               <Users aria-hidden="true" className="text-muted mx-auto size-8" />
               <h2 className="text-foreground mt-3 text-xl font-black">
-                No submissions yet
+                {query ? "No matching submission" : "No submissions yet"}
               </h2>
               <p className="text-muted mt-2 text-sm">
-                New entries will appear here.
+                {query
+                  ? "Try a different display name."
+                  : "New entries will appear here."}
               </p>
             </CardContent>
           </Card>
         ) : (
-          <ul className="grid gap-2" aria-label="All submissions">
-            {rows.map((entry) => (
+          <ul
+            className="grid min-w-0 grid-cols-1 gap-2"
+            aria-label="All submissions"
+          >
+            {filteredRows.map((entry) => (
               <li key={entry.id}>
                 <Card>
                   <CardContent className="flex flex-col gap-3 py-3 sm:flex-row sm:items-center">
                     <div className="min-w-0 grow">
                       <Link
-                        className="text-foreground focus-visible:ring-accent/30 focus-visible:ring-offset-background inline-flex min-h-11 max-w-full items-center truncate rounded-lg font-black underline-offset-4 outline-none hover:underline focus-visible:ring-2 focus-visible:ring-offset-2"
+                        className="text-foreground focus-visible:ring-accent/30 focus-visible:ring-offset-background block min-h-11 max-w-full content-center rounded-lg font-black wrap-anywhere underline-offset-4 outline-none hover:underline focus-visible:ring-2 focus-visible:ring-offset-2"
                         href={`/entries/${entry.id}`}
                       >
                         {entry.participantName}

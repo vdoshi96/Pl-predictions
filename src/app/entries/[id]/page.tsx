@@ -1,8 +1,9 @@
-import { Eye, LockKeyhole, Medal, Sparkles } from "lucide-react";
+import { Eye, LockKeyhole, Sparkles } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
+import { PageHeading } from "@/components/page-heading";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { TeamMark } from "@/components/team-mark";
@@ -44,47 +45,29 @@ export default async function EntryPage({
   ).length;
 
   return (
-    <main className="page-shell w-full flex-1 py-6 sm:py-10">
+    <main id="main-content" className="page-shell w-full flex-1 py-6 sm:py-10">
       <div className="mx-auto grid max-w-4xl gap-5 sm:gap-7">
-        <section className="brand-hero rounded-3xl p-5 text-white sm:p-8">
-          <div className="flex flex-wrap items-center gap-2">
-            <Badge className="bg-accent text-accent-ink ring-accent">
-              2026/27 prediction
+        <PageHeading
+          title={`${entry.participantName}'s prediction`}
+          description="The original prediction, against the published season table."
+          status={
+            <Badge variant={entry.predictionsRevealed ? "success" : "warning"}>
+              {entry.predictionsRevealed ? "Public" : "Private confirmation"}
             </Badge>
-            {entry.predictionsRevealed ? (
-              <Badge variant="success">Public</Badge>
-            ) : (
-              <Badge variant="warning">Private confirmation</Badge>
-            )}
-            {entry.snapshot ? (
-              <Badge variant={entry.snapshot.isFinal ? "accent" : "warning"}>
-                {entry.snapshot.isFinal ? "Final" : "Provisional"}
-              </Badge>
-            ) : null}
-          </div>
-          <h1 className="mt-5 text-3xl font-black tracking-tight [overflow-wrap:anywhere] sm:text-5xl">
-            {entry.participantName}&apos;s prediction
-          </h1>
-          <p className="mt-3 text-sm leading-6 text-white/75">
-            Submitted {formatChicagoUtcDateTime(entry.createdAt)}
-          </p>
-          {entry.totalScore !== null ? (
-            <div className="mt-6 flex items-center gap-3">
-              <span className="bg-accent text-accent-ink grid size-12 place-items-center rounded-2xl">
-                <Medal aria-hidden="true" className="size-6" />
-              </span>
-              <div>
-                <strong className="block text-3xl font-black tabular-nums">
-                  {entry.totalScore} table points
-                </strong>
-                <span className="text-xs font-semibold text-white/65">
-                  Main leaderboard score · maximum 100
-                </span>
-              </div>
-            </div>
+          }
+        >
+          <span>Submitted {formatChicagoUtcDateTime(entry.createdAt)}</span>
+          {entry.snapshot ? (
+            <Badge variant={entry.snapshot.isFinal ? "success" : "warning"}>
+              {entry.snapshot.isFinal ? "Final" : "Provisional"}
+            </Badge>
           ) : null}
-        </section>
-
+          {entry.totalScore !== null ? (
+            <strong className="text-brand-ink text-xl">
+              {entry.totalScore} / 100 table points
+            </strong>
+          ) : null}
+        </PageHeading>
         {!entry.predictionsRevealed && entry.isOwnerReceipt ? (
           <Card>
             <CardContent className="flex items-start gap-3">
@@ -97,61 +80,15 @@ export default async function EntryPage({
                   Only this browser can see the table
                 </h2>
                 <p className="text-muted mt-1 text-sm leading-6">
-                  Your secure receipt authorizes this confirmation. Other people
-                  cannot enumerate or open it before reveal.
+                  Your secure receipt authorizes this confirmation. Before
+                  reveal, opening this address in a different browser does not
+                  replace the receipt. Keep this browser’s cookies to return to
+                  your entry.
                 </p>
               </div>
             </CardContent>
           </Card>
         ) : null}
-
-        <Card>
-          <CardContent>
-            <div className="flex flex-wrap items-start justify-between gap-2">
-              <div>
-                <h2 className="text-brand-ink-strong text-xl font-black">
-                  Spotlight picks
-                </h2>
-                <p className="text-muted mt-1 text-sm leading-6">
-                  These seven picks are stored with the table. Their separate
-                  just-for-fun accuracy appears as result lists become available
-                  and never changes the 100-point table score.
-                </p>
-                {entry.snapshot && !entry.snapshot.isFinal ? (
-                  <p className="text-warning mt-2 text-xs leading-5 font-semibold">
-                    Accuracy uses provisional published snapshots. Shared ties
-                    can award the same high rank, including zero-stat rows early
-                    in the season.
-                  </p>
-                ) : null}
-              </div>
-              <div className="flex flex-wrap items-center gap-2">
-                <Badge
-                  variant={availableSpotlightCount > 0 ? "success" : "warning"}
-                >
-                  {availableSpotlightCount} of 7 results available
-                </Badge>
-                <Link
-                  className="text-brand-ink focus-visible:ring-accent-blue border-accent-lilac/30 hover:bg-brand-soft inline-flex min-h-10 items-center gap-2 rounded-xl border px-3 text-xs font-black outline-none focus-visible:ring-2"
-                  href="/spotlight"
-                >
-                  <Sparkles aria-hidden="true" className="size-4" />
-                  View accuracy table
-                </Link>
-              </div>
-            </div>
-            {entry.spotlightPicks.length > 0 ? (
-              <SpotlightPickGrid
-                className="mt-4"
-                picks={entry.spotlightPicks}
-              />
-            ) : (
-              <p className="bg-surface-subtle text-muted mt-4 rounded-xl p-3 text-sm">
-                This legacy entry does not contain spotlight picks.
-              </p>
-            )}
-          </CardContent>
-        </Card>
 
         {entry.snapshot ? (
           <p className="text-muted flex min-w-0 items-center gap-2 text-xs font-semibold">
@@ -172,7 +109,7 @@ export default async function EntryPage({
         )}
 
         <ol
-          className="grid gap-2"
+          className="entry-comparison"
           aria-label={`${entry.participantName}'s predicted table`}
         >
           {entry.comparisonItems.map((item) => {
@@ -231,6 +168,54 @@ export default async function EntryPage({
             );
           })}
         </ol>
+
+        <Card>
+          <CardContent>
+            <div className="flex flex-wrap items-start justify-between gap-2">
+              <div>
+                <h2 className="text-brand-ink-strong text-xl font-black">
+                  Spotlight picks
+                </h2>
+                <p className="text-muted mt-1 text-sm leading-6">
+                  These seven picks are stored with the table. Their separate
+                  just-for-fun accuracy appears as result lists become available
+                  and never changes the 100-point table score.
+                </p>
+                {entry.snapshot && !entry.snapshot.isFinal ? (
+                  <p className="text-warning mt-2 text-xs leading-5 font-semibold">
+                    Accuracy uses provisional published snapshots. Shared ties
+                    can award the same high rank, including zero-stat rows early
+                    in the season.
+                  </p>
+                ) : null}
+              </div>
+              <div className="flex flex-wrap items-center gap-2">
+                <Badge
+                  variant={availableSpotlightCount > 0 ? "success" : "warning"}
+                >
+                  {availableSpotlightCount} of 7 results available
+                </Badge>
+                <Link
+                  className="text-brand-ink focus-visible:ring-accent-blue border-accent-lilac/30 hover:bg-brand-soft inline-flex min-h-10 items-center gap-2 rounded-xl border px-3 text-xs font-black outline-none focus-visible:ring-2"
+                  href="/spotlight"
+                >
+                  <Sparkles aria-hidden="true" className="size-4" />
+                  View accuracy table
+                </Link>
+              </div>
+            </div>
+            {entry.spotlightPicks.length > 0 ? (
+              <SpotlightPickGrid
+                className="mt-4"
+                picks={entry.spotlightPicks}
+              />
+            ) : (
+              <p className="bg-surface-subtle text-muted mt-4 rounded-xl p-3 text-sm">
+                This legacy entry does not contain spotlight picks.
+              </p>
+            )}
+          </CardContent>
+        </Card>
       </div>
     </main>
   );

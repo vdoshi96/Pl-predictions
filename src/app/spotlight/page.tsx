@@ -1,8 +1,8 @@
-import { EyeOff, SlidersHorizontal, Sparkles, Trophy } from "lucide-react";
+import { EyeOff, SlidersHorizontal } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
 
-import { Badge } from "@/components/ui/badge";
+import { PageHeading } from "@/components/page-heading";
 import { Card, CardContent } from "@/components/ui/card";
 import { SPOTLIGHT_SCORING_MESSAGE } from "@/content/public-copy";
 import { LeaderboardEntryLink } from "@/features/leaderboard/entry-link";
@@ -85,11 +85,16 @@ export default async function SpotlightPage({
   searchParams: Promise<{
     sort?: string | string[];
     view?: string | string[];
+    category?: string | string[];
   }>;
 }) {
   const [view, query] = await Promise.all([getLeaderboardView(), searchParams]);
   const sort = parseSort(query.sort);
   const selectedView = parseSpotlightView(query.view);
+  const selectedCategory =
+    typeof query.category === "string" && isPredictionCategory(query.category)
+      ? query.category
+      : "top_scorer";
   const selectedDefinition =
     sort === "overall"
       ? null
@@ -159,69 +164,21 @@ export default async function SpotlightPage({
   }
 
   return (
-    <main className="page-shell w-full flex-1 py-6 sm:py-10">
+    <main id="main-content" className="page-shell w-full flex-1 py-6 sm:py-10">
       <div className="grid gap-5 sm:gap-7">
-        <section className="brand-hero rounded-3xl p-5 text-white sm:p-8">
-          <div className="flex flex-wrap items-center gap-2">
-            <Badge className="bg-accent text-accent-ink ring-accent">
-              {view.seasonName}
-            </Badge>
-            <Badge className="bg-white/15 text-white ring-white/20">
-              Just for fun
-            </Badge>
-          </div>
-          <div className="mt-5 flex items-start gap-3">
-            <Sparkles
-              aria-hidden="true"
-              className="text-accent-blue mt-1 size-7 shrink-0"
-            />
-            <div>
-              <h1 className="text-3xl font-black tracking-tight sm:text-4xl">
-                Spotlight accuracy
-              </h1>
-              <p className="mt-2 max-w-2xl text-sm leading-6 text-white/75 sm:text-base">
-                This separate page tracks how highly each selected player or
-                club finishes in its outcome list. It never changes the main
-                100-point table leaderboard.
-              </p>
-            </div>
-          </div>
-          <div className="mt-6 flex flex-wrap items-center gap-3 text-xs font-semibold text-white/75">
-            <span className="inline-flex items-center rounded-full bg-white/10 px-3 py-2">
-              {view.entries.length} active{" "}
-              {view.entries.length === 1 ? "bracket" : "brackets"}
-            </span>
-            <Link
-              className="bg-accent text-accent-ink hover:bg-accent-yellow inline-flex min-h-10 items-center rounded-xl px-3 font-black transition-colors"
-              href="/leaderboard"
-            >
-              View table leaderboard
-            </Link>
-          </div>
-        </section>
-
-        <Card>
-          <CardContent className="flex items-start gap-3">
-            <span className="bg-brand-soft text-brand-ink grid size-11 shrink-0 place-items-center rounded-xl">
-              <Trophy aria-hidden="true" className="size-5" />
-            </span>
-            <div>
-              <h2 className="text-brand-ink-strong text-xl font-black">
-                How spotlight points work
-              </h2>
-              <p className="text-muted mt-1 text-sm leading-6">
-                {SPOTLIGHT_SCORING_MESSAGE}
-              </p>
-              <Link
-                className="text-brand-ink focus-visible:ring-accent-blue mt-3 inline-flex min-h-11 items-center rounded-lg font-black underline decoration-2 underline-offset-4 outline-none focus-visible:ring-2"
-                href="/rules#spotlight-scoring"
-              >
-                Read the full scoring rules
-              </Link>
-            </div>
-          </CardContent>
-        </Card>
-
+        <PageHeading
+          title="Who called it?"
+          description="Seven spotlight predictions. A separate measure of accuracy."
+        >
+          <span>{view.seasonName}</span>
+          <span>{view.entries.length} active entries</span>
+          <Link
+            className="text-brand-ink inline-flex min-h-11 items-center font-semibold underline"
+            href="/leaderboard"
+          >
+            Table leaderboard
+          </Link>
+        </PageHeading>
         <nav aria-label="Spotlight views">
           <ul className="bg-surface-subtle grid grid-cols-3 gap-1 rounded-xl p-1">
             {viewOptions.map((option) => {
@@ -339,12 +296,60 @@ export default async function SpotlightPage({
             </CardContent>
           </Card>
         ) : selectedView === "categories" ? (
-          <SpotlightCategoriesView
-            boards={categoryBoards}
-            entryCount={view.entries.length}
-            leaders={categoryLeaders}
-            liveCategories={liveCategories}
-          />
+          <div className="grid gap-5">
+            <form
+              action="/spotlight"
+              className="flex flex-wrap items-end gap-3"
+            >
+              <label className="grid gap-2 text-sm font-semibold">
+                Category
+                <select
+                  name="category"
+                  defaultValue={selectedCategory}
+                  className="border-border bg-surface min-h-11 rounded-lg border px-3"
+                >
+                  {PREDICTION_CATEGORY_DEFINITIONS.map((definition) => (
+                    <option
+                      key={definition.category}
+                      value={definition.category}
+                    >
+                      {definition.label}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <button
+                type="submit"
+                className="bg-brand min-h-11 rounded-lg px-4 text-sm font-semibold text-white"
+              >
+                Show category
+              </button>
+            </form>
+            <div className="season-layout">
+              <SpotlightCategoriesView
+                boards={categoryBoards.filter(
+                  (board) => board.category === selectedCategory,
+                )}
+                entryCount={view.entries.length}
+                leaders={categoryLeaders}
+                liveCategories={liveCategories}
+              />
+              <aside className="border-border bg-surface rounded-xl border p-5 text-sm leading-6">
+                <h2 className="font-bold">How this category ranks</h2>
+                <p className="text-muted mt-2">
+                  {selectedCategory.endsWith("_team")
+                    ? "Only distinct clubs picked in this category are ranked. The expectation index uses every complete table prediction in the group."
+                    : selectedCategory.endsWith("_player")
+                      ? "Only players picked in this category with reviewed ratings are ranked. Missing ratings stay N/A and contribute no accuracy points."
+                      : "Published season totals determine occupied ranks, including ties. A reviewed result worth zero points is different from a pending result."}
+                </p>
+                <p className="text-muted mt-3">
+                  Select a player or club to see everyone who backed them.
+                  Spotlight accuracy stays separate from table points.
+                </p>
+              </aside>
+            </div>
+          </div>
         ) : selectedView === "matrix" ? (
           <SpotlightMatrixView entries={matrixEntries} />
         ) : (
@@ -465,6 +470,20 @@ export default async function SpotlightPage({
             </section>
           </div>
         )}
+        <details className="border-border border-t py-4">
+          <summary className="min-h-11 cursor-pointer text-sm font-bold">
+            How spotlight points work
+          </summary>
+          <p className="text-muted mt-3 max-w-3xl text-sm leading-6">
+            {SPOTLIGHT_SCORING_MESSAGE}
+          </p>
+          <Link
+            className="text-brand-ink mt-3 inline-flex min-h-11 items-center text-sm font-semibold underline"
+            href="/rules#spotlight-scoring"
+          >
+            Read the full scoring rules
+          </Link>
+        </details>
       </div>
     </main>
   );

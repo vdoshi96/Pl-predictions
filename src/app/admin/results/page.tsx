@@ -2,7 +2,6 @@ import { and, asc, count, eq, inArray, isNotNull } from "drizzle-orm";
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 
-import { Badge } from "@/components/ui/badge";
 import { getDb } from "@/db/client";
 import {
   players,
@@ -276,11 +275,10 @@ export default async function AdminResultsPage() {
   );
 
   return (
-    <main className="page-shell min-w-0 flex-1 py-6 sm:py-10">
+    <main id="main-content" className="page-shell min-w-0 flex-1 py-6 sm:py-10">
       <div className="grid min-w-0 gap-5">
         <div>
-          <Badge variant="accent">Manual reviewed outcomes</Badge>
-          <h1 className="text-foreground mt-3 text-3xl font-black tracking-tight sm:text-4xl">
+          <h1 className="text-foreground text-3xl font-bold tracking-tight sm:text-4xl">
             Spotlight results
           </h1>
           <p className="text-muted mt-2 max-w-3xl text-sm leading-6">

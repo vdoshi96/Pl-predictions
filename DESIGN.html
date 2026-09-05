@@ -1,0 +1,233 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="generated-by" content="scripts/generate-docs-html.mjs" />
+    <meta name="canonical-source" content="DESIGN.md" />
+    <meta name="canonical-source-sha256" content="a9a49e3d489654fae00992b1411e7ba28f0902857f1c49db93af5d5ef6bd1bd8" />
+    <title>Design System: Dranx Prediction League</title>
+    <style>
+      :root { color-scheme: light dark; font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+      body { margin: 0; background: #f5f5f0; color: #18201c; }
+      main { box-sizing: border-box; width: min(100% - 2rem, 880px); margin: 2rem auto; padding: clamp(1.25rem, 4vw, 3rem); background: #fff; border: 1px solid #d9ddd8; border-radius: 1rem; box-shadow: 0 18px 60px rgb(22 31 26 / 8%); }
+      h1, h2, h3 { line-height: 1.15; color: #102d22; }
+      h1 { font-size: clamp(2rem, 5vw, 3.25rem); letter-spacing: -.04em; }
+      h2 { margin-top: 2.5rem; padding-top: 1rem; border-top: 1px solid #e2e6e2; }
+      p, li { line-height: 1.7; }
+      a { color: #087854; text-underline-offset: .2em; }
+      code { padding: .12rem .35rem; border-radius: .3rem; background: #edf1ed; font-size: .92em; }
+      pre { overflow-x: auto; padding: 1rem; border-radius: .65rem; background: #111a16; color: #edf8f2; }
+      pre code { padding: 0; background: transparent; }
+      table { display: block; overflow-x: auto; width: 100%; border-collapse: collapse; }
+      th, td { padding: .65rem .8rem; border: 1px solid #d9ddd8; text-align: left; vertical-align: top; }
+      th { background: #edf4ef; }
+      img { max-width: 100%; height: auto; border-radius: .75rem; }
+      blockquote { margin-left: 0; padding-left: 1rem; border-left: .25rem solid #1b9a6c; color: #49564f; }
+      .source { margin-top: 3rem; padding-top: 1rem; border-top: 1px solid #d9ddd8; color: #627069; font-size: .85rem; }
+      @media (prefers-color-scheme: dark) {
+        body { background: #0e1512; color: #e5ebe7; }
+        main { background: #16201b; border-color: #34423a; }
+        h1, h2, h3 { color: #f2fff8; }
+        h2, .source { border-color: #34423a; }
+        a { color: #58ddb0; }
+        code, th { background: #24322b; }
+        th, td { border-color: #3b4b42; }
+        blockquote { color: #b5c2bb; }
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <hr>
+<p>name: Dranx Prediction League
+description: Compact football comparisons on warm paper with purple identity and a playful shared-rank podium.
+colors:
+  background: &quot;#f5f3ee&quot;
+  surface: &quot;#fffefa&quot;
+  surface-subtle: &quot;#efebf0&quot;
+  foreground: &quot;#302036&quot;
+  muted: &quot;#6b6071&quot;
+  border: &quot;#ded9df&quot;
+  brand: &quot;#37003c&quot;
+  brand-ink: &quot;#37003c&quot;
+  brand-soft: &quot;#eae5ed&quot;
+  accent: &quot;#d6ff78&quot;
+  accent-yellow: &quot;#e4ffa3&quot;
+  accent-pressed: &quot;#c3ef64&quot;
+  accent-ink: &quot;#26002d&quot;
+  accent-blue: &quot;#a34daf&quot;
+  accent-lilac: &quot;#85418e&quot;
+  brand-pressed: &quot;#e8d9eb&quot;
+  danger: &quot;#a32b32&quot;
+  danger-soft: &quot;#fde8e8&quot;
+  warning: &quot;#8a5a00&quot;
+  warning-soft: &quot;#fff2cc&quot;
+  mint: &quot;#ddffef&quot;
+  mint-ink: &quot;#075d42&quot;
+  sky-soft: &quot;#dffcff&quot;
+  background-dark: &quot;#17131a&quot;
+  surface-dark: &quot;#211b25&quot;
+  surface-subtle-dark: &quot;#342939&quot;
+  foreground-dark: &quot;#f0eaf2&quot;
+  muted-dark: &quot;#bcb0c2&quot;
+  border-dark: &quot;#453a4a&quot;
+  brand-ink-dark: &quot;#e7c7eb&quot;
+  brand-soft-dark: &quot;#342939&quot;
+  accent-blue-dark: &quot;#ce9cd6&quot;
+  brand-pressed-dark: &quot;#47204f&quot;
+  danger-dark: &quot;#ff9ba0&quot;
+  danger-soft-dark: &quot;#3d1216&quot;
+  warning-dark: &quot;#ffd60a&quot;
+  warning-soft-dark: &quot;#3a2c05&quot;
+  mint-dark: &quot;#12382d&quot;
+  mint-ink-dark: &quot;#8fffc9&quot;
+  sky-soft-dark: &quot;#0d353a&quot;
+typography:
+  headline:
+    fontSize: &quot;1.875rem&quot;
+    fontWeight: 700
+    lineHeight: &quot;2.25rem&quot;
+    letterSpacing: &quot;-0.025em&quot;
+  headline-wide:
+    fontSize: &quot;2.25rem&quot;
+    fontWeight: 700
+    lineHeight: &quot;2.5rem&quot;
+    letterSpacing: &quot;-0.025em&quot;
+  body:
+    fontFamily: &#39;&quot;Avenir Next&quot;, &quot;Segoe UI&quot;, Helvetica, Arial, sans-serif&#39;
+    fontSize: &quot;0.875rem&quot;
+    lineHeight: &quot;1.5rem&quot;
+  label:
+    fontSize: &quot;0.75rem&quot;
+    lineHeight: &quot;1.25rem&quot;
+    fontWeight: 600
+rounded:
+  lg: &quot;8px&quot;
+  xl: &quot;12px&quot;
+  2xl: &quot;16px&quot;
+  full: &quot;9999px&quot;
+spacing:
+  2: &quot;8px&quot;
+  3: &quot;12px&quot;
+  4: &quot;16px&quot;
+  6: &quot;24px&quot;
+  8: &quot;32px&quot;
+components:
+  button-primary:
+    backgroundColor: &quot;{colors.accent}&quot;
+    textColor: &quot;{colors.accent-ink}&quot;
+    rounded: &quot;{rounded.xl}&quot;
+    padding: &quot;0 16px&quot;
+  button-primary-hover:
+    backgroundColor: &quot;{colors.accent-yellow}&quot;
+  button-secondary:
+    backgroundColor: &quot;{colors.surface}&quot;
+    textColor: &quot;{colors.brand-ink}&quot;
+    rounded: &quot;{rounded.xl}&quot;
+    padding: &quot;0 16px&quot;
+  button-ghost:
+    textColor: &quot;{colors.muted}&quot;
+    rounded: &quot;{rounded.xl}&quot;
+    padding: &quot;0 16px&quot;
+  card:
+    backgroundColor: &quot;{colors.surface}&quot;
+    textColor: &quot;{colors.foreground}&quot;
+    rounded: &quot;{rounded.2xl}&quot;
+  input:
+    backgroundColor: &quot;{colors.surface}&quot;
+    rounded: &quot;{rounded.xl}&quot;
+    padding: &quot;0 12px&quot;
+  badge-neutral:
+    backgroundColor: &quot;{colors.brand-soft}&quot;
+    textColor: &quot;{colors.brand-ink}&quot;
+    rounded: &quot;{rounded.full}&quot;
+padding: &quot;2px 10px&quot;
+</p>
+<hr>
+<h1 id="design-system-dranx-prediction-league">Design System: Dranx Prediction League</h1>
+<h2 id="overview">Overview</h2>
+<p><strong>Creative North Star: &quot;Calm football comparisons&quot;</strong></p>
+<p>Dranx presents a friends&#39; competition through compact headings, readable comparison rows, and warm surfaces. Purple carries identity; lime marks primary actions and selected highlights. Local club badges connect the interface to the competition.</p>
+<p>The podium adds restrained playfulness through outlined animal icons. Names, scores, and occupied ranks remain the authoritative information. This record describes the approved implementation; source components and global styles govern behavior when an illustrative snippet omits application logic.</p>
+<p><strong>Key Characteristics:</strong></p>
+<ul>
+<li>Warm paper with purple text and restrained lime accents.</li>
+<li>Compact headers and dense, readable comparison rows.</li>
+<li>Equal visual treatment for every participant at the same podium rank.</li>
+<li>Responsive layouts with explicit labels and visible action states.</li>
+</ul>
+<h2 id="colors">Colors</h2>
+<p>The palette pairs warm neutral surfaces with purple identity and a small set of semantic status colors. The frontmatter records light values and explicit dark overrides; unchanged tokens carry across themes.</p>
+<h3 id="primary">Primary</h3>
+<p><strong>Purple brand</strong> anchors the logo, the first-place podium header, and selected controls. <strong>Purple ink</strong> is the theme-aware text counterpart. Use the ink token for text on ordinary surfaces; the brand fill remains dark in both themes.</p>
+<h3 id="secondary">Secondary</h3>
+<p><strong>Lime accent</strong> fills primary buttons and selection highlights. Its yellow and pressed variants provide interaction states. <strong>Lilac accent</strong> marks active navigation and selected borders. The legacy accent-blue name identifies the purple focus color; preserve the source name.</p>
+<h3 id="neutral">Neutral</h3>
+<p><strong>Warm paper</strong> surrounds <strong>surface</strong> panels. <strong>Subtle surface</strong> and <strong>soft brand</strong> group supporting information. <strong>Foreground</strong>, <strong>muted</strong>, and <strong>border</strong> separate primary content, supporting copy, and row boundaries.</p>
+<h3 id="semantic-colors">Semantic colors</h3>
+<p>Mint, warning, and danger pairs communicate successful, cautionary, and failed states. Comparison-gap chips have a separate signed scale with near, slight, and far bands in each theme. Preserve their arrows and numerical differences; color is additional information.</p>
+<p><strong>The semantic pair Rule.</strong> Use each status foreground with its matching surface, and retain a text label or numerical cue.</p>
+<p>The sidecar&#39;s synthesized tonal ramps support preview swatches; they are not additional application colors.</p>
+<p>The application follows the operating system&#39;s color preference. The light-preview scope is reserved for intentional light examples; it does not replace theme-aware application surfaces.</p>
+<h2 id="typography">Typography</h2>
+<p>Body copy uses the installed Avenir Next stack, with Segoe UI, Helvetica, Arial, and sans-serif fallbacks. Page headings inherit that stack. The frontmatter records their size and weight, without promoting a system font into a distinctive display identity.</p>
+<p>Page titles use the compact headline size and increase at the small breakpoint. Supporting descriptions use the body role with generous line spacing. Section headings commonly use bold base or extra-large text; metadata and badges use small labels. Numerical columns and scores use tabular numerals where alignment matters. Monospace appears in compact position labels and paste-entry fields.</p>
+<p><strong>The comparison hierarchy Rule.</strong> Keep club or participant names prominent, supporting facts quieter, and scores aligned. Let long names wrap instead of concealing them.</p>
+<p>Decorative uppercase eyebrows are not a heading pattern. Functional table column labels remain part of the comparison interface.</p>
+<h2 id="layout">Layout</h2>
+<p>The public page shell uses <code>min(100% - 2rem, 72rem)</code> and centers itself. Its minimum supported viewport is 320px. The header contains a compact brand row and a separate row of five navigation links.</p>
+<p>The season comparison uses a flexible table column beside a 19rem supporting column, with a 2rem gap. Below 900px, it becomes one column. At that breakpoint, podium columns become stacked rank groups. Each mobile group has a 4.5rem rank rail; every tied participant remains visible.</p>
+<p>Card padding increases from the 16px spacing step to the 24px step at 640px. Smaller gaps use the 8px and 12px steps. Under 480px, navigation spacing and podium decoration contract to preserve content width.</p>
+<p>Comparison tables retain row boundaries. On mobile, Group avg. appears as a labeled inline value beneath the club name. The entry comparison leads with per-club scoring. Stage 3 uses an ordinary full-page review with all 20 clubs and seven picks, separate edit actions, and one final submission action.</p>
+<p>Bottom actions and mobile selector sheets account for the device safe area. A selector becomes a fixed bottom sheet on narrow screens and an anchored dropdown from 640px. Constrain wide matrices within their own scroll region; preserve the page&#39;s reflow.</p>
+<h2 id="elevation-depth">Elevation &amp; Depth</h2>
+<p>Most surfaces are flat, with thin borders and tonal grouping. Shared buttons use a small ambient shadow. Popovers, dialogs, and selected floating regions use stronger elevation to distinguish temporary layers. The panel shadow is a soft purple-tinted spread in light mode and a black spread in dark mode; its exact values live in the sidecar.</p>
+<p>Dropdowns and dialogs open over 250ms and close over 150ms. Stage panels use a short vertical offset with opacity and blur. Success feedback has a finite stroke-draw animation. Reduced-motion rules remove or shorten movement, reveal the completed check, and disable smooth scrolling.</p>
+<p><strong>The resting surface Rule.</strong> Use borders and tone for ordinary content; reserve raised layers for controls or transient content that already uses elevation.</p>
+<h2 id="shapes">Shapes</h2>
+<p>Controls and comparison rows use gently rounded corners. Shared buttons use the xl radius; cards use 2xl; compact navigation controls and some inputs use lg. Badges use the full radius. Preserve these distinctions instead of enclosing every region in a card.</p>
+<p>Podium tiers have rounded upper corners on desktop and a rounded outer outline on mobile. Their animal containers use a softly shaped silhouette. The original club marks retain their supplied artwork and fit within consistent image bounds.</p>
+<h2 id="components">Components</h2>
+<h3 id="buttons">Buttons</h3>
+<p>Shared buttons have primary, secondary, ghost, and danger variants. Primary is lime; secondary has a surface fill and border; ghost gains a soft brand surface on interaction. The danger variant uses Tailwind red with white text rather than the semantic danger surface pair.</p>
+<p>Small and medium buttons have a minimum height of 44px. Large buttons and icon buttons use 48px. Shared controls expose hover, pressed, focus, and disabled states. Their color transitions last 150ms. Disabled buttons reduce opacity and use an unavailable cursor.</p>
+<h3 id="inputs-and-selectors">Inputs and selectors</h3>
+<p>Fields use a surface fill, thin border, and visible focus treatment. Most form fields have a 44px minimum height and xl corners; the leaderboard search uses lg corners. Preserve labels, error text, disabled states, and pending feedback.</p>
+<p>Searchable prediction selectors use combobox and listbox semantics, keyboard selection, and a bounded results panel. Keep the Other player path available when catalogue data is loading, empty, or unavailable. The player catalogue remains lazily loaded; this design does not introduce a runtime football feed.</p>
+<h3 id="badges">Badges</h3>
+<p>Status badges are compact pills with an inset ring. Neutral, accent, success, warning, and danger variants retain readable text. Badges report state; they do not replace a required action control.</p>
+<h3 id="cards-and-comparison-rows">Cards and comparison rows</h3>
+<p>Cards are bordered surfaces without a default panel shadow. Headers, content, and footers share responsive padding. Footers use a dividing line. Comparison lists join rows inside one rounded outline, preserving data density and column alignment.</p>
+<h3 id="navigation">Navigation</h3>
+<p>Primary navigation names Season table, Leaderboard, Spotlight, Win Streak, and Rules. Active links use a lilac underline and purple ink, with <code>aria-current=&quot;page&quot;</code>. Links retain a 48px minimum height. The skip link becomes visible on focus.</p>
+<p>The owner results desk uses selected workspace controls with <code>aria-pressed</code>. Inactive workspaces remain mounted and hidden so switching datasets preserves unsaved drafts. Publication remains a separate reviewed action with its existing validation and attestation gates.</p>
+<h3 id="podium">Podium</h3>
+<p>Group entries by occupied competition ranks 1, 2, and 3, including every tied entry. Do not allocate only three participant slots. A rank group shares its treatment, and the first-place header carries the strongest brand fill.</p>
+<p>Animal icons derive deterministically from the public display name and are hidden from assistive technology. They require no profile setting or additional personal data. Visible names, rank labels, and scores carry meaning independently.</p>
+<p><strong>The equal place Rule.</strong> Give every participant at the same rank the same visual status, without truncating the group.</p>
+<h3 id="review-and-action-safeguards">Review and action safeguards</h3>
+<p>The review page exposes the full entry before the irreversible submission. Keep Edit table, Edit picks, pending state, rejection feedback, and focus on the review heading. Preserve the existing browser draft and immutable submission behavior.</p>
+<p>Sorting rows have 56px minimum height and retain touch, pointer, and keyboard controls. Theme, reduced-motion, focus, long-name wrapping, and safe-area behavior apply to these interactions as well as read-only views.</p>
+<h2 id="dos-and-donts">Do&#39;s and Don&#39;ts</h2>
+<h3 id="do">Do</h3>
+<ul>
+<li><strong>Do</strong> use theme-aware surface and text pairs.</li>
+<li><strong>Do</strong> keep names, ranks, status labels, and numerical differences visible independently of color or decoration.</li>
+<li><strong>Do</strong> include every tied podium participant with equal treatment.</li>
+<li><strong>Do</strong> preserve full-page review, draft retention, visible focus, and immutable action feedback.</li>
+<li><strong>Do</strong> reuse the original local club badges and existing decorative animal system.</li>
+</ul>
+<h3 id="dont">Don&#39;t</h3>
+<ul>
+<li><strong>Don&#39;t</strong> turn a compact heading into a decorative eyebrow stack.</li>
+<li><strong>Don&#39;t</strong> hide comparison facts or middle review rows to make a narrow screen look shorter.</li>
+<li><strong>Don&#39;t</strong> replace working controls with static visual imitations or remove publication safeguards.</li>
+<li><strong>Don&#39;t</strong> turn illustrative participant data, icon choices, or prototype content into persisted product data.</li>
+</ul>
+<p>Not canonized: inherited system-font headings are recorded as implementation evidence, not a distinctive display-font rule. One-off decorative values and unused legacy styling do not establish patterns for additional screens.</p>
+
+      <p class="source">Generated deterministically from <a href="DESIGN.md">DESIGN.md</a>. Canonical SHA-256: <code>a9a49e3d489654fae00992b1411e7ba28f0902857f1c49db93af5d5ef6bd1bd8</code>.</p>
+    </main>
+  </body>
+</html>

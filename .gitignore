@@ -46,3 +46,7 @@ next-env.d.ts
 !.agents/skills/update-results/
 !.agents/skills/update-results/**
 skills-lock.json
+
+# Local design review inputs and captures.
+/.impeccable/*
+!/.impeccable/design.json

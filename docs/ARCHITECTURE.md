@@ -28,11 +28,16 @@ Next.js server components/actions                           |
 
 The public application never contacts FotMob or another football-data source. The owner-selected `premier-league-players-2026-08-20/` handoff supplies selector identities and portrait files. The deployed app never executes its acquisition code. The handoff and application fixture are reconciled internally; this update does not claim independent roster verification against official club or Premier League pages. The handoff does not supply competition outcomes. The owner confirmed permission on 2026-08-14 for offline acquisition, storage, redistribution, and production use in this player-catalogue workflow. Offline work may produce reviewed facts, but the owner enters factual outcomes only through the authenticated manual results desk. Missing datasets remain pending and do not receive zero.
 
+## Interface composition
+
+The final entry review is a full-page third stage: all 20 ordered clubs and seven picks remain visible, with separate edit actions and one submission action. The owner results desk selects one dataset workspace at a time while keeping unsaved editor state mounted across workspace changes. Mobile season rows retain Group avg. inline beneath the club name when the desktop average column does not fit.
+
 ## Runtime and deployment
 
 - Vercel project: `vdoshi96s-projects/pl-predictions`.
+- Latest redesign release evidence: [Approved redesign release](redesign-release.md).
 - Production alias: `https://pl-predictions-2026.vercel.app`.
-- Current verified production release: Win Streak GitHub PR #39 merged as `19bf11b4df43f8c3410f704fb278d1d4bdd845b5`; Vercel deployment `dpl_BTncZC77GmA3EXtaUjAKvfWZvRzP` is Ready at `https://pl-predictions-cdq31rqls-vdoshi96s-projects.vercel.app` and owns the stable production alias. Additive migration `0010` and the targeted 37-round/370-fixture seed are applied.
+- Initial Win Streak release (historical): GitHub PR #39 merged as `19bf11b4df43f8c3410f704fb278d1d4bdd845b5`; Vercel deployment `dpl_BTncZC77GmA3EXtaUjAKvfWZvRzP` was Ready at `https://pl-predictions-cdq31rqls-vdoshi96s-projects.vercel.app` and owned the stable production alias at that release. Additive migration `0010` and the targeted 37-round/370-fixture seed are applied.
 - Deployment protection: Vercel Authentication is `preview`; production is public and retained previews require Vercel sign-in.
 - Database: Neon resource `neon-coffee-queen`, project `young-leaf-03280061`, provisioned through Vercel Marketplace before migrations and seed. Its root `main` branch has a six-hour restore window.
 - Runtime: Node.js 24.x, Next.js 16.3.0, React 19.2.8, Neon serverless HTTP, and Drizzle ORM.
@@ -44,7 +49,7 @@ The initial homepage server path reads an explicit active-season projection and 
 ## Routes
 
 - `/` — the three-stage table, spotlight, and review flow before reveal; after reveal, the live Premier League table versus consensus averages and expectation-index callouts.
-- `/leaderboard` — a 0-point champion-pick roster before scoring, then a top-three podium and dense shared-rank table with previous-snapshot movement, score breakdowns, and progress toward the 100-point cap.
+- `/leaderboard` — a 0-point champion-pick roster before scoring, then a compact podium including everyone at ranks 1–3 and a searchable shared-rank table with previous-snapshot movement, score breakdowns, and progress toward the 100-point cap.
 - `/spotlight` — separate fun-accuracy views selected by `?view=categories|entries|matrix`. Categories are the default, entries retain `?sort=`, and the desktop matrix keeps its first column sticky. Before reveal, every view exposes only the complete-bracket count, not picks, identifiers, or hidden ordering.
 - `/win-streak` — public Win Streak leaderboard plus the receipt-authorized current-profile picker. The leaderboard renders without a profile and publishes each current-matchweek pick; receipt and database identifiers remain private.
 - `/entries/[id]` — receipt/admin-authorized private confirmation before reveal; public comparison afterward.
@@ -215,3 +220,9 @@ Roster identity and portrait ingestion are separate from result entry. The snaps
 - Fixture drift that changes a team, pairing, fixture identity, matchweek, expired deadline, picked fixture, or resolved fixture cannot pass the targeted refresh. No-drift checks perform no write.
 - A Win Streak round with an unelapsed kickoff, fewer or more than ten results, invalid provenance, or a stale/concurrent transition cannot resolve. Published results are immutable.
 - Public Win Streak reads compare round state before and after their bounded queries and retry up to two times. Continued concurrent change returns a clear refresh error instead of a mixed leaderboard.
+
+## Approved comparison layout
+
+Public pages use a warm paper surface, a compact heading, and explicit Season table and Leaderboard navigation. The podium groups entries by their existing competition rank, includes every tie at ranks 1–3, and derives decorative animal icons from public display names without storing extra data. Entry detail places the complete per-club comparison before separate Spotlight picks. Spotlight Categories starts with Top scorer and offers every category through a native selector; Entries and Matrix retain their existing rankings and disclosures. Rules uses the canonical `scoreClub` function for its interactive worked example.
+
+Owner pages group routine review work separately from season fairness actions. Dataset jump links preserve all draft editors and publication controls. The Win Streak server-action module exports only actions; its client initial state lives in `action-state.ts`. Authentication, payload validation, exact-pointer transitions, and immutable result guards remain in their original server and database paths.

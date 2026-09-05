@@ -4,7 +4,9 @@ import { inArray, like } from "drizzle-orm";
 import { getDb } from "@/db/client";
 import { securityRateLimits, winStreakProfiles } from "@/db/schema";
 import { normalizedParticipantNameKey } from "@/features/predictions/normalization";
-import { seedWinStreakFixtures } from "../../scripts/seed-win-streak-fixtures";
+import { createWinStreakTestSeason } from "../win-streak-test-season";
+
+let cleanupFutureSeason: (() => Promise<void>) | undefined;
 
 const TEST_NAME_PREFIX = "WS E2E";
 const evidencePaths = {
@@ -106,12 +108,13 @@ async function confirmPick(
 }
 
 test.beforeAll(async () => {
-  await seedWinStreakFixtures();
-  await cleanTestProfiles();
+  const fixture = await createWinStreakTestSeason(true);
+  cleanupFutureSeason = fixture.cleanup;
 });
 
 test.afterAll(async () => {
   await cleanTestProfiles();
+  await cleanupFutureSeason?.();
 });
 
 test.beforeEach(async ({ baseURL, page }) => {
@@ -133,7 +136,7 @@ test.beforeEach(async ({ baseURL, page }) => {
   });
   await page.goto("/win-streak");
   await expect(
-    page.getByRole("heading", { level: 1, name: "Win Streak" }),
+    page.getByRole("heading", { level: 1, name: "One pick. Keep it going." }),
   ).toBeVisible();
   test.info().annotations.push({
     description: JSON.stringify({ errors, externalRequests }),
@@ -162,7 +165,7 @@ test("shows the public leaderboard before a participant creates a profile", asyn
     page.getByRole("heading", { name: "Win Streak leaderboard" }),
   ).toBeVisible();
   await expect(page.getByLabel("Display name")).toBeVisible();
-  await expect(page.getByText("Public picks", { exact: true })).toBeVisible();
+  await expect(page.getByText(/Matchweeks 2–38 · Public picks/)).toBeVisible();
   await expectNoHorizontalOverflow(page);
 });
 
@@ -256,6 +259,6 @@ test("retains the Dranx dark theme without mobile overflow", async ({
         .trim(),
       prefersDark: window.matchMedia("(prefers-color-scheme: dark)").matches,
     })),
-  ).toEqual({ background: "#17041a", prefersDark: true });
+  ).toEqual({ background: "#17131a", prefersDark: true });
   await expectNoHorizontalOverflow(page);
 });

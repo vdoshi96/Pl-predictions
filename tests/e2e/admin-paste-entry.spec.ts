@@ -262,7 +262,7 @@ test.describe("admin paste entry", () => {
     await expect(
       leaderboardPage.getByRole("heading", {
         level: 1,
-        name: "Dranx Prediction League",
+        name: "The friends’ leaderboard.",
       }),
     ).toBeVisible({ timeout: 20_000 });
     await leaderboardPage.close();

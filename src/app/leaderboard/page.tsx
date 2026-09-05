@@ -1,7 +1,8 @@
-import { Clock3, EyeOff, Medal, Sparkles, Trophy, Users } from "lucide-react";
+import { EyeOff, Medal } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
 
+import { PageHeading } from "@/components/page-heading";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import {
@@ -14,75 +15,49 @@ import { formatChicagoUtcDateTime } from "@/shared/format";
 export const metadata: Metadata = { title: "Table leaderboard" };
 export const dynamic = "force-dynamic";
 
-export default async function LeaderboardPage() {
+export default async function LeaderboardPage({
+  searchParams,
+}: PageProps<"/leaderboard">) {
+  const params = await searchParams;
+  const query =
+    typeof params.q === "string" ? params.q.trim().slice(0, 80) : "";
   const view = await getLeaderboardView();
   const scoringStarted = view.scoredEntries !== null;
 
   return (
-    <main className="page-shell w-full flex-1 py-6 sm:py-10">
+    <main id="main-content" className="page-shell w-full flex-1 py-6 sm:py-10">
       <div className="grid gap-5 sm:gap-7">
-        <section className="brand-hero rounded-3xl p-5 text-white sm:p-8">
-          <div className="flex flex-wrap items-center gap-2">
-            <Badge className="bg-accent text-accent-ink ring-accent">
-              {view.seasonName}
-            </Badge>
-            <Badge className="bg-white/15 text-white ring-white/20">
-              100-point table
-            </Badge>
-            {view.snapshot ? (
-              <Badge variant={view.snapshot.isFinal ? "accent" : "warning"}>
+        <PageHeading
+          title="The friends’ leaderboard."
+          description="One table prediction. Twenty clubs. Up to 100 points."
+          status={
+            view.snapshot ? (
+              <Badge variant={view.snapshot.isFinal ? "success" : "warning"}>
                 {view.snapshot.isFinal ? "Final" : "Provisional"}
               </Badge>
-            ) : null}
-          </div>
-          <div className="mt-5 flex items-start gap-3">
-            <Trophy
-              aria-hidden="true"
-              className="text-accent-blue mt-1 size-7 shrink-0"
-            />
-            <div>
-              <h1 className="text-3xl font-black tracking-tight sm:text-4xl">
-                Dranx Prediction League
-              </h1>
-              <p className="mt-2 max-w-2xl text-sm leading-6 text-white/75 sm:text-base">
-                The table leaderboard is recalculated from the latest valid
-                standings and always stays within 100 points. Spotlight picks
-                have a separate just-for-fun accuracy table.
-              </p>
-            </div>
-          </div>
-          <div className="mt-6 flex flex-wrap items-center gap-3 text-xs font-semibold text-white/75">
-            <span className="inline-flex items-center rounded-full bg-white/10 px-3 py-2">
-              Table points · maximum 100
+            ) : undefined
+          }
+        >
+          <span>
+            {view.entries.length}{" "}
+            {view.entries.length === 1 ? "entry" : "entries"} · Table points
+            only
+          </span>
+          {view.snapshot ? (
+            <span>
+              Updated {formatChicagoUtcDateTime(view.snapshot.capturedAt)}
             </span>
-            <span className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-2">
-              <Users aria-hidden="true" className="text-accent size-4" />
-              {view.entries.length}{" "}
-              {view.entries.length === 1 ? "entry" : "entries"}
-            </span>
-            {view.snapshot ? (
-              <span className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-2">
-                <Clock3
-                  aria-hidden="true"
-                  className="text-accent-blue size-4"
-                />
-                Updated {formatChicagoUtcDateTime(view.snapshot.capturedAt)}
-              </span>
-            ) : null}
-            {view.snapshot?.matchweek ? (
-              <span className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-2">
-                Matchweek {view.snapshot.matchweek}
-              </span>
-            ) : null}
-            <Link
-              className="bg-accent text-accent-ink hover:bg-accent-yellow inline-flex min-h-10 items-center gap-2 rounded-xl px-3 font-black transition-colors"
-              href="/spotlight"
-            >
-              <Sparkles aria-hidden="true" className="size-4" />
-              View spotlight accuracy
-            </Link>
-          </div>
-        </section>
+          ) : null}
+          {view.snapshot?.matchweek ? (
+            <span>Matchweek {view.snapshot.matchweek}</span>
+          ) : null}
+          <Link
+            className="text-brand-ink inline-flex min-h-11 items-center font-semibold underline"
+            href="/spotlight"
+          >
+            View separate spotlight accuracy
+          </Link>
+        </PageHeading>
 
         {!view.predictionsRevealed ? (
           <Card>
@@ -125,6 +100,33 @@ export default async function LeaderboardPage() {
           </Card>
         ) : null}
 
+        <form action="/leaderboard" className="flex items-end gap-3">
+          <label className="grid w-full max-w-sm gap-2 text-sm font-semibold">
+            Find a participant
+            <input
+              name="q"
+              type="search"
+              defaultValue={query}
+              maxLength={80}
+              placeholder="Display name"
+              className="border-border bg-surface min-h-11 w-full rounded-lg border px-3"
+            />
+          </label>
+          <button
+            type="submit"
+            className="bg-brand min-h-11 rounded-lg px-4 text-sm font-semibold text-white"
+          >
+            Find
+          </button>
+          {query ? (
+            <Link
+              href="/leaderboard"
+              className="text-brand-ink inline-flex min-h-11 items-center text-sm underline"
+            >
+              Clear
+            </Link>
+          ) : null}
+        </form>
         {view.entries.length === 0 ? (
           <Card>
             <CardContent className="py-10 text-center">
@@ -143,10 +145,14 @@ export default async function LeaderboardPage() {
             </CardContent>
           </Card>
         ) : scoringStarted && view.scoredEntries ? (
-          <ScoredLeaderboardBoard entries={view.scoredEntries} />
+          <ScoredLeaderboardBoard entries={view.scoredEntries} query={query} />
         ) : (
           <LeaderboardRosterTable
-            entries={view.entries}
+            entries={view.entries.filter((entry) =>
+              entry.participantName
+                .toLocaleLowerCase()
+                .includes(query.toLocaleLowerCase()),
+            )}
             predictionsRevealed={view.predictionsRevealed}
           />
         )}

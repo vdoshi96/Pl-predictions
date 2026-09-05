@@ -11,15 +11,7 @@ import {
 } from "@/features/win-streak/results";
 import { PublicError, safeErrorMessage } from "@/shared/errors";
 
-export type WinStreakResultActionState = Readonly<{
-  message: string;
-  ok: boolean;
-}>;
-
-export const INITIAL_WIN_STREAK_RESULT_ACTION_STATE = {
-  message: "",
-  ok: false,
-} as const satisfies WinStreakResultActionState;
+import type { WinStreakResultActionState } from "./action-state";
 
 export async function resolveWinStreakRoundAction(
   _previousState: WinStreakResultActionState,

@@ -547,7 +547,7 @@ test("desktop public routes render the complete league without overflow", async 
   await expect(
     page.getByRole("heading", {
       level: 1,
-      name: "Build your 2026/27 Premier League table.",
+      name: "Your table. Your season.",
     }),
   ).toBeVisible();
   await expect(
@@ -617,20 +617,18 @@ test("desktop public routes render the complete league without overflow", async 
 
   await page.goto("/leaderboard");
   await expect(
-    page.getByRole("heading", { level: 1, name: "Dranx Prediction League" }),
+    page.getByRole("heading", { level: 1, name: "The friends’ leaderboard." }),
   ).toBeVisible();
   await expect(
-    page.getByRole("link", { name: "View spotlight accuracy" }),
+    page.getByRole("link", { name: "View separate spotlight accuracy" }),
   ).toBeVisible();
   await expectNoHorizontalOverflow(page);
 
   await page.goto("/spotlight");
   await expect(
-    page.getByRole("heading", { level: 1, name: "Spotlight accuracy" }),
+    page.getByRole("heading", { level: 1, name: "Who called it?" }),
   ).toBeVisible();
-  await expect(
-    page.getByRole("heading", { name: "How spotlight points work" }),
-  ).toBeVisible();
+  await page.getByText("How spotlight points work", { exact: true }).click();
   await expect(
     page.getByText(/your pick earns more spotlight points/i),
   ).toBeVisible();
@@ -642,8 +640,12 @@ test("desktop public routes render the complete league without overflow", async 
 
   await page.goto("/rules");
   await expect(
-    page.getByRole("heading", { level: 1, name: "How to play & scoring" }),
+    page.getByRole("heading", {
+      level: 1,
+      name: "The rules, without the guesswork.",
+    }),
   ).toBeVisible();
+  await page.getByText("How you enter", { exact: true }).click();
   await expect(
     page.getByRole("heading", { name: "How to play in three steps" }),
   ).toBeVisible();
@@ -678,7 +680,8 @@ test("mobile journey preserves privacy and gives the owner full control", async 
       : undefined;
   const walkthroughScreenshotDirectory =
     testInfo.project.name === "mobile-chromium"
-      ? process.env.WALKTHROUGH_SCREENSHOT_DIR
+      ? (process.env.WALKTHROUGH_SCREENSHOT_DIR ??
+        (process.env.QA_SCREENSHOT_DIR ? "public/how-to-play" : undefined))
       : undefined;
   expect(
     adminSecret,
@@ -841,7 +844,7 @@ test("mobile journey preserves privacy and gives the owner full control", async 
     ],
   );
   await page.getByRole("button", { name: "Review all predictions" }).click();
-  const review = page.getByRole("dialog", {
+  const review = page.getByRole("region", {
     name: "Review every prediction",
   });
   await expect(review).toBeVisible();
@@ -850,30 +853,14 @@ test("mobile journey preserves privacy and gives the owner full control", async 
     name: "Prediction review, positions 1 through 20",
   });
   await expect(reviewTable.locator("li")).toHaveCount(20);
-  await expect(reviewTable.getByRole("listitem")).toHaveCount(8);
-  const reviewScroller = review.locator(".overflow-y-auto");
-  await reviewScroller.evaluate((element) => {
-    element.scrollTop = 0;
-  });
-  await expect
-    .poll(() => reviewScroller.evaluate((element) => element.scrollTop))
-    .toBe(0);
+  await expect(reviewTable.getByRole("listitem")).toHaveCount(20);
   await expectNoHorizontalOverflow(page);
-  await reviewScroller.evaluate((scroller) => {
-    const table = scroller.querySelector<HTMLElement>(
-      '[aria-label="Prediction review, positions 1 through 20"]',
-    );
-    if (!table) throw new Error("Prediction review table is missing.");
-    scroller.scrollTop +=
-      table.getBoundingClientRect().top - scroller.getBoundingClientRect().top;
-  });
-  await expect(reviewTable.getByText("Top 5", { exact: true })).toBeVisible();
+  await review.getByRole("heading", { level: 1 }).scrollIntoViewIfNeeded();
   await capturePlainEvidence(
     page,
     walkthroughScreenshotDirectory,
     "step-3-review-mobile.png",
   );
-  await reviewTable.getByText("Show all 20 clubs", { exact: true }).click();
   await expect(reviewTable.getByRole("listitem")).toHaveCount(20);
 
   await review.getByRole("button", { name: "Submit prediction" }).click();
@@ -962,17 +949,18 @@ test("mobile journey preserves privacy and gives the owner full control", async 
   await expect(
     page.getByRole("heading", { level: 1, name: "Spotlight results" }),
   ).toBeVisible();
-  for (const resultTableName of [
+  for (const workspace of [
     "Top scorer",
     "Top assister",
     "Most clean sheets",
-    "Underdog player ratings",
-    "Overrated player ratings",
+    "Player ratings",
   ]) {
+    await page.getByRole("button", { name: workspace, exact: true }).click();
     await expect(
-      page.getByRole("heading", { level: 3, name: resultTableName }),
+      page.getByRole("heading", { level: 2, name: workspace, exact: true }),
     ).toBeVisible();
   }
+  await page.getByRole("button", { name: "Top scorer", exact: true }).click();
   const topScorerResults = page
     .getByRole("heading", { level: 3, name: "Top scorer" })
     .locator("xpath=ancestor::section");
@@ -981,11 +969,21 @@ test("mobile journey preserves privacy and gives the owner full control", async 
     .getByRole("spinbutton", { name: /^Top scorer Goals for /u })
     .fill("3");
   await expect(
-    topScorerResults.getByRole("cell", { exact: true, name: "1" }),
+    topScorerResults.getByRole("cell", { exact: true, name: "Rank 1" }),
   ).toBeVisible();
   await expect(page.getByText("Unsaved changes", { exact: true })).toHaveCount(
     1,
   );
+  await page
+    .getByRole("button", { name: "Player ratings", exact: true })
+    .click();
+  await expect(topScorerResults).not.toBeVisible();
+  await page.getByRole("button", { name: "Top scorer", exact: true }).click();
+  await expect(
+    topScorerResults.getByRole("spinbutton", {
+      name: /^Top scorer Goals for /u,
+    }),
+  ).toHaveValue("3");
   await expectNoHorizontalOverflow(page);
   await topScorerResults.scrollIntoViewIfNeeded();
   await page.evaluate(() => {
@@ -1145,7 +1143,7 @@ test("mobile journey preserves privacy and gives the owner full control", async 
     waitUntil: "networkidle",
   });
   await expect(
-    page.getByRole("heading", { level: 1, name: "Spotlight accuracy" }),
+    page.getByRole("heading", { level: 1, name: "Who called it?" }),
   ).toBeVisible();
   await expect(
     page.getByRole("heading", {

@@ -1,6 +1,6 @@
 import { TeamMark } from "@/components/team-mark";
-import { Card, CardContent } from "@/components/ui/card";
-import { ordinal } from "@/shared/format";
+import { Card } from "@/components/ui/card";
+import { Podium } from "./podium";
 
 import { getEntryAvatar } from "./entry-avatar";
 import { LeaderboardEntryLink } from "./entry-link";
@@ -68,92 +68,26 @@ function Champion({
   );
 }
 
-function Podium({ entries }: { entries: readonly ScoredLeaderboardEntry[] }) {
-  const podium = [
-    { icon: "👑", lift: "", order: "sm:order-2" },
-    { icon: "🥈", lift: "sm:mt-6", order: "sm:order-1" },
-    { icon: "🥉", lift: "sm:mt-8", order: "sm:order-3" },
-  ] as const;
-
-  return (
-    <section
-      aria-label="Leaderboard podium"
-      className="grid gap-3 sm:grid-cols-3 sm:items-end"
-    >
-      {entries.slice(0, 3).map((entry, index) => {
-        const winner = index === 0;
-        const meta = podium[index];
-        return (
-          <div
-            className={`relative mt-4 ${meta.order} ${meta.lift}`}
-            data-testid="podium-entry"
-            key={entry.id}
-          >
-            <span
-              className={`absolute -top-2.5 left-4 z-10 rounded-full px-2.5 py-0.5 text-[0.68rem] font-black ${
-                winner
-                  ? "bg-accent text-accent-ink"
-                  : index === 1
-                    ? "bg-accent-blue text-accent-ink"
-                    : "bg-accent-yellow text-accent-ink"
-              }`}
-            >
-              {ordinal(entry.rank)}
-            </span>
-            <span
-              aria-hidden="true"
-              className={`bg-surface border-border absolute right-4 z-10 grid place-items-center rounded-full border shadow-lg ${
-                winner ? "-top-6 size-12 text-2xl" : "-top-5 size-10 text-xl"
-              }`}
-            >
-              {meta.icon}
-            </span>
-            <Card
-              className={`h-full overflow-hidden ${
-                winner
-                  ? "brand-hero border-brand text-white"
-                  : "bg-surface-lilac"
-              }`}
-            >
-              <CardContent className="pt-7">
-                <div className="flex min-w-0 items-center gap-2">
-                  <EntryAvatar name={entry.participantName} />
-                  <LeaderboardEntryLink
-                    className={
-                      winner ? "text-white decoration-white/40" : undefined
-                    }
-                    entryId={entry.id}
-                    participantName={entry.participantName}
-                  />
-                </div>
-                <strong
-                  className={`mt-2 block text-3xl font-black tabular-nums ${winner ? "text-accent" : "text-rose-score"}`}
-                >
-                  {entry.totalScore}
-                </strong>
-                <span
-                  className={`mt-1 block text-xs font-semibold ${winner ? "text-white/70" : "text-muted"}`}
-                >
-                  {entry.exactCount} exact · champion{" "}
-                  {entry.champion.displayName}
-                </span>
-              </CardContent>
-            </Card>
-          </div>
-        );
-      })}
-    </section>
-  );
-}
-
 export function ScoredLeaderboardBoard({
   entries,
+  query = "",
 }: {
   entries: readonly ScoredLeaderboardEntry[];
+  query?: string;
 }) {
+  const visibleEntries = entries.filter((entry) =>
+    entry.participantName
+      .toLocaleLowerCase()
+      .includes(query.toLocaleLowerCase()),
+  );
   return (
     <section aria-label="Scored leaderboard" className="grid gap-5">
       <Podium entries={entries} />
+      {visibleEntries.length === 0 ? (
+        <p role="status" className="text-muted py-4 text-sm">
+          No matching participant. Try a different name.
+        </p>
+      ) : null}
       <Card className="overflow-hidden">
         <table className="w-full border-collapse text-sm max-sm:block">
           <caption className="sr-only">
@@ -180,7 +114,7 @@ export function ScoredLeaderboardBoard({
             </tr>
           </thead>
           <tbody className="max-sm:block">
-            {entries.map((entry) => (
+            {visibleEntries.map((entry) => (
               <tr
                 aria-label={`${entry.participantName} leaderboard entry`}
                 className="border-surface-lilac-border hover:bg-surface-subtle border-b align-middle last:border-b-0 max-sm:grid max-sm:min-h-24 max-sm:grid-cols-[3rem_minmax(0,1fr)_auto] max-sm:grid-rows-[auto_auto] max-sm:items-center max-sm:gap-x-2 max-sm:px-3 max-sm:py-2"

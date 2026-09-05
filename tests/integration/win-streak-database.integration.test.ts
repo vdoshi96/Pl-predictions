@@ -5,6 +5,7 @@ import { randomUUID } from "node:crypto";
 import { and, count, eq } from "drizzle-orm";
 import { afterEach, describe, expect, it } from "vitest";
 
+import { createWinStreakTestSeason } from "../win-streak-test-season";
 import { ACTIVE_SEASON } from "@/data";
 import { getDb } from "@/db/client";
 import {
@@ -31,6 +32,7 @@ if (enabled) {
 }
 
 const createdProfileIds = new Set<string>();
+let cleanupFutureSeason: (() => Promise<void>) | null = null;
 
 async function expectDatabaseConstraint(
   operation: Promise<unknown>,
@@ -42,7 +44,7 @@ async function expectDatabaseConstraint(
 }
 
 afterEach(async () => {
-  if (!enabled || createdProfileIds.size === 0) return;
+  if (!enabled) return;
   const db = getDb();
   for (const profileId of createdProfileIds) {
     await db
@@ -50,9 +52,16 @@ afterEach(async () => {
       .where(eq(winStreakProfiles.id, profileId));
   }
   createdProfileIds.clear();
+  await cleanupFutureSeason?.();
+  cleanupFutureSeason = null;
 });
 
-async function activeWinStreakFixture() {
+async function activeWinStreakFixture(future = true) {
+  if (future) {
+    const fixture = await createWinStreakTestSeason();
+    cleanupFutureSeason = fixture.cleanup;
+    return fixture;
+  }
   const db = getDb();
   const [season] = await db
     .select({ id: seasons.id })
@@ -137,7 +146,7 @@ describe.runIf(enabled)("Win Streak database", () => {
       insertWinStreakPickAtomically(db, {
         id: randomUUID(),
         profileId,
-        receiptTokenHash,
+        receiptTokenHash: resumedReceiptTokenHash,
         teamSlug: "chelsea",
       }),
     ).rejects.toThrow();
@@ -331,7 +340,7 @@ describe.runIf(enabled)("Win Streak database", () => {
 
   it("keeps all seeded fixtures scoped to teams in the active season", async () => {
     await seedWinStreakFixtures();
-    const { db, season } = await activeWinStreakFixture();
+    const { db, season } = await activeWinStreakFixture(false);
     const activeTeams = await db
       .select({ id: teams.id })
       .from(teams)

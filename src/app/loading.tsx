@@ -1,6 +1,9 @@
 export default function Loading() {
   return (
-    <main className="page-shell flex flex-1 items-center justify-center py-20">
+    <main
+      id="main-content"
+      className="page-shell flex flex-1 items-center justify-center py-20"
+    >
       <div className="border-border bg-surface w-full max-w-xl animate-pulse rounded-3xl border p-8">
         <div className="bg-surface-subtle h-4 w-24 rounded" />
         <div className="bg-surface-subtle mt-5 h-10 w-3/4 rounded" />

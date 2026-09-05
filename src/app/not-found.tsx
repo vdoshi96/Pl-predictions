@@ -2,7 +2,10 @@ import Link from "next/link";
 
 export default function NotFound() {
   return (
-    <main className="page-shell flex flex-1 items-center justify-center py-20">
+    <main
+      id="main-content"
+      className="page-shell flex flex-1 items-center justify-center py-20"
+    >
       <section className="panel-shadow border-border bg-surface max-w-lg rounded-3xl border p-8 text-center sm:p-12">
         <p className="text-brand-ink text-sm font-bold tracking-[0.18em] uppercase">
           404

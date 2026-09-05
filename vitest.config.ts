@@ -18,6 +18,8 @@ export default defineConfig({
   },
   test: {
     environment: "jsdom",
+    testTimeout: process.env.RUN_DB_INTEGRATION === "1" ? 30_000 : 5_000,
+    hookTimeout: process.env.RUN_DB_INTEGRATION === "1" ? 30_000 : 10_000,
     setupFiles: ["./tests/setup.ts"],
     include: ["tests/**/*.test.{ts,tsx}"],
     coverage: {

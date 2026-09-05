@@ -160,6 +160,7 @@ test("320–430px reflow keeps private identifiers out of HTML and RSC", async (
   await expectNoHorizontalOverflow(page);
 
   await page.goto("/rules");
+  await page.getByText("How you enter", { exact: true }).click();
   await expect(
     page.getByRole("heading", { name: "How to play in three steps" }),
   ).toBeVisible();
@@ -341,7 +342,7 @@ test("320–430px reflow keeps private identifiers out of HTML and RSC", async (
     page.getByText(/^7 of 7 spotlight categories started\./u),
   ).toBeVisible();
   await page.getByRole("button", { name: "Review all predictions" }).click();
-  const restoredReview = page.getByRole("dialog", {
+  const restoredReview = page.getByRole("region", {
     name: "Review every prediction",
   });
   await expect(restoredReview.getByText(/Submitting as/u)).toContainText(
@@ -352,7 +353,7 @@ test("320–430px reflow keeps private identifiers out of HTML and RSC", async (
     name: "Prediction review, positions 1 through 20",
   });
   await expect(restoredReviewTable.locator("li")).toHaveCount(20);
-  await expect(restoredReviewTable.getByRole("listitem")).toHaveCount(8);
+  await expect(restoredReviewTable.getByRole("listitem")).toHaveCount(20);
   for (const playerName of customPlayerNames) {
     await expect(
       restoredReview.getByText(playerName, { exact: true }),
@@ -504,7 +505,7 @@ test("320–430px reflow keeps private identifiers out of HTML and RSC", async (
 
   await page.goto("/spotlight?view=entries&sort=overrated_player");
   await expect(
-    page.getByRole("heading", { level: 1, name: "Spotlight accuracy" }),
+    page.getByRole("heading", { level: 1, name: "Who called it?" }),
   ).toBeVisible();
   await expect(
     page.getByRole("heading", {
@@ -563,13 +564,19 @@ test("320–430px admin result and deadline controls reflow without writes", asy
   await expect(
     page.getByText("Reveal and close first", { exact: true }),
   ).toBeVisible();
-  const reviewButtons = page.getByRole("button", {
-    name: "Review & publish",
-  });
-  await expect(reviewButtons).toHaveCount(4);
-  for (const reviewButton of await reviewButtons.all()) {
+  for (const workspace of [
+    "Top scorer",
+    "Top assister",
+    "Most clean sheets",
+    "Player ratings",
+  ]) {
+    await page.getByRole("button", { name: workspace, exact: true }).click();
+    const reviewButton = page.getByRole("button", { name: "Review & publish" });
+    await expect(reviewButton).toHaveCount(1);
     await expect(reviewButton).toBeDisabled();
+    await expectNoHorizontalOverflow(page);
   }
+  await page.getByRole("button", { name: "Top scorer", exact: true }).click();
 
   const topScorerResults = page
     .getByRole("heading", { level: 3, name: "Top scorer" })
@@ -589,7 +596,7 @@ test("320–430px admin result and deadline controls reflow without writes", asy
     .getByRole("spinbutton", { name: /^Top scorer Goals for /u })
     .fill("3");
   await expect(
-    topScorerResults.getByRole("cell", { exact: true, name: "1" }),
+    topScorerResults.getByRole("cell", { exact: true, name: "Rank 1" }),
   ).toBeVisible();
   await expect(page.getByText("Unsaved changes", { exact: true })).toHaveCount(
     1,

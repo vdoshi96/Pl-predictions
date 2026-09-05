@@ -20,6 +20,10 @@ The seven spotlight categories are top scorer, top assister, most clean sheets, 
 
 The 20 owner-provided club badge PNGs are the canonical local team marks; the original monograms remain rollback-only fallbacks for the first badge release. The owner-provided `premier-league-players-2026-08-20/` snapshot is the current reviewed selector source: 580 players across the 20 clubs, with 578 supplied portrait PNGs and two intentional silhouette fallbacks for Ryan McAidoo and Luc De Fougerolles. Keep Other player available for unavailable or newly added players. This roster import is not an outcome feed; do not infer the five pending result rankings from it or add runtime acquisition.
 
+## Interface direction
+
+The approved September 2026 redesign uses calm surfaces, compact headers, and explicit Season table and Leaderboard navigation. Keep the points podium: group it by competition ranks 1–3, include everyone tied at a displayed rank, and give tied entries equal styling. Decorative animal icons derive from public display names without new data or customization. Entry detail leads with per-club scoring before Spotlight. The Categories view offers all seven boards through a selector; retain Entries, Matrix, and participant disclosures.
+
 ## Important paths
 
 - `src/app/` — public, administrator, and API routes.

@@ -1,6 +1,7 @@
-import { Clock3, Table2 } from "lucide-react";
+import { Clock3 } from "lucide-react";
 import Link from "next/link";
 
+import { PageHeading } from "@/components/page-heading";
 import { TeamMark } from "@/components/team-mark";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
@@ -62,12 +63,17 @@ function Callout({
 }) {
   const positive = kind === "overachiever";
   return (
-    <Card
+    <section
       className={
-        positive ? "border-mint bg-mint" : "border-rose-soft bg-rose-soft"
+        positive
+          ? "bg-brand rounded-xl p-6 text-white"
+          : "border-border bg-surface rounded-xl border p-6"
       }
     >
-      <CardContent className="flex items-center gap-3 p-4 sm:p-5">
+      <h2 className="text-xl font-bold tracking-tight">
+        {positive ? "The biggest surprise" : "Below expectations"}
+      </h2>
+      <div className="mt-5 flex items-center gap-3">
         <TeamMark
           decorative
           initials={value.team.shortName}
@@ -75,19 +81,27 @@ function Callout({
           size="lg"
           src={value.team.assetPath}
         />
-        <div className="min-w-0">
-          <span
-            className={`block text-[0.65rem] font-black tracking-wider uppercase ${positive ? "text-mint-ink" : "text-rose-ink"}`}
-          >
-            {positive ? "Overachiever" : "Underachiever"}
-          </span>
-          <strong className="text-brand-ink-strong mt-1 block text-sm leading-5 font-black [overflow-wrap:anywhere] sm:text-base">
-            {value.team.displayName} · {ordinal(value.actualPosition)}, league
-            said {formatConsensusValue(value.avgPredicted)}
-          </strong>
-        </div>
-      </CardContent>
-    </Card>
+        <strong className="min-w-0 [overflow-wrap:anywhere]">
+          {value.team.displayName}
+        </strong>
+      </div>
+      <p
+        className={`mt-4 text-sm leading-6 ${positive ? "text-white/80" : "text-muted"}`}
+      >
+        {ordinal(value.actualPosition)} in the published table. The group’s
+        average prediction:{" "}
+        <strong>{formatConsensusValue(value.avgPredicted)}</strong>.
+      </p>
+      <span
+        className={`mt-4 inline-flex rounded-md px-2 py-1 text-xs font-semibold ${positive ? "bg-white/15 text-white" : "bg-brand-soft text-brand-ink"}`}
+      >
+        {positive ? "Overachiever" : "Underachiever"} ·{" "}
+        {formatConsensusValue(
+          Math.abs(value.avgPredicted - value.actualPosition),
+        )}{" "}
+        places {positive ? "above" : "below"} expectations
+      </span>
+    </section>
   );
 }
 
@@ -105,219 +119,224 @@ export async function SeasonTablePage({
   const showConsensus = Boolean(view.snapshot && view.consensusActive);
 
   return (
-    <main className="page-shell w-full flex-1 py-6 sm:py-10">
+    <main id="main-content" className="page-shell w-full flex-1 py-6 sm:py-10">
       <div className="grid gap-5 sm:gap-7">
-        <section className="brand-hero rounded-3xl p-5 text-white sm:p-8">
-          <div className="flex flex-wrap items-center gap-2">
-            <Badge className="bg-accent text-accent-ink ring-accent">
-              {view.seasonName}
-            </Badge>
-            {view.snapshot?.matchweek ? (
-              <Badge className="bg-white/15 text-white ring-white/20">
-                Matchweek {view.snapshot.matchweek}
+        <PageHeading
+          title="The season, against our predictions."
+          description="The published league table beside what the group expected."
+          status={
+            view.snapshot ? (
+              <Badge variant={view.snapshot.isFinal ? "success" : "warning"}>
+                {view.snapshot.isFinal ? "Final" : "Provisional"}
               </Badge>
-            ) : null}
-            {view.snapshot ? (
-              <>
-                <Badge className="bg-white/15 text-white ring-white/20">
-                  Updated {formatChicagoUtcDateTime(view.snapshot.capturedAt)}
-                </Badge>
-                <Badge className="bg-white/15 text-white ring-white/20">
-                  {view.snapshot.isFinal ? "Final" : "Provisional"}
-                </Badge>
-              </>
-            ) : null}
-            <Badge className="bg-white/15 text-white ring-white/20">
-              Submissions closed · predictions revealed
-            </Badge>
-          </div>
-          <div className="mt-5 flex items-start gap-3">
-            <Table2
-              aria-hidden="true"
-              className="text-accent-blue mt-1 size-7 shrink-0"
-            />
-            <div>
-              <h1 className="text-3xl font-black tracking-tight sm:text-4xl">
-                Season table
-              </h1>
-              <p className="mt-2 max-w-2xl text-sm leading-6 text-white/75 sm:text-base">
-                See the live Premier League table against the prediction
-                league&apos;s revealed consensus.
-              </p>
-            </div>
-          </div>
-          <div className="mt-6 flex flex-wrap gap-3">
-            <Link
-              className="bg-accent text-accent-ink hover:bg-accent-yellow inline-flex min-h-11 items-center rounded-xl px-4 text-sm font-black transition-colors"
-              href="/leaderboard"
-            >
-              Table leaderboard
-            </Link>
-            <Link
-              className="bg-accent-blue text-accent-ink hover:bg-surface inline-flex min-h-11 items-center rounded-xl px-4 text-sm font-black transition-colors"
-              href="/spotlight"
-            >
-              Spotlight
-            </Link>
-          </div>
-        </section>
-
-        {view.snapshot &&
-        view.callouts.overachiever &&
-        view.callouts.underachiever ? (
-          <section
-            aria-label="Season consensus surprises"
-            className="grid gap-3 md:grid-cols-2"
-          >
-            <Callout kind="overachiever" value={view.callouts.overachiever} />
-            <Callout kind="underachiever" value={view.callouts.underachiever} />
-          </section>
-        ) : null}
-
-        {!view.snapshot ? (
-          <Card>
-            <CardContent className="flex items-start gap-3 py-8">
-              <Clock3
-                aria-hidden="true"
-                className="text-brand-ink mt-0.5 size-5 shrink-0"
-              />
-              <div>
-                <h2 className="text-foreground font-black">
-                  Waiting for the first standings import
-                </h2>
-                <p className="text-muted mt-1 text-sm leading-6">
-                  The season table will appear here after the owner accepts the
-                  first complete standings snapshot.
-                </p>
-              </div>
-            </CardContent>
-          </Card>
-        ) : (
-          <>
-            {!view.consensusActive ? (
-              <Card className="border-accent-blue/40 bg-sky-soft">
-                <CardContent className="flex items-start gap-3">
+            ) : undefined
+          }
+        >
+          <span>{view.seasonName}</span>
+          {view.snapshot ? (
+            <span>
+              Updated {formatChicagoUtcDateTime(view.snapshot.capturedAt)}
+            </span>
+          ) : null}
+          {view.snapshot?.matchweek ? (
+            <span>Matchweek {view.snapshot.matchweek}</span>
+          ) : null}
+          <span>Submissions closed · predictions revealed</span>
+        </PageHeading>
+        <div className="season-layout">
+          <div className="grid min-w-0 gap-4">
+            {!view.snapshot ? (
+              <Card>
+                <CardContent className="flex items-start gap-3 py-8">
                   <Clock3
                     aria-hidden="true"
                     className="text-brand-ink mt-0.5 size-5 shrink-0"
                   />
                   <div>
-                    <h2 className="text-brand-ink font-black">
-                      Consensus comparison is waiting for a meaningful table
+                    <h2 className="text-foreground font-black">
+                      Waiting for the first standings import
                     </h2>
-                    <p className="text-brand-ink mt-1 text-sm leading-6">
-                      Live positions remain visible. Consensus appears once the
-                      scoring window is open and the active table contains
-                      played matches.
+                    <p className="text-muted mt-1 text-sm leading-6">
+                      The season table will appear here after the owner accepts
+                      the first complete standings snapshot.
                     </p>
                   </div>
                 </CardContent>
               </Card>
-            ) : null}
+            ) : (
+              <>
+                {!view.consensusActive ? (
+                  <Card className="border-accent-blue/40 bg-sky-soft">
+                    <CardContent className="flex items-start gap-3">
+                      <Clock3
+                        aria-hidden="true"
+                        className="text-brand-ink mt-0.5 size-5 shrink-0"
+                      />
+                      <div>
+                        <h2 className="text-brand-ink font-black">
+                          Consensus comparison is waiting for a meaningful table
+                        </h2>
+                        <p className="text-brand-ink mt-1 text-sm leading-6">
+                          Published positions remain visible. Consensus appears
+                          once the scoring window is open and the active table
+                          contains played matches.
+                        </p>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ) : null}
 
-            <Card className="overflow-hidden">
-              <table
-                aria-label="Premier League season table"
-                className="w-full table-fixed border-collapse text-sm"
-              >
-                <caption className="sr-only">
-                  Live Premier League positions
-                  {showConsensus ? " compared with the league consensus" : ""}.
-                </caption>
-                <colgroup>
-                  <col className="w-2" />
-                  <col className="w-9" />
-                  <col />
-                  <col className="w-11" />
-                  {showConsensus ? (
-                    <col className="w-20 max-[479px]:hidden" />
-                  ) : null}
-                  {showConsensus ? <col className="w-20" /> : null}
-                </colgroup>
-                <thead>
-                  <tr className="border-border text-muted border-b-2 text-left text-[0.62rem] font-black tracking-wider uppercase">
-                    <th scope="col">
-                      <span className="sr-only">Zone</span>
-                    </th>
-                    <th className="px-1 py-3" scope="col">
-                      Pos
-                    </th>
-                    <th className="px-1 py-3" scope="col">
-                      Club
-                    </th>
-                    <th className="px-1 py-3 text-right" scope="col">
-                      Pts
-                    </th>
-                    {showConsensus ? (
-                      <th
-                        className="px-1 py-3 text-right max-[479px]:hidden"
-                        scope="col"
-                      >
-                        League said
-                      </th>
-                    ) : null}
-                    {showConsensus ? (
-                      <th className="px-1 py-3 text-right" scope="col">
-                        vs consensus
-                      </th>
-                    ) : null}
-                  </tr>
-                </thead>
-                <tbody>
-                  {(view.rows ?? []).map((row) => {
-                    const zone = zoneFor(row.actualPosition);
-                    return (
-                      <tr
-                        className="border-surface-lilac-border border-b last:border-b-0"
-                        key={row.team.displayName}
-                      >
-                        <td className="py-2 pl-1">
-                          <span
-                            aria-hidden="true"
-                            className={`block h-8 w-1 rounded-full ${zone.className}`}
-                          />
-                          <span className="sr-only">{zone.label}</span>
-                        </td>
-                        <td className="px-1 py-2 font-black tabular-nums">
-                          {row.actualPosition}
-                        </td>
-                        <td className="min-w-0 px-1 py-2">
-                          <span className="text-foreground flex min-w-0 items-center gap-1.5 font-black">
-                            <TeamMark
-                              decorative
-                              initials={row.team.shortName}
-                              name={row.team.displayName}
-                              size="sm"
-                              src={row.team.assetPath}
-                            />
-                            <span className="min-w-0 text-xs leading-4 [overflow-wrap:anywhere] sm:text-sm">
-                              {row.team.displayName}
-                            </span>
-                          </span>
-                        </td>
-                        <td className="px-1 py-2 text-right font-black tabular-nums">
-                          {row.leaguePoints ?? "—"}
-                        </td>
+                <Card className="overflow-hidden">
+                  <table
+                    aria-label="Premier League season table"
+                    className="w-full table-fixed border-collapse text-sm"
+                  >
+                    <caption className="sr-only">
+                      Published Premier League positions
+                      {showConsensus
+                        ? " compared with the league consensus"
+                        : ""}
+                      .
+                    </caption>
+                    <colgroup>
+                      <col className="w-2" />
+                      <col className="w-9" />
+                      <col />
+                      <col className="w-11" />
+                      {showConsensus ? (
+                        <col className="w-20 max-[479px]:hidden" />
+                      ) : null}
+                      {showConsensus ? <col className="w-20" /> : null}
+                    </colgroup>
+                    <thead>
+                      <tr className="border-border text-muted border-b-2 text-left text-[0.62rem] font-black tracking-wider uppercase">
+                        <th scope="col">
+                          <span className="sr-only">Zone</span>
+                        </th>
+                        <th className="px-1 py-3" scope="col">
+                          Pos
+                        </th>
+                        <th className="px-1 py-3" scope="col">
+                          Club
+                        </th>
+                        <th className="px-1 py-3 text-right" scope="col">
+                          Pts
+                        </th>
                         {showConsensus ? (
-                          <td className="text-muted px-1 py-2 text-right text-xs font-bold tabular-nums max-[479px]:hidden">
-                            {row.avgPredicted === null
-                              ? "—"
-                              : formatConsensusValue(row.avgPredicted)}
-                          </td>
+                          <th
+                            className="px-1 py-3 text-right max-[479px]:hidden"
+                            scope="col"
+                          >
+                            Group avg.
+                          </th>
                         ) : null}
                         {showConsensus ? (
-                          <td className="px-1 py-2 text-right">
-                            <DeltaChip delta={row.delta} />
-                          </td>
+                          <th className="px-1 py-3 text-right" scope="col">
+                            Gap
+                          </th>
                         ) : null}
                       </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </Card>
-          </>
-        )}
+                    </thead>
+                    <tbody>
+                      {(view.rows ?? []).map((row) => {
+                        const zone = zoneFor(row.actualPosition);
+                        return (
+                          <tr
+                            className="border-surface-lilac-border border-b last:border-b-0"
+                            key={row.team.displayName}
+                          >
+                            <td className="py-2 pl-1">
+                              <span
+                                aria-hidden="true"
+                                className={`block h-8 w-1 rounded-full ${zone.className}`}
+                              />
+                              <span className="sr-only">{zone.label}</span>
+                            </td>
+                            <td className="px-1 py-2 font-black tabular-nums">
+                              {row.actualPosition}
+                            </td>
+                            <td className="min-w-0 px-1 py-2">
+                              <span className="text-foreground flex min-w-0 items-center gap-1.5 font-black">
+                                <TeamMark
+                                  decorative
+                                  initials={row.team.shortName}
+                                  name={row.team.displayName}
+                                  size="sm"
+                                  src={row.team.assetPath}
+                                />
+                                <span className="min-w-0 text-xs leading-4 [overflow-wrap:anywhere] sm:text-sm">
+                                  {row.team.displayName}
+                                  {showConsensus ? (
+                                    <span className="text-muted block text-[0.625rem] font-semibold min-[480px]:hidden">
+                                      Group avg.{" "}
+                                      {row.avgPredicted === null
+                                        ? "—"
+                                        : formatConsensusValue(
+                                            row.avgPredicted,
+                                          )}
+                                    </span>
+                                  ) : null}
+                                </span>
+                              </span>
+                            </td>
+                            <td className="px-1 py-2 text-right font-black tabular-nums">
+                              {row.leaguePoints ?? "—"}
+                            </td>
+                            {showConsensus ? (
+                              <td className="text-muted px-1 py-2 text-right text-xs font-bold tabular-nums max-[479px]:hidden">
+                                {row.avgPredicted === null
+                                  ? "—"
+                                  : formatConsensusValue(row.avgPredicted)}
+                              </td>
+                            ) : null}
+                            {showConsensus ? (
+                              <td className="px-1 py-2 text-right">
+                                <DeltaChip delta={row.delta} />
+                              </td>
+                            ) : null}
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </Card>
+              </>
+            )}
+          </div>
+          <aside
+            className="season-aside"
+            aria-label="Season consensus surprises"
+          >
+            {view.snapshot &&
+            view.callouts.overachiever &&
+            view.callouts.underachiever ? (
+              <>
+                <Callout
+                  kind="overachiever"
+                  value={view.callouts.overachiever}
+                />
+                <Callout
+                  kind="underachiever"
+                  value={view.callouts.underachiever}
+                />
+              </>
+            ) : null}
+            <div className="px-1 text-sm leading-6">
+              <h2 className="font-bold">How to read the gap</h2>
+              <p className="text-muted mt-2">
+                Positive means above the group’s expectations. Negative means
+                below. The number shows how many places separate the prediction
+                average and the published position.
+              </p>
+            </div>
+            <Link
+              href="/leaderboard"
+              className="text-brand-ink inline-flex min-h-11 items-center font-semibold underline"
+            >
+              See how everyone is doing
+            </Link>
+          </aside>
+        </div>
       </div>
     </main>
   );

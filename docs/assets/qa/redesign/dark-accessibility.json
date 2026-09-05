@@ -1,0 +1,52 @@
+[
+  {
+    "width": 1280,
+    "route": "/",
+    "violations": []
+  },
+  {
+    "width": 1280,
+    "route": "/leaderboard",
+    "violations": []
+  },
+  {
+    "width": 1280,
+    "route": "/spotlight",
+    "violations": []
+  },
+  {
+    "width": 1280,
+    "route": "/rules",
+    "violations": []
+  },
+  {
+    "width": 1280,
+    "route": "/win-streak",
+    "violations": []
+  },
+  {
+    "width": 390,
+    "route": "/",
+    "violations": []
+  },
+  {
+    "width": 390,
+    "route": "/leaderboard",
+    "violations": []
+  },
+  {
+    "width": 390,
+    "route": "/spotlight",
+    "violations": []
+  },
+  {
+    "width": 390,
+    "route": "/rules",
+    "violations": []
+  },
+  {
+    "width": 390,
+    "route": "/win-streak",
+    "violations": []
+  }
+]

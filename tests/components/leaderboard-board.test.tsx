@@ -54,32 +54,54 @@ describe("dense leaderboard", () => {
     );
 
     const podium = screen.getByLabelText("Leaderboard podium");
-    expect(within(podium).getByText("1st")).toBeVisible();
-    expect(within(podium).getAllByText("2nd")).toHaveLength(2);
-    const podiumCards = within(podium).getAllByTestId("podium-entry");
-    expect(podiumCards[0]).toHaveClass("sm:order-2");
-    expect(podiumCards[1]).toHaveClass("sm:order-1", "sm:mt-6");
-    expect(podiumCards[2]).toHaveClass("sm:order-3", "sm:mt-8");
-    expect(podiumCards.map((card) => card.textContent)).toEqual([
-      expect.stringContaining("Maya"),
-      expect.stringContaining("Dev"),
-      expect.stringContaining("Vishal"),
-    ]);
-    expect(within(podium).getByText("👑")).toHaveAttribute(
-      "aria-hidden",
-      "true",
-    );
-    expect(within(podium).getByText("🥈")).toHaveAttribute(
-      "aria-hidden",
-      "true",
-    );
-    expect(within(podium).getByText("🥉")).toHaveAttribute(
-      "aria-hidden",
-      "true",
-    );
+    const groups = within(podium).getAllByRole("group");
+    expect(groups).toHaveLength(2);
+    expect(groups[0]).toHaveAttribute("aria-label", "1st place");
+    expect(groups[1]).toHaveAttribute("aria-label", "Joint 2nd place");
+    const tied = within(groups[1]).getAllByTestId("podium-entry");
+    expect(tied).toHaveLength(2);
+    expect(tied[0].className).toBe(tied[1].className);
+    expect(tied[0]).toHaveTextContent("Dev");
+    expect(tied[1]).toHaveTextContent("Vishal");
     expect(
       within(screen.getByLabelText("Scored leaderboard")).getAllByRole("row"),
     ).toHaveLength(4);
+  });
+
+  it("includes every tie at the third occupied rank without promoting rank four", () => {
+    render(
+      <ScoredLeaderboardBoard
+        entries={[
+          scored("a", "One", 1, 90, null),
+          scored("b", "Two", 2, 80, null),
+          ...["Three", "Four", "Five", "Six"].map((name) =>
+            scored(name, name, 3, 70, null),
+          ),
+          scored("z", "Seventh", 7, 60, null),
+        ]}
+      />,
+    );
+    const podium = screen.getByLabelText("Leaderboard podium");
+    expect(within(podium).getAllByTestId("podium-entry")).toHaveLength(6);
+    expect(within(podium).queryByText("Seventh")).not.toBeInTheDocument();
+    expect(
+      within(
+        within(podium).getByRole("group", { name: "Joint 3rd place" }),
+      ).getAllByTestId("podium-entry"),
+    ).toHaveLength(4);
+  });
+
+  it("places all joint leaders on the same tier and skips unoccupied ranks", () => {
+    render(
+      <ScoredLeaderboardBoard
+        entries={["A", "B", "C", "D"].map((name) =>
+          scored(name, name, 1, 40, null),
+        )}
+      />,
+    );
+    const podium = screen.getByLabelText("Leaderboard podium");
+    expect(within(podium).getAllByRole("group")).toHaveLength(1);
+    expect(within(podium).getAllByTestId("podium-entry")).toHaveLength(4);
   });
 
   it("shows movement, score pills, and capped progress semantics", () => {

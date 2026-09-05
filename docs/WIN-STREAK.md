@@ -94,3 +94,7 @@ The interactive flow is exercised against a production build and isolated Neon d
 ![Win Streak mobile flow at 390 pixels](assets/qa/win-streak-mobile.png)
 
 The screenshots use isolated QA profiles and data. They are not production participant records.
+
+## Date-independent verification
+
+Integration and browser pick journeys use disposable future rounds in the isolated database. The helper asserts the wrapper's database attestation before any write. Browser tests temporarily activate a separate QA season, then delete that season and verify restoration of the original isolated season. These fixtures exercise the real PostgreSQL clock and deadline guards without changing production schedules or adding runtime clock overrides.

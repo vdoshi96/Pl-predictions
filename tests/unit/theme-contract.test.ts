@@ -14,11 +14,11 @@ describe("theme contract", () => {
 
     expect(css).toContain("color-scheme: light dark");
     expect(css).toContain("@media (prefers-color-scheme: dark)");
-    expect(css).toMatch(/--background:\s*#17041a/u);
-    expect(css).toMatch(/--surface:\s*#23102a/u);
-    expect(css).toMatch(/--foreground:\s*#f3e9f5/u);
+    expect(css).toMatch(/--background:\s*#17131a/u);
+    expect(css).toMatch(/--surface:\s*#211b25/u);
+    expect(css).toMatch(/--foreground:\s*#f0eaf2/u);
     expect(css).toMatch(/--accent-ink:\s*#26002d/u);
     expect(layout).toContain('media: "(prefers-color-scheme: dark)"');
-    expect(layout).toContain('color: "#17041a"');
+    expect(layout).toContain('color: "#17131a"');
   });
 });

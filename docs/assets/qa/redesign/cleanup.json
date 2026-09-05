@@ -1,0 +1,20 @@
+{
+  "target": "isolated test database",
+  "counts": {
+    "predictions": 0,
+    "predictionItems": 0,
+    "predictionCategoryPicks": 0,
+    "standingsSnapshots": 0,
+    "standingsItems": 0,
+    "winStreakProfiles": 0,
+    "winStreakPicks": 0,
+    "temporaryWinStreakSeasons": 0
+  },
+  "season": {
+    "slug": "2026-27",
+    "revealPredictions": false,
+    "submissionsLocked": false,
+    "activeSnapshotId": null,
+    "finalSnapshotId": null
+  }
+}

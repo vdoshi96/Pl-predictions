@@ -1,5 +1,7 @@
 "use client";
 
+import { INITIAL_WIN_STREAK_RESULT_ACTION_STATE } from "./action-state";
+
 import { AlertTriangle, LockKeyhole } from "lucide-react";
 import { useActionState } from "react";
 
@@ -8,10 +10,7 @@ import { TeamMark } from "@/components/team-mark";
 import { Card, CardContent } from "@/components/ui/card";
 import { formatChicagoUtcDateTime } from "@/shared/format";
 
-import {
-  INITIAL_WIN_STREAK_RESULT_ACTION_STATE,
-  resolveWinStreakRoundAction,
-} from "./actions";
+import { resolveWinStreakRoundAction } from "./actions";
 
 export type WinStreakResultsDeskFixture = Readonly<{
   awayTeam: WinStreakResultsDeskTeam;

@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="generated-by" content="scripts/generate-docs-html.mjs" />
+    <meta name="canonical-source" content="redesign-release.md" />
+    <meta name="canonical-source-sha256" content="b0191207d6255686f4a97ca59c4918108cc3ac5783d370568c90bea5169462cb" />
+    <title>Approved redesign release</title>
+    <style>
+      :root { color-scheme: light dark; font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+      body { margin: 0; background: #f5f5f0; color: #18201c; }
+      main { box-sizing: border-box; width: min(100% - 2rem, 880px); margin: 2rem auto; padding: clamp(1.25rem, 4vw, 3rem); background: #fff; border: 1px solid #d9ddd8; border-radius: 1rem; box-shadow: 0 18px 60px rgb(22 31 26 / 8%); }
+      h1, h2, h3 { line-height: 1.15; color: #102d22; }
+      h1 { font-size: clamp(2rem, 5vw, 3.25rem); letter-spacing: -.04em; }
+      h2 { margin-top: 2.5rem; padding-top: 1rem; border-top: 1px solid #e2e6e2; }
+      p, li { line-height: 1.7; }
+      a { color: #087854; text-underline-offset: .2em; }
+      code { padding: .12rem .35rem; border-radius: .3rem; background: #edf1ed; font-size: .92em; }
+      pre { overflow-x: auto; padding: 1rem; border-radius: .65rem; background: #111a16; color: #edf8f2; }
+      pre code { padding: 0; background: transparent; }
+      table { display: block; overflow-x: auto; width: 100%; border-collapse: collapse; }
+      th, td { padding: .65rem .8rem; border: 1px solid #d9ddd8; text-align: left; vertical-align: top; }
+      th { background: #edf4ef; }
+      img { max-width: 100%; height: auto; border-radius: .75rem; }
+      blockquote { margin-left: 0; padding-left: 1rem; border-left: .25rem solid #1b9a6c; color: #49564f; }
+      .source { margin-top: 3rem; padding-top: 1rem; border-top: 1px solid #d9ddd8; color: #627069; font-size: .85rem; }
+      @media (prefers-color-scheme: dark) {
+        body { background: #0e1512; color: #e5ebe7; }
+        main { background: #16201b; border-color: #34423a; }
+        h1, h2, h3 { color: #f2fff8; }
+        h2, .source { border-color: #34423a; }
+        a { color: #58ddb0; }
+        code, th { background: #24322b; }
+        th, td { border-color: #3b4b42; }
+        blockquote { color: #b5c2bb; }
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1 id="approved-redesign-release">Approved redesign release</h1>
+<h2 id="scope">Scope</h2>
+<p>Implement the approved September 5, 2026 interactive redesign across the 13 application routes, entry stages, and system states. Retain the points podium, group it by occupied competition rank, and show every tied participant equally. The owner authorizes implementation, GitHub integration, and production deployment.</p>
+<h2 id="direction">Direction</h2>
+<p>Use warm paper and calm surfaces, purple brand accents, compact headings, and comparison-first layouts. Keep the original badges. Use a consistent small animal icon system on the podium, derived from public display names without persistence or new personal data. The primary navigation distinguishes Season table from Leaderboard.</p>
+<h2 id="implementation-plan">Implementation plan</h2>
+<ol>
+<li>Establish shared surface tokens, navigation, and compact page headings.</li>
+<li>Recompose the season comparison, friends&#39; leaderboard and podium, Spotlight views, and entry detail.</li>
+<li>Adapt entry, review, receipt, Rules, Win Streak, owner workflows, and system states while preserving complete interactions.</li>
+<li>Run focused regressions, the full isolated verification gates, and desktop/mobile visual checks. Update canonical documentation and HTML peers.</li>
+<li>Push and merge the feature branch, verify the exact Ready production deployment and stable alias, run bounded read-only production checks, and synchronize local main.</li>
+</ol>
+<h2 id="data-boundary">Data boundary</h2>
+<p>No production migration, fixture refresh, seed, participant write, result publication, deadline edit, LOCK, or REVEAL belongs to this redesign. Write journeys use the repository&#39;s fail-closed isolated database wrapper. Preserve the fresh main branch&#39;s September 4 fixture updates.</p>
+<h2 id="verification-and-release-status">Verification and release status</h2>
+<p>The starting base is <code>55c2664</code>, including PR #63. The redesign preserves that fixture update.</p>
+<table>
+<thead>
+<tr>
+<th>Check</th>
+<th>Evidence</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Podium regression</td>
+<td>The original three-slot implementation failed the strengthened tie tests. The replacement includes every participant at occupied ranks 1, 2, and 3, including more than three joint leaders.</td>
+</tr>
+<tr>
+<td>Unit and component tests</td>
+<td>429 passed; 34 database-guarded cases remain excluded from the default run.</td>
+</tr>
+<tr>
+<td>Isolated integration</td>
+<td>32 passed. Win Streak fixtures use real PostgreSQL time and a disposable future season; production deadline guards remain unchanged.</td>
+</tr>
+<tr>
+<td>Catalogue integrity</td>
+<td>580 players, 578 decoded portraits, two intentional silhouettes, and release fingerprints verified.</td>
+</tr>
+<tr>
+<td>TypeScript and ESLint</td>
+<td>Passed.</td>
+</tr>
+<tr>
+<td>Optimized application build</td>
+<td>Passed with the installed Next.js 16.3 webpack build.</td>
+</tr>
+<tr>
+<td>Design detector</td>
+<td>No findings across changed and added interface files.</td>
+</tr>
+<tr>
+<td>Entry and owner browser journeys</td>
+<td>24 passed across desktop Chromium, mobile Chromium, 320px, 430px, and mobile WebKit. Two narrow-screen assertions were updated for the selected dataset workspace and passed on targeted replay; 26 routing exclusions are intentional.</td>
+</tr>
+<tr>
+<td>Revealed-state browser matrix</td>
+<td>5 passed across desktop Chromium, mobile Chromium, 320px, 430px, and mobile WebKit. Four joint first-place participants remain equally represented; results, separate scoring, privacy, and all route reflow checks pass.</td>
+</tr>
+<tr>
+<td>Accessibility</td>
+<td>Zero WCAG A/AA violations across 40 checks: 28 light route/viewport checks, ten dark public route/viewport checks, and both full-page review sizes.</td>
+</tr>
+<tr>
+<td>Independent finish review</td>
+<td>Disposition <strong>ship</strong> for the four scored fixes, all resolved. The reviewer checked refreshed desktop/mobile captures and sampled source; runtime gates remain separately recorded here.</td>
+</tr>
+<tr>
+<td>Production release</td>
+<td>Pending GitHub integration and exact deployment/alias verification.</td>
+</tr>
+</tbody></table>
+<h2 id="test-isolation-and-cleanup">Test isolation and cleanup</h2>
+<p>Browser journeys run through <code>scripts/run-with-test-database.mjs</code>. They restore the exact original season state and remove their tracked predictions, table items, spotlight picks, standings snapshots, import runs, and audit records. The Win Streak helper creates all 37 rounds and 370 future fixtures in a disposable season. It temporarily assigns that season the active slug only inside the isolated browser run, then deletes it and verifies restoration of the original season ID. It never changes PostgreSQL time or disables a guard. The final read-only cleanup check, saved as <code>docs/assets/qa/redesign/cleanup.json</code>, found zero predictions, table items, Spotlight picks, standings snapshots/items, Win Streak profiles/picks, or temporary Win Streak seasons. The original 2026/27 season is open, unrevealed, and has no active/final standings pointer.</p>
+<p>An interrupted runner left two synthetic post-kickoff snapshots in the isolated database. Targeted cleanup removed snapshots <code>5762cf59-d44f-417a-ba00-9527080f7b73</code> and <code>7e91076f-fea7-45be-a69e-eddd9ee3e212</code>, plus predictions <code>f24da22b-c566-45aa-9265-69f9300fd9ac</code> and <code>8641dcb0-0008-4098-a60c-48cb53d2644d</code>. Verification found zero remaining predictions, prediction items, spotlight picks, standings snapshots, and standings items. The empty open baseline was re-established before the completed suites. Production was never the cleanup target.</p>
+<h2 id="interface-evidence">Interface evidence</h2>
+<p>Captures in <code>docs/assets/qa/redesign/</code> cover the comparison table, leaderboard, three Spotlight views, entry detail, Rules, Win Streak, owner pages, and the full-page entry review. The route matrix uses synthetic isolated QA entries. The <code>before-*</code> and <code>after-*</code> public comparisons show actual published data through read-only requests. The <code>public/how-to-play/</code> entry walkthrough comes from the isolated build. Each path retains this iteration&#39;s newest capture.</p>
+<p>The four requested finish-review corrections are visible in the refreshed evidence: each mobile club row includes Group avg.; Stage 3 displays all 20 clubs and seven picks with separate edit actions; the owner results desk selects one workspace without losing unsaved edits; and owner headings omit the decorative eyebrows. Browser checks verify the edit round trip, retained drafts, rejection recovery, immutable submission, and disabled publication gates before reveal.</p>
+<p>Local Next.js sometimes reports a destination stream closing early during automated navigation. This is retained as a local verification limitation; it is not treated as production evidence or as a failed business transition.</p>
+<p>The implemented visual system is recorded in <a href="../DESIGN.html">DESIGN.md</a>, with the machine-readable extension at <code>.impeccable/design.json</code>.</p>
+<h2 id="release-and-checkout-closeout">Release and checkout closeout</h2>
+<p>Local verification and the four-fix independent design verdict are complete. The <code>vishal/approved-redesign</code> worktree remains active until merge and deployment verification complete.</p>
+
+      <p class="source">Generated deterministically from <a href="redesign-release.md">docs/redesign-release.md</a>. Canonical SHA-256: <code>b0191207d6255686f4a97ca59c4918108cc3ac5783d370568c90bea5169462cb</code>.</p>
+    </main>
+  </body>
+</html>

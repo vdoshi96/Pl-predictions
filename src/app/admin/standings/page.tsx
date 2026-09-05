@@ -92,11 +92,10 @@ export default async function AdminStandingsPage({
   const completedCandidate = isFinalStandingsCandidate(activeItems);
 
   return (
-    <main className="page-shell w-full flex-1 py-6 sm:py-10">
+    <main id="main-content" className="page-shell w-full flex-1 py-6 sm:py-10">
       <div className="grid gap-5">
         <div>
-          <Badge variant="accent">Validated snapshot control</Badge>
-          <h1 className="text-foreground mt-3 text-3xl font-black tracking-tight sm:text-4xl">
+          <h1 className="text-foreground text-3xl font-bold tracking-tight sm:text-4xl">
             Current standings
           </h1>
           <p className="text-muted mt-2 max-w-2xl text-sm leading-6">

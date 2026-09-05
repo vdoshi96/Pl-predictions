@@ -35,7 +35,7 @@ import {
   type PredictionTeam,
   sortTeamsAlphabetically,
 } from "./prediction-sorter";
-import { ReviewDialog } from "./review-dialog";
+import { ReviewStep } from "./review-step";
 import {
   buildSpotlightCategoryPicks,
   buildSpotlightReviewItems,
@@ -894,6 +894,11 @@ export function PredictionForm({
                 `Your ${seasonName} table and seven spotlight picks are saved. They cannot be edited after submission.`}
             </p>
           </div>
+          <p className="text-muted max-w-md text-sm leading-6">
+            Before reveal, your confirmation needs this browser’s receipt.
+            Saving the address alone does not grant access from another browser.
+            Keep your cookies to return to it.
+          </p>
           <div className="flex flex-wrap justify-center gap-2">
             {success.entryId ? (
               <Link
@@ -912,6 +917,26 @@ export function PredictionForm({
           </div>
         </CardContent>
       </Card>
+    );
+  }
+
+  if (reviewOpen) {
+    return (
+      <ReviewStep
+        confirmDisabled={!canSubmit}
+        participantName={normalizedName}
+        spotlightPicks={spotlightReviewItems}
+        teams={orderedTeams}
+        pending={pending}
+        error={error}
+        onEdit={(nextStage) => {
+          if (pending) return;
+          setReviewOpen(false);
+          setStage(nextStage);
+          setError(null);
+        }}
+        onConfirm={confirmSubmission}
+      />
     );
   }
 
@@ -1199,21 +1224,6 @@ export function PredictionForm({
         }}
         onOpenChange={setAlphabeticalWarningOpen}
         open={alphabeticalWarningOpen}
-      />
-
-      <ReviewDialog
-        confirmDisabled={!canSubmit}
-        open={reviewOpen}
-        participantName={normalizedName}
-        spotlightPicks={spotlightReviewItems}
-        teams={orderedTeams}
-        pending={pending}
-        error={error}
-        onOpenChange={(nextOpen) => {
-          setReviewOpen(nextOpen);
-          if (!nextOpen) setError(null);
-        }}
-        onConfirm={confirmSubmission}
       />
     </form>
   );

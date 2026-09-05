@@ -1,4 +1,6 @@
 import { randomUUID } from "node:crypto";
+import { mkdir, writeFile } from "node:fs/promises";
+import path from "node:path";
 
 import { neon } from "@neondatabase/serverless";
 import { expect, test } from "@playwright/test";
@@ -18,6 +20,8 @@ import {
 
 const scoredProjects = new Set([
   "chromium",
+  "mobile-chromium",
+  "mobile-webkit",
   "reflow-320-chromium",
   "reflow-430-chromium",
 ]);
@@ -29,7 +33,7 @@ type OriginalSeasonState = typeof seasons.$inferSelect;
 type QaFixture = {
   exactName: string;
   originalSeason: OriginalSeasonState;
-  predictionIds: [string, string];
+  predictionIds: string[];
   seasonUpdated: boolean;
   snapshotId: string;
   swappedName: string;
@@ -227,7 +231,8 @@ test("post-kickoff table and spotlight rankings stay split at desktop and mobile
     !scoredProjects.has(testInfo.project.name),
     "Scored leaderboard coverage runs at desktop and exact 320/430px mobile widths.",
   );
-  test.setTimeout(90_000);
+  test.setTimeout(180_000);
+  page.setDefaultTimeout(15_000);
 
   const db = getQaDb();
   const [originalSeason] = await db
@@ -271,7 +276,7 @@ test("post-kickoff table and spotlight rankings stay split at desktop and mobile
 
   const runId = randomUUID();
   const suffix = runId.slice(0, 8);
-  const predictionIds: [string, string] = [randomUUID(), randomUUID()];
+  const predictionIds: string[] = [randomUUID(), randomUUID()];
   const snapshotId = randomUUID();
   const exactName = `Post-kickoff exact champion ${suffix}`;
   const swappedName = `Post-kickoff swapped champion ${suffix}`;
@@ -393,14 +398,14 @@ test("post-kickoff table and spotlight rankings stay split at desktop and mobile
   ).toHaveCount(0);
   await expect(staleExactEntry.locator("details")).toHaveCount(0);
   await expect(
-    page.getByRole("link", { name: "View spotlight accuracy" }),
+    page.getByRole("link", { name: "View separate spotlight accuracy" }),
   ).toBeVisible();
 
   await page.goto("/spotlight?view=entries&sort=overall", {
     waitUntil: "networkidle",
   });
   await expect(
-    page.getByRole("heading", { level: 1, name: "Spotlight accuracy" }),
+    page.getByRole("heading", { level: 1, name: "Who called it?" }),
   ).toBeVisible();
   await expect(
     page.getByRole("heading", {
@@ -447,7 +452,10 @@ test("post-kickoff table and spotlight rankings stay split at desktop and mobile
 
   await page.goto("/", { waitUntil: "networkidle" });
   await expect(
-    page.getByRole("heading", { level: 1, name: "Season table" }),
+    page.getByRole("heading", {
+      level: 1,
+      name: "The season, against our predictions.",
+    }),
   ).toBeVisible();
   await expect(
     page.getByRole("table", { name: "Premier League season table" }),
@@ -501,9 +509,15 @@ test("post-kickoff table and spotlight rankings stay split at desktop and mobile
   await expect(page.getByLabel("Spotlight categories")).toBeVisible();
   await expect(
     page.getByLabel("Spotlight categories").getByRole("heading", { level: 2 }),
-  ).toHaveCount(7);
-  await expect(page.getByText("Result live")).toHaveCount(2);
-  await expect(page.getByText("Result pending")).toHaveCount(5);
+  ).toHaveCount(1);
+  await expect(page.getByText("Result pending", { exact: true })).toHaveCount(
+    1,
+  );
+  await page
+    .getByRole("combobox", { name: "Category", exact: true })
+    .selectOption("underdog_team");
+  await page.getByRole("button", { name: "Show category" }).click();
+  await expect(page.getByText("Result live", { exact: true })).toHaveCount(1);
   await expectNoHorizontalOverflow(page);
 
   await page.goto("/spotlight?view=matrix", { waitUntil: "networkidle" });
@@ -613,6 +627,9 @@ test("post-kickoff table and spotlight rankings stay split at desktop and mobile
   await page.getByRole("button", { name: "Sign in securely" }).click();
   await expect(page).toHaveURL(/\/admin$/u);
   await page.goto("/admin/results", { waitUntil: "networkidle" });
+  await page
+    .getByRole("button", { name: "Player ratings", exact: true })
+    .click();
   await page.getByRole("button", { name: "Seed picked players" }).click();
 
   const underdogRatings = page
@@ -648,9 +665,172 @@ test("post-kickoff table and spotlight rankings stay split at desktop and mobile
     ).toHaveCount(0);
   }
   await expect(
-    page.getByText("All 4 picked opinion players have a rating.", {
+    page.getByText("All 4 picked opinion players have a reviewed rating.", {
       exact: true,
     }),
   ).toBeVisible();
   await expectNoHorizontalOverflow(page);
+
+  // Capture the working surfaces using this test's isolated, revealed league.
+  const screenshotDirectory = process.env.QA_SCREENSHOT_DIR;
+  const capture = async (name: string) => {
+    if (!screenshotDirectory) return;
+    await mkdir(screenshotDirectory, { recursive: true });
+    await page.evaluate(async () => {
+      await document.fonts.ready;
+      await Promise.all(
+        Array.from(document.images).map(async (image) => {
+          image.loading = "eager";
+          try {
+            await image.decode();
+          } catch {
+            /* The component owns its fallback. */
+          }
+        }),
+      );
+      window.scrollTo(0, 0);
+    });
+    await page.screenshot({
+      path: path.join(
+        screenshotDirectory,
+        `${testInfo.project.name}-${name}.png`,
+      ),
+      fullPage: true,
+      animations: "disabled",
+    });
+  };
+  const accessibilityFailures: { route: string; violations: unknown[] }[] = [];
+  const routes = [
+    ["season", "/"],
+    ["leaderboard", "/leaderboard"],
+    ["spotlight", "/spotlight"],
+    ["spotlight-entries", "/spotlight?view=entries"],
+    ["spotlight-matrix", "/spotlight?view=matrix"],
+    ["entry", `/entries/${predictionIds[0]}`],
+    ["rules", "/rules"],
+    ["win-streak", "/win-streak"],
+    ["admin", "/admin"],
+    ["admin-submissions", "/admin/submissions"],
+    ["admin-standings", "/admin/standings"],
+    ["admin-results", "/admin/results"],
+    ["admin-win-streak", "/admin/win-streak"],
+    ["admin-settings", "/admin/settings"],
+  ];
+  for (const [name, route] of routes) {
+    await page.goto(route!, { waitUntil: "networkidle" });
+    await expect(page.locator("main h1")).toHaveCount(1);
+    await expectNoHorizontalOverflow(page);
+    if (
+      process.env.QA_AXE_SOURCE &&
+      ["chromium", "mobile-chromium"].includes(testInfo.project.name)
+    ) {
+      await page.addScriptTag({ path: process.env.QA_AXE_SOURCE });
+      const result = await page.evaluate(async () => {
+        const axe = (
+          window as unknown as {
+            axe: {
+              run: (options: object) => Promise<{ violations: unknown[] }>;
+            };
+          }
+        ).axe;
+        return axe.run({
+          runOnly: {
+            type: "tag",
+            values: ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"],
+          },
+        });
+      });
+      if (screenshotDirectory) {
+        await mkdir(screenshotDirectory, { recursive: true });
+        await writeFile(
+          path.join(
+            screenshotDirectory,
+            `${testInfo.project.name}-${name}-accessibility.json`,
+          ),
+          JSON.stringify(result.violations, null, 2) + "\n",
+        );
+      }
+      if (result.violations.length)
+        accessibilityFailures.push({
+          route: route!,
+          violations: result.violations,
+        });
+    }
+    if (["chromium", "mobile-chromium"].includes(testInfo.project.name))
+      await capture(name!);
+    if (
+      name === "admin-results" &&
+      ["chromium", "mobile-chromium"].includes(testInfo.project.name)
+    ) {
+      await page
+        .getByRole("button", { name: "Player ratings", exact: true })
+        .click();
+      await expect(
+        page.getByRole("heading", {
+          level: 2,
+          name: "Top scorer",
+          exact: true,
+        }),
+      ).not.toBeVisible();
+      await capture("admin-player-ratings");
+      await page
+        .getByRole("button", { name: "Other-player matches", exact: true })
+        .click();
+      await capture("admin-aliases");
+    }
+  }
+  await page.goto("/leaderboard");
+  await page.getByLabel("Find a participant").fill(swappedName);
+  await page.getByRole("button", { name: "Find", exact: true }).click();
+  await expect(
+    page.getByLabel(`${swappedName} leaderboard entry`),
+  ).toBeVisible();
+  await expect(page.getByLabel(`${exactName} leaderboard entry`)).toHaveCount(
+    0,
+  );
+  await page.getByRole("link", { name: "Clear", exact: true }).click();
+  await expect(page.getByLabel(`${exactName} leaderboard entry`)).toBeVisible();
+
+  // More joint leaders than a three-slot podium can hold. Cleanup owns every ID.
+  for (let index = 1; index <= 3; index++) {
+    const id = randomUUID();
+    predictionIds.push(id);
+    const name = `Joint leader ${index} ${suffix}`;
+    await db.batch([
+      db.insert(predictions).values({
+        id,
+        participantName: name,
+        normalizedParticipantName: name.toLowerCase(),
+        seasonId: originalSeason!.id,
+      }),
+      db.insert(predictionItems).values(
+        seasonTeams.map((team, index) => ({
+          predictedPosition: index + 1,
+          predictionId: id,
+          teamId: team.id,
+        })),
+      ),
+      db
+        .insert(predictionCategoryPicks)
+        .values(
+          spotlightRowsFor(
+            id,
+            seasonTeams,
+            seasonPlayers.slice(0, 2),
+            `${suffix} tie ${index}`,
+          ),
+        ),
+    ]);
+  }
+  await page.goto("/leaderboard", { waitUntil: "networkidle" });
+  const jointLeaders = page.getByRole("group", { name: "Joint 1st place" });
+  await expect(jointLeaders.getByTestId("podium-entry")).toHaveCount(4);
+  await expect(page.getByTestId("podium-entry")).toHaveCount(4);
+  await expect(jointLeaders.getByText("100", { exact: false })).toHaveCount(4);
+  await expectNoHorizontalOverflow(page);
+  await capture("podium-ties");
+  await page.emulateMedia({ colorScheme: "dark", reducedMotion: "reduce" });
+  await capture("podium-ties-dark");
+  await expectNoHorizontalOverflow(page);
+  expect(accessibilityFailures).toEqual([]);
 });

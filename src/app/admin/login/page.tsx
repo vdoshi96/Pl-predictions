@@ -22,15 +22,15 @@ export default async function AdminLoginPage({
   const invalid = params.error === "invalid";
 
   return (
-    <main className="page-shell flex w-full flex-1 items-center justify-center py-10 sm:py-16">
+    <main
+      id="main-content"
+      className="page-shell flex w-full flex-1 items-center justify-center py-10 sm:py-16"
+    >
       <Card className="panel-shadow w-full max-w-md overflow-hidden">
         <CardContent className="p-6 sm:p-8">
           <span className="bg-mint text-mint-ink grid size-12 place-items-center rounded-2xl">
             <ShieldCheck aria-hidden="true" className="size-6" />
           </span>
-          <p className="text-mint-ink mt-5 text-xs font-black tracking-[0.16em] uppercase">
-            Owner access
-          </p>
           <h1 className="text-foreground mt-2 text-3xl font-black tracking-tight">
             Admin sign in
           </h1>

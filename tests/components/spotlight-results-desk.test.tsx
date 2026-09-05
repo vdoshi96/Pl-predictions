@@ -242,7 +242,7 @@ describe("SpotlightResultsDesk", () => {
     ).toBeVisible();
 
     const resultTables = screen.getAllByRole("table");
-    expect(resultTables).toHaveLength(5);
+    expect(resultTables).toHaveLength(1);
     for (const table of resultTables) {
       expect(table.closest("section")).toHaveClass("min-w-0");
       expect(table.parentElement).toHaveClass("overflow-x-auto");
@@ -250,6 +250,7 @@ describe("SpotlightResultsDesk", () => {
     expect(
       screen.getByRole("combobox", { name: "Top scorer rank 1 subject" }),
     ).toHaveAttribute("aria-autocomplete", "list");
+    fireEvent.click(screen.getByRole("button", { name: "Player ratings" }));
     const underdogRating = screen.getByRole("spinbutton", {
       name: /Underdog player ratings Season rating for Alice/,
     });
@@ -273,6 +274,7 @@ describe("SpotlightResultsDesk", () => {
 
   it("seeds the union of both opinion-player pools into one shared draft", () => {
     renderDesk();
+    fireEvent.click(screen.getByRole("button", { name: "Player ratings" }));
     const ratingsCard = screen
       .getByRole("heading", { level: 2, name: "Player ratings" })
       .closest(".rounded-2xl");
@@ -298,6 +300,7 @@ describe("SpotlightResultsDesk", () => {
 
   it("applies only picked players from a full pasted ratings list", async () => {
     renderDesk();
+    fireEvent.click(screen.getByRole("button", { name: "Player ratings" }));
     const ratingsCard = screen
       .getByRole("heading", { level: 2, name: "Player ratings" })
       .closest(".rounded-2xl");
@@ -325,6 +328,7 @@ describe("SpotlightResultsDesk", () => {
 
   it("allows a reviewed ratings subset to be saved and published", async () => {
     renderDesk();
+    fireEvent.click(screen.getByRole("button", { name: "Player ratings" }));
     const ratingsCard = screen
       .getByRole("heading", { level: 2, name: "Player ratings" })
       .closest(".rounded-2xl");
@@ -343,6 +347,7 @@ describe("SpotlightResultsDesk", () => {
 
   it("saves the shared ratings rows once from either synchronized view", async () => {
     renderDesk();
+    fireEvent.click(screen.getByRole("button", { name: "Player ratings" }));
     const ratingsHeading = screen.getByRole("heading", {
       level: 2,
       name: "Player ratings",
@@ -397,6 +402,9 @@ describe("SpotlightResultsDesk", () => {
     ).toBeDisabled();
     fireEvent.click(within(dialog).getByRole("button", { name: "Cancel" }));
 
+    fireEvent.click(
+      screen.getByRole("button", { name: "Other-player matches" }),
+    );
     const aliasSelect = screen.getByRole("combobox", {
       name: "Catalogue match",
     });
@@ -408,6 +416,7 @@ describe("SpotlightResultsDesk", () => {
 
     fireEvent.click(screen.getByRole("button", { name: "Save match" }));
     await waitFor(() => expect(saveAlias).toHaveBeenCalledTimes(1));
+    fireEvent.click(screen.getByRole("button", { name: "Top scorer" }));
     fireEvent.click(goals.getByRole("button", { name: "Review & publish" }));
     dialog = screen.getByRole("dialog", {
       name: "Review and publish Top scorer",
@@ -463,6 +472,7 @@ describe("SpotlightResultsDesk", () => {
 
   it("blocks a repeated publish after the working snapshot becomes active", async () => {
     renderDesk();
+    fireEvent.click(screen.getByRole("button", { name: "Most clean sheets" }));
     const cleanSheetsHeading = screen.getByRole("heading", {
       level: 2,
       name: "Most clean sheets",
@@ -494,6 +504,7 @@ describe("SpotlightResultsDesk", () => {
       snapshotId: returnedSnapshotId,
     });
     renderDesk();
+    fireEvent.click(screen.getByRole("button", { name: "Most clean sheets" }));
     const cleanSheetsHeading = screen.getByRole("heading", {
       level: 2,
       name: "Most clean sheets",
@@ -561,6 +572,7 @@ describe("SpotlightResultsDesk", () => {
       ok: false,
     });
     renderDesk();
+    fireEvent.click(screen.getByRole("button", { name: "Most clean sheets" }));
     const cleanSheetsHeading = screen.getByRole("heading", {
       level: 2,
       name: "Most clean sheets",
@@ -592,6 +604,9 @@ describe("SpotlightResultsDesk", () => {
   it("can create and match a genuinely new inactive result-only player", async () => {
     renderDesk();
     fireEvent.click(
+      screen.getByRole("button", { name: "Other-player matches" }),
+    );
+    fireEvent.click(
       screen.getByRole("button", { name: "Create result-only player" }),
     );
 
@@ -611,6 +626,9 @@ describe("SpotlightResultsDesk", () => {
 
   it("can add an unpredicted inactive player for factual result rows", async () => {
     renderDesk();
+    fireEvent.click(
+      screen.getByRole("button", { name: "Other-player matches" }),
+    );
     fireEvent.change(
       screen.getByRole("textbox", { name: /New factual result subject/ }),
       { target: { value: "Late Breakthrough" } },

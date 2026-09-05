@@ -16,10 +16,9 @@ describe("administrator navigation", () => {
       screen.getByRole("navigation", { name: "Admin navigation" }),
     ).toBeVisible();
     expect(screen.getAllByRole("link")).toHaveLength(6);
-    expect(screen.getByRole("link", { name: "Results" })).toHaveAttribute(
-      "href",
-      "/admin/results",
-    );
+    expect(
+      screen.getByRole("link", { name: "Spotlight results" }),
+    ).toHaveAttribute("href", "/admin/results");
     expect(screen.getByRole("link", { name: "Win Streak" })).toHaveAttribute(
       "href",
       "/admin/win-streak",

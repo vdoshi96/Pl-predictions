@@ -7,17 +7,17 @@ import { logoutAction } from "./actions";
 const links = [
   { href: "/admin", label: "Overview" },
   { href: "/admin/submissions", label: "Submissions" },
-  { href: "/admin/settings", label: "Settings" },
   { href: "/admin/standings", label: "Standings" },
-  { href: "/admin/results", label: "Results" },
+  { href: "/admin/results", label: "Spotlight results" },
   { href: "/admin/win-streak", label: "Win Streak" },
+  { href: "/admin/settings", label: "Settings" },
 ] as const;
 
 type AdminRoute = (typeof links)[number]["href"];
 
 export function AdminNav({ current }: { current: AdminRoute }) {
   return (
-    <div className="border-border bg-surface grid gap-3 rounded-2xl border p-3 sm:grid-cols-[1fr_auto] sm:items-center">
+    <div className="border-border bg-surface grid gap-3 rounded-xl border p-2 sm:grid-cols-[1fr_auto] sm:items-center">
       <nav aria-label="Admin navigation" className="min-w-0">
         <ul className="grid grid-cols-2 gap-1 sm:flex sm:flex-wrap">
           {links.map((link) => {

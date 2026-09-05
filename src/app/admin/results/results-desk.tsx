@@ -424,6 +424,9 @@ export function SpotlightResultsDesk({
   seasonName,
   teams,
 }: ResultDeskProps) {
+  const [selectedWorkspace, setSelectedWorkspace] = useState<
+    SpotlightResultDataset | "aliases"
+  >("goals");
   const [datasets, setDatasets] = useState<
     Record<SpotlightResultDataset, EditableDataset>
   >(
@@ -1131,6 +1134,25 @@ export function SpotlightResultsDesk({
         </CardContent>
       </Card>
 
+      <nav aria-label="Result datasets" className="flex flex-wrap gap-2">
+        {[...ordinaryDatasets, "player_ratings", "aliases"].map((name) => {
+          const workspace = name as SpotlightResultDataset | "aliases";
+          return (
+            <button
+              key={name}
+              type="button"
+              aria-pressed={selectedWorkspace === workspace}
+              aria-controls={`dataset-${name.replaceAll("_", "-")}`}
+              onClick={() => setSelectedWorkspace(workspace)}
+              className="text-brand-ink border-border bg-surface aria-pressed:bg-brand focus-visible:outline-accent-blue inline-flex min-h-11 items-center rounded-lg border px-3 text-sm font-semibold focus-visible:outline-2 focus-visible:outline-offset-2 aria-pressed:text-white"
+            >
+              {workspace === "aliases"
+                ? "Other-player matches"
+                : DATASET_LABELS[workspace]}
+            </button>
+          );
+        })}
+      </nav>
       {ordinaryDatasets.map((datasetName) => {
         const dataset = datasets[datasetName];
         const frozen = Boolean(dataset.pointers.finalSnapshotId);
@@ -1138,7 +1160,11 @@ export function SpotlightResultsDesk({
           datasetName === "clean_sheets" ? teams : availablePlayers;
         const coverage = evaluateCoverage(dataset.rows, bracketCount);
         return (
-          <Card key={datasetName}>
+          <Card
+            key={datasetName}
+            id={`dataset-${datasetName.replaceAll("_", "-")}`}
+            hidden={selectedWorkspace !== datasetName}
+          >
             <CardContent className="grid gap-5">
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <h2 className="text-foreground text-xl font-black">
@@ -1194,7 +1220,10 @@ export function SpotlightResultsDesk({
         );
       })}
 
-      <Card>
+      <Card
+        id="dataset-player-ratings"
+        hidden={selectedWorkspace !== "player_ratings"}
+      >
         <CardContent className="grid gap-5">
           <div className="flex flex-wrap items-center justify-between gap-2">
             <div>
@@ -1290,7 +1319,7 @@ export function SpotlightResultsDesk({
         </CardContent>
       </Card>
 
-      <Card>
+      <Card id="dataset-aliases" hidden={selectedWorkspace !== "aliases"}>
         <CardContent>
           <h2 className="text-foreground text-xl font-black">
             Other-player matches

@@ -1,7 +1,6 @@
 import {
   Calculator,
   EyeOff,
-  ListChecks,
   Medal,
   Search,
   ShieldCheck,
@@ -11,7 +10,8 @@ import {
 import type { Metadata } from "next";
 import Link from "next/link";
 
-import { Badge } from "@/components/ui/badge";
+import { PageHeading } from "@/components/page-heading";
+import { ScoringExample } from "@/components/scoring-example";
 import { Card, CardContent } from "@/components/ui/card";
 import { RULES_PENDING_RESULTS_MESSAGE } from "@/content/public-copy";
 import { HowToPlay } from "@/components/how-to-play";
@@ -52,35 +52,12 @@ const spotlightRules = [
 
 export default function RulesPage() {
   return (
-    <main className="page-shell w-full flex-1 py-6 sm:py-10">
+    <main id="main-content" className="page-shell w-full flex-1 py-6 sm:py-10">
       <div className="mx-auto grid max-w-4xl gap-5 sm:gap-7">
-        <section className="brand-hero rounded-3xl p-5 text-white sm:p-8">
-          <div className="flex flex-wrap gap-2">
-            <Badge className="bg-accent text-accent-ink ring-accent">
-              2026/27 competition
-            </Badge>
-            <Badge variant="accent">Owner-reviewed results</Badge>
-          </div>
-          <div className="mt-5 flex items-start gap-3">
-            <ListChecks
-              aria-hidden="true"
-              className="text-accent-blue mt-1 size-7 shrink-0"
-            />
-            <div>
-              <h1 className="text-3xl font-black tracking-tight sm:text-4xl">
-                How to play & scoring
-              </h1>
-              <p className="mt-2 max-w-2xl text-sm leading-6 text-white/75 sm:text-base">
-                Follow the three mobile steps to submit one immutable entry:
-                your full 1–20 table, all seven spotlight picks, and a final
-                review. Table and spotlight scoring stay separate.
-              </p>
-            </div>
-          </div>
-        </section>
-
-        <HowToPlay />
-
+        <PageHeading
+          title="The rules, without the guesswork."
+          description="The season game and Win Streak run independently."
+        />
         <Card>
           <CardContent>
             <div className="flex items-start gap-3">
@@ -117,6 +94,34 @@ export default function RulesPage() {
           </CardContent>
         </Card>
 
+        <ScoringExample />
+        <details className="border-border border-y py-4">
+          <summary className="min-h-11 cursor-pointer font-bold">
+            How you enter
+          </summary>
+          <div className="mt-4">
+            <HowToPlay />
+          </div>
+        </details>
+        <details className="border-border border-b pb-4">
+          <summary className="min-h-11 cursor-pointer font-bold">
+            Win Streak: a fresh choice each round
+          </summary>
+          <p className="text-muted mt-3 text-sm leading-6">
+            Matchweeks 2–38. Choose one available club before the first kickoff
+            of the round. Picks are final. A win extends your streak and
+            restricts that club. A draw or loss resets the streak and unlocks
+            clubs. A missed or void round preserves it. Personal best decides
+            rank; ties share rank. Re-enter the same display name to resume your
+            profile in another browser. Current-round picks are public.
+          </p>
+          <Link
+            href="/win-streak"
+            className="text-brand-ink mt-3 inline-flex min-h-11 items-center text-sm font-semibold underline"
+          >
+            Play Win Streak
+          </Link>
+        </details>
         <Card id="spotlight-scoring">
           <CardContent>
             <div className="flex items-start gap-3">

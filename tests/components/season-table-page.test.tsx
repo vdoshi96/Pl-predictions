@@ -74,7 +74,7 @@ describe("season table landing", () => {
       }),
     ).toBeVisible();
     expect(
-      screen.queryByRole("columnheader", { name: "League said" }),
+      screen.queryByRole("columnheader", { name: "Group avg." }),
     ).not.toBeInTheDocument();
   });
 
@@ -104,10 +104,14 @@ describe("season table landing", () => {
         }),
       }),
     );
-    expect(screen.getByText("Overachiever")).toBeVisible();
-    expect(screen.getByText("Underachiever")).toBeVisible();
     expect(
-      screen.getByRole("columnheader", { name: "League said" }),
+      screen.getByRole("heading", { name: "The biggest surprise" }),
+    ).toBeVisible();
+    expect(
+      screen.getByRole("heading", { name: "Below expectations" }),
+    ).toBeVisible();
+    expect(
+      screen.getByRole("columnheader", { name: "Group avg." }),
     ).toBeVisible();
     expect(
       screen.getByText(
@@ -215,9 +219,9 @@ describe("season table landing", () => {
     });
   });
 
-  it("uses Home for the root navigation item", () => {
+  it("distinguishes Season table from the friends leaderboard", () => {
     render(<SiteHeader />);
-    expect(screen.getByRole("link", { name: "Home" })).toHaveAttribute(
+    expect(screen.getByRole("link", { name: "Season table" })).toHaveAttribute(
       "href",
       "/",
     );

@@ -96,7 +96,11 @@ export function SpotlightCategoriesView({
   return (
     <section
       aria-label="Spotlight categories"
-      className="grid gap-4 min-[860px]:grid-cols-2"
+      className={
+        boards.length === 1
+          ? "grid min-w-0 gap-4"
+          : "grid gap-4 min-[860px]:grid-cols-2"
+      }
     >
       {boards.map((board) => {
         const leader = leaders[board.category];
@@ -104,7 +108,7 @@ export function SpotlightCategoriesView({
         return (
           <Card className="overflow-hidden" key={board.category}>
             <div className="bg-surface-lilac border-surface-lilac-border flex min-h-14 items-center justify-between gap-2 border-b px-4 py-3">
-              <h2 className="text-rose-ink text-xs font-black tracking-wider uppercase">
+              <h2 className="text-brand-ink text-lg font-bold">
                 {board.label}
               </h2>
               <Badge variant={resultLive ? "success" : "warning"}>

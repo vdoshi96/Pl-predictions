@@ -176,11 +176,11 @@ test("production public routes are mobile-safe and healthy", async ({
   await page.goto("/");
   const seasonTableHeading = page.getByRole("heading", {
     level: 1,
-    name: "Season table",
+    name: "The season, against our predictions.",
   });
   const entryHeading = page.getByRole("heading", {
     level: 1,
-    name: "Build your 2026/27 Premier League table.",
+    name: "Your table. Your season.",
   });
   await expect(seasonTableHeading.or(entryHeading)).toBeVisible();
   const predictionsRevealed = await seasonTableHeading.isVisible();
@@ -312,7 +312,7 @@ test("production public routes are mobile-safe and healthy", async ({
       });
     }
     await page.getByRole("button", { name: "Review all predictions" }).click();
-    const reviewDialog = page.getByRole("dialog", {
+    const reviewDialog = page.getByRole("region", {
       name: "Review every prediction",
     });
     await expect(reviewDialog).toBeVisible();
@@ -342,26 +342,20 @@ test("production public routes are mobile-safe and healthy", async ({
       name: "Prediction review, positions 1 through 20",
     });
     await expect(reviewTable.locator("li")).toHaveCount(20);
-    await expect(reviewTable.getByRole("listitem")).toHaveCount(8);
-    await reviewTable.getByText("Show all 20 clubs", { exact: true }).click();
+    await expect(reviewTable.getByRole("listitem")).toHaveCount(20);
     await expect(reviewTable.getByRole("listitem")).toHaveCount(20);
     await expectClubMarksLoaded(
       reviewTable.getByRole("img", { name: / club mark$/u }),
     );
-    const reviewScroller = reviewDialog.locator(".overflow-y-auto");
-    await reviewScroller.evaluate((element) => {
-      element.scrollTop = 0;
-    });
-    await expect
-      .poll(() => reviewScroller.evaluate((element) => element.scrollTop))
-      .toBe(0);
+    await reviewDialog
+      .getByRole("heading", { level: 1 })
+      .scrollIntoViewIfNeeded();
     if (captureMobileEvidence) {
       await page.screenshot({
         path: path.join(screenshotDirectory!, "review-mobile.png"),
       });
     }
-    await page.keyboard.press("Escape");
-    await page.getByRole("button", { name: "Back to table" }).click();
+    await reviewDialog.getByRole("button", { name: "Edit table" }).click();
   } else if (predictionsRevealed) {
     await expect(participantName).toHaveCount(0);
     await expect(continueButton).toHaveCount(0);
@@ -398,10 +392,10 @@ test("production public routes are mobile-safe and healthy", async ({
 
   await page.goto("/leaderboard");
   await expect(
-    page.getByRole("heading", { level: 1, name: "Dranx Prediction League" }),
+    page.getByRole("heading", { level: 1, name: "The friends’ leaderboard." }),
   ).toBeVisible();
   await expect(
-    page.getByRole("link", { name: "View spotlight accuracy" }),
+    page.getByRole("link", { name: "View separate spotlight accuracy" }),
   ).toBeVisible();
   await expect(
     page.getByRole("region", { name: "Spotlight accuracy test run" }),
@@ -410,7 +404,7 @@ test("production public routes are mobile-safe and healthy", async ({
 
   await page.goto("/win-streak");
   await expect(
-    page.getByRole("heading", { level: 1, name: "Win Streak" }),
+    page.getByRole("heading", { level: 1, name: "One pick. Keep it going." }),
   ).toBeVisible();
   const winStreakLeaderboard = page.getByTestId("win-streak-leaderboard");
   await expect(winStreakLeaderboard).toBeVisible();
@@ -441,7 +435,7 @@ test("production public routes are mobile-safe and healthy", async ({
 
   await page.goto("/spotlight?view=entries&sort=overall");
   await expect(
-    page.getByRole("heading", { level: 1, name: "Spotlight accuracy" }),
+    page.getByRole("heading", { level: 1, name: "Who called it?" }),
   ).toBeVisible();
   await expect(
     page.getByRole("region", { name: "Spotlight accuracy test run" }),
@@ -487,8 +481,12 @@ test("production public routes are mobile-safe and healthy", async ({
 
   await page.goto("/rules");
   await expect(
-    page.getByRole("heading", { level: 1, name: "How to play & scoring" }),
+    page.getByRole("heading", {
+      level: 1,
+      name: "The rules, without the guesswork.",
+    }),
   ).toBeVisible();
+  await page.getByText("How you enter", { exact: true }).click();
   await expect(
     page.getByRole("heading", { name: "How to play in three steps" }),
   ).toBeVisible();

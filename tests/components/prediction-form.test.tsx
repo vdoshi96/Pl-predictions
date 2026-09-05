@@ -569,7 +569,9 @@ describe("PredictionForm", () => {
       screen.getByRole("button", { name: /review all predictions/i }),
     );
 
-    const dialog = await screen.findByRole("dialog");
+    const dialog = await screen.findByRole("region", {
+      name: "Review every prediction",
+    });
     expect(within(dialog).getByText(/submitting as/i)).toHaveTextContent(
       "Vishal Doshi",
     );
@@ -581,8 +583,8 @@ describe("PredictionForm", () => {
     expect(within(dialog).getByText("Bukayo Saka")).toBeVisible();
     expect(within(dialog).getByText("Elliot Anderson")).toBeVisible();
     expect(within(dialog).getByText("Antony Matheus")).toBeVisible();
-    expect(dialog).toHaveClass("bottom-2", "sm:bottom-auto", "sm:top-1/2");
-    expect(dialog.className).toContain("safe-area-inset-top");
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+    expect(within(dialog).getByRole("heading", { level: 1 })).toHaveFocus();
 
     const brightonName = within(dialog).getByText("Brighton & Hove Albion");
     expect(brightonName).toHaveClass("break-words");
@@ -637,7 +639,7 @@ describe("PredictionForm", () => {
     ).toHaveAttribute("href", "/leaderboard");
   });
 
-  it("keeps a server rejection actionable in the review dialog", async () => {
+  it("keeps a server rejection actionable in the review step", async () => {
     const storageKey = predictionDraftStorageKey("2026-27");
     const onSubmit = vi.fn().mockResolvedValue({
       ok: false,
@@ -663,7 +665,9 @@ describe("PredictionForm", () => {
       screen.getByRole("button", { name: /review all predictions/i }),
     );
 
-    const dialog = await screen.findByRole("dialog");
+    const dialog = await screen.findByRole("region", {
+      name: "Review every prediction",
+    });
     fireEvent.click(
       within(dialog).getByRole("button", { name: /submit prediction/i }),
     );
@@ -679,6 +683,11 @@ describe("PredictionForm", () => {
       within(dialog).getByRole("button", { name: /go back/i }),
     ).toBeEnabled();
     expect(window.localStorage.getItem(storageKey)).not.toBeNull();
+    fireEvent.click(within(dialog).getByRole("button", { name: "Edit table" }));
+    expect(screen.getByLabelText(/your display name/i)).toHaveValue("Alex");
+    expect(
+      screen.queryByRole("region", { name: "Review every prediction" }),
+    ).not.toBeInTheDocument();
   });
 
   it("clears a browser draft after the server verifies permanent season closure", async () => {
@@ -764,7 +773,7 @@ describe("PredictionForm", () => {
       screen.getByRole("button", { name: /review all predictions/i }),
     );
     expect(
-      screen.getByRole("dialog", { name: /review every prediction/i }),
+      screen.getByRole("region", { name: /review every prediction/i }),
     ).toBeVisible();
 
     view.rerender(
@@ -779,7 +788,7 @@ describe("PredictionForm", () => {
 
     await waitFor(() =>
       expect(
-        screen.queryByRole("dialog", { name: /review every prediction/i }),
+        screen.queryByRole("region", { name: /review every prediction/i }),
       ).not.toBeInTheDocument(),
     );
     expect(screen.getByLabelText(/your display name/i)).toHaveValue("");
@@ -1450,21 +1459,13 @@ describe("shared site chrome", () => {
     const { rerender } = render(<SiteHeader />);
 
     const navigation = screen.getByRole("navigation", { name: /primary/i });
-    const homeLink = screen.getByRole("link", { name: /^home$/i });
+    const homeLink = screen.getByRole("link", { name: /^season table$/i });
 
-    expect(navigation).toBeVisible();
-    expect(navigation).toHaveClass("basis-full", "sm:basis-auto");
-    expect(within(navigation).getByRole("list")).toHaveClass(
-      "grid",
-      "grid-cols-5",
-      "sm:flex",
-    );
+    expect(navigation).toHaveClass("site-nav");
     expect(homeLink).toHaveAttribute("href", "/");
-    expect(homeLink).toHaveClass("min-h-12", "min-w-0");
-    expect(screen.getByRole("link", { name: /^table$/i })).toHaveAttribute(
-      "href",
-      "/leaderboard",
-    );
+    expect(
+      screen.getByRole("link", { name: /^leaderboard$/i }),
+    ).toHaveAttribute("href", "/leaderboard");
     expect(screen.getByRole("link", { name: /^spotlight$/i })).toHaveAttribute(
       "href",
       "/spotlight",
@@ -1478,8 +1479,10 @@ describe("shared site chrome", () => {
       "/rules",
     );
     expect(screen.queryByRole("link", { name: /^admin$/i })).toBeNull();
-    expect(screen.getByText("2026/27 Premier League")).toBeVisible();
-    expect(screen.getByText("Dranx Prediction League")).toBeVisible();
+    expect(screen.getByText("2026 / 27")).toBeVisible();
+    expect(
+      screen.getByRole("link", { name: /Dranx.*Prediction League/ }),
+    ).toBeVisible();
 
     rerender(<SiteFooter />);
 

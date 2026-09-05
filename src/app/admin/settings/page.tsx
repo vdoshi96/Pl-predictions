@@ -2,7 +2,6 @@ import { CalendarClock, LockKeyhole } from "lucide-react";
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 
-import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { ACTIVE_SEASON } from "@/data/season";
 import { getAdminSession } from "@/features/admin";
@@ -35,10 +34,9 @@ export default async function AdminSettingsPage() {
   );
 
   return (
-    <main className="page-shell w-full flex-1 py-6 sm:py-10">
+    <main id="main-content" className="page-shell w-full flex-1 py-6 sm:py-10">
       <div className="grid gap-5">
         <div>
-          <Badge variant="accent">Fairness controls</Badge>
           <h1 className="text-foreground mt-3 text-3xl font-black tracking-tight sm:text-4xl">
             Season settings
           </h1>

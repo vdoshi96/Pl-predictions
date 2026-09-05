@@ -201,7 +201,7 @@ test("production enforces its current submission state and cleans any QA entry",
   await page.getByRole("button", { name: "Review all predictions" }).click();
   submissionAttempted = true;
   await page
-    .getByRole("dialog", { name: "Review every prediction" })
+    .getByRole("region", { name: "Review every prediction" })
     .getByRole("button", { name: "Submit prediction" })
     .click();
 
@@ -309,7 +309,7 @@ test("production enforces its current submission state and cleans any QA entry",
   ).toBeVisible();
   await freshPage.goto("/spotlight?view=entries&sort=top_scorer");
   await expect(
-    freshPage.getByRole("heading", { level: 1, name: "Spotlight accuracy" }),
+    freshPage.getByRole("heading", { level: 1, name: "Who called it?" }),
   ).toBeVisible();
   await expect(
     freshPage.getByRole("heading", {

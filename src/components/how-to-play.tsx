@@ -1,6 +1,10 @@
 import { Smartphone } from "lucide-react";
 import Image from "next/image";
 
+import tableScreenshot from "../../public/how-to-play/step-1-table-mobile.png";
+import spotlightScreenshot from "../../public/how-to-play/step-2-spotlight-mobile.png";
+import reviewScreenshot from "../../public/how-to-play/step-3-review-mobile.png";
+
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 
@@ -23,7 +27,7 @@ const walkthroughSteps = [
     ],
     description:
       "Enter the display name that will appear on the leaderboard, then put every club in your predicted finishing order.",
-    image: "/how-to-play/step-1-table-mobile.png",
+    image: tableScreenshot,
     step: 1,
     title: "Build your 1–20 table",
   },
@@ -45,29 +49,29 @@ const walkthroughSteps = [
     ],
     description:
       "Choose all seven required player and club predictions. Other player remains available when the catalogue does not have your pick.",
-    image: "/how-to-play/step-2-spotlight-mobile.png",
+    image: spotlightScreenshot,
     step: 2,
     title: "Make seven spotlight picks",
   },
   {
-    alt: "Mobile final-review screen showing a compact club summary, seven spotlight picks, and the submit button.",
+    alt: "Mobile final-review page showing the participant name, Edit table action, and ordered clubs.",
     callouts: [
       {
         label:
-          "Confirm the champion, seven spotlight picks, and table summary; expand the middle positions if needed.",
+          "Review all 20 club positions and all seven spotlight picks before submitting.",
         marker: "1",
         position: { left: "96%", top: "51%" },
       },
       {
         label:
-          "Submit only when everything is right; a completed entry cannot be edited.",
+          "Use Edit table or Edit picks to make a correction. Submit below only when everything is right; entries are final.",
         marker: "2",
-        position: { left: "96%", top: "94%" },
+        position: { left: "96%", top: "22%" },
       },
     ],
     description:
-      "Check the complete package before the one atomic submission saves your table and spotlight choices together.",
-    image: "/how-to-play/step-3-review-mobile.png",
+      "Scroll through the full table and seven picks before submitting them together.",
+    image: reviewScreenshot,
     step: 3,
     title: "Review once, then submit",
   },

@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="generated-by" content="scripts/generate-docs-html.mjs" />
     <meta name="canonical-source" content="redesign-release.md" />
-    <meta name="canonical-source-sha256" content="b0191207d6255686f4a97ca59c4918108cc3ac5783d370568c90bea5169462cb" />
+    <meta name="canonical-source-sha256" content="0b6ffc7fe40f32254961d7a4579268155a0bb6402a2fac3d2a0a9d1a56e49e5e" />
     <title>Approved redesign release</title>
     <style>
       :root { color-scheme: light dark; font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
@@ -109,21 +109,24 @@
 </tr>
 <tr>
 <td>Production release</td>
-<td>Pending GitHub integration and exact deployment/alias verification.</td>
+<td><a href="https://github.com/vdoshi96/Pl-predictions/pull/64">PR #64</a> merged as <code>30fc0c8</code>. Deployment <code>dpl_8u48idBUx3pJich7MNAM9wivrRXM</code> was Ready and served the stable URL during verification. All five read-only production smoke projects passed.</td>
 </tr>
 </tbody></table>
 <h2 id="test-isolation-and-cleanup">Test isolation and cleanup</h2>
 <p>Browser journeys run through <code>scripts/run-with-test-database.mjs</code>. They restore the exact original season state and remove their tracked predictions, table items, spotlight picks, standings snapshots, import runs, and audit records. The Win Streak helper creates all 37 rounds and 370 future fixtures in a disposable season. It temporarily assigns that season the active slug only inside the isolated browser run, then deletes it and verifies restoration of the original season ID. It never changes PostgreSQL time or disables a guard. The final read-only cleanup check, saved as <code>docs/assets/qa/redesign/cleanup.json</code>, found zero predictions, table items, Spotlight picks, standings snapshots/items, Win Streak profiles/picks, or temporary Win Streak seasons. The original 2026/27 season is open, unrevealed, and has no active/final standings pointer.</p>
 <p>An interrupted runner left two synthetic post-kickoff snapshots in the isolated database. Targeted cleanup removed snapshots <code>5762cf59-d44f-417a-ba00-9527080f7b73</code> and <code>7e91076f-fea7-45be-a69e-eddd9ee3e212</code>, plus predictions <code>f24da22b-c566-45aa-9265-69f9300fd9ac</code> and <code>8641dcb0-0008-4098-a60c-48cb53d2644d</code>. Verification found zero remaining predictions, prediction items, spotlight picks, standings snapshots, and standings items. The empty open baseline was re-established before the completed suites. Production was never the cleanup target.</p>
 <h2 id="interface-evidence">Interface evidence</h2>
-<p>Captures in <code>docs/assets/qa/redesign/</code> cover the comparison table, leaderboard, three Spotlight views, entry detail, Rules, Win Streak, owner pages, and the full-page entry review. The route matrix uses synthetic isolated QA entries. The <code>before-*</code> and <code>after-*</code> public comparisons show actual published data through read-only requests. The <code>public/how-to-play/</code> entry walkthrough comes from the isolated build. Each path retains this iteration&#39;s newest capture.</p>
+<p>Captures in <code>docs/assets/qa/redesign/</code> cover the comparison table, leaderboard, three Spotlight views, entry detail, Rules, Win Streak, owner pages, and the full-page entry review. The route matrix uses synthetic isolated QA entries. The <code>before-*</code> and <code>after-*</code> public comparisons show actual published data through read-only requests; final <code>after-*</code> images were refreshed from the verified stable production URL. The <code>public/how-to-play/</code> entry walkthrough comes from the isolated build. Each path retains this iteration&#39;s newest capture.</p>
 <p>The four requested finish-review corrections are visible in the refreshed evidence: each mobile club row includes Group avg.; Stage 3 displays all 20 clubs and seven picks with separate edit actions; the owner results desk selects one workspace without losing unsaved edits; and owner headings omit the decorative eyebrows. Browser checks verify the edit round trip, retained drafts, rejection recovery, immutable submission, and disabled publication gates before reveal.</p>
 <p>Local Next.js sometimes reports a destination stream closing early during automated navigation. This is retained as a local verification limitation; it is not treated as production evidence or as a failed business transition.</p>
 <p>The implemented visual system is recorded in <a href="../DESIGN.html">DESIGN.md</a>, with the machine-readable extension at <code>.impeccable/design.json</code>.</p>
-<h2 id="release-and-checkout-closeout">Release and checkout closeout</h2>
-<p>Local verification and the four-fix independent design verdict are complete. The <code>vishal/approved-redesign</code> worktree remains active until merge and deployment verification complete.</p>
+<h2 id="production-verification-and-repository-closeout">Production verification and repository closeout</h2>
+<p><a href="https://github.com/vdoshi96/Pl-predictions/pull/64">PR #64</a> merged the application as <code>30fc0c8c65d9e97dc25a1d0787a99efc0243787d</code>. Its GitHub Vercel status and Ready deployment <code>dpl_8u48idBUx3pJich7MNAM9wivrRXM</code> identify the same release. The stable URL resolved to that exact deployment during verification; Vercel advanced the alias automatically.</p>
+<p>All five read-only production smoke projects passed in 28.8 seconds. They covered health, public pages, 20 loaded local club badges, Win Streak anonymous access, Spotlight, Rules, owner sign-in, and 320–430px reflow. The suite recorded zero browser errors, network errors, runtime football requests, or same-origin mutations. Its old “active brackets” assertion was corrected to the approved “active entries” wording and the complete suite was replayed. No application change was needed for that assertion.</p>
+<p>Bounded deployment-log queries returned zero error-level events, fatal events, and HTTP 5xx responses in the preceding 15-minute window, capped at 50 results per filter. This is release-window evidence, not a claim about future traffic. The machine-readable record is <a href="assets/qa/redesign/production/verification.json">production verification</a>.</p>
+<p>The application release is complete. The follow-up closeout commit records the production captures, checks, and corrected smoke assertion. It also aligns the Rules walkthrough caption, image description, and edit-action marker with the full-page Stage 3 review; the old collapsed-middle instruction is removed. Walkthrough images use static imports so Next.js hashes their contents and a previous optimized screenshot cannot remain selected at an unchanged URL. Checkout synchronization and removal of the completed worktree follow that evidence merge; GitHub <code>main</code> and <code>git worktree list</code> are the authoritative repository state.</p>
 
-      <p class="source">Generated deterministically from <a href="redesign-release.md">docs/redesign-release.md</a>. Canonical SHA-256: <code>b0191207d6255686f4a97ca59c4918108cc3ac5783d370568c90bea5169462cb</code>.</p>
+      <p class="source">Generated deterministically from <a href="redesign-release.md">docs/redesign-release.md</a>. Canonical SHA-256: <code>0b6ffc7fe40f32254961d7a4579268155a0bb6402a2fac3d2a0a9d1a56e49e5e</code>.</p>
     </main>
   </body>
 </html>

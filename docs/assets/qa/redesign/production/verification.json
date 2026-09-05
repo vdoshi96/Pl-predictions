@@ -1,10 +1,10 @@
 {
-  "verifiedAtUtc": "2026-09-05T01:51:37.313613+00:00",
-  "applicationCommit": "30fc0c8c65d9e97dc25a1d0787a99efc0243787d",
-  "pullRequest": "https://github.com/vdoshi96/Pl-predictions/pull/64",
+  "verifiedAtUtc": "2026-09-05T02:05:05.553588+00:00",
+  "applicationCommit": "0b71d3491e91ee7c337732b3d72d65d57415b210",
+  "pullRequest": "https://github.com/vdoshi96/Pl-predictions/pull/65",
   "deployment": {
-    "id": "dpl_8u48idBUx3pJich7MNAM9wivrRXM",
-    "url": "https://pl-predictions-ojihn525p-vdoshi96s-projects.vercel.app",
+    "id": "dpl_GyqRx2UXkTQZ4GpZy12oBuy5RKLq",
+    "url": "https://pl-predictions-ac9g0cppe-vdoshi96s-projects.vercel.app",
     "state": "READY"
   },
   "stableUrl": "https://pl-predictions-2026.vercel.app",
@@ -21,7 +21,9 @@
     "sameOriginMutations": 0,
     "browserErrors": 0,
     "networkErrors": 0,
-    "runtimeFootballRequests": 0
+    "runtimeFootballRequests": 0,
+    "durationSeconds": 23.5,
+    "hashedWalkthroughImagesVerified": true
   },
   "boundedRuntimeLogs": {
     "window": "preceding 15 minutes",

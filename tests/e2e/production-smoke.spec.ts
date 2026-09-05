@@ -497,7 +497,7 @@ test("production public routes are mobile-safe and healthy", async ({
   for (const screenshot of await walkthroughScreenshots.all()) {
     expect(
       decodeURIComponent((await screenshot.getAttribute("src")) ?? ""),
-    ).toContain("/_next/static/media/");
+    ).toMatch(/\/_next\/static\/(?:immutable\/)?media\//u);
     await screenshot.scrollIntoViewIfNeeded();
     await expect
       .poll(() =>

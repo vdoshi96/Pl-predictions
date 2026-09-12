@@ -116,12 +116,14 @@ function renderOfficialArticle(
 }
 
 describe("official Win Streak fixture refresh", () => {
-  it("parses official article markup and normalizes the published team alias", () => {
+  it("parses official article markup and normalizes the published team aliases", () => {
     const html = `
       <article>
         <p><strong>Sunday 25 October 2026</strong><br />
           14:00 GMT Crystal Palace v Newcastle (Sky Sports)*<br />
-          Hull City v Brentford
+          Hull City v Brentford<br />
+          16:30 GMT Man Utd v Nott&#039;m Forest (Sky Sports)<br />
+          19:30 Spurs v Brighton (Sky Sports)
         </p>
       </article>
     `;
@@ -141,7 +143,67 @@ describe("official Win Streak fixture refresh", () => {
         localDate: "2026-10-25",
         localTime: "15:00",
       }),
+      expect.objectContaining({
+        awayTeamSlug: "nottingham-forest",
+        explicitTime: true,
+        homeTeamSlug: "manchester-united",
+        localDate: "2026-10-25",
+        localTime: "16:30",
+      }),
+      expect.objectContaining({
+        awayTeamSlug: "brighton-and-hove-albion",
+        explicitTime: true,
+        homeTeamSlug: "tottenham-hotspur",
+        localDate: "2026-10-25",
+        localTime: "19:30",
+      }),
     ]);
+  });
+
+  it("keeps only the explicit broadcast line when a stale duplicate remains", () => {
+    const html = `
+      <article>
+        <p><strong>Saturday 24 October 2026</strong><br />
+          Arsenal v Everton<br />
+          Liverpool v Brighton &amp; Hove Albion
+        </p>
+        <p><strong>Sunday 25 October 2026</strong><br />
+          14:00 GMT Liverpool v Brighton (Sky Sports)
+        </p>
+      </article>
+    `;
+
+    expect(parseOfficialFixtureArticle(html)).toEqual([
+      expect.objectContaining({
+        awayTeamSlug: "everton",
+        homeTeamSlug: "arsenal",
+        localDate: "2026-10-24",
+        sourceIndex: 0,
+      }),
+      expect.objectContaining({
+        awayTeamSlug: "brighton-and-hove-albion",
+        explicitTime: true,
+        homeTeamSlug: "liverpool",
+        localDate: "2026-10-25",
+        localTime: "14:00",
+        sourceIndex: 1,
+      }),
+    ]);
+  });
+
+  it("fails closed on duplicate lines without one explicit-time update", () => {
+    const html = `
+      <article>
+        <p><strong>Saturday 24 October 2026</strong><br />
+          Liverpool v Brighton &amp; Hove Albion<br />
+          Liverpool v Brighton
+        </p>
+      </article>
+    `;
+
+    expect(() => parseOfficialFixtureArticle(html)).toThrow(
+      /appears 2 times without one explicit-time update/u,
+    );
   });
 
   it("converts Europe/London local kickoffs across GMT and BST", () => {
@@ -164,7 +226,7 @@ describe("official Win Streak fixture refresh", () => {
     expect(canonicalFixtureSnapshot.source.fixtureListUrl).toBe(
       OFFICIAL_FIXTURE_LIST_URL,
     );
-    expect(canonicalFixtureSnapshot.source.checkedAt).toBe("2026-09-04");
+    expect(canonicalFixtureSnapshot.source.checkedAt).toBe("2026-09-12");
     expect(canonicalFixtureSnapshot.rounds).toHaveLength(37);
     expect(canonicalFixtures()).toHaveLength(370);
     expect(

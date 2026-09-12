@@ -95,9 +95,24 @@ const TEAM_SLUG_BY_OFFICIAL_NAME = new Map<string, TeamSlug>(
   PREMIER_LEAGUE_2026_27_TEAMS.map((team) => [team.displayName, team.slug]),
 );
 
-// The official article abbreviates Newcastle United once. Normalize that
-// published alias before validating the complete season schedule.
-TEAM_SLUG_BY_OFFICIAL_NAME.set("Newcastle", "newcastle-united");
+// The official article abbreviates club names on broadcast-updated lines
+// (first Newcastle, then the October/Christmas selections update). Normalize
+// every published alias before validating the complete season schedule.
+const OFFICIAL_PUBLISHED_ALIASES = [
+  ["Brighton", "brighton-and-hove-albion"],
+  ["Coventry", "coventry-city"],
+  ["Hull", "hull-city"],
+  ["Ipswich", "ipswich-town"],
+  ["Leeds", "leeds-united"],
+  ["Man City", "manchester-city"],
+  ["Man Utd", "manchester-united"],
+  ["Newcastle", "newcastle-united"],
+  ["Nott'm Forest", "nottingham-forest"],
+  ["Spurs", "tottenham-hotspur"],
+] as const satisfies readonly (readonly [string, TeamSlug])[];
+for (const [publishedName, slug] of OFFICIAL_PUBLISHED_ALIASES) {
+  TEAM_SLUG_BY_OFFICIAL_NAME.set(publishedName, slug);
+}
 
 const TEAM_SLUG_SET = new Set<TeamSlug>(
   PREMIER_LEAGUE_2026_27_TEAMS.map((team) => team.slug),
@@ -230,6 +245,56 @@ function parseFixtureLine(
   };
 }
 
+/**
+ * A broadcast-selection update can move a fixture to a new day while the
+ * article keeps the stale default-time line (observed for Liverpool v
+ * Brighton, 24 -> 25 October 2026). When one directed pairing appears twice
+ * and exactly one line carries an explicit kickoff time, keep the explicit
+ * broadcast line and drop the stale default-time leftover. Every other
+ * duplicate shape stays ambiguous and fails closed.
+ */
+function resolveSupersededFixtureLines(
+  fixtures: readonly ParsedOfficialFixture[],
+): readonly ParsedOfficialFixture[] {
+  const indexesByPairing = new Map<string, number[]>();
+  fixtures.forEach((fixture, index) => {
+    const pairing = `${fixture.homeTeamSlug}:${fixture.awayTeamSlug}`;
+    const existing = indexesByPairing.get(pairing);
+    if (existing) {
+      existing.push(index);
+    } else {
+      indexesByPairing.set(pairing, [index]);
+    }
+  });
+
+  const supersededIndexes = new Set<number>();
+  for (const [pairing, indexes] of indexesByPairing) {
+    if (indexes.length === 1) {
+      continue;
+    }
+    const explicitIndexes = indexes.filter(
+      (index) => fixtures[index]?.explicitTime,
+    );
+    if (indexes.length !== 2 || explicitIndexes.length !== 1) {
+      fail(
+        `directed pairing ${pairing} appears ${indexes.length} times without one explicit-time update.`,
+      );
+    }
+    for (const index of indexes) {
+      if (!fixtures[index]?.explicitTime) {
+        supersededIndexes.add(index);
+      }
+    }
+  }
+
+  if (supersededIndexes.size === 0) {
+    return fixtures;
+  }
+  return fixtures
+    .filter((_, index) => !supersededIndexes.has(index))
+    .map((fixture, sourceIndex) => ({ ...fixture, sourceIndex }));
+}
+
 export function parseOfficialFixtureArticle(
   html: string,
 ): readonly ParsedOfficialFixture[] {
@@ -265,7 +330,7 @@ export function parseOfficialFixtureArticle(
     }
   }
 
-  return fixtures;
+  return resolveSupersededFixtureLines(fixtures);
 }
 
 function localDateTimePartsAtUtc(utcMilliseconds: number) {

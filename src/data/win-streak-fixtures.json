@@ -679,16 +679,6 @@
           "timeBasis": "weekend-default"
         },
         {
-          "awayTeamSlug": "brighton-and-hove-albion",
-          "homeTeamSlug": "liverpool",
-          "id": "2026-27-mw08-liverpool-brighton-and-hove-albion",
-          "kickoffAt": "2026-10-24T14:00:00.000Z",
-          "localDate": "2026-10-24",
-          "localTime": "15:00",
-          "matchweek": 8,
-          "timeBasis": "weekend-default"
-        },
-        {
           "awayTeamSlug": "tottenham-hotspur",
           "homeTeamSlug": "chelsea",
           "id": "2026-27-mw08-chelsea-tottenham-hotspur",
@@ -702,6 +692,16 @@
           "awayTeamSlug": "newcastle-united",
           "homeTeamSlug": "crystal-palace",
           "id": "2026-27-mw08-crystal-palace-newcastle-united",
+          "kickoffAt": "2026-10-25T14:00:00.000Z",
+          "localDate": "2026-10-25",
+          "localTime": "14:00",
+          "matchweek": 8,
+          "timeBasis": "explicit"
+        },
+        {
+          "awayTeamSlug": "brighton-and-hove-albion",
+          "homeTeamSlug": "liverpool",
+          "id": "2026-27-mw08-liverpool-brighton-and-hove-albion",
           "kickoffAt": "2026-10-25T14:00:00.000Z",
           "localDate": "2026-10-25",
           "localTime": "14:00",
@@ -1587,31 +1587,11 @@
           "awayTeamSlug": "leeds-united",
           "homeTeamSlug": "aston-villa",
           "id": "2026-27-mw17-aston-villa-leeds-united",
-          "kickoffAt": "2026-12-26T15:00:00.000Z",
+          "kickoffAt": "2026-12-26T12:30:00.000Z",
           "localDate": "2026-12-26",
-          "localTime": "15:00",
+          "localTime": "12:30",
           "matchweek": 17,
-          "timeBasis": "weekend-default"
-        },
-        {
-          "awayTeamSlug": "chelsea",
-          "homeTeamSlug": "coventry-city",
-          "id": "2026-27-mw17-coventry-city-chelsea",
-          "kickoffAt": "2026-12-26T15:00:00.000Z",
-          "localDate": "2026-12-26",
-          "localTime": "15:00",
-          "matchweek": 17,
-          "timeBasis": "weekend-default"
-        },
-        {
-          "awayTeamSlug": "arsenal",
-          "homeTeamSlug": "crystal-palace",
-          "id": "2026-27-mw17-crystal-palace-arsenal",
-          "kickoffAt": "2026-12-26T15:00:00.000Z",
-          "localDate": "2026-12-26",
-          "localTime": "15:00",
-          "matchweek": 17,
-          "timeBasis": "weekend-default"
+          "timeBasis": "explicit"
         },
         {
           "awayTeamSlug": "sunderland",
@@ -1634,39 +1614,9 @@
           "timeBasis": "weekend-default"
         },
         {
-          "awayTeamSlug": "liverpool",
-          "homeTeamSlug": "hull-city",
-          "id": "2026-27-mw17-hull-city-liverpool",
-          "kickoffAt": "2026-12-26T15:00:00.000Z",
-          "localDate": "2026-12-26",
-          "localTime": "15:00",
-          "matchweek": 17,
-          "timeBasis": "weekend-default"
-        },
-        {
           "awayTeamSlug": "brentford",
           "homeTeamSlug": "ipswich-town",
           "id": "2026-27-mw17-ipswich-town-brentford",
-          "kickoffAt": "2026-12-26T15:00:00.000Z",
-          "localDate": "2026-12-26",
-          "localTime": "15:00",
-          "matchweek": 17,
-          "timeBasis": "weekend-default"
-        },
-        {
-          "awayTeamSlug": "nottingham-forest",
-          "homeTeamSlug": "manchester-united",
-          "id": "2026-27-mw17-manchester-united-nottingham-forest",
-          "kickoffAt": "2026-12-26T15:00:00.000Z",
-          "localDate": "2026-12-26",
-          "localTime": "15:00",
-          "matchweek": 17,
-          "timeBasis": "weekend-default"
-        },
-        {
-          "awayTeamSlug": "manchester-city",
-          "homeTeamSlug": "newcastle-united",
-          "id": "2026-27-mw17-newcastle-united-manchester-city",
           "kickoffAt": "2026-12-26T15:00:00.000Z",
           "localDate": "2026-12-26",
           "localTime": "15:00",
@@ -1682,6 +1632,56 @@
           "localTime": "15:00",
           "matchweek": 17,
           "timeBasis": "weekend-default"
+        },
+        {
+          "awayTeamSlug": "liverpool",
+          "homeTeamSlug": "hull-city",
+          "id": "2026-27-mw17-hull-city-liverpool",
+          "kickoffAt": "2026-12-26T17:30:00.000Z",
+          "localDate": "2026-12-26",
+          "localTime": "17:30",
+          "matchweek": 17,
+          "timeBasis": "explicit"
+        },
+        {
+          "awayTeamSlug": "manchester-city",
+          "homeTeamSlug": "newcastle-united",
+          "id": "2026-27-mw17-newcastle-united-manchester-city",
+          "kickoffAt": "2026-12-26T20:00:00.000Z",
+          "localDate": "2026-12-26",
+          "localTime": "20:00",
+          "matchweek": 17,
+          "timeBasis": "explicit"
+        },
+        {
+          "awayTeamSlug": "chelsea",
+          "homeTeamSlug": "coventry-city",
+          "id": "2026-27-mw17-coventry-city-chelsea",
+          "kickoffAt": "2026-12-27T14:00:00.000Z",
+          "localDate": "2026-12-27",
+          "localTime": "14:00",
+          "matchweek": 17,
+          "timeBasis": "explicit"
+        },
+        {
+          "awayTeamSlug": "nottingham-forest",
+          "homeTeamSlug": "manchester-united",
+          "id": "2026-27-mw17-manchester-united-nottingham-forest",
+          "kickoffAt": "2026-12-27T16:30:00.000Z",
+          "localDate": "2026-12-27",
+          "localTime": "16:30",
+          "matchweek": 17,
+          "timeBasis": "explicit"
+        },
+        {
+          "awayTeamSlug": "arsenal",
+          "homeTeamSlug": "crystal-palace",
+          "id": "2026-27-mw17-crystal-palace-arsenal",
+          "kickoffAt": "2026-12-27T19:00:00.000Z",
+          "localDate": "2026-12-27",
+          "localTime": "19:00",
+          "matchweek": 17,
+          "timeBasis": "explicit"
         }
       ],
       "matchweek": 17
@@ -1689,92 +1689,12 @@
     {
       "fixtures": [
         {
-          "awayTeamSlug": "liverpool",
-          "homeTeamSlug": "aston-villa",
-          "id": "2026-27-mw18-aston-villa-liverpool",
-          "kickoffAt": "2026-12-30T20:00:00.000Z",
-          "localDate": "2026-12-30",
-          "localTime": "20:00",
-          "matchweek": 18,
-          "timeBasis": "explicit"
-        },
-        {
-          "awayTeamSlug": "brentford",
-          "homeTeamSlug": "coventry-city",
-          "id": "2026-27-mw18-coventry-city-brentford",
-          "kickoffAt": "2026-12-30T20:00:00.000Z",
-          "localDate": "2026-12-30",
-          "localTime": "20:00",
-          "matchweek": 18,
-          "timeBasis": "explicit"
-        },
-        {
-          "awayTeamSlug": "afc-bournemouth",
-          "homeTeamSlug": "crystal-palace",
-          "id": "2026-27-mw18-crystal-palace-afc-bournemouth",
-          "kickoffAt": "2026-12-30T20:00:00.000Z",
-          "localDate": "2026-12-30",
-          "localTime": "20:00",
-          "matchweek": 18,
-          "timeBasis": "explicit"
-        },
-        {
-          "awayTeamSlug": "manchester-city",
-          "homeTeamSlug": "everton",
-          "id": "2026-27-mw18-everton-manchester-city",
-          "kickoffAt": "2026-12-30T20:00:00.000Z",
-          "localDate": "2026-12-30",
-          "localTime": "20:00",
-          "matchweek": 18,
-          "timeBasis": "explicit"
-        },
-        {
-          "awayTeamSlug": "arsenal",
-          "homeTeamSlug": "fulham",
-          "id": "2026-27-mw18-fulham-arsenal",
-          "kickoffAt": "2026-12-30T20:00:00.000Z",
-          "localDate": "2026-12-30",
-          "localTime": "20:00",
-          "matchweek": 18,
-          "timeBasis": "explicit"
-        },
-        {
           "awayTeamSlug": "leeds-united",
           "homeTeamSlug": "hull-city",
           "id": "2026-27-mw18-hull-city-leeds-united",
-          "kickoffAt": "2026-12-30T20:00:00.000Z",
-          "localDate": "2026-12-30",
-          "localTime": "20:00",
-          "matchweek": 18,
-          "timeBasis": "explicit"
-        },
-        {
-          "awayTeamSlug": "chelsea",
-          "homeTeamSlug": "ipswich-town",
-          "id": "2026-27-mw18-ipswich-town-chelsea",
-          "kickoffAt": "2026-12-30T20:00:00.000Z",
-          "localDate": "2026-12-30",
-          "localTime": "20:00",
-          "matchweek": 18,
-          "timeBasis": "explicit"
-        },
-        {
-          "awayTeamSlug": "sunderland",
-          "homeTeamSlug": "manchester-united",
-          "id": "2026-27-mw18-manchester-united-sunderland",
-          "kickoffAt": "2026-12-30T20:00:00.000Z",
-          "localDate": "2026-12-30",
-          "localTime": "20:00",
-          "matchweek": 18,
-          "timeBasis": "explicit"
-        },
-        {
-          "awayTeamSlug": "nottingham-forest",
-          "homeTeamSlug": "newcastle-united",
-          "id": "2026-27-mw18-newcastle-united-nottingham-forest",
-          "kickoffAt": "2026-12-30T20:00:00.000Z",
-          "localDate": "2026-12-30",
-          "localTime": "20:00",
+          "kickoffAt": "2026-12-29T19:30:00.000Z",
+          "localDate": "2026-12-29",
+          "localTime": "19:30",
           "matchweek": 18,
           "timeBasis": "explicit"
         },
@@ -1782,9 +1702,89 @@
           "awayTeamSlug": "brighton-and-hove-albion",
           "homeTeamSlug": "tottenham-hotspur",
           "id": "2026-27-mw18-tottenham-hotspur-brighton-and-hove-albion",
-          "kickoffAt": "2026-12-30T20:00:00.000Z",
+          "kickoffAt": "2026-12-29T19:30:00.000Z",
+          "localDate": "2026-12-29",
+          "localTime": "19:30",
+          "matchweek": 18,
+          "timeBasis": "explicit"
+        },
+        {
+          "awayTeamSlug": "manchester-city",
+          "homeTeamSlug": "everton",
+          "id": "2026-27-mw18-everton-manchester-city",
+          "kickoffAt": "2026-12-29T20:15:00.000Z",
+          "localDate": "2026-12-29",
+          "localTime": "20:15",
+          "matchweek": 18,
+          "timeBasis": "explicit"
+        },
+        {
+          "awayTeamSlug": "brentford",
+          "homeTeamSlug": "coventry-city",
+          "id": "2026-27-mw18-coventry-city-brentford",
+          "kickoffAt": "2026-12-30T19:30:00.000Z",
           "localDate": "2026-12-30",
-          "localTime": "20:00",
+          "localTime": "19:30",
+          "matchweek": 18,
+          "timeBasis": "explicit"
+        },
+        {
+          "awayTeamSlug": "afc-bournemouth",
+          "homeTeamSlug": "crystal-palace",
+          "id": "2026-27-mw18-crystal-palace-afc-bournemouth",
+          "kickoffAt": "2026-12-30T19:30:00.000Z",
+          "localDate": "2026-12-30",
+          "localTime": "19:30",
+          "matchweek": 18,
+          "timeBasis": "explicit"
+        },
+        {
+          "awayTeamSlug": "arsenal",
+          "homeTeamSlug": "fulham",
+          "id": "2026-27-mw18-fulham-arsenal",
+          "kickoffAt": "2026-12-30T19:30:00.000Z",
+          "localDate": "2026-12-30",
+          "localTime": "19:30",
+          "matchweek": 18,
+          "timeBasis": "explicit"
+        },
+        {
+          "awayTeamSlug": "sunderland",
+          "homeTeamSlug": "manchester-united",
+          "id": "2026-27-mw18-manchester-united-sunderland",
+          "kickoffAt": "2026-12-30T19:30:00.000Z",
+          "localDate": "2026-12-30",
+          "localTime": "19:30",
+          "matchweek": 18,
+          "timeBasis": "explicit"
+        },
+        {
+          "awayTeamSlug": "nottingham-forest",
+          "homeTeamSlug": "newcastle-united",
+          "id": "2026-27-mw18-newcastle-united-nottingham-forest",
+          "kickoffAt": "2026-12-30T19:30:00.000Z",
+          "localDate": "2026-12-30",
+          "localTime": "19:30",
+          "matchweek": 18,
+          "timeBasis": "explicit"
+        },
+        {
+          "awayTeamSlug": "liverpool",
+          "homeTeamSlug": "aston-villa",
+          "id": "2026-27-mw18-aston-villa-liverpool",
+          "kickoffAt": "2026-12-30T20:15:00.000Z",
+          "localDate": "2026-12-30",
+          "localTime": "20:15",
+          "matchweek": 18,
+          "timeBasis": "explicit"
+        },
+        {
+          "awayTeamSlug": "chelsea",
+          "homeTeamSlug": "ipswich-town",
+          "id": "2026-27-mw18-ipswich-town-chelsea",
+          "kickoffAt": "2026-12-30T20:15:00.000Z",
+          "localDate": "2026-12-30",
+          "localTime": "20:15",
           "matchweek": 18,
           "timeBasis": "explicit"
         }
@@ -1794,14 +1794,24 @@
     {
       "fixtures": [
         {
-          "awayTeamSlug": "aston-villa",
-          "homeTeamSlug": "afc-bournemouth",
-          "id": "2026-27-mw19-afc-bournemouth-aston-villa",
-          "kickoffAt": "2027-01-02T15:00:00.000Z",
-          "localDate": "2027-01-02",
-          "localTime": "15:00",
+          "awayTeamSlug": "everton",
+          "homeTeamSlug": "leeds-united",
+          "id": "2026-27-mw19-leeds-united-everton",
+          "kickoffAt": "2027-01-01T20:00:00.000Z",
+          "localDate": "2027-01-01",
+          "localTime": "20:00",
           "matchweek": 19,
-          "timeBasis": "weekend-default"
+          "timeBasis": "explicit"
+        },
+        {
+          "awayTeamSlug": "manchester-united",
+          "homeTeamSlug": "brighton-and-hove-albion",
+          "id": "2026-27-mw19-brighton-and-hove-albion-manchester-united",
+          "kickoffAt": "2027-01-02T12:30:00.000Z",
+          "localDate": "2027-01-02",
+          "localTime": "12:30",
+          "matchweek": 19,
+          "timeBasis": "explicit"
         },
         {
           "awayTeamSlug": "ipswich-town",
@@ -1824,49 +1834,9 @@
           "timeBasis": "weekend-default"
         },
         {
-          "awayTeamSlug": "manchester-united",
-          "homeTeamSlug": "brighton-and-hove-albion",
-          "id": "2026-27-mw19-brighton-and-hove-albion-manchester-united",
-          "kickoffAt": "2027-01-02T15:00:00.000Z",
-          "localDate": "2027-01-02",
-          "localTime": "15:00",
-          "matchweek": 19,
-          "timeBasis": "weekend-default"
-        },
-        {
-          "awayTeamSlug": "newcastle-united",
-          "homeTeamSlug": "chelsea",
-          "id": "2026-27-mw19-chelsea-newcastle-united",
-          "kickoffAt": "2027-01-02T15:00:00.000Z",
-          "localDate": "2027-01-02",
-          "localTime": "15:00",
-          "matchweek": 19,
-          "timeBasis": "weekend-default"
-        },
-        {
-          "awayTeamSlug": "everton",
-          "homeTeamSlug": "leeds-united",
-          "id": "2026-27-mw19-leeds-united-everton",
-          "kickoffAt": "2027-01-02T15:00:00.000Z",
-          "localDate": "2027-01-02",
-          "localTime": "15:00",
-          "matchweek": 19,
-          "timeBasis": "weekend-default"
-        },
-        {
           "awayTeamSlug": "coventry-city",
           "homeTeamSlug": "liverpool",
           "id": "2026-27-mw19-liverpool-coventry-city",
-          "kickoffAt": "2027-01-02T15:00:00.000Z",
-          "localDate": "2027-01-02",
-          "localTime": "15:00",
-          "matchweek": 19,
-          "timeBasis": "weekend-default"
-        },
-        {
-          "awayTeamSlug": "tottenham-hotspur",
-          "homeTeamSlug": "manchester-city",
-          "id": "2026-27-mw19-manchester-city-tottenham-hotspur",
           "kickoffAt": "2027-01-02T15:00:00.000Z",
           "localDate": "2027-01-02",
           "localTime": "15:00",
@@ -1892,6 +1862,36 @@
           "localTime": "15:00",
           "matchweek": 19,
           "timeBasis": "weekend-default"
+        },
+        {
+          "awayTeamSlug": "aston-villa",
+          "homeTeamSlug": "afc-bournemouth",
+          "id": "2026-27-mw19-afc-bournemouth-aston-villa",
+          "kickoffAt": "2027-01-02T17:30:00.000Z",
+          "localDate": "2027-01-02",
+          "localTime": "17:30",
+          "matchweek": 19,
+          "timeBasis": "explicit"
+        },
+        {
+          "awayTeamSlug": "newcastle-united",
+          "homeTeamSlug": "chelsea",
+          "id": "2026-27-mw19-chelsea-newcastle-united",
+          "kickoffAt": "2027-01-03T14:00:00.000Z",
+          "localDate": "2027-01-03",
+          "localTime": "14:00",
+          "matchweek": 19,
+          "timeBasis": "explicit"
+        },
+        {
+          "awayTeamSlug": "tottenham-hotspur",
+          "homeTeamSlug": "manchester-city",
+          "id": "2026-27-mw19-manchester-city-tottenham-hotspur",
+          "kickoffAt": "2027-01-03T16:30:00.000Z",
+          "localDate": "2027-01-03",
+          "localTime": "16:30",
+          "matchweek": 19,
+          "timeBasis": "explicit"
         }
       ],
       "matchweek": 19
@@ -1902,9 +1902,9 @@
           "awayTeamSlug": "brentford",
           "homeTeamSlug": "arsenal",
           "id": "2026-27-mw20-arsenal-brentford",
-          "kickoffAt": "2027-01-06T20:00:00.000Z",
-          "localDate": "2027-01-06",
-          "localTime": "20:00",
+          "kickoffAt": "2027-01-05T19:30:00.000Z",
+          "localDate": "2027-01-05",
+          "localTime": "19:30",
           "matchweek": 20,
           "timeBasis": "explicit"
         },
@@ -1912,19 +1912,9 @@
           "awayTeamSlug": "afc-bournemouth",
           "homeTeamSlug": "brighton-and-hove-albion",
           "id": "2026-27-mw20-brighton-and-hove-albion-afc-bournemouth",
-          "kickoffAt": "2027-01-06T20:00:00.000Z",
-          "localDate": "2027-01-06",
-          "localTime": "20:00",
-          "matchweek": 20,
-          "timeBasis": "explicit"
-        },
-        {
-          "awayTeamSlug": "chelsea",
-          "homeTeamSlug": "crystal-palace",
-          "id": "2026-27-mw20-crystal-palace-chelsea",
-          "kickoffAt": "2027-01-06T20:00:00.000Z",
-          "localDate": "2027-01-06",
-          "localTime": "20:00",
+          "kickoffAt": "2027-01-05T19:30:00.000Z",
+          "localDate": "2027-01-05",
+          "localTime": "19:30",
           "matchweek": 20,
           "timeBasis": "explicit"
         },
@@ -1932,49 +1922,9 @@
           "awayTeamSlug": "aston-villa",
           "homeTeamSlug": "everton",
           "id": "2026-27-mw20-everton-aston-villa",
-          "kickoffAt": "2027-01-06T20:00:00.000Z",
-          "localDate": "2027-01-06",
-          "localTime": "20:00",
-          "matchweek": 20,
-          "timeBasis": "explicit"
-        },
-        {
-          "awayTeamSlug": "tottenham-hotspur",
-          "homeTeamSlug": "fulham",
-          "id": "2026-27-mw20-fulham-tottenham-hotspur",
-          "kickoffAt": "2027-01-06T20:00:00.000Z",
-          "localDate": "2027-01-06",
-          "localTime": "20:00",
-          "matchweek": 20,
-          "timeBasis": "explicit"
-        },
-        {
-          "awayTeamSlug": "coventry-city",
-          "homeTeamSlug": "ipswich-town",
-          "id": "2026-27-mw20-ipswich-town-coventry-city",
-          "kickoffAt": "2027-01-06T20:00:00.000Z",
-          "localDate": "2027-01-06",
-          "localTime": "20:00",
-          "matchweek": 20,
-          "timeBasis": "explicit"
-        },
-        {
-          "awayTeamSlug": "manchester-city",
-          "homeTeamSlug": "leeds-united",
-          "id": "2026-27-mw20-leeds-united-manchester-city",
-          "kickoffAt": "2027-01-06T20:00:00.000Z",
-          "localDate": "2027-01-06",
-          "localTime": "20:00",
-          "matchweek": 20,
-          "timeBasis": "explicit"
-        },
-        {
-          "awayTeamSlug": "newcastle-united",
-          "homeTeamSlug": "manchester-united",
-          "id": "2026-27-mw20-manchester-united-newcastle-united",
-          "kickoffAt": "2027-01-06T20:00:00.000Z",
-          "localDate": "2027-01-06",
-          "localTime": "20:00",
+          "kickoffAt": "2027-01-05T19:30:00.000Z",
+          "localDate": "2027-01-05",
+          "localTime": "19:30",
           "matchweek": 20,
           "timeBasis": "explicit"
         },
@@ -1982,9 +1932,9 @@
           "awayTeamSlug": "hull-city",
           "homeTeamSlug": "nottingham-forest",
           "id": "2026-27-mw20-nottingham-forest-hull-city",
-          "kickoffAt": "2027-01-06T20:00:00.000Z",
-          "localDate": "2027-01-06",
-          "localTime": "20:00",
+          "kickoffAt": "2027-01-05T19:30:00.000Z",
+          "localDate": "2027-01-05",
+          "localTime": "19:30",
           "matchweek": 20,
           "timeBasis": "explicit"
         },
@@ -1992,8 +1942,58 @@
           "awayTeamSlug": "liverpool",
           "homeTeamSlug": "sunderland",
           "id": "2026-27-mw20-sunderland-liverpool",
-          "kickoffAt": "2027-01-06T20:00:00.000Z",
+          "kickoffAt": "2027-01-05T20:15:00.000Z",
+          "localDate": "2027-01-05",
+          "localTime": "20:15",
+          "matchweek": 20,
+          "timeBasis": "explicit"
+        },
+        {
+          "awayTeamSlug": "chelsea",
+          "homeTeamSlug": "crystal-palace",
+          "id": "2026-27-mw20-crystal-palace-chelsea",
+          "kickoffAt": "2027-01-06T19:30:00.000Z",
           "localDate": "2027-01-06",
+          "localTime": "19:30",
+          "matchweek": 20,
+          "timeBasis": "explicit"
+        },
+        {
+          "awayTeamSlug": "tottenham-hotspur",
+          "homeTeamSlug": "fulham",
+          "id": "2026-27-mw20-fulham-tottenham-hotspur",
+          "kickoffAt": "2027-01-06T19:30:00.000Z",
+          "localDate": "2027-01-06",
+          "localTime": "19:30",
+          "matchweek": 20,
+          "timeBasis": "explicit"
+        },
+        {
+          "awayTeamSlug": "coventry-city",
+          "homeTeamSlug": "ipswich-town",
+          "id": "2026-27-mw20-ipswich-town-coventry-city",
+          "kickoffAt": "2027-01-06T19:30:00.000Z",
+          "localDate": "2027-01-06",
+          "localTime": "19:30",
+          "matchweek": 20,
+          "timeBasis": "explicit"
+        },
+        {
+          "awayTeamSlug": "manchester-city",
+          "homeTeamSlug": "leeds-united",
+          "id": "2026-27-mw20-leeds-united-manchester-city",
+          "kickoffAt": "2027-01-06T20:15:00.000Z",
+          "localDate": "2027-01-06",
+          "localTime": "20:15",
+          "matchweek": 20,
+          "timeBasis": "explicit"
+        },
+        {
+          "awayTeamSlug": "newcastle-united",
+          "homeTeamSlug": "manchester-united",
+          "id": "2026-27-mw20-manchester-united-newcastle-united",
+          "kickoffAt": "2027-01-07T20:00:00.000Z",
+          "localDate": "2027-01-07",
           "localTime": "20:00",
           "matchweek": 20,
           "timeBasis": "explicit"
@@ -3895,10 +3895,10 @@
   "schemaVersion": 1,
   "season": "2026/27",
   "source": {
-    "checkedAt": "2026-09-04",
+    "checkedAt": "2026-09-12",
     "finalMatchweekTimingUrl": "https://www.premierleague.com/en/news/4675508/premier-league-fixture-schedule-released-for-season-202627",
     "fixtureListUrl": "https://www.premierleague.com/en/news/4675097",
-    "normalizedFixtureSha256": "4234ac0bafe0076acaaee1839fa20cadacfccae748b3a601b604b7e22550ce19",
+    "normalizedFixtureSha256": "6b9db92aeb0b477145395f019b8a13c0f328a1bc2817e0be9988a52aa1652551",
     "subjectToChange": true
   },
   "timeZone": "Europe/London"

@@ -717,13 +717,6 @@ html {
 .entry-comparison > li + li {
   border-top: 1px solid var(--border);
 }
-.entry-comparison > li > div {
-  border: 0;
-  border-radius: 0;
-}
-.entry-comparison > li > div > div {
-  padding: 0.75rem;
-}
 
 .mobile-tab-bar {
   position: fixed;

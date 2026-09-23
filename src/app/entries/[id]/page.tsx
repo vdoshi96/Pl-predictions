@@ -3,13 +3,18 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
+import { LeagueTime } from "@/components/league-time";
+import { SnapshotStatus } from "@/components/snapshot-status";
 import { PageHeading } from "@/components/page-heading";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
-import { TeamMark } from "@/components/team-mark";
+import { EntryComparePicker } from "@/features/entries/entry-compare-picker";
+import { EntryComparisonTable } from "@/features/entries/entry-comparison-table";
+import { EntryPager } from "@/features/entries/entry-pager";
+import { findAdjacentEntries } from "@/features/entries/navigation";
+import { getLeaderboardView } from "@/features/leaderboard/queries";
 import { getEntryComparison } from "@/features/entries/queries";
 import { SpotlightPickGrid } from "@/features/leaderboard/spotlight-pick-grid";
-import { formatChicagoUtcDateTime, ordinal } from "@/shared/format";
 
 export const dynamic = "force-dynamic";
 
@@ -22,24 +27,38 @@ export async function generateMetadata({
     : { title: "Prediction unavailable" };
 }
 
-const tierPresentation = {
-  exact: { label: "Exact", className: "bg-mint text-mint-ink" },
-  "within-three": {
-    label: "Within 3",
-    className: "bg-sky-soft text-brand-ink",
-  },
-  "correct-half": {
-    label: "Correct half",
-    className: "bg-rose-soft text-rose-ink",
-  },
-  miss: { label: "No points", className: "bg-surface-subtle text-muted" },
-} as const;
-
 export default async function EntryPage({
   params,
+  searchParams,
 }: PageProps<"/entries/[id]">) {
-  const entry = await getEntryComparison((await params).id);
+  const [{ id }, query] = await Promise.all([params, searchParams]);
+  const entry = await getEntryComparison(id);
   if (!entry) notFound();
+  const board = entry.predictionsRevealed ? await getLeaderboardView() : null;
+  const boardEntries: readonly { id: string | null; participantName: string }[] =
+    board ? (board.scoredEntries ?? board.entries) : [];
+  const ordered = boardEntries.flatMap((candidate) =>
+    candidate.id
+      ? [{ id: candidate.id, participantName: candidate.participantName }]
+      : [],
+  );
+  const navigation = findAdjacentEntries(ordered, entry.id);
+  const compareId = typeof query.compare === "string" ? query.compare : null;
+  const compareEntry =
+    entry.predictionsRevealed && compareId && compareId !== entry.id
+      ? await getEntryComparison(compareId)
+      : null;
+  const compare = compareEntry?.predictionsRevealed
+    ? {
+        participantName: compareEntry.participantName,
+        positions: Object.fromEntries(
+          compareEntry.comparisonItems.map((item) => [
+            item.teamId,
+            item.predictedPosition,
+          ]),
+        ),
+      }
+    : null;
   const availableSpotlightCount = entry.spotlightPicks.filter(
     (pick) => pick.accuracyPoints !== null && pick.accuracyPoints !== undefined,
   ).length;
@@ -56,18 +75,12 @@ export default async function EntryPage({
             </Badge>
           }
         >
-          <span>Submitted {formatChicagoUtcDateTime(entry.createdAt)}</span>
+          <LeagueTime prefix="Submitted" value={entry.createdAt} />
           {entry.snapshot ? (
-            <Badge variant={entry.snapshot.isFinal ? "success" : "warning"}>
-              {entry.snapshot.isFinal ? "Final" : "Provisional"}
-            </Badge>
-          ) : null}
-          {entry.totalScore !== null ? (
-            <strong className="text-brand-ink text-xl">
-              {entry.totalScore} / 100 table points
-            </strong>
+            <SnapshotStatus isFinal={entry.snapshot.isFinal} />
           ) : null}
         </PageHeading>
+        {navigation ? <EntryPager navigation={navigation} /> : null}
         {!entry.predictionsRevealed && entry.isOwnerReceipt ? (
           <Card>
             <CardContent className="flex items-start gap-3">
@@ -94,8 +107,7 @@ export default async function EntryPage({
           <p className="text-muted flex min-w-0 items-center gap-2 text-xs font-semibold">
             <Eye aria-hidden="true" className="size-4 shrink-0" />
             <span className="min-w-0 break-words">
-              Standings snapshot{" "}
-              {formatChicagoUtcDateTime(entry.snapshot.capturedAt)}
+              <LeagueTime prefix="Standings from" value={entry.snapshot.capturedAt} />
               {entry.snapshot.matchweek
                 ? ` · Matchweek ${entry.snapshot.matchweek}`
                 : ""}
@@ -108,66 +120,19 @@ export default async function EntryPage({
           </p>
         )}
 
-        <ol
-          className="entry-comparison"
-          aria-label={`${entry.participantName}'s predicted table`}
-        >
-          {entry.comparisonItems.map((item) => {
-            const tier = item.tier ? tierPresentation[item.tier] : null;
-            return (
-              <li key={item.teamId}>
-                <Card>
-                  <CardContent className="grid grid-cols-[auto_auto_1fr] items-center gap-3 py-3 sm:grid-cols-[3rem_3rem_1fr_7rem_6rem_7rem]">
-                    <span
-                      className="bg-brand grid size-10 place-items-center rounded-xl font-mono text-sm font-black text-white"
-                      aria-label={`Predicted ${ordinal(item.predictedPosition)}`}
-                    >
-                      {item.predictedPosition}
-                    </span>
-                    <TeamMark
-                      initials={item.shortName}
-                      name={item.displayName}
-                      size="md"
-                      src={item.assetPath}
-                    />
-                    <span className="text-foreground min-w-0 font-black [overflow-wrap:anywhere] sm:truncate">
-                      {item.displayName}
-                    </span>
-                    <div className="col-start-1 text-center sm:col-start-auto">
-                      <span className="text-muted block text-[0.64rem] font-bold tracking-wide uppercase">
-                        Actual
-                      </span>
-                      <strong className="text-foreground font-mono text-sm">
-                        {item.actualPosition ?? "—"}
-                      </strong>
-                    </div>
-                    <div className="text-center">
-                      <span className="text-muted block text-[0.64rem] font-bold tracking-wide uppercase">
-                        Difference
-                      </span>
-                      <strong className="text-foreground font-mono text-sm">
-                        {item.difference ?? "—"}
-                      </strong>
-                    </div>
-                    <div className="text-right">
-                      {tier ? (
-                        <span
-                          className={`inline-flex min-h-8 items-center rounded-lg px-2.5 text-xs font-black ${tier.className}`}
-                        >
-                          {item.points} · {tier.label}
-                        </span>
-                      ) : (
-                        <span className="text-muted text-sm font-bold">
-                          Not scored
-                        </span>
-                      )}
-                    </div>
-                  </CardContent>
-                </Card>
-              </li>
-            );
-          })}
-        </ol>
+        {entry.predictionsRevealed && ordered.length > 1 ? (
+          <EntryComparePicker
+            activeCompareId={compare ? compareId : null}
+            entryId={entry.id}
+            others={ordered.filter((other) => other.id !== entry.id)}
+          />
+        ) : null}
+        <EntryComparisonTable
+          compare={compare}
+          items={entry.comparisonItems}
+          participantName={entry.participantName}
+          totalScore={entry.totalScore}
+        />
 
         <Card>
           <CardContent>

@@ -1,11 +1,12 @@
 import { Clock3 } from "lucide-react";
 import Link from "next/link";
 
+import { LeagueTime } from "@/components/league-time";
+import { SnapshotStatus } from "@/components/snapshot-status";
 import { PageHeading } from "@/components/page-heading";
 import { TeamMark } from "@/components/team-mark";
-import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
-import { formatChicagoUtcDateTime, ordinal } from "@/shared/format";
+import { ordinal } from "@/shared/format";
 
 import { getSeasonTableView, type SeasonTableView } from "./season-table";
 import { formatConsensusValue } from "./season-table-view";
@@ -22,31 +23,39 @@ function zoneFor(position: number): {
   return { className: "bg-transparent", label: "No qualification zone" };
 }
 
+export const SEASON_TABLE_ZONES = [
+  { className: "bg-accent", label: "Champions League" },
+  { className: "bg-accent-blue", label: "Europa League" },
+  { className: "bg-accent-pink", label: "Relegation" },
+] as const;
+
 function DeltaChip({ delta }: { delta: number | null }) {
   if (delta === null) {
     return <span className="text-muted text-sm font-bold">—</span>;
   }
   const roundedDelta = Number(formatConsensusValue(delta));
   const magnitude = Math.abs(roundedDelta);
-  const neutral = roundedDelta === 0;
-  const positive = roundedDelta > 0;
-  const band = neutral
-    ? "neutral"
-    : magnitude >= 6
-      ? "far"
-      : magnitude >= 1
+  const direction =
+    roundedDelta === 0 ? "neutral" : roundedDelta > 0 ? "positive" : "negative";
+  const band =
+    magnitude < 1
+      ? "neutral"
+      : magnitude < 3
         ? "slight"
-        : "near";
-  const visible = `${neutral ? "‒" : positive ? "▲" : "▼"} ${formatConsensusValue(magnitude)}`;
-  const description = neutral
-    ? `${formatConsensusValue(magnitude)} places from the league's average prediction`
-    : `${positive ? "overachieving" : "underachieving"} by ${formatConsensusValue(magnitude)} places vs the league's average prediction`;
+        : magnitude < 8
+          ? "clear"
+          : "far";
+  const visible = `${direction === "neutral" ? "‒" : direction === "positive" ? "▲" : "▼"} ${formatConsensusValue(magnitude)}`;
+  const description =
+    direction === "neutral"
+      ? `${formatConsensusValue(magnitude)} places from the league's average prediction`
+      : `${direction === "positive" ? "overachieving" : "underachieving"} by ${formatConsensusValue(magnitude)} places vs the league's average prediction`;
 
   return (
     <span
       className="consensus-delta inline-flex min-h-7 items-center rounded-lg px-2 text-xs font-black whitespace-nowrap"
-      data-direction={neutral ? "neutral" : positive ? "positive" : "negative"}
       data-band={band}
+      data-direction={direction}
     >
       <span aria-hidden="true">{visible}</span>
       <span className="sr-only">{description}</span>
@@ -81,7 +90,7 @@ function Callout({
           size="lg"
           src={value.team.assetPath}
         />
-        <strong className="min-w-0 [overflow-wrap:anywhere]">
+        <strong className="min-w-0 break-words">
           {value.team.displayName}
         </strong>
       </div>
@@ -126,17 +135,12 @@ export async function SeasonTablePage({
           description="The published league table beside what the group expected."
           status={
             view.snapshot ? (
-              <Badge variant={view.snapshot.isFinal ? "success" : "warning"}>
-                {view.snapshot.isFinal ? "Final" : "Provisional"}
-              </Badge>
+              <SnapshotStatus isFinal={view.snapshot.isFinal} />
             ) : undefined
           }
         >
-          <span>{view.seasonName}</span>
           {view.snapshot ? (
-            <span>
-              Updated {formatChicagoUtcDateTime(view.snapshot.capturedAt)}
-            </span>
+            <LeagueTime prefix="Updated" value={view.snapshot.capturedAt} />
           ) : null}
           {view.snapshot?.matchweek ? (
             <span>Matchweek {view.snapshot.matchweek}</span>
@@ -165,6 +169,20 @@ export async function SeasonTablePage({
               </Card>
             ) : (
               <>
+                <ul
+                  aria-label="Table zones"
+                  className="text-muted flex flex-wrap gap-x-4 gap-y-1 px-1 text-xs font-semibold"
+                >
+                  {SEASON_TABLE_ZONES.map((zone) => (
+                    <li className="flex items-center gap-1.5" key={zone.label}>
+                      <span
+                        aria-hidden="true"
+                        className={`block h-3 w-1 rounded-full ${zone.className}`}
+                      />
+                      {zone.label}
+                    </li>
+                  ))}
+                </ul>
                 {!view.consensusActive ? (
                   <Card className="border-accent-blue/40 bg-sky-soft">
                     <CardContent className="flex items-start gap-3">
@@ -200,13 +218,13 @@ export async function SeasonTablePage({
                     </caption>
                     <colgroup>
                       <col className="w-2" />
-                      <col className="w-9" />
+                      <col className="w-7 sm:w-9" />
                       <col />
-                      <col className="w-11" />
+                      <col className="w-8 sm:w-11" />
                       {showConsensus ? (
                         <col className="w-20 max-[479px]:hidden" />
                       ) : null}
-                      {showConsensus ? <col className="w-20" /> : null}
+                      {showConsensus ? <col className="w-[4.25rem] sm:w-20" /> : null}
                     </colgroup>
                     <thead>
                       <tr className="border-border text-muted border-b-2 text-left text-[0.62rem] font-black tracking-wider uppercase">
@@ -264,7 +282,7 @@ export async function SeasonTablePage({
                                   size="sm"
                                   src={row.team.assetPath}
                                 />
-                                <span className="min-w-0 text-xs leading-4 [overflow-wrap:anywhere] sm:text-sm">
+                                <span className="min-w-0 text-xs leading-4 break-words sm:text-sm" data-club-name>
                                   {row.team.displayName}
                                   {showConsensus ? (
                                     <span className="text-muted block text-[0.625rem] font-semibold min-[480px]:hidden">

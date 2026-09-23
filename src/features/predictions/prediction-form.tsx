@@ -1155,7 +1155,7 @@ export function PredictionForm({
 
       <div
         className={`border-border/80 bg-surface z-20 -mx-2 border-t px-2 pt-2 pb-[max(0.75rem,env(safe-area-inset-bottom))] shadow-[0_-16px_30px_-26px_rgba(55,0,60,0.6)] sm:static sm:mx-0 sm:border-0 sm:bg-transparent sm:p-0 sm:shadow-none ${
-          disabled ? "static" : "sticky bottom-0"
+          disabled ? "static" : "sticky bottom-0 max-sm:bottom-[var(--mobile-tab-bar-height,0px)]"
         } ${stage === "spotlight" && expandedSelectorCategory ? "hidden" : ""}`}
       >
         <div

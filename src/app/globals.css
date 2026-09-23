@@ -805,13 +805,6 @@ a {
   }
 }
 @media (max-width: 479px) {
-  .site-nav {
-    justify-content: space-between;
-    gap: 0.25rem;
-  }
-  .site-nav a {
-    font-size: 0.66rem;
-  }
   .podium-person {
     gap: 0.5rem;
     padding: 0.5rem;
@@ -849,4 +842,50 @@ html {
 }
 .entry-comparison > li > div > div {
   padding: 0.75rem;
+}
+
+.mobile-tab-bar {
+  position: fixed;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 40;
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  border-top: 1px solid var(--border);
+  background: var(--surface);
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+.mobile-tab-bar a {
+  display: grid;
+  min-height: 56px;
+  place-items: center;
+  align-content: center;
+  gap: 2px;
+  color: var(--muted);
+  font-size: 0.66rem;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.mobile-tab-bar a[aria-current="page"] {
+  color: var(--brand-ink);
+}
+
+.mobile-tab-bar a:focus-visible {
+  outline-offset: -3px;
+}
+
+@media (max-width: 639px) {
+  body:has(.mobile-tab-bar) {
+    --mobile-tab-bar-height: calc(56px + env(safe-area-inset-bottom));
+    padding-bottom: var(--mobile-tab-bar-height);
+  }
+}
+
+@media (min-width: 640px) {
+  .mobile-tab-bar {
+    display: none;
+  }
 }

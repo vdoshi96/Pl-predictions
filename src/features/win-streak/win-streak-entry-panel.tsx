@@ -610,7 +610,7 @@ function ProfilePanel({
               </div>
             </fieldset>
           </CardContent>
-          <CardFooter className="bg-surface/95 sticky bottom-0 z-10 pb-[max(1rem,env(safe-area-inset-bottom))] backdrop-blur sm:static">
+          <CardFooter className="bg-surface/95 sticky bottom-0 max-sm:bottom-[var(--mobile-tab-bar-height,0px)] z-10 pb-[max(1rem,env(safe-area-inset-bottom))] backdrop-blur sm:static">
             <Button
               className="w-full"
               disabled={!selectedTeamSlug}

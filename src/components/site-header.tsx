@@ -10,7 +10,7 @@ export function SiteHeader() {
         Skip to content
       </a>
       <div className="page-shell">
-        <div className="flex min-h-18 items-center justify-between gap-3">
+        <div className="flex min-h-14 items-center justify-between gap-3 sm:min-h-18">
           <Link
             href="/"
             className="flex min-h-11 min-w-0 items-center gap-2.5 rounded-lg"

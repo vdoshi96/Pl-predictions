@@ -340,7 +340,7 @@ export function SearchablePredictionSelect({
           aria-hidden={closing}
           aria-label={`${label} options`}
           className={cn(
-            "t-dropdown border-border bg-surface fixed inset-x-2 bottom-[max(0.5rem,env(safe-area-inset-bottom))] z-40 max-h-[min(22rem,52dvh)] overflow-y-auto overscroll-contain rounded-2xl border p-1.5 shadow-2xl sm:absolute sm:inset-x-0 sm:top-[calc(100%+0.35rem)] sm:bottom-auto sm:z-30 sm:max-h-72 sm:rounded-xl",
+            "t-dropdown border-border bg-surface fixed inset-x-2 bottom-[max(0.5rem,env(safe-area-inset-bottom))] z-50 max-h-[min(22rem,52dvh)] overflow-y-auto overscroll-contain rounded-2xl border p-1.5 shadow-2xl sm:absolute sm:inset-x-0 sm:top-[calc(100%+0.35rem)] sm:bottom-auto sm:z-30 sm:max-h-72 sm:rounded-xl",
             expanded ? "is-open" : "is-closing",
           )}
           data-origin="top-left"

@@ -1,0 +1,1503 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Dranx mid-season mini-games — concept pitch</title>
+    <meta
+      name="description"
+      content="Nine mid-season mini-games for Dranx Prediction League. How each one behaves, locks, scores, and stays inside the existing season rules."
+    />
+    <style>
+      :root {
+        color-scheme: dark;
+        --bg: #120314;
+        --bg-2: #1b071f;
+        --surface: #26102c;
+        --surface-2: #311638;
+        --ink: #f6eef8;
+        --muted: #c4adc9;
+        --faint: #8f7496;
+        --line: #5a3d61;
+        --brand: #37003c;
+        --cyan: #05f0ff;
+        --green: #00ff87;
+        --pink: #ff2882;
+        --lilac: #953bff;
+        --yellow: #ebff00;
+        --shadow: 0 28px 80px rgb(0 0 0 / 36%);
+        --measure: 72ch;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html {
+        scroll-behavior: smooth;
+      }
+
+      body {
+        margin: 0;
+        background:
+          radial-gradient(1200px 600px at 10% -10%, rgb(149 59 255 / 22%), transparent 55%),
+          radial-gradient(900px 500px at 110% 8%, rgb(5 240 255 / 12%), transparent 50%),
+          linear-gradient(180deg, #1a0520 0%, var(--bg) 28%, #0d0210 100%);
+        color: var(--ink);
+        font:
+          16px/1.6 ui-sans-serif,
+          system-ui,
+          -apple-system,
+          "Segoe UI",
+          sans-serif;
+      }
+
+      a {
+        color: var(--cyan);
+        text-underline-offset: 0.18em;
+      }
+
+      code {
+        font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+        font-size: 0.88em;
+        padding: 0.08em 0.38em;
+        border-radius: 0.35rem;
+        background: rgb(255 255 255 / 8%);
+      }
+
+      .wrap {
+        width: min(1120px, calc(100% - 1.5rem));
+        margin: 0 auto;
+      }
+
+      header.hero {
+        padding: 2.2rem 0 1.4rem;
+      }
+
+      .kicker {
+        display: inline-flex;
+        gap: 0.45rem;
+        align-items: center;
+        flex-wrap: wrap;
+        margin: 0 0 0.9rem;
+      }
+
+      .pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+        padding: 0.22rem 0.65rem;
+        border-radius: 999px;
+        font-size: 0.74rem;
+        font-weight: 700;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        border: 1px solid transparent;
+      }
+
+      .pill-yellow {
+        background: var(--yellow);
+        color: #1a0520;
+      }
+
+      .pill-green {
+        background: rgb(0 255 135 / 16%);
+        color: var(--green);
+        border-color: rgb(0 255 135 / 35%);
+      }
+
+      .pill-cyan {
+        background: rgb(5 240 255 / 12%);
+        color: var(--cyan);
+        border-color: rgb(5 240 255 / 28%);
+      }
+
+      .pill-pink {
+        background: rgb(255 40 130 / 14%);
+        color: #ff8cba;
+        border-color: rgb(255 40 130 / 32%);
+      }
+
+      .pill-lilac {
+        background: rgb(149 59 255 / 16%);
+        color: #d2b4ff;
+        border-color: rgb(149 59 255 / 35%);
+      }
+
+      .pill-ghost {
+        background: rgb(255 255 255 / 6%);
+        color: var(--muted);
+        border-color: var(--line);
+      }
+
+      h1 {
+        margin: 0 0 0.7rem;
+        font-size: clamp(2.2rem, 6vw, 4.4rem);
+        line-height: 0.95;
+        letter-spacing: -0.05em;
+        max-width: 16ch;
+      }
+
+      .lede {
+        max-width: 62ch;
+        color: var(--muted);
+        font-size: 1.08rem;
+      }
+
+      nav.toc {
+        position: sticky;
+        top: 0;
+        z-index: 8;
+        margin: 1.2rem 0 0;
+        padding: 0.7rem 0;
+        background: linear-gradient(180deg, rgb(18 3 20 / 92%), rgb(18 3 20 / 72%) 70%, transparent);
+        backdrop-filter: blur(12px);
+      }
+
+      .toc-row {
+        display: flex;
+        gap: 0.45rem;
+        overflow-x: auto;
+        padding-bottom: 0.25rem;
+        scrollbar-width: thin;
+      }
+
+      .toc-row a {
+        flex: 0 0 auto;
+        text-decoration: none;
+        color: var(--ink);
+        background: var(--surface);
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        padding: 0.38rem 0.75rem;
+        font-size: 0.82rem;
+        font-weight: 650;
+      }
+
+      .toc-row a:hover,
+      .toc-row a:focus-visible {
+        border-color: var(--cyan);
+        color: var(--cyan);
+      }
+
+      .filters {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.45rem;
+        margin: 0.4rem 0 1.6rem;
+      }
+
+      .filters button {
+        appearance: none;
+        border: 1px solid var(--line);
+        background: var(--surface);
+        color: var(--ink);
+        border-radius: 999px;
+        padding: 0.4rem 0.8rem;
+        font: inherit;
+        font-size: 0.82rem;
+        font-weight: 700;
+        cursor: pointer;
+      }
+
+      .filters button[aria-pressed="true"] {
+        background: var(--yellow);
+        color: #1a0520;
+        border-color: var(--yellow);
+      }
+
+      section.block {
+        margin: 0 0 2.4rem;
+      }
+
+      h2 {
+        margin: 0 0 0.7rem;
+        font-size: clamp(1.5rem, 3vw, 2.1rem);
+        letter-spacing: -0.04em;
+      }
+
+      h3 {
+        margin: 0 0 0.45rem;
+        font-size: 1.05rem;
+        letter-spacing: -0.02em;
+      }
+
+      .panel {
+        background: color-mix(in srgb, var(--surface) 88%, transparent);
+        border: 1px solid var(--line);
+        border-radius: 1.25rem;
+        padding: 1.1rem 1.15rem 1.2rem;
+        box-shadow: var(--shadow);
+      }
+
+      .laws {
+        display: grid;
+        gap: 0.75rem;
+      }
+
+      @media (min-width: 760px) {
+        .laws {
+          grid-template-columns: 1fr 1fr;
+        }
+      }
+
+      .law {
+        padding: 0.95rem 1rem;
+        border-radius: 1rem;
+        background: var(--surface-2);
+        border: 1px solid rgb(255 255 255 / 6%);
+      }
+
+      .law strong {
+        display: block;
+        margin-bottom: 0.2rem;
+      }
+
+      .calendar {
+        display: grid;
+        gap: 0.55rem;
+      }
+
+      .cal-row {
+        display: grid;
+        grid-template-columns: 7.5rem 1fr;
+        gap: 0.7rem;
+        align-items: start;
+        padding: 0.7rem 0.2rem;
+        border-bottom: 1px solid rgb(255 255 255 / 7%);
+      }
+
+      .cal-row:last-child {
+        border-bottom: 0;
+      }
+
+      .cal-when {
+        font-size: 0.78rem;
+        font-weight: 800;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        color: var(--yellow);
+      }
+
+      .game {
+        margin: 0 0 1.3rem;
+        overflow: hidden;
+      }
+
+      .game[hidden] {
+        display: none;
+      }
+
+      .game-head {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.55rem 0.8rem;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 0.85rem;
+      }
+
+      .game-title {
+        margin: 0;
+        font-size: clamp(1.6rem, 4vw, 2.35rem);
+        letter-spacing: -0.045em;
+        line-height: 1;
+      }
+
+      .number {
+        color: var(--pink);
+        font-size: 0.72em;
+        margin-right: 0.25rem;
+      }
+
+      .split {
+        display: grid;
+        gap: 1rem;
+      }
+
+      @media (min-width: 880px) {
+        .split {
+          grid-template-columns: 1.35fr 0.9fr;
+          align-items: start;
+        }
+      }
+
+      .phone {
+        border-radius: 1.4rem;
+        background: #0b020d;
+        border: 1px solid #6a4472;
+        padding: 0.7rem 0.7rem 0.9rem;
+        box-shadow: inset 0 0 0 1px rgb(255 255 255 / 4%);
+      }
+
+      .phone-bar {
+        display: flex;
+        justify-content: space-between;
+        color: var(--faint);
+        font-size: 0.7rem;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        margin-bottom: 0.55rem;
+      }
+
+      .phone h4 {
+        margin: 0 0 0.35rem;
+        font-size: 1.05rem;
+      }
+
+      .phone p {
+        margin: 0 0 0.7rem;
+        color: var(--muted);
+        font-size: 0.88rem;
+      }
+
+      .choice,
+      .face-row,
+      .surv-row {
+        display: grid;
+        gap: 0.4rem;
+      }
+
+      .choice button,
+      .wdl button {
+        appearance: none;
+        border: 1px solid #6a4472;
+        background: #1c0b22;
+        color: var(--ink);
+        border-radius: 0.75rem;
+        padding: 0.65rem 0.7rem;
+        text-align: left;
+        font: inherit;
+        cursor: pointer;
+      }
+
+      .wdl {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 0.45rem;
+        align-items: center;
+        margin-bottom: 0.45rem;
+      }
+
+      .wdl span {
+        font-weight: 700;
+        font-size: 0.9rem;
+      }
+
+      .wdl .btns {
+        display: flex;
+        gap: 0.3rem;
+      }
+
+      .wdl button {
+        min-width: 2.3rem;
+        padding: 0.4rem 0.45rem;
+        text-align: center;
+        font-weight: 800;
+      }
+
+      .wdl button.on {
+        background: var(--green);
+        color: #072214;
+        border-color: var(--green);
+      }
+
+      .faces {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.45rem;
+      }
+
+      .face {
+        border: 1px solid #6a4472;
+        border-radius: 0.9rem;
+        padding: 0.55rem;
+        background: #1c0b22;
+        text-align: center;
+        font-size: 0.78rem;
+        font-weight: 700;
+      }
+
+      .silhouette {
+        width: 3.4rem;
+        height: 3.4rem;
+        margin: 0 auto 0.4rem;
+        border-radius: 50%;
+        background:
+          radial-gradient(circle at 50% 38%, #3a2042 0 28%, transparent 29%),
+          radial-gradient(circle at 50% 88%, #3a2042 0 42%, transparent 43%),
+          #120314;
+        border: 2px solid var(--cyan);
+      }
+
+      .surv {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 0.35rem;
+      }
+
+      .surv i {
+        display: grid;
+        place-items: center;
+        min-height: 2.4rem;
+        border-radius: 0.55rem;
+        background: #1c0b22;
+        border: 1px solid #6a4472;
+        font-size: 0.68rem;
+        font-weight: 800;
+        font-style: normal;
+        letter-spacing: 0.02em;
+      }
+
+      .surv i.used {
+        opacity: 0.35;
+        text-decoration: line-through;
+      }
+
+      .surv i.pick {
+        background: var(--yellow);
+        color: #1a0520;
+        border-color: var(--yellow);
+      }
+
+      .rules,
+      .flow {
+        margin: 0.4rem 0 0;
+        padding-left: 1.15rem;
+      }
+
+      .rules li,
+      .flow li {
+        margin: 0.28rem 0;
+      }
+
+      .meta-grid {
+        display: grid;
+        gap: 0.7rem;
+        margin-top: 0.9rem;
+      }
+
+      @media (min-width: 700px) {
+        .meta-grid {
+          grid-template-columns: 1fr 1fr 1fr;
+        }
+      }
+
+      .meta {
+        background: #1a0a20;
+        border: 1px solid rgb(255 255 255 / 7%);
+        border-radius: 0.9rem;
+        padding: 0.75rem 0.8rem;
+      }
+
+      .meta .label {
+        display: block;
+        font-size: 0.7rem;
+        font-weight: 800;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--faint);
+        margin-bottom: 0.25rem;
+      }
+
+      .ship {
+        display: grid;
+        gap: 0.75rem;
+      }
+
+      @media (min-width: 800px) {
+        .ship {
+          grid-template-columns: repeat(3, 1fr);
+        }
+      }
+
+      .wave {
+        padding: 1rem;
+        border-radius: 1rem;
+        background: var(--surface-2);
+        border: 1px solid rgb(255 255 255 / 6%);
+      }
+
+      .wave ol {
+        margin: 0.4rem 0 0;
+        padding-left: 1.15rem;
+      }
+
+      .reject {
+        margin: 0;
+        padding: 0;
+        list-style: none;
+        display: grid;
+        gap: 0.6rem;
+      }
+
+      .reject li {
+        padding: 0.8rem 0.9rem;
+        border-radius: 0.9rem;
+        background: #1a0a20;
+        border: 1px solid rgb(255 255 255 / 7%);
+      }
+
+      footer {
+        padding: 1.5rem 0 2.8rem;
+        color: var(--faint);
+        font-size: 0.86rem;
+      }
+
+      .score-note {
+        margin: 0.8rem 0 0;
+        padding: 0.75rem 0.85rem;
+        border-left: 4px solid var(--yellow);
+        background: rgb(235 255 0 / 7%);
+        border-radius: 0 0.7rem 0.7rem 0;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <header class="hero">
+        <p class="kicker">
+          <span class="pill pill-yellow">Concept pitch</span>
+          <span class="pill pill-ghost">Not built yet</span>
+          <span class="pill pill-cyan">2026/27 season</span>
+        </p>
+        <h1>Keep the group coming back after the one big entry.</h1>
+        <p class="lede">
+          Dranx already has the season-long game: one immutable 20-club table and seven
+          spotlight picks, scored from imported standings and the manual results desk.
+          These nine mini-games sit beside that. They never change the 100-point table
+          board or spotlight accuracy. They reuse display names, club badges, the player
+          catalogue, and owner paste desks. No live football API, no cron, no extra
+          accounts.
+        </p>
+      </header>
+
+      <nav class="toc" aria-label="On this page">
+        <div class="toc-row">
+          <a href="#laws">House rules</a>
+          <a href="#calendar">Season rhythm</a>
+          <a href="#g1">Weekend Slip</a>
+          <a href="#g2">Last Club Standing</a>
+          <a href="#g3">Halfway Rewrite</a>
+          <a href="#g4">Face in the Crowd</a>
+          <a href="#g5">Contrarian Chip</a>
+          <a href="#g6">Monthly Armband</a>
+          <a href="#g7">Hot Take Tribunal</a>
+          <a href="#g8">Festive Frenzy</a>
+          <a href="#g9">January Window</a>
+          <a href="#ship">What to ship first</a>
+        </div>
+      </nav>
+
+      <div class="filters" role="group" aria-label="Filter by cadence">
+        <button type="button" data-filter="all" aria-pressed="true">All nine</button>
+        <button type="button" data-filter="weekly">Weekly ritual</button>
+        <button type="button" data-filter="season">Season-long</button>
+        <button type="button" data-filter="event">Calendar events</button>
+        <button type="button" data-filter="break">International breaks</button>
+      </div>
+
+      <section class="block" id="laws">
+        <h2>House rules every idea obeys</h2>
+        <div class="laws">
+          <article class="law">
+            <strong>The season entry stays sacred.</strong>
+            Mini-game points live on their own boards. They never edit table points,
+            never change spotlight accuracy, and never rewrite a submitted prediction.
+          </article>
+          <article class="law">
+            <strong>Same friends, same names.</strong>
+            Only people who already submitted a display name can play. The existing
+            receipt cookie identifies them. No new accounts, emails, or personal data.
+          </article>
+          <article class="law">
+            <strong>Owner paste, not a live feed.</strong>
+            Fixtures, weekend results, monthly deltas, and transfer verdicts enter
+            through authenticated admin desks, the same way standings and spotlight
+            facts already do.
+          </article>
+          <article class="law">
+            <strong>Mobile first, two-minute taps.</strong>
+            A weekly game should be finishable on a phone in under two minutes, with
+            56px targets and no horizontal overflow. Instant quizzes can be shorter.
+          </article>
+          <article class="law">
+            <strong>Locks are explicit and honest.</strong>
+            A round either locks at an owner-set kickoff instant or stays open. A late
+            or already-closed save is a truthful no-op, same spirit as season lock.
+          </article>
+          <article class="law">
+            <strong>Hobby-tier cheap.</strong>
+            No scrapers, no Vercel Cron, no image hotlinks. Local badges and the 578
+            portraits already on the site are the visual kit.
+          </article>
+        </div>
+      </section>
+
+      <section class="block" id="calendar">
+        <h2>How the year would feel</h2>
+        <div class="panel calendar">
+          <div class="cal-row">
+            <div class="cal-when">Now → May</div>
+            <div>
+              <strong>Weekend Slip</strong> and <strong>Last Club Standing</strong>
+              become the Friday night habit. After each standings import, the existing
+              table leaderboard still does the heavy drama.
+            </div>
+          </div>
+          <div class="cal-row">
+            <div class="cal-when">After reveal</div>
+            <div>
+              <strong>Contrarian Chip</strong> opens once the group table is public.
+              You spend one tap calling the consensus wrong.
+            </div>
+          </div>
+          <div class="cal-row">
+            <div class="cal-when">Each month</div>
+            <div>
+              <strong>Monthly Armband</strong> resets on the 1st. Pick a player, then
+              watch the published goals and assists snapshots move.
+            </div>
+          </div>
+          <div class="cal-row">
+            <div class="cal-when">Int'l breaks</div>
+            <div>
+              <strong>Face in the Crowd</strong> and a short
+              <strong>Hot Take Tribunal</strong> fill the empty Saturdays. No fixtures
+              required.
+            </div>
+          </div>
+          <div class="cal-row">
+            <div class="cal-when">Boxing Day</div>
+            <div>
+              <strong>Festive Frenzy</strong> is a five-to-eight day mini-league over
+              the holiday fixtures the owner posts.
+            </div>
+          </div>
+          <div class="cal-row">
+            <div class="cal-when">~GW19</div>
+            <div>
+              <strong>The Halfway Rewrite</strong> lets everyone submit a second final
+              table with eyes open. Original entries stay frozen.
+            </div>
+          </div>
+          <div class="cal-row">
+            <div class="cal-when">1–31 Jan</div>
+            <div>
+              <strong>January Window</strong> turns rumours into a sealed market.
+              Owner gavels completed deals after deadline day.
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <article class="panel game" id="g1" data-tags="weekly">
+        <div class="game-head">
+          <h2 class="game-title"><span class="number">01</span>Weekend Slip</h2>
+          <p class="kicker" style="margin: 0">
+            <span class="pill pill-green">Weekly</span>
+            <span class="pill pill-cyan">Owner paste</span>
+            <span class="pill pill-lilac">First to ship</span>
+          </p>
+        </div>
+        <div class="split">
+          <div>
+            <p>
+              The Friday pint game. The owner posts six to eight featured fixtures.
+              Everyone taps Win / Draw / Away before the first of those kickoffs.
+              Results land through a paste desk on Sunday or Monday. A separate
+              <em>Slip</em> board ranks the group. Season table points do not move.
+            </p>
+            <h3>How it behaves</h3>
+            <ol class="flow">
+              <li>
+                Thursday or Friday, the owner pastes a reviewed fixture list for the
+                gameweek: home, away, and a lock instant.
+              </li>
+              <li>
+                <code>/play/slip</code> opens for submitted names only. Each fixture
+                shows two club badges and three fat buttons: Home, Draw, Away.
+              </li>
+              <li>
+                A participant can change picks until the lock instant. After lock,
+                the slip is read-only. A late submit is a no-op.
+              </li>
+              <li>
+                After the weekend, the owner pastes the six-to-eight results. The
+                board updates from the sealed weekend snapshot, never from a live
+                feed.
+              </li>
+              <li>
+                The page shows your week score, the group table, and a “you vs the
+                modal pick” row so the chat has something to argue about.
+              </li>
+            </ol>
+            <h3>Rules</h3>
+            <ol class="rules">
+              <li>One slip per display name per gameweek.</li>
+              <li>Every posted fixture must be filled. Partial slips do not lock in.</li>
+              <li>Correct result (1X2) scores 1 point. No exact-score line. Keep it fast.</li>
+              <li>A postponed match is void and ignored. Remaining fixtures still score.</li>
+              <li>Missed lock = zero for that week, not a penalty on the season board.</li>
+              <li>Season Slip total is the sum of week scores. Ties share rank.</li>
+            </ol>
+            <p class="score-note">
+              Why 1X2 and not exact scores: friends actually finish a six-fixture slip
+              on the train. Exact scores become homework and empty slips.
+            </p>
+          </div>
+          <aside class="phone" aria-label="Weekend Slip mock">
+            <div class="phone-bar"><span>Slip · GW3</span><span>Locks Sat 11:30 CT</span></div>
+            <h4>Tap the weekend</h4>
+            <p>Six fixtures. One tap each. Change anything until lock.</p>
+            <div class="wdl">
+              <span>Arsenal — Chelsea</span>
+              <div class="btns">
+                <button type="button" class="on">H</button>
+                <button type="button">D</button>
+                <button type="button">A</button>
+              </div>
+            </div>
+            <div class="wdl">
+              <span>Spurs — Man City</span>
+              <div class="btns">
+                <button type="button">H</button>
+                <button type="button" class="on">D</button>
+                <button type="button">A</button>
+              </div>
+            </div>
+            <div class="wdl">
+              <span>Sunderland — Liverpool</span>
+              <div class="btns">
+                <button type="button">H</button>
+                <button type="button">D</button>
+                <button type="button" class="on">A</button>
+              </div>
+            </div>
+          </aside>
+        </div>
+        <div class="meta-grid">
+          <div class="meta">
+            <span class="label">Owner work</span>
+            Paste fixtures once, paste results once. Same validation spirit as the
+            standings desk: complete reviewed list or keep the last good week.
+          </div>
+          <div class="meta">
+            <span class="label">Reuses</span>
+            Display names, club badges, season clock pattern, authenticated paste,
+            sealed snapshot + pointer.
+          </div>
+          <div class="meta">
+            <span class="label">Come-back hook</span>
+            A reason to open the site every Friday, not just when the table updates.
+          </div>
+        </div>
+      </article>
+
+      <article class="panel game" id="g2" data-tags="weekly season">
+        <div class="game-head">
+          <h2 class="game-title"><span class="number">02</span>Last Club Standing</h2>
+          <p class="kicker" style="margin: 0">
+            <span class="pill pill-green">Weekly</span>
+            <span class="pill pill-pink">Elimination</span>
+            <span class="pill pill-lilac">First to ship</span>
+          </p>
+        </div>
+        <div class="split">
+          <div>
+            <p>
+              Classic survivor, Premier League flavoured. Each gameweek you pick one
+              club you think will <em>win</em> its match. You cannot reuse a club.
+              Pick a loser or a draw and you are out. Last name standing gets a
+              silly crown on the site until May.
+            </p>
+            <h3>How it behaves</h3>
+            <ol class="flow">
+              <li>
+                The owner posts the gameweek’s 10 pairings, or a shorter featured
+                set if a midweek slate is messy. Each club appears at most once.
+              </li>
+              <li>
+                Alive players see a 20-club grid. Used clubs are struck through.
+                Eliminated players see a tombstone and the remaining field.
+              </li>
+              <li>
+                Lock is the earliest kickoff of any club still available that week.
+                After lock, picks reveal to the group so the group chat can groan.
+              </li>
+              <li>
+                Owner pastes the week’s winning clubs. Draws and losses eliminate
+                anyone who picked that club. Unused picks on an eliminated player
+                stay unused.
+              </li>
+              <li>
+                If the whole remaining field dies on the same week, they all
+                re-enter that week with their used-club lists intact. Nobody lucks
+                into a bye.
+              </li>
+            </ol>
+            <h3>Rules</h3>
+            <ol class="rules">
+              <li>One living pick per week. No doubles, no player reuse.</li>
+              <li>Win only. Draw or defeat eliminates you.</li>
+              <li>A postponed club is unselectable that week if the owner marks it void.</li>
+              <li>Missed lock while alive = elimination. The grid is the reminder.</li>
+              <li>
+                Optional Christmas chip: each alive player may, once, reuse a
+                previously used club between GW17 and GW21. Makes the festive
+                congestion playable.
+              </li>
+              <li>
+                If two or more are still alive at the final gameweek and they all
+                survive it, they share the crown. No sudden-death extra data.
+              </li>
+            </ol>
+          </div>
+          <aside class="phone" aria-label="Survivor mock">
+            <div class="phone-bar"><span>Survivor · GW4</span><span>12 still alive</span></div>
+            <h4>Pick a winner</h4>
+            <p>Used clubs are dead to you. You have not touched Sunderland yet.</p>
+            <div class="surv" aria-hidden="true">
+              <i class="used">ARS</i><i>AVL</i><i class="used">BOU</i><i>BRE</i>
+              <i>BHA</i><i class="used">BUR</i><i>CHE</i><i>CRY</i>
+              <i>EVE</i><i>FUL</i><i class="used">LEE</i><i>LIV</i>
+              <i>MCI</i><i>MUN</i><i>NFO</i><i class="pick">SUN</i>
+              <i>TOT</i><i>WHU</i><i>WOL</i><i>COV</i>
+            </div>
+          </aside>
+        </div>
+        <div class="meta-grid">
+          <div class="meta">
+            <span class="label">Owner work</span>
+            Pairings plus a winner list. If Weekend Slip already exists, survivor
+            can read the same result snapshot.
+          </div>
+          <div class="meta">
+            <span class="label">Reuses</span>
+            20-club set, badges, display names, weekend result snapshot.
+          </div>
+          <div class="meta">
+            <span class="label">Come-back hook</span>
+            Fear. People open the site to see if they are still alive, then stay
+            for the table.
+          </div>
+        </div>
+      </article>
+
+      <article class="panel game" id="g3" data-tags="event season">
+        <div class="game-head">
+          <h2 class="game-title"><span class="number">03</span>The Halfway Rewrite</h2>
+          <p class="kicker" style="margin: 0">
+            <span class="pill pill-pink">One shot</span>
+            <span class="pill pill-cyan">Reuses table UI</span>
+            <span class="pill pill-ghost">~GW19</span>
+          </p>
+        </div>
+        <div>
+          <p>
+            The most Dranx mini-game that is not a new sport. Around the halfway
+            mark, everyone may submit a <em>second</em> 20-club final table: “knowing
+            what I know now, this is how it finishes.” The original August entry
+            stays frozen and keeps scoring the main 100-point board. The rewrite
+            gets its own podium.
+          </p>
+          <h3>How it behaves</h3>
+          <ol class="flow">
+            <li>
+              Owner opens the window after a chosen standings import — typically
+              the table after GW19 — and sets a lock at the next Saturday kickoff.
+            </li>
+            <li>
+              <code>/play/rewrite</code> loads the existing Stage 1 reorderer,
+              prefilled with the live table so nobody starts from A–Z by accident.
+              An untouched live-table order still needs the same explicit
+              acknowledgement pattern the season form already uses.
+            </li>
+            <li>
+              No spotlight picks. This is table-only, five minutes on a phone.
+            </li>
+            <li>
+              After lock, rewrites reveal next to original champions so the group
+              can see who blinked. Scoring waits for the final standings snapshot.
+            </li>
+          </ol>
+          <h3>Rules</h3>
+          <ol class="rules">
+            <li>One rewrite per display name. Same atomic write: all 20 clubs or nothing.</li>
+            <li>
+              Scoring copies the main table curve: 5 for exact place, 3 within
+              three, 1 for correct half, cap 100. Separate board.
+            </li>
+            <li>A player who skips it simply does not appear on the rewrite board.</li>
+            <li>The rewrite cannot be used to edit or replace the August entry.</li>
+          </ol>
+          <div class="meta-grid">
+            <div class="meta">
+              <span class="label">Owner work</span>
+              Open/close the window. Final table already exists at season end.
+            </div>
+            <div class="meta">
+              <span class="label">Reuses</span>
+              Drag-and-drop table, A–Z acknowledgement, 5–3–1 scorer, badges.
+            </div>
+            <div class="meta">
+              <span class="label">Come-back hook</span>
+              A second chance without rewriting history. Perfect January conversation.
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <article class="panel game" id="g4" data-tags="break">
+        <div class="game-head">
+          <h2 class="game-title"><span class="number">04</span>Face in the Crowd</h2>
+          <p class="kicker" style="margin: 0">
+            <span class="pill pill-green">Anytime</span>
+            <span class="pill pill-yellow">Zero match data</span>
+            <span class="pill pill-lilac">First to ship</span>
+          </p>
+        </div>
+        <div class="split">
+          <div>
+            <p>
+              You already host 578 local portraits and a searchable 580-player
+              catalogue. During international breaks — when Weekend Slip has
+              nothing to lock — the site becomes a pub-quiz machine. Each day in
+              a break week, one seeded puzzle: a cropped or silhouetted face and
+              four names.
+            </p>
+            <h3>How it behaves</h3>
+            <ol class="flow">
+              <li>
+                A daily puzzle is derived on the server from the active catalogue
+                and a season-day seed. No owner fixture paste. Other-player names
+                never appear as the answer.
+              </li>
+              <li>
+                The portrait starts as a silhouette or an eyes-only crop. After
+                you answer, the real <code>PlayerMark</code> face reveals, with
+                the silhouette fallback for the two known missing portraits.
+              </li>
+              <li>
+                Four names: the answer plus three distractors from other clubs.
+                One tap. Immediate right/wrong. You cannot change it.
+              </li>
+              <li>
+                A break-week board sums correct answers. Ties break on faster
+                first tap, recorded server-side when the answer lands.
+              </li>
+            </ol>
+            <h3>Rules</h3>
+            <ol class="rules">
+              <li>One answer per display name per puzzle. First tap is final.</li>
+              <li>Correct = 1. Wrong or skip = 0.</li>
+              <li>Ryan McAidoo and Luc De Fougerolles are excluded as answers.</li>
+              <li>
+                The initial homepage still must not ship the catalogue. The quiz
+                route lazy-loads faces the same way Stage 2 already does.
+              </li>
+              <li>This is entertainment. It never feeds result rankings.</li>
+            </ol>
+          </div>
+          <aside class="phone" aria-label="Portrait quiz mock">
+            <div class="phone-bar"><span>Face · Break day 2</span><span>4 names</span></div>
+            <h4>Who is this?</h4>
+            <p>Silhouette first. The real portrait waits until you tap.</p>
+            <div class="silhouette" aria-hidden="true"></div>
+            <div class="faces">
+              <div class="face">Bukayo Saka</div>
+              <div class="face">Morgan Rogers</div>
+              <div class="face">Antoine Semenyo</div>
+              <div class="face">Wilson Isidor</div>
+            </div>
+          </aside>
+        </div>
+        <div class="meta-grid">
+          <div class="meta">
+            <span class="label">Owner work</span>
+            Almost none. Optional: hide the quiz outside international breaks.
+          </div>
+          <div class="meta">
+            <span class="label">Reuses</span>
+            Player catalogue route, portraits, <code>PlayerMark</code>, display names.
+          </div>
+          <div class="meta">
+            <span class="label">Come-back hook</span>
+            Daily dopamine when the league is idle. Uses assets you already paid
+            for.
+          </div>
+        </div>
+      </article>
+
+      <article class="panel game" id="g5" data-tags="season">
+        <div class="game-head">
+          <h2 class="game-title"><span class="number">05</span>Contrarian Chip</h2>
+          <p class="kicker" style="margin: 0">
+            <span class="pill pill-pink">One chip</span>
+            <span class="pill pill-cyan">Uses consensus</span>
+            <span class="pill pill-ghost">After reveal</span>
+          </p>
+        </div>
+        <div>
+          <p>
+            The group’s average table is already a character in Dranx. This game
+            lets you bet against it. After reveal, each person places one chip on
+            one club: “they finish higher than we think” or “they finish lower
+            than we think.” The existing underdog / overrated index does the
+            maths.
+          </p>
+          <h3>How it behaves</h3>
+          <ol class="flow">
+            <li>
+              Once season predictions are revealed, <code>/play/contrarian</code>
+              lists the 20 clubs with the live consensus average and current
+              actual position.
+            </li>
+            <li>
+              You pick one club and one direction: Upstart or Overhyped. Lock is
+              owner-set, defaulting to the next Saturday after reveal.
+            </li>
+            <li>
+              After every standings import the chip shows a live index, using the
+              same formulas as spotlight team categories: upstart =
+              <code>average predicted position − actual</code>, overhyped = the
+              inverse.
+            </li>
+            <li>
+              At the final table, the largest index in the direction you chose
+              wins. Negative index is a proud zero, not a debt.
+            </li>
+          </ol>
+          <h3>Rules</h3>
+          <ol class="rules">
+            <li>One chip, one club, one direction. No swaps after lock.</li>
+            <li>You may chip a club you already picked as champion or as a spotlight team.</li>
+            <li>Scoring is the raw index, full precision, then ranked. Ties share.</li>
+            <li>A chip placed after lock is rejected. No silent overwrite.</li>
+            <li>This board is independent of the underdog / overrated spotlight scores.</li>
+          </ol>
+          <div class="meta-grid">
+            <div class="meta">
+              <span class="label">Owner work</span>
+              Open the window after reveal. Standings imports already refresh the index.
+            </div>
+            <div class="meta">
+              <span class="label">Reuses</span>
+              Consensus averages, expectation-index helpers, imported table, badges.
+            </div>
+            <div class="meta">
+              <span class="label">Come-back hook</span>
+              Every new table answers “was I right to fade the group?”
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <article class="panel game" id="g6" data-tags="season">
+        <div class="game-head">
+          <h2 class="game-title"><span class="number">06</span>Monthly Armband</h2>
+          <p class="kicker" style="margin: 0">
+            <span class="pill pill-green">Monthly</span>
+            <span class="pill pill-cyan">Uses result snapshots</span>
+          </p>
+        </div>
+        <div>
+          <p>
+            Each calendar month you captain one player. They score from the
+            <em>delta</em> between two published result snapshots you already
+            know how to seal: goals plus assists for that player in that month.
+            No new stat type. No weekly match-by-match feed.
+          </p>
+          <h3>How it behaves</h3>
+          <ol class="flow">
+            <li>
+              On the 1st, or when the owner opens the month, the Stage 2 player
+              selector appears. Other player stays available.
+            </li>
+            <li>
+              Lock is 12:00 America/Chicago on the 2nd, or the first league
+              kickoff of the month if that is earlier. Same dual-zone display as
+              settings.
+            </li>
+            <li>
+              During the month the armband page is just a gallery of captains and
+              portraits. No live numbers until the owner publishes.
+            </li>
+            <li>
+              Owner publishes the usual goals and assists datasets. The month
+              score for a player is
+              <code>(goals_now + assists_now) − (goals_prev + assists_prev)</code>
+              using the last sealed snapshots from the previous month. First
+              month uses a zero baseline.
+            </li>
+          </ol>
+          <h3>Rules</h3>
+          <ol class="rules">
+            <li>One captain per display name per month.</li>
+            <li>You may repeat a captain in a later month.</li>
+            <li>Month points = the nonnegative delta. A player who scores nothing is a valid zero.</li>
+            <li>
+              Other-player captains only score after the owner pins the exact
+              alias on that month’s snapshot, same as spotlight.
+            </li>
+            <li>Unresolved or unpublished month stays pending. No invented stats.</li>
+            <li>Season Armband total sums resolved months only. Ties share rank.</li>
+          </ol>
+          <div class="meta-grid">
+            <div class="meta">
+              <span class="label">Owner work</span>
+              Keep doing monthly result publishes. The delta is derived.
+            </div>
+            <div class="meta">
+              <span class="label">Reuses</span>
+              Player selector, Other-player aliases, sealed <code>goals</code> /
+              <code>assists</code> snapshots, portraits.
+            </div>
+            <div class="meta">
+              <span class="label">Come-back hook</span>
+              A new argument every 1st of the month without a new data pipeline.
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <article class="panel game" id="g7" data-tags="weekly break">
+        <div class="game-head">
+          <h2 class="game-title"><span class="number">07</span>Hot Take Tribunal</h2>
+          <p class="kicker" style="margin: 0">
+            <span class="pill pill-green">On demand</span>
+            <span class="pill pill-yellow">Social</span>
+          </p>
+        </div>
+        <div>
+          <p>
+            The owner posts one sentence. The group votes Yes or No before a
+            lock. Some takes resolve from facts you already store. Some resolve
+            when the owner bangs the gavel. The page is a timeline of takes,
+            vote splits, and who looks clever.
+          </p>
+          <h3>How it behaves</h3>
+          <ol class="flow">
+            <li>
+              Owner writes a take, a lock instant, and a resolve mode:
+              <em>gavel</em>, <em>final table place</em>, or
+              <em>spotlight fact</em>.
+            </li>
+            <li>
+              Friends see the sentence, two giant buttons, and a live count only
+              after they vote. No preview of the split first — stops pile-ons.
+            </li>
+            <li>
+              After lock, the split reveals. Resolve happens later: either a
+              typed <code>YES</code> / <code>NO</code> gavel, or a derived check
+              such as “Arsenal finish 1st” against the final standings.
+            </li>
+          </ol>
+          <h3>Rules</h3>
+          <ol class="rules">
+            <li>One vote per take. Changeable until lock, then frozen.</li>
+            <li>Correct side scores 1. Wrong scores 0. Unresolved stays pending.</li>
+            <li>
+              Derived takes may only read imported standings or published result
+              snapshots. They may not invent a live table.
+            </li>
+            <li>
+              Gavel takes require the exact typed phrase and are irreversible,
+              same caution as season <code>LOCK</code> / <code>REVEAL</code>.
+            </li>
+            <li>A take with no votes at lock is void, not a forced result.</li>
+          </ol>
+          <p class="score-note">
+            Example takes that already fit the data: “Sunderland finish top half.”
+            “Haaland is the published top scorer.” “The group’s average champion
+            is wrong.” Gavel takes cover everything spicier: “this manager is
+            gone by March.”
+          </p>
+          <div class="meta-grid">
+            <div class="meta">
+              <span class="label">Owner work</span>
+              Write the sentence. Gavel or wait for a snapshot you were publishing anyway.
+            </div>
+            <div class="meta">
+              <span class="label">Reuses</span>
+              Display names, standings, result snapshots, irreversible-phrase UX.
+            </div>
+            <div class="meta">
+              <span class="label">Come-back hook</span>
+              Screenshot bait. The group chat already talks like this — put it on
+              the site.
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <article class="panel game" id="g8" data-tags="event">
+        <div class="game-head">
+          <h2 class="game-title"><span class="number">08</span>Festive Frenzy</h2>
+          <p class="kicker" style="margin: 0">
+            <span class="pill pill-pink">Holiday window</span>
+            <span class="pill pill-cyan">Uses Weekend Slip</span>
+          </p>
+        </div>
+        <div>
+          <p>
+            A named mini-league over the Boxing Day to New Year congestion. It is
+            not a new engine. It is Weekend Slip with a gold frame, a shorter
+            calendar, and a trophy that is allowed to be tasteless.
+          </p>
+          <h3>How it behaves</h3>
+          <ol class="flow">
+            <li>
+              Owner marks a contiguous run of posted slates as the Festive
+              window — typically the fixtures from 26 December through 3 January.
+            </li>
+            <li>
+              The same 1X2 slip UI is used. A festive skin and a countdown sit on
+              <code>/play/slip</code>.
+            </li>
+            <li>
+              A dedicated Frenzy board sums only those slates. The main Slip
+              season board still counts them too, so nobody is punished for
+              playing Christmas.
+            </li>
+            <li>
+              Optional bauble: during the window, Last Club Standing’s one reuse
+              chip becomes available if that game is live.
+            </li>
+          </ol>
+          <h3>Rules</h3>
+          <ol class="rules">
+            <li>Same 1X2 scoring as Weekend Slip.</li>
+            <li>Only owner-tagged festive slates count on the Frenzy board.</li>
+            <li>Ties share the bauble. No extra tie-break match is invented.</li>
+            <li>If a festive slate is voided, Frenzy simply has one fewer round.</li>
+          </ol>
+          <div class="meta-grid">
+            <div class="meta">
+              <span class="label">Owner work</span>
+              Tag the window. No new result format.
+            </div>
+            <div class="meta">
+              <span class="label">Reuses</span>
+              Weekend Slip snapshots, badges, display names.
+            </div>
+            <div class="meta">
+              <span class="label">Come-back hook</span>
+              A holiday title people will mention in May. Cheap once Slip exists.
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <article class="panel game" id="g9" data-tags="event">
+        <div class="game-head">
+          <h2 class="game-title"><span class="number">09</span>January Window</h2>
+          <p class="kicker" style="margin: 0">
+            <span class="pill pill-pink">1–31 January</span>
+            <span class="pill pill-yellow">Owner gavel</span>
+          </p>
+        </div>
+        <div>
+          <p>
+            Transfer deadline day is the only mid-season event the whole group
+            already watches. Each person files three sealed rumours: a club, a
+            direction (in or out), and a player from the catalogue or Other
+            player. After the window, the owner gavels each rumour against
+            completed deals.
+          </p>
+          <h3>How it behaves</h3>
+          <ol class="flow">
+            <li>
+              Market opens 1 January 00:00 America/Chicago and locks 31 January
+              at an owner-set hour before the real deadline, so nobody is still
+              typing during the last TV crawl.
+            </li>
+            <li>
+              Three slots. Each slot: club badge picker, In or Out, then the
+              same player selector Stage 2 already uses. Out rumours should name
+              a player currently at that club; the server checks the active
+              catalogue. In rumours may be Other player.
+            </li>
+            <li>
+              Slips stay private until lock, then they publish as a rumour wall.
+            </li>
+            <li>
+              After deadline day the owner marks each rumour
+              <code>landed</code>, <code>close</code>, or <code>miss</code>.
+              Close is for the right club and direction but the wrong player.
+            </li>
+          </ol>
+          <h3>Rules</h3>
+          <ol class="rules">
+            <li>Exactly three rumours, or the file is rejected.</li>
+            <li>Landed = 3, close = 1, miss = 0.</li>
+            <li>Loans count if the owner says they count on that rumour’s gavel.</li>
+            <li>Unfinished or collapsed deals are misses, not pending forever.</li>
+            <li>
+              The catalogue is still a selector, not an outcome feed. A completed
+              deal is an owner fact, same as a result snapshot.
+            </li>
+            <li>Window points never touch table or spotlight scores.</li>
+          </ol>
+          <div class="meta-grid">
+            <div class="meta">
+              <span class="label">Owner work</span>
+              One gavel pass after 1 February. Highest drama per minute of admin.
+            </div>
+            <div class="meta">
+              <span class="label">Reuses</span>
+              Clubs, player selector, Other player, irreversible admin phrases.
+            </div>
+            <div class="meta">
+              <span class="label">Come-back hook</span>
+              Deadline-night energy in a group that already lives in the rumour mill.
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <section class="block" id="ship">
+        <h2>What I would ship, and in what order</h2>
+        <div class="ship">
+          <article class="wave">
+            <span class="pill pill-lilac">Wave 1</span>
+            <h3>The weekly habit</h3>
+            <ol>
+              <li>Weekend Slip</li>
+              <li>Last Club Standing, reading the same result snapshot</li>
+              <li>Face in the Crowd for empty Saturdays</li>
+            </ol>
+            <p>
+              This is the engagement engine. One new admin desk (fixtures +
+              1X2 results) powers two games. The quiz needs no desk.
+            </p>
+          </article>
+          <article class="wave">
+            <span class="pill pill-cyan">Wave 2</span>
+            <h3>The Dranx-flavoured pair</h3>
+            <ol>
+              <li>Contrarian Chip</li>
+              <li>The Halfway Rewrite</li>
+              <li>Hot Take Tribunal</li>
+            </ol>
+            <p>
+              These talk to data you already compute: consensus, the table
+              reorderer, imported standings. Low new surface, high in-jokes.
+            </p>
+          </article>
+          <article class="wave">
+            <span class="pill pill-yellow">Wave 3</span>
+            <h3>The calendar events</h3>
+            <ol>
+              <li>Monthly Armband</li>
+              <li>Festive Frenzy (skin on Slip)</li>
+              <li>January Window</li>
+            </ol>
+            <p>
+              Ship these when the year actually reaches them. Frenzy is almost
+              free after Wave 1. The window is a one-month product.
+            </p>
+          </article>
+        </div>
+      </section>
+
+      <section class="block">
+        <h2>Ideas I would not add</h2>
+        <ul class="reject">
+          <li>
+            <strong>Exact-score jackpots or real-money stakes.</strong>
+            This is a friends league with display names only. Keep it a pint,
+            not a betting product.
+          </li>
+          <li>
+            <strong>A live match centre or scrapers.</strong>
+            The app’s boundary is no runtime football API, no production
+            scraper, no cron. Mini-games that need 3pm live scores would break
+            that on purpose.
+          </li>
+          <li>
+            <strong>Editing the August table mid-season.</strong>
+            The immutability is the sport. The Halfway Rewrite exists so people
+            can be wiser without pretending they always were.
+          </li>
+          <li>
+            <strong>Fantasy XI with weekly player points.</strong>
+            That is a second product and a weekly stats feed. Monthly Armband is
+            the honest version of the same itch.
+          </li>
+          <li>
+            <strong>Pushing mini-game points into the 100-point table.</strong>
+            Spotlight accuracy is already the fun side-board. More side-boards
+            are fine. Mixing them is how the main race stops meaning anything.
+          </li>
+        </ul>
+      </section>
+
+      <section class="block">
+        <h2>Shared technical shape, if any of this is built</h2>
+        <div class="panel">
+          <ul>
+            <li>
+              New routes under <code>/play/…</code>, linked from the post-reveal
+              home and the nav, never injected into the pre-reveal prediction
+              form.
+            </li>
+            <li>
+              Each mini-game write is atomic for that game’s row set, with the
+              same signed admin session and same-origin checks on owner
+              mutations.
+            </li>
+            <li>
+              Weekend results and festive tags are sealed snapshots with
+              last-good preservation, copied from standings/results discipline.
+            </li>
+            <li>
+              Public HTML still must not leak unrevealed season picks. Mini-game
+              picks can be public after their own lock, not before.
+            </li>
+            <li>
+              Scoring stays derived. No editable totals. Pending beats invented
+              zero.
+            </li>
+          </ul>
+        </div>
+      </section>
+
+      <footer>
+        <p>
+          Written 23 August 2026 as a concept pitch for Dranx Prediction League.
+          None of these games are implemented. The 2026/27 season entry, table
+          points, and spotlight rules stay as they are until someone chooses a
+          game and specs it properly.
+        </p>
+      </footer>
+    </div>
+    <script>
+      const buttons = document.querySelectorAll(".filters button");
+      const games = document.querySelectorAll(".game");
+
+      buttons.forEach((button) => {
+        button.addEventListener("click", () => {
+          const filter = button.getAttribute("data-filter");
+          buttons.forEach((other) =>
+            other.setAttribute("aria-pressed", String(other === button)),
+          );
+          games.forEach((game) => {
+            const tags = (game.getAttribute("data-tags") || "").split(/\s+/);
+            game.hidden = filter !== "all" && !tags.includes(filter);
+          });
+        });
+      });
+
+      document.querySelectorAll(".wdl button").forEach((button) => {
+        button.addEventListener("click", () => {
+          const group = button.parentElement;
+          if (!group) return;
+          group.querySelectorAll("button").forEach((other) => other.classList.remove("on"));
+          button.classList.add("on");
+        });
+      });
+    </script>
+  </body>
+</html>

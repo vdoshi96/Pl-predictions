@@ -1,20 +1,15 @@
-import {
-  Calculator,
-  EyeOff,
-  Medal,
-  Search,
-  ShieldCheck,
-  Sparkles,
-  Trophy,
-} from "lucide-react";
+import { EyeOff, Search, Sparkles, Trophy } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
 
+import { HowToPlay } from "@/components/how-to-play";
 import { PageHeading } from "@/components/page-heading";
 import { ScoringExample } from "@/components/scoring-example";
 import { Card, CardContent } from "@/components/ui/card";
 import { RULES_PENDING_RESULTS_MESSAGE } from "@/content/public-copy";
-import { HowToPlay } from "@/components/how-to-play";
+import { RoundOutcomeChips } from "@/features/win-streak/round-outcomes";
+
+import { RulesTabs } from "./rules-tabs";
 
 export const metadata: Metadata = { title: "How to play & scoring" };
 
@@ -25,30 +20,216 @@ const tableRules = [
   { label: "Everything else", points: 0 },
 ] as const;
 
-const spotlightRules = [
-  ["Top scorer", "Ranked by the chosen player’s final goals-list position."],
+const spotlightCategories = [
+  ["Top scorer", "The player who finishes highest in the league goals list."],
   [
     "Top assister",
-    "Ranked by the chosen player’s final assists-list position.",
+    "The player who finishes highest in the league assists list.",
   ],
-  ["Most clean sheets", "A club pick, ranked by the club clean-sheets list."],
+  ["Most clean sheets", "The club that keeps the most clean sheets."],
   [
     "Underdog team",
-    "Among underdog-team picks, average predicted finish minus actual finish; the largest index ranks first.",
+    "The club that beats the group’s average prediction by the most. Only clubs picked for this category are ranked.",
   ],
   [
     "Overrated team",
-    "Among overrated-team picks, actual finish minus average predicted finish; the largest index ranks first.",
+    "The club that falls furthest below the group’s average prediction. Only clubs picked for this category are ranked.",
   ],
   [
     "Underdog player",
-    "Underdog-player picks ranked by reviewed average season rating from highest to lowest.",
+    "Picked players ranked by reviewed average season rating, highest first. A player without a rating shows N/A and scores nothing.",
   ],
   [
     "Overrated player",
-    "Overrated-player picks ranked by reviewed average season rating from lowest to highest.",
+    "Picked players ranked by reviewed average season rating, lowest first. A player without a rating shows N/A and scores nothing.",
   ],
 ] as const;
+
+function TableRules() {
+  return (
+    <>
+      <Card>
+        <CardContent>
+          <div className="flex items-start gap-3">
+            <span className="bg-brand-soft text-brand-ink grid size-11 shrink-0 place-items-center rounded-xl">
+              <Trophy aria-hidden="true" className="size-5" />
+            </span>
+            <div>
+              <h2 className="text-brand-ink-strong text-xl font-black">
+                League-table points
+              </h2>
+              <p className="text-muted mt-1 text-sm leading-6">
+                Each club earns only its highest matching tier. Your champion is
+                the club placed first in your table; it uses the same scoring,
+                with no separate bonus. The most anyone can score is 100.
+              </p>
+            </div>
+          </div>
+          <dl className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-4">
+            {tableRules.map((rule) => (
+              <div
+                className="bg-brand-soft ring-border rounded-xl p-3 text-center ring-1"
+                key={rule.label}
+              >
+                <dt className="text-muted text-xs leading-4 font-semibold">
+                  {rule.label}
+                </dt>
+                <dd className="text-brand-ink mt-1 text-2xl font-black">
+                  {rule.points}
+                </dd>
+              </div>
+            ))}
+          </dl>
+        </CardContent>
+      </Card>
+      <ScoringExample />
+      <details className="border-border border-y py-4">
+        <summary className="min-h-11 cursor-pointer font-bold">
+          How you enter
+        </summary>
+        <div className="mt-4">
+          <HowToPlay />
+        </div>
+      </details>
+      <Card>
+        <CardContent className="flex items-start gap-3">
+          <EyeOff
+            aria-hidden="true"
+            className="text-brand-ink size-6 shrink-0"
+          />
+          <div>
+            <h2 className="text-brand-ink-strong text-lg font-black">
+              Privacy and reveal
+            </h2>
+            <p className="text-muted mt-1 text-sm leading-6">
+              Before the reveal, everyone sees only each entry’s name, 0 points,
+              and champion. The other 19 positions and all seven spotlight picks
+              stay private until the season opens.
+            </p>
+          </div>
+        </CardContent>
+      </Card>
+    </>
+  );
+}
+
+function SpotlightRules() {
+  return (
+    <>
+      <div className="flex items-start gap-3">
+        <span className="bg-rose-soft text-rose-ink grid size-11 shrink-0 place-items-center rounded-xl">
+          <Sparkles aria-hidden="true" className="size-5" />
+        </span>
+        <div>
+          <h2 className="text-brand-ink-strong text-xl font-black">
+            Pick seven outcomes. Closer calls score more.
+          </h2>
+          <p className="text-muted mt-1 text-sm leading-6">
+            Each category is ranked once its result list is published. The
+            best-placed pick earns one point per entry, the next earns one
+            fewer, and so on. With 14 entries, 1st earns 14 points, 2nd earns
+            13, and so on down to 0. Ties share the higher place. Spotlight
+            points never change your 100-point table score.
+          </p>
+        </div>
+      </div>
+      <Card>
+        <CardContent>
+          <h3 className="text-brand-ink-strong text-sm font-black">
+            Worked example · Top scorer
+          </h3>
+          <ul className="mt-2 grid gap-1.5 text-sm">
+            <li className="flex items-center justify-between gap-3">
+              <span>Your pick finished 1st</span>
+              <span className="score-pill" data-tier="exact">
+                +14
+              </span>
+            </li>
+            <li className="flex items-center justify-between gap-3">
+              <span>Your pick finished 13th</span>
+              <span className="score-pill" data-tier="miss">
+                +2
+              </span>
+            </li>
+          </ul>
+        </CardContent>
+      </Card>
+      <div className="grid gap-2 sm:grid-cols-2">
+        {spotlightCategories.map(([label, description]) => (
+          <div
+            className="border-border bg-surface-lilac rounded-xl border p-3"
+            key={label}
+          >
+            <h3 className="text-brand-ink-strong text-sm font-black">
+              {label}
+            </h3>
+            <p className="text-muted mt-1 text-xs leading-5">{description}</p>
+          </div>
+        ))}
+      </div>
+      <p className="text-muted text-sm leading-6">
+        Example: if the group expected Manchester United to finish 2.4th on
+        average and they finish 10th, they are 7.6 places below expectations.
+        That is a strong overrated pick and a poor underdog pick.
+      </p>
+      <p className="text-muted text-sm leading-6">
+        {RULES_PENDING_RESULTS_MESSAGE}
+      </p>
+      <Card>
+        <CardContent className="flex items-start gap-3">
+          <Search
+            aria-hidden="true"
+            className="text-brand-ink size-6 shrink-0"
+          />
+          <div>
+            <h3 className="text-brand-ink-strong text-lg font-black">
+              Can’t find a player?
+            </h3>
+            <p className="text-muted mt-1 text-sm leading-6">
+              Search by first or last name. If someone is missing, choose Other
+              player and type their name. The owner matches it to the right
+              player before results count.
+            </p>
+          </div>
+        </CardContent>
+      </Card>
+      <Link
+        className="bg-brand text-accent focus-visible:ring-accent-blue hover:bg-brand-hover inline-flex min-h-11 items-center justify-self-start rounded-xl px-4 text-sm font-black outline-none focus-visible:ring-2"
+        href="/spotlight"
+      >
+        Open spotlight accuracy
+      </Link>
+    </>
+  );
+}
+
+function WinStreakRules() {
+  return (
+    <>
+      <div>
+        <h2 className="text-brand-ink-strong text-xl font-black">
+          One club per matchweek. Keep winning.
+        </h2>
+        <p className="text-muted mt-1 text-sm leading-6">
+          Matchweeks 2–38. Pick one club to win before the round’s first
+          kickoff. Picks are final and everyone can see them.
+        </p>
+      </div>
+      <RoundOutcomeChips />
+      <p className="text-muted text-sm leading-6">
+        A club that wins for you can’t be picked again until your streak resets.
+        Your best streak decides your rank, and equal bests share a place. Lost
+        your cookie? Enter the same display name to pick up where you left off.
+      </p>
+      <Link
+        className="text-brand-ink inline-flex min-h-11 items-center justify-self-start text-sm font-semibold underline"
+        href="/win-streak"
+      >
+        Play Win Streak
+      </Link>
+    </>
+  );
+}
 
 export default function RulesPage() {
   return (
@@ -58,198 +239,28 @@ export default function RulesPage() {
           title="The rules, without the guesswork."
           description="The season game and Win Streak run independently."
         />
-        <Card>
-          <CardContent>
-            <div className="flex items-start gap-3">
-              <span className="bg-brand-soft text-brand-ink grid size-11 shrink-0 place-items-center rounded-xl">
-                <Trophy aria-hidden="true" className="size-5" />
-              </span>
-              <div>
-                <h2 className="text-brand-ink-strong text-xl font-black">
-                  League-table points
-                </h2>
-                <p className="text-muted mt-1 text-sm leading-6">
-                  Each club earns only its highest matching tier. Your champion
-                  is the club placed first in your table; it is highlighted on
-                  the leaderboard and uses the same table scoring, with no
-                  separate champion bonus.
-                </p>
-              </div>
-            </div>
-            <dl className="mt-4 grid gap-2 sm:grid-cols-4">
-              {tableRules.map((rule) => (
-                <div
-                  className="bg-brand-soft ring-border rounded-xl p-3 text-center ring-1"
-                  key={rule.label}
-                >
-                  <dt className="text-muted text-xs leading-4 font-semibold">
-                    {rule.label}
-                  </dt>
-                  <dd className="text-brand-ink mt-1 text-2xl font-black">
-                    {rule.points}
-                  </dd>
-                </div>
-              ))}
-            </dl>
-          </CardContent>
-        </Card>
-
-        <ScoringExample />
-        <details className="border-border border-y py-4">
-          <summary className="min-h-11 cursor-pointer font-bold">
-            How you enter
-          </summary>
-          <div className="mt-4">
-            <HowToPlay />
-          </div>
-        </details>
-        <details className="border-border border-b pb-4">
-          <summary className="min-h-11 cursor-pointer font-bold">
-            Win Streak: a fresh choice each round
-          </summary>
-          <p className="text-muted mt-3 text-sm leading-6">
-            Matchweeks 2–38. Choose one available club before the first kickoff
-            of the round. Picks are final. A win extends your streak and
-            restricts that club. A draw or loss resets the streak and unlocks
-            clubs. A missed or void round preserves it. Personal best decides
-            rank; ties share rank. Re-enter the same display name to resume your
-            profile in another browser. Current-round picks are public.
-          </p>
-          <Link
-            href="/win-streak"
-            className="text-brand-ink mt-3 inline-flex min-h-11 items-center text-sm font-semibold underline"
-          >
-            Play Win Streak
-          </Link>
-        </details>
-        <Card id="spotlight-scoring">
-          <CardContent>
-            <div className="flex items-start gap-3">
-              <span className="bg-rose-soft text-rose-ink grid size-11 shrink-0 place-items-center rounded-xl">
-                <Sparkles aria-hidden="true" className="size-5" />
-              </span>
-              <div>
-                <h2 className="text-brand-ink-strong text-xl font-black">
-                  Spotlight accuracy
-                </h2>
-                <p className="text-muted mt-1 text-sm leading-6">
-                  This score never joins the table leaderboard. With N active
-                  brackets, an occupied result rank earns max(0, N + 1 − rank)
-                  accuracy points. Rank 1 earns N, rank 2 earns N − 1, and ranks
-                  after N earn 0. Equal outcomes share the same result rank and
-                  accuracy points. Each underdog and overrated category ranks
-                  only the distinct subjects picked for that category.
-                </p>
-              </div>
-            </div>
-            <div className="mt-4 grid gap-2 sm:grid-cols-2">
-              {spotlightRules.map(([label, description]) => (
-                <div
-                  className="border-border bg-surface-lilac rounded-xl border p-3"
-                  key={label}
-                >
-                  <h3 className="text-brand-ink-strong text-sm font-black">
-                    {label}
-                  </h3>
-                  <p className="text-muted mt-1 text-xs leading-5">
-                    {description}
-                  </p>
-                </div>
-              ))}
-            </div>
-            <Link
-              className="bg-brand text-accent focus-visible:ring-accent-blue hover:bg-brand-hover mt-4 inline-flex min-h-11 items-center rounded-xl px-4 text-sm font-black outline-none focus-visible:ring-2"
-              href="/spotlight"
-            >
-              Open spotlight accuracy
-            </Link>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="grid gap-4 sm:grid-cols-[auto_1fr]">
-            <span className="bg-sky-soft text-brand-ink grid size-11 place-items-center rounded-xl">
-              <Calculator aria-hidden="true" className="size-5" />
-            </span>
-            <div>
-              <h2 className="text-brand-ink-strong text-xl font-black">
-                Team expectation example
-              </h2>
-              <p className="text-muted mt-1 text-sm leading-6">
-                If Manchester United’s average predicted finish is 2.4 and its
-                actual position is 10th, its underdog index is 2.4 − 10 = −7.6,
-                while its overrated index is 10 − 2.4 = +7.6. Indexes keep full
-                precision for ranking and are rounded only for display. The
-                underdog list includes only underdog-team picks, and the
-                overrated list includes only overrated-team picks.
-              </p>
-            </div>
-          </CardContent>
-        </Card>
-
-        <div className="grid gap-3 sm:grid-cols-2">
-          <Card>
-            <CardContent>
-              <Search aria-hidden="true" className="text-brand-ink size-6" />
-              <h2 className="text-brand-ink-strong mt-3 text-lg font-black">
-                Player list and Other
-              </h2>
-              <p className="text-muted mt-1 text-sm leading-6">
-                The 2026-08-20 snapshot covers 580 players across all 20 clubs.
-                It is the owner-selected, internally reconciled roster for this
-                game, not an independently verified official league list. Player
-                selectors search first, last, or full name after two letters and
-                show up to 20 matches; 578 supplied portraits appear locally.
-                Ryan McAidoo and Luc De Fougerolles use the silhouette fallback.
-                Choose Other player for anyone unavailable or newly added. A
-                silhouette also appears if a portrait fails to load. Each custom
-                name must be matched to a canonical season player before its
-                reviewed result dataset can be published and scored.
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardContent>
-              <EyeOff aria-hidden="true" className="text-brand-ink size-6" />
-              <h2 className="text-brand-ink-strong mt-3 text-lg font-black">
-                Privacy and reveal
-              </h2>
-              <p className="text-muted mt-1 text-sm leading-6">
-                Before reveal, the public leaderboard shows only the
-                participant, 0 points, and champion pick. The other 19 table
-                positions and all seven spotlight picks stay private. A receipt
-                browser and the administrator may view the full entry.
-              </p>
-            </CardContent>
-          </Card>
-        </div>
-
-        <Card className="border-warning/35 bg-warning-soft">
-          <CardContent className="flex items-start gap-3">
-            <Medal aria-hidden="true" className="text-warning mt-0.5 size-5" />
-            <div>
-              <h2 className="text-warning font-black">Current data status</h2>
-              <p className="text-warning mt-1 text-sm leading-6">
-                The app stores and displays all seven picks. Underdog-team and
-                overrated-team accuracy can recalculate from the group tables
-                and active standings. The player roster and available portraits
-                are loaded. {RULES_PENDING_RESULTS_MESSAGE} Result snapshots
-                remain provisional until the owner finalizes them. Only complete
-                submitted entries appear in the active bracket count.
-              </p>
-            </div>
-          </CardContent>
-        </Card>
-
-        <p className="text-muted flex items-start gap-2 text-xs leading-5">
-          <ShieldCheck aria-hidden="true" className="mt-0.5 size-4 shrink-0" />
-          Table scores are derived on read and remain capped at 100. Spotlight
-          accuracy is separate; manually entered outcome lists supply results,
-          not editable participant totals. Deleting an entry removes its table
-          and spotlight picks and recalculates the active bracket count and any
-          group averages from the remaining submissions.
-        </p>
+        <RulesTabs
+          tabs={[
+            {
+              content: <TableRules />,
+              label: "Table",
+              panelId: "table-rules",
+              value: "table",
+            },
+            {
+              content: <SpotlightRules />,
+              label: "Spotlight",
+              panelId: "spotlight-scoring",
+              value: "spotlight",
+            },
+            {
+              content: <WinStreakRules />,
+              label: "Win Streak",
+              panelId: "win-streak-rules",
+              value: "win-streak",
+            },
+          ]}
+        />
       </div>
     </main>
   );

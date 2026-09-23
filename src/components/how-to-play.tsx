@@ -14,7 +14,7 @@ const walkthroughSteps = [
     callouts: [
       {
         label:
-          "Enter your display name first, then drag the handles or use Arrow, Page Up, Page Down, Home, and End.",
+          "Enter your display name first, then drag the handles, tap a position number, or use Arrow, Page Up, Page Down, Home, and End.",
         marker: "1",
         position: { left: "96%", top: "84%" },
       },

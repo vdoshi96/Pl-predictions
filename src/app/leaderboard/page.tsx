@@ -2,15 +2,12 @@ import { EyeOff, Medal } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
 
+import { LeagueTime } from "@/components/league-time";
+import { SnapshotStatus } from "@/components/snapshot-status";
 import { PageHeading } from "@/components/page-heading";
-import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
-import {
-  LeaderboardRosterTable,
-  ScoredLeaderboardBoard,
-} from "@/features/leaderboard/leaderboard-board";
+import { LeaderboardExplorer } from "@/features/leaderboard/leaderboard-explorer";
 import { getLeaderboardView } from "@/features/leaderboard/queries";
-import { formatChicagoUtcDateTime } from "@/shared/format";
 
 export const metadata: Metadata = { title: "Table leaderboard" };
 export const dynamic = "force-dynamic";
@@ -32,9 +29,7 @@ export default async function LeaderboardPage({
           description="One table prediction. Twenty clubs. Up to 100 points."
           status={
             view.snapshot ? (
-              <Badge variant={view.snapshot.isFinal ? "success" : "warning"}>
-                {view.snapshot.isFinal ? "Final" : "Provisional"}
-              </Badge>
+              <SnapshotStatus isFinal={view.snapshot.isFinal} />
             ) : undefined
           }
         >
@@ -44,9 +39,7 @@ export default async function LeaderboardPage({
             only
           </span>
           {view.snapshot ? (
-            <span>
-              Updated {formatChicagoUtcDateTime(view.snapshot.capturedAt)}
-            </span>
+            <LeagueTime prefix="Updated" value={view.snapshot.capturedAt} />
           ) : null}
           {view.snapshot?.matchweek ? (
             <span>Matchweek {view.snapshot.matchweek}</span>
@@ -100,33 +93,6 @@ export default async function LeaderboardPage({
           </Card>
         ) : null}
 
-        <form action="/leaderboard" className="flex items-end gap-3">
-          <label className="grid w-full max-w-sm gap-2 text-sm font-semibold">
-            Find a participant
-            <input
-              name="q"
-              type="search"
-              defaultValue={query}
-              maxLength={80}
-              placeholder="Display name"
-              className="border-border bg-surface min-h-11 w-full rounded-lg border px-3"
-            />
-          </label>
-          <button
-            type="submit"
-            className="bg-brand min-h-11 rounded-lg px-4 text-sm font-semibold text-white"
-          >
-            Find
-          </button>
-          {query ? (
-            <Link
-              href="/leaderboard"
-              className="text-brand-ink inline-flex min-h-11 items-center text-sm underline"
-            >
-              Clear
-            </Link>
-          ) : null}
-        </form>
         {view.entries.length === 0 ? (
           <Card>
             <CardContent className="py-10 text-center">
@@ -144,16 +110,17 @@ export default async function LeaderboardPage({
               </Link>
             </CardContent>
           </Card>
-        ) : scoringStarted && view.scoredEntries ? (
-          <ScoredLeaderboardBoard entries={view.scoredEntries} query={query} />
         ) : (
-          <LeaderboardRosterTable
-            entries={view.entries.filter((entry) =>
-              entry.participantName
-                .toLocaleLowerCase()
-                .includes(query.toLocaleLowerCase()),
-            )}
+          <LeaderboardExplorer
+            initialQuery={query}
             predictionsRevealed={view.predictionsRevealed}
+            rosterEntries={view.entries.map((entry) => ({
+              ...entry,
+              spotlightPicks: null,
+            }))}
+            scoredEntries={
+              scoringStarted && view.scoredEntries ? view.scoredEntries : null
+            }
           />
         )}
       </div>

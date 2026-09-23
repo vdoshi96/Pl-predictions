@@ -24,6 +24,7 @@ export type WinStreakFixtureView = {
 
 export type WinStreakActiveRoundView = {
   deadlineAt: string;
+  secondsUntilDeadline: number;
   fixtures: readonly WinStreakFixtureView[];
   matchweek: number;
   pickOpen: boolean;

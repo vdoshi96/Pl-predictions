@@ -11,6 +11,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { WIN_STREAK_SOURCE } from "@/features/win-streak/fixtures";
 import { getWinStreakPageData } from "@/features/win-streak/queries";
 import { WinStreakEntryPanel } from "@/features/win-streak/win-streak-entry-panel";
+import { WinStreakLayout } from "@/features/win-streak/win-streak-layout";
 import { WinStreakLeaderboard } from "@/features/win-streak/win-streak-leaderboard";
 import { formatChicagoUtcDateTime } from "@/shared/format";
 
@@ -93,19 +94,18 @@ export default async function WinStreakPage() {
     <main id="main-content" className="page-shell w-full flex-1 py-6 sm:py-10">
       <div className="mx-auto grid max-w-6xl gap-5 sm:gap-7">
         <Hero activeRound={view.activeRound} />
-        <div className="grid min-w-0 gap-5 lg:grid-cols-[minmax(20rem,0.82fr)_minmax(0,1.18fr)] lg:items-start lg:gap-7">
-          <div className="min-w-0 lg:sticky lg:top-5">
+        <WinStreakLayout
+          leaderboard={<WinStreakLeaderboard entries={view.leaderboard} />}
+          panel={
             <WinStreakEntryPanel
               activeRound={view.activeRound}
               createProfileAction={createWinStreakProfileAction}
               submitPickAction={submitWinStreakPickAction}
               viewer={view.viewer}
             />
-          </div>
-          <div className="min-w-0">
-            <WinStreakLeaderboard entries={view.leaderboard} />
-          </div>
-        </div>
+          }
+          viewerPresent={view.viewer !== null}
+        />
         <SourceNote />
       </div>
     </main>

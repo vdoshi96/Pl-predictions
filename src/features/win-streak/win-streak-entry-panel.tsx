@@ -33,6 +33,10 @@ import {
 import { cn } from "@/components/ui/cn";
 import { formatChicagoUtcDateTime } from "@/shared/format";
 
+import { groupFixturesByLeagueDay } from "./fixture-days";
+import { usedClubReason } from "./used-club-reason";
+import { RoundCountdown } from "./round-countdown";
+import { RoundOutcomeChips } from "./round-outcomes";
 import { getWinStreakTeam, type WinStreakTeamSlug } from "./fixtures";
 import type {
   WinStreakActionResult,
@@ -193,11 +197,13 @@ function TeamChoice({
   checked,
   side,
   teamSlug,
+  unavailableReason,
   onSelect,
 }: {
   available: boolean;
   checked: boolean;
   side: "Home" | "Away";
+  unavailableReason: string;
   teamSlug: WinStreakTeamSlug;
   onSelect: (teamSlug: WinStreakTeamSlug) => void;
 }) {
@@ -238,9 +244,9 @@ function TeamChoice({
         {!available ? (
           <span
             id={reasonId}
-            className="text-danger mt-0.5 block text-[0.66rem] leading-4 font-semibold"
+            className="text-muted mt-0.5 block text-[0.66rem] leading-4 font-semibold"
           >
-            Used in this streak
+            {unavailableReason}
           </span>
         ) : null}
       </span>
@@ -281,6 +287,7 @@ function LockedPick({ pick }: { pick: WinStreakPublicPick }) {
 }
 
 function PickReviewDialog({
+  currentStreak,
   error,
   open,
   pending,
@@ -289,6 +296,7 @@ function PickReviewDialog({
   onConfirm,
   onOpenChange,
 }: {
+  currentStreak: number;
   error: string | null;
   open: boolean;
   pending: boolean;
@@ -323,7 +331,7 @@ function PickReviewDialog({
           onInteractOutside={(event) => {
             if (pending) event.preventDefault();
           }}
-          className={`t-modal t-modal-centered-responsive border-border bg-surface text-foreground fixed inset-x-2 top-[max(0.5rem,env(safe-area-inset-top))] bottom-[max(0.5rem,env(safe-area-inset-bottom))] z-50 overflow-y-auto rounded-2xl border p-4 shadow-2xl outline-none sm:top-1/2 sm:bottom-auto sm:left-1/2 sm:max-h-[min(42rem,calc(100dvh-2rem))] sm:w-[min(30rem,calc(100vw-2rem))] sm:p-6 ${open ? "is-open" : "is-closing"}`}
+          className={`t-modal t-modal-centered-responsive border-border bg-surface text-foreground fixed inset-x-0 bottom-0 max-h-[85dvh] rounded-t-2xl pb-[max(1rem,env(safe-area-inset-bottom))] z-50 overflow-y-auto rounded-2xl border p-4 shadow-2xl outline-none sm:inset-x-auto sm:rounded-2xl sm:top-1/2 sm:bottom-auto sm:left-1/2 sm:max-h-[min(42rem,calc(100dvh-2rem))] sm:w-[min(30rem,calc(100vw-2rem))] sm:p-6 ${open ? "is-open" : "is-closing"}`}
         >
           <div className="flex items-start justify-between gap-3">
             <div>
@@ -369,6 +377,15 @@ function PickReviewDialog({
               </span>
             </div>
           </div>
+          <ul
+            aria-label="What happens next"
+            className="text-foreground mt-4 grid gap-1.5 text-sm leading-5"
+          >
+            <li>
+              {`If ${team.displayName} win: streak ${currentStreak} → ${currentStreak + 1}. ${team.displayName} is then unavailable until your streak resets.`}
+            </li>
+            <li>Draw or loss: streak resets to 0 and every club unlocks.</li>
+          </ul>
           {error ? (
             <p
               className="border-danger/35 bg-danger-soft text-danger mt-5 flex items-start gap-2 rounded-xl border p-3 text-sm leading-5 font-medium"
@@ -515,6 +532,7 @@ function ProfilePanel({
                 ? "All clubs are available."
                 : `${used.size} winning ${used.size === 1 ? "club is" : "clubs are"} unavailable until this streak resets.`}
             </p>
+            <div className="mt-3"><RoundOutcomeChips /></div>
           </div>
           <Badge variant="accent">This browser</Badge>
         </CardContent>
@@ -564,6 +582,13 @@ function ProfilePanel({
                 <p className="text-muted mt-1 text-sm leading-5">
                   Locks {formatChicagoUtcDateTime(activeRound.deadlineAt)}
                 </p>
+                <div className="mt-2">
+                  <RoundCountdown
+                    deadlineIso={activeRound.deadlineAt}
+                    initialRemainingSeconds={activeRound.secondsUntilDeadline}
+                    matchweek={activeRound.matchweek}
+                  />
+                </div>
               </div>
               <Badge>{20 - used.size} clubs available</Badge>
             </div>
@@ -573,38 +598,50 @@ function ProfilePanel({
               <legend className="sr-only">
                 Choose one club to win Matchweek {activeRound.matchweek}
               </legend>
-              <div className="grid gap-2">
-                {activeRound.fixtures.map((fixture) => (
-                  <div
-                    key={`${fixture.homeTeamSlug}:${fixture.awayTeamSlug}`}
-                    className="border-border bg-surface-lilac grid min-w-0 grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-1.5 rounded-2xl border p-1.5 sm:gap-3 sm:p-2"
-                  >
-                    <TeamChoice
-                      available={!used.has(fixture.homeTeamSlug)}
-                      checked={selectedTeamSlug === fixture.homeTeamSlug}
-                      side="Home"
-                      teamSlug={fixture.homeTeamSlug}
-                      onSelect={(teamSlug) => {
-                        setSelectedTeamSlug(teamSlug);
-                        setMessage(null);
-                      }}
-                    />
-                    <span className="text-muted px-0.5 text-center text-[0.62rem] leading-4 font-black uppercase">
-                      <span className="block">v</span>
-                      <span className="hidden max-w-28 normal-case lg:block">
-                        {formatChicagoUtcDateTime(fixture.kickoffAt)}
-                      </span>
-                    </span>
-                    <TeamChoice
-                      available={!used.has(fixture.awayTeamSlug)}
-                      checked={selectedTeamSlug === fixture.awayTeamSlug}
-                      side="Away"
-                      teamSlug={fixture.awayTeamSlug}
-                      onSelect={(teamSlug) => {
-                        setSelectedTeamSlug(teamSlug);
-                        setMessage(null);
-                      }}
-                    />
+              <div className="grid gap-4">
+                {groupFixturesByLeagueDay(activeRound.fixtures).map((group) => (
+                  <div className="grid gap-2" key={group.dayLabel}>
+                    <h4 className="text-muted px-1 text-[0.68rem] font-black tracking-wider uppercase">
+                      {group.dayLabel}
+                    </h4>
+                    {group.fixtures.map((fixture) => (
+                      <div
+                        className="border-border bg-surface-lilac grid min-w-0 grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-1.5 rounded-2xl border p-1.5 sm:gap-3 sm:p-2"
+                        key={`${fixture.homeTeamSlug}:${fixture.awayTeamSlug}`}
+                      >
+                        <TeamChoice
+                          available={!used.has(fixture.homeTeamSlug)}
+                          checked={selectedTeamSlug === fixture.homeTeamSlug}
+                          side="Home"
+                          teamSlug={fixture.homeTeamSlug}
+                          unavailableReason={usedClubReason(
+                            viewer.history,
+                            fixture.homeTeamSlug,
+                          )}
+                          onSelect={(teamSlug) => {
+                            setSelectedTeamSlug(teamSlug);
+                            setMessage(null);
+                          }}
+                        />
+                        <span className="text-muted px-0.5 text-center text-[0.68rem] leading-4 font-black whitespace-nowrap">
+                          {fixture.timeLabel}
+                        </span>
+                        <TeamChoice
+                          available={!used.has(fixture.awayTeamSlug)}
+                          checked={selectedTeamSlug === fixture.awayTeamSlug}
+                          side="Away"
+                          teamSlug={fixture.awayTeamSlug}
+                          unavailableReason={usedClubReason(
+                            viewer.history,
+                            fixture.awayTeamSlug,
+                          )}
+                          onSelect={(teamSlug) => {
+                            setSelectedTeamSlug(teamSlug);
+                            setMessage(null);
+                          }}
+                        />
+                      </div>
+                    ))}
                   </div>
                 ))}
               </div>
@@ -662,6 +699,7 @@ function ProfilePanel({
 
       {activeRound ? (
         <PickReviewDialog
+          currentStreak={viewer.currentStreak}
           error={message}
           open={reviewOpen}
           pending={pending}

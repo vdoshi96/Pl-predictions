@@ -202,7 +202,7 @@ export default async function SpotlightPage({
                         aria-current={active ? "page" : undefined}
                         className={`focus-visible:ring-accent-blue inline-flex min-h-11 items-center rounded-xl border px-3 text-xs font-black outline-none focus-visible:ring-2 ${
                           active
-                            ? "border-brand bg-brand text-white dark:ring-1 dark:ring-accent-blue"
+                            ? "border-brand bg-brand dark:ring-accent-blue text-white dark:ring-1"
                             : "border-border bg-surface text-muted hover:bg-surface-subtle"
                         }`}
                         href={

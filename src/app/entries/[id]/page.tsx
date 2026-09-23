@@ -35,8 +35,10 @@ export default async function EntryPage({
   const entry = await getEntryComparison(id);
   if (!entry) notFound();
   const board = entry.predictionsRevealed ? await getLeaderboardView() : null;
-  const boardEntries: readonly { id: string | null; participantName: string }[] =
-    board ? (board.scoredEntries ?? board.entries) : [];
+  const boardEntries: readonly {
+    id: string | null;
+    participantName: string;
+  }[] = board ? (board.scoredEntries ?? board.entries) : [];
   const ordered = boardEntries.flatMap((candidate) =>
     candidate.id
       ? [{ id: candidate.id, participantName: candidate.participantName }]
@@ -107,7 +109,10 @@ export default async function EntryPage({
           <p className="text-muted flex min-w-0 items-center gap-2 text-xs font-semibold">
             <Eye aria-hidden="true" className="size-4 shrink-0" />
             <span className="min-w-0 break-words">
-              <LeagueTime prefix="Standings from" value={entry.snapshot.capturedAt} />
+              <LeagueTime
+                prefix="Standings from"
+                value={entry.snapshot.capturedAt}
+              />
               {entry.snapshot.matchweek
                 ? ` · Matchweek ${entry.snapshot.matchweek}`
                 : ""}

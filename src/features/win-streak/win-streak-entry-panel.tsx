@@ -331,7 +331,7 @@ function PickReviewDialog({
           onInteractOutside={(event) => {
             if (pending) event.preventDefault();
           }}
-          className={`t-modal t-modal-centered-responsive border-border bg-surface text-foreground fixed inset-x-0 bottom-0 max-h-[85dvh] rounded-t-2xl pb-[max(1rem,env(safe-area-inset-bottom))] z-50 overflow-y-auto rounded-2xl border p-4 shadow-2xl outline-none sm:inset-x-auto sm:rounded-2xl sm:top-1/2 sm:bottom-auto sm:left-1/2 sm:max-h-[min(42rem,calc(100dvh-2rem))] sm:w-[min(30rem,calc(100vw-2rem))] sm:p-6 ${open ? "is-open" : "is-closing"}`}
+          className={`t-modal t-modal-centered-responsive border-border bg-surface text-foreground fixed inset-x-0 bottom-0 z-50 max-h-[85dvh] overflow-y-auto rounded-2xl rounded-t-2xl border p-4 pb-[max(1rem,env(safe-area-inset-bottom))] shadow-2xl outline-none sm:inset-x-auto sm:top-1/2 sm:bottom-auto sm:left-1/2 sm:max-h-[min(42rem,calc(100dvh-2rem))] sm:w-[min(30rem,calc(100vw-2rem))] sm:rounded-2xl sm:p-6 ${open ? "is-open" : "is-closing"}`}
         >
           <div className="flex items-start justify-between gap-3">
             <div>
@@ -532,7 +532,9 @@ function ProfilePanel({
                 ? "All clubs are available."
                 : `${used.size} winning ${used.size === 1 ? "club is" : "clubs are"} unavailable until this streak resets.`}
             </p>
-            <div className="mt-3"><RoundOutcomeChips /></div>
+            <div className="mt-3">
+              <RoundOutcomeChips />
+            </div>
           </div>
           <Badge variant="accent">This browser</Badge>
         </CardContent>
@@ -647,7 +649,7 @@ function ProfilePanel({
               </div>
             </fieldset>
           </CardContent>
-          <CardFooter className="bg-surface/95 sticky bottom-0 max-sm:bottom-[var(--mobile-tab-bar-height,0px)] z-10 pb-[max(1rem,env(safe-area-inset-bottom))] backdrop-blur sm:static">
+          <CardFooter className="bg-surface/95 sticky bottom-0 z-10 pb-[max(1rem,env(safe-area-inset-bottom))] backdrop-blur max-sm:bottom-[var(--mobile-tab-bar-height,0px)] sm:static">
             <Button
               className="w-full"
               disabled={!selectedTeamSlug}

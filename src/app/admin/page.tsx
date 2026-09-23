@@ -16,7 +16,11 @@ import {
   standingsSnapshots,
 } from "@/db/schema";
 import { getAdminSession } from "@/features/admin";
-import { AdminStatusBoard, buildAdminStatusRows, type AdminDatasetKey } from "@/features/admin/status-board";
+import {
+  AdminStatusBoard,
+  buildAdminStatusRows,
+  type AdminDatasetKey,
+} from "@/features/admin/status-board";
 import { isSpotlightResultDataset } from "@/features/results";
 import { getActiveSeasonContext } from "@/features/seasons/queries";
 import { formatChicagoUtcDateTime } from "@/shared/format";
@@ -32,7 +36,13 @@ export default async function AdminPage() {
 
   const { databaseNow, season } = await getActiveSeasonContext();
   const db = getDb();
-  const [[submissionCount], latestRuns, activeSnapshots, resultStates, nextRounds] = await Promise.all([
+  const [
+    [submissionCount],
+    latestRuns,
+    activeSnapshots,
+    resultStates,
+    nextRounds,
+  ] = await Promise.all([
     db
       .select({ value: count() })
       .from(predictions)
@@ -77,7 +87,10 @@ export default async function AdminPage() {
         matchweek: winStreakRounds.matchweek,
       })
       .from(winStreakRounds)
-      .leftJoin(winStreakFixtures, eq(winStreakFixtures.roundId, winStreakRounds.id))
+      .leftJoin(
+        winStreakFixtures,
+        eq(winStreakFixtures.roundId, winStreakRounds.id),
+      )
       .where(
         and(
           eq(winStreakRounds.seasonId, season.id),
@@ -127,7 +140,8 @@ export default async function AdminPage() {
           matchweek: nextRound.matchweek,
           readyToResolve:
             nextRound.lastKickoffAt !== null &&
-            new Date(nextRound.lastKickoffAt).getTime() <= databaseNow.getTime(),
+            new Date(nextRound.lastKickoffAt).getTime() <=
+              databaseNow.getTime(),
         }
       : null,
   });

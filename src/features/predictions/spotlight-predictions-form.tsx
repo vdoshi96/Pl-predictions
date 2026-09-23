@@ -18,10 +18,16 @@ import {
   type SearchablePredictionOption,
 } from "./searchable-prediction-select";
 
-import { normalizedCustomName, normalizedCustomNameKey, spotlightIncompleteCategories, spotlightPicksAreComplete } from "./spotlight-completeness";
+import {
+  normalizedCustomName,
+  spotlightPicksAreComplete,
+} from "./spotlight-completeness";
 import { SpotlightProgress } from "./spotlight-progress";
 
-export { spotlightIncompleteCategories, spotlightPicksAreComplete } from "./spotlight-completeness";
+export {
+  spotlightIncompleteCategories,
+  spotlightPicksAreComplete,
+} from "./spotlight-completeness";
 
 export interface PredictionPlayer {
   assetPath?: string | null;

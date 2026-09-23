@@ -224,7 +224,9 @@ export async function SeasonTablePage({
                       {showConsensus ? (
                         <col className="w-20 max-[479px]:hidden" />
                       ) : null}
-                      {showConsensus ? <col className="w-[4.25rem] sm:w-20" /> : null}
+                      {showConsensus ? (
+                        <col className="w-[4.25rem] sm:w-20" />
+                      ) : null}
                     </colgroup>
                     <thead>
                       <tr className="border-border text-muted border-b-2 text-left text-[0.62rem] font-black tracking-wider uppercase">
@@ -282,7 +284,10 @@ export async function SeasonTablePage({
                                   size="sm"
                                   src={row.team.assetPath}
                                 />
-                                <span className="min-w-0 text-xs leading-4 break-words sm:text-sm" data-club-name>
+                                <span
+                                  className="min-w-0 text-xs leading-4 break-words sm:text-sm"
+                                  data-club-name
+                                >
                                   {row.team.displayName}
                                   {showConsensus ? (
                                     <span className="text-muted block text-[0.625rem] font-semibold min-[480px]:hidden">

@@ -54,7 +54,7 @@ const walkthroughSteps = [
     title: "Make seven spotlight picks",
   },
   {
-    alt: "Mobile final-review page showing the participant name, Edit table action, and ordered clubs.",
+    alt: "Mobile final-review screen showing the participant name, Edit table action, and ordered clubs.",
     callouts: [
       {
         label:

@@ -1,4 +1,7 @@
-import { PREDICTION_CATEGORY_DEFINITIONS, type PredictionCategory } from "./categories";
+import {
+  PREDICTION_CATEGORY_DEFINITIONS,
+  type PredictionCategory,
+} from "./categories";
 import type { SpotlightPicksDraft } from "./spotlight-predictions-form";
 
 export function normalizedCustomName(value: string) {
@@ -39,4 +42,3 @@ export function spotlightIncompleteCategories(
       : [definition.category];
   });
 }
-

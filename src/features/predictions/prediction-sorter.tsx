@@ -123,7 +123,9 @@ const SortableTeamRow = memo(function SortableTeamRow({
         aria-label={`Choose a new position for ${team.displayName}, currently ${position} of ${count}`}
         className={cn(
           "focus-visible:ring-accent-blue grid size-11 shrink-0 place-items-center rounded-lg font-mono text-xs font-black tabular-nums outline-none focus-visible:ring-2 disabled:cursor-not-allowed",
-          position <= 10 ? "bg-brand text-white" : "bg-brand-soft text-brand-ink",
+          position <= 10
+            ? "bg-brand text-white"
+            : "bg-brand-soft text-brand-ink",
         )}
         disabled={disabled}
         onClick={() => onChoosePosition(team.id)}
@@ -371,7 +373,8 @@ export function PredictionSorter({
               : "Your predicted table"}
           </h2>
           <p className="text-muted mt-1 text-sm leading-5">
-            Drag the handle, tap a position number, or use Arrow, Page Up, Page Down, Home, and End.
+            Drag the handle, tap a position number, or use Arrow, Page Up, Page
+            Down, Home, and End.
           </p>
         </div>
         <Button

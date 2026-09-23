@@ -282,7 +282,8 @@ export default async function AdminResultsPage() {
             Spotlight results
           </h1>
           <p className="text-muted mt-2 max-w-3xl text-sm leading-6">
-            Enter a result list, check it against everyone’s picks, then publish it. Drafts stay private until you publish.
+            Enter a result list, check it against everyone’s picks, then publish
+            it. Drafts stay private until you publish.
           </p>
         </div>
 

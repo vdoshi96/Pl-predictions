@@ -128,7 +128,7 @@ export function AdminStatusBoard({
       <h2 className="text-xl font-bold" id="dataset-status-heading">
         Dataset status
       </h2>
-      <div className="border-border bg-surface overflow-x-auto rounded-xl border">
+      <div className="border-border bg-surface relative overflow-x-auto rounded-xl border">
         <table
           aria-label="Dataset status"
           className="w-full min-w-[34rem] text-left text-sm"

@@ -64,3 +64,47 @@ export function ordinal(value: number) {
       return `${value}th`;
   }
 }
+
+const leagueFormatter = new Intl.DateTimeFormat("en-US", {
+  day: "numeric",
+  hour: "numeric",
+  hour12: true,
+  minute: "2-digit",
+  month: "short",
+  timeZone: "America/Chicago",
+  timeZoneName: "short",
+  weekday: "short",
+});
+
+function leagueParts(value: Date | string) {
+  const date = typeof value === "string" ? new Date(value) : value;
+  const parts = new Map(
+    leagueFormatter
+      .formatToParts(date)
+      .filter((part) => part.type !== "literal")
+      .map((part) => [part.type, part.value]),
+  );
+  return {
+    day: `${parts.get("weekday")} ${parts.get("day")} ${parts.get("month")}`,
+    time: `${parts.get("hour")}:${parts.get("minute")} ${parts.get("dayPeriod")?.toLowerCase()}`,
+    zone: parts.get("timeZoneName"),
+  };
+}
+
+export function formatLeagueDateTime(value: Date | string) {
+  const parts = leagueParts(value);
+  return `${parts.day}, ${parts.time} ${parts.zone}`;
+}
+
+export function formatLeagueDay(value: Date | string) {
+  return leagueParts(value).day;
+}
+
+export function formatLeagueTime(value: Date | string) {
+  return leagueParts(value).time;
+}
+
+export function formatUtcDateTime(value: Date | string) {
+  const date = typeof value === "string" ? new Date(value) : value;
+  return formatDateTimePart(date, dateTimeFormatters.utc);
+}

@@ -15,11 +15,11 @@ export function PageHeading({
     <header className="page-heading">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div className="min-w-0">
-          <h1 className="text-3xl font-bold tracking-tight [overflow-wrap:anywhere] sm:text-4xl">
+          <h1 className="text-[1.75rem] leading-8 font-bold tracking-tight break-words sm:text-4xl sm:leading-10">
             {title}
           </h1>
           {description ? (
-            <p className="text-muted mt-2 max-w-2xl text-sm leading-6">
+            <p className="text-muted mt-1.5 max-w-2xl text-sm leading-6 sm:mt-2">
               {description}
             </p>
           ) : null}
@@ -27,7 +27,7 @@ export function PageHeading({
         {status}
       </div>
       {children ? (
-        <div className="text-muted mt-4 flex flex-wrap items-center gap-x-5 gap-y-2 text-xs leading-5">
+        <div className="text-muted mt-3 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs leading-5">
           {children}
         </div>
       ) : null}

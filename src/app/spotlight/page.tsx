@@ -11,12 +11,13 @@ import {
   buildSpotlightMatrix,
   canLoadSpotlightCategoryData,
   parseSpotlightView,
-  type SpotlightView,
 } from "@/features/leaderboard/spotlight-board";
 import { getLeaderboardView } from "@/features/leaderboard/queries";
 import { SpotlightPickGrid } from "@/features/leaderboard/spotlight-pick-grid";
 import {
   SpotlightCategoriesView,
+  SpotlightCategoryNav,
+  SpotlightViewNav,
   SpotlightMatrixView,
 } from "@/features/leaderboard/spotlight-views";
 import {
@@ -36,12 +37,6 @@ export const metadata: Metadata = { title: "Spotlight accuracy" };
 export const dynamic = "force-dynamic";
 
 type SpotlightSort = "overall" | PredictionCategory;
-const viewOptions: readonly { label: string; value: SpotlightView }[] = [
-  { label: "Categories", value: "categories" },
-  { label: "Entries", value: "entries" },
-  { label: "Matrix", value: "matrix" },
-];
-
 const sortOptions: readonly { label: string; value: SpotlightSort }[] = [
   { label: "Overall", value: "overall" },
   ...PREDICTION_CATEGORY_DEFINITIONS.map((definition) => ({
@@ -170,7 +165,6 @@ export default async function SpotlightPage({
           title="Who called it?"
           description="Seven spotlight predictions. A separate measure of accuracy."
         >
-          <span>{view.seasonName}</span>
           <span>{view.entries.length} active entries</span>
           <Link
             className="text-brand-ink inline-flex min-h-11 items-center font-semibold underline"
@@ -179,32 +173,7 @@ export default async function SpotlightPage({
             Table leaderboard
           </Link>
         </PageHeading>
-        <nav aria-label="Spotlight views">
-          <ul className="bg-surface-subtle grid grid-cols-3 gap-1 rounded-xl p-1">
-            {viewOptions.map((option) => {
-              const active = option.value === selectedView;
-              const href =
-                option.value === "categories"
-                  ? "/spotlight"
-                  : `/spotlight?view=${option.value}`;
-              return (
-                <li key={option.value}>
-                  <Link
-                    aria-current={active ? "page" : undefined}
-                    className={`focus-visible:ring-accent-blue inline-flex min-h-11 w-full items-center justify-center rounded-lg px-2 text-xs font-black outline-none focus-visible:ring-2 ${
-                      active
-                        ? "bg-brand text-white"
-                        : "text-muted hover:bg-surface"
-                    }`}
-                    href={href}
-                  >
-                    {option.label}
-                  </Link>
-                </li>
-              );
-            })}
-          </ul>
-        </nav>
+        <SpotlightViewNav selected={selectedView} />
 
         {selectedView === "entries" ? (
           <section
@@ -233,7 +202,7 @@ export default async function SpotlightPage({
                         aria-current={active ? "page" : undefined}
                         className={`focus-visible:ring-accent-blue inline-flex min-h-11 items-center rounded-xl border px-3 text-xs font-black outline-none focus-visible:ring-2 ${
                           active
-                            ? "border-brand bg-brand text-white"
+                            ? "border-brand bg-brand dark:ring-accent-blue text-white dark:ring-1"
                             : "border-border bg-surface text-muted hover:bg-surface-subtle"
                         }`}
                         href={
@@ -297,34 +266,7 @@ export default async function SpotlightPage({
           </Card>
         ) : selectedView === "categories" ? (
           <div className="grid gap-5">
-            <form
-              action="/spotlight"
-              className="flex flex-wrap items-end gap-3"
-            >
-              <label className="grid gap-2 text-sm font-semibold">
-                Category
-                <select
-                  name="category"
-                  defaultValue={selectedCategory}
-                  className="border-border bg-surface min-h-11 rounded-lg border px-3"
-                >
-                  {PREDICTION_CATEGORY_DEFINITIONS.map((definition) => (
-                    <option
-                      key={definition.category}
-                      value={definition.category}
-                    >
-                      {definition.label}
-                    </option>
-                  ))}
-                </select>
-              </label>
-              <button
-                type="submit"
-                className="bg-brand min-h-11 rounded-lg px-4 text-sm font-semibold text-white"
-              >
-                Show category
-              </button>
-            </form>
+            <SpotlightCategoryNav selected={selectedCategory} />
             <div className="season-layout">
               <SpotlightCategoriesView
                 boards={categoryBoards.filter(
@@ -344,7 +286,6 @@ export default async function SpotlightPage({
                       : "Published season totals determine occupied ranks, including ties. A reviewed result worth zero points is different from a pending result."}
                 </p>
                 <p className="text-muted mt-3">
-                  Select a player or club to see everyone who backed them.
                   Spotlight accuracy stays separate from table points.
                 </p>
               </aside>
@@ -442,7 +383,7 @@ export default async function SpotlightPage({
                           </span>
                         </div>
                         <div className="text-right">
-                          <strong className="text-rose-score block text-2xl font-black tabular-nums">
+                          <strong className="text-brand-ink-strong block text-2xl font-black tabular-nums">
                             {displayedScore}
                           </strong>
                           <span className="text-muted text-[0.65rem] font-bold tracking-wide uppercase">

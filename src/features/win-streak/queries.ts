@@ -351,6 +351,10 @@ async function activeRoundView(
 
   return {
     deadlineAt: deadline.toISOString(),
+    secondsUntilDeadline: Math.max(
+      0,
+      Math.floor((deadline.getTime() - databaseNow.getTime()) / 1_000),
+    ),
     fixtures: fixtureRows.map((fixture) => ({
       awayTeamSlug: requiredTeamSlug(
         teamSlugById.get(fixture.awayTeamId) ?? "",

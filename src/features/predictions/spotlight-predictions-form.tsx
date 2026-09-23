@@ -1,6 +1,5 @@
 "use client";
 
-import { Sparkles } from "lucide-react";
 import { useMemo, useState } from "react";
 
 import { PlayerMark } from "@/components/player-mark";
@@ -18,6 +17,17 @@ import {
   SearchablePredictionSelect,
   type SearchablePredictionOption,
 } from "./searchable-prediction-select";
+
+import {
+  normalizedCustomName,
+  spotlightPicksAreComplete,
+} from "./spotlight-completeness";
+import { SpotlightProgress } from "./spotlight-progress";
+
+export {
+  spotlightIncompleteCategories,
+  spotlightPicksAreComplete,
+} from "./spotlight-completeness";
 
 export interface PredictionPlayer {
   assetPath?: string | null;
@@ -54,45 +64,6 @@ export type SpotlightReviewItem = Readonly<{
   shortName?: string | null;
   subject: "player" | "team";
 }>;
-
-function normalizedCustomName(value: string) {
-  return value.normalize("NFKC").trim().replace(/\s+/gu, " ");
-}
-
-function normalizedCustomNameKey(value: string) {
-  return normalizedCustomName(value).toLocaleLowerCase("en-GB");
-}
-
-export function spotlightPicksAreComplete(picks: SpotlightPicksDraft): boolean {
-  return spotlightIncompleteCategories(picks).length === 0;
-}
-
-export function spotlightIncompleteCategories(
-  picks: SpotlightPicksDraft,
-): PredictionCategory[] {
-  return PREDICTION_CATEGORY_DEFINITIONS.flatMap((definition) => {
-    const pick = picks[definition.category];
-    if (!pick) return [definition.category];
-
-    if (definition.subject === "team") {
-      return pick.kind === "team" && Boolean(pick.teamId)
-        ? []
-        : [definition.category];
-    }
-
-    if (pick.kind === "player") {
-      return pick.playerId && pick.displayName.trim()
-        ? []
-        : [definition.category];
-    }
-    return pick.kind === "custom-player" &&
-      normalizedCustomName(pick.customPlayerName).length >= 2 &&
-      normalizedCustomName(pick.customPlayerName).length <= 120 &&
-      normalizedCustomNameKey(pick.customPlayerName).length <= 120
-      ? []
-      : [definition.category];
-  });
-}
 
 export function buildSpotlightCategoryPicks(
   picks: SpotlightPicksDraft,
@@ -245,30 +216,24 @@ export function SpotlightPredictionsForm({
 
   return (
     <section aria-labelledby="spotlight-picks-heading" className="grid gap-4">
-      <Card className="border-accent-lilac/30 bg-surface-lilac overflow-visible">
-        <CardContent className="flex items-start gap-3">
-          <span className="bg-brand text-accent grid size-11 shrink-0 place-items-center rounded-xl">
-            <Sparkles aria-hidden="true" className="size-5" />
-          </span>
-          <div>
-            <p className="text-rose-ink text-xs font-black tracking-[0.12em] uppercase">
-              Step 2 of 3
-            </p>
-            <h2
-              id="spotlight-picks-heading"
-              tabIndex={-1}
-              className="text-brand-ink-strong mt-1 text-2xl font-black tracking-tight outline-none"
-            >
-              Make your spotlight picks
-            </h2>
-            <p className="text-muted mt-2 text-sm leading-6">
-              {players.length > 0
-                ? `Type at least 2 letters to search ${players.length.toLocaleString("en-GB")} ${players.length === 1 ? "player" : "players"} by name. Up to 20 matches are shown, and Other player remains available for anyone new or unavailable.`
-                : "No player catalogue is loaded yet. Other player remains available in every player category."}
-            </p>
-          </div>
-        </CardContent>
-      </Card>
+      <div className="grid gap-2">
+        <p className="text-rose-ink text-xs font-black tracking-[0.12em] uppercase">
+          Step 2 of 3
+        </p>
+        <h2
+          className="text-brand-ink-strong text-2xl font-black tracking-tight outline-none"
+          id="spotlight-picks-heading"
+          tabIndex={-1}
+        >
+          Make your spotlight picks
+        </h2>
+        <SpotlightProgress picks={picks} />
+        <p className="text-muted text-sm leading-6">
+          {players.length > 0
+            ? `Search ${players.length.toLocaleString("en-GB")} ${players.length === 1 ? "player" : "players"} by name (2+ letters). Other player is always available.`
+            : "No player catalogue is loaded yet. Other player remains available in every player category."}
+        </p>
+      </div>
 
       {invalidCount > 0 ? (
         <p

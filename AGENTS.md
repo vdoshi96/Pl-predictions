@@ -22,7 +22,7 @@ The 20 owner-provided club badge PNGs are the canonical local team marks; the or
 
 ## Interface direction
 
-The approved September 2026 redesign uses calm surfaces, compact headers, and explicit Season table and Leaderboard navigation. Keep the points podium: group it by competition ranks 1–3, include everyone tied at a displayed rank, and give tied entries equal styling. Decorative animal icons derive from public display names without new data or customization. Entry detail leads with per-club scoring before Spotlight. The Categories view offers all seven boards through a selector; retain Entries, Matrix, and participant disclosures.
+The approved September 2026 redesign uses calm surfaces, compact headers, and explicit Season table and Leaderboard navigation. Keep the points podium: group it by competition ranks 1–3, include everyone tied at a displayed rank, and give tied entries equal styling. Decorative animal icons derive from public display names without new data or customization. Entry detail leads with per-club scoring before Spotlight. The Categories view offers all seven boards through a selector; retain Entries, Matrix, and participant disclosures. The September 22 UX refresh adds a mobile bottom tab bar, one-tap Spotlight category chips, an instant leaderboard filter, a scored entry summary with compare and previous/next, tabbed Rules, and a Win Streak countdown with day-grouped kickoffs; `docs/superpowers/specs/2026-09-22-ux-audit.html` records the approved direction.
 
 ## Important paths
 

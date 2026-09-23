@@ -1,22 +1,15 @@
+import { ScoreBreakdownBar } from "@/components/score-breakdown-bar";
 import { TeamMark } from "@/components/team-mark";
 import { Card } from "@/components/ui/card";
-import { Podium } from "./podium";
 
-import { getEntryAvatar } from "./entry-avatar";
 import { LeaderboardEntryLink } from "./entry-link";
+import { Podium } from "./podium";
 import type { LeaderboardRosterEntry, ScoredLeaderboardEntry } from "./queries";
 
-function EntryAvatar({ name }: { name: string }) {
-  const avatar = getEntryAvatar(name);
-  return (
-    <span
-      aria-hidden="true"
-      className="grid size-9 shrink-0 place-items-center rounded-full text-xs font-black text-white"
-      style={{ backgroundColor: avatar.backgroundColor }}
-    >
-      {avatar.initials}
-    </span>
-  );
+export function matchesParticipantQuery(name: string, query: string) {
+  return name
+    .toLocaleLowerCase("en-GB")
+    .includes(query.trim().toLocaleLowerCase("en-GB"));
 }
 
 function Movement({ value }: { value: number | null }) {
@@ -32,8 +25,8 @@ function Movement({ value }: { value: number | null }) {
           : "no rank change";
   return (
     <span
-      className={`mt-1 block text-[0.7rem] font-black whitespace-nowrap ${
-        climbed ? "text-mint-ink" : dropped ? "text-rose-score" : "text-muted"
+      className={`mt-0.5 block text-[0.68rem] font-black whitespace-nowrap ${
+        climbed ? "text-mint-ink" : dropped ? "text-danger" : "text-muted"
       }`}
     >
       <span aria-hidden="true">
@@ -61,12 +54,15 @@ function Champion({
         size="sm"
         src={champion.assetPath}
       />
-      <span className="min-w-0 [overflow-wrap:anywhere]">
+      <span className="min-w-0 break-words max-sm:sr-only">
         {champion.displayName}
       </span>
     </span>
   );
 }
+
+const rowClassName =
+  "border-surface-lilac-border hover:bg-surface-subtle border-b align-middle last:border-b-0 max-sm:grid max-sm:min-h-14 max-sm:grid-cols-[2.5rem_minmax(0,1fr)_2rem_3rem] max-sm:grid-rows-[auto_auto] max-sm:items-center max-sm:gap-x-2 max-sm:px-3 max-sm:py-2";
 
 export function ScoredLeaderboardBoard({
   entries,
@@ -76,15 +72,20 @@ export function ScoredLeaderboardBoard({
   query?: string;
 }) {
   const visibleEntries = entries.filter((entry) =>
-    entry.participantName
-      .toLocaleLowerCase()
-      .includes(query.toLocaleLowerCase()),
+    matchesParticipantQuery(entry.participantName, query),
   );
+  const hasMovement = entries.some((entry) => entry.movement !== null);
+
   return (
-    <section aria-label="Scored leaderboard" className="grid gap-5">
+    <section aria-label="Scored leaderboard" className="grid gap-4">
       <Podium entries={entries} />
+      {hasMovement ? (
+        <p className="text-muted px-1 text-xs">
+          ▲▼ Movement since the previous published table.
+        </p>
+      ) : null}
       {visibleEntries.length === 0 ? (
-        <p role="status" className="text-muted py-4 text-sm">
+        <p className="text-muted py-4 text-sm" role="status">
           No matching participant. Try a different name.
         </p>
       ) : null}
@@ -103,12 +104,12 @@ export function ScoredLeaderboardBoard({
                 Entry
               </th>
               <th className="px-3 py-3" scope="col">
-                Champion
-              </th>
-              <th className="px-3 py-3" scope="col">
                 Breakdown
               </th>
-              <th className="w-32 px-3 py-3 text-right" scope="col">
+              <th className="px-3 py-3" scope="col">
+                Champion
+              </th>
+              <th className="w-28 px-3 py-3 text-right" scope="col">
                 Table points
               </th>
             </tr>
@@ -117,69 +118,44 @@ export function ScoredLeaderboardBoard({
             {visibleEntries.map((entry) => (
               <tr
                 aria-label={`${entry.participantName} leaderboard entry`}
-                className="border-surface-lilac-border hover:bg-surface-subtle border-b align-middle last:border-b-0 max-sm:grid max-sm:min-h-24 max-sm:grid-cols-[3rem_minmax(0,1fr)_auto] max-sm:grid-rows-[auto_auto] max-sm:items-center max-sm:gap-x-2 max-sm:px-3 max-sm:py-2"
+                className={rowClassName}
                 key={entry.id}
               >
-                <td className="px-3 py-2 max-sm:col-start-1 max-sm:row-span-2 max-sm:p-0">
+                <td className="px-3 py-2 max-sm:col-start-1 max-sm:row-span-2 max-sm:row-start-1 max-sm:p-0 max-sm:text-center">
                   <span
                     aria-label={`Rank ${entry.rank}`}
-                    className="bg-brand grid size-9 place-items-center rounded-xl font-black text-white"
+                    className="bg-brand mx-auto grid size-8 place-items-center rounded-lg text-sm font-black text-white tabular-nums sm:mx-0 sm:size-9 sm:rounded-xl"
                   >
                     {entry.rank}
                   </span>
                   <Movement value={entry.movement} />
                 </td>
                 <td className="min-w-0 px-3 py-2 max-sm:col-start-2 max-sm:row-start-1 max-sm:p-0">
-                  <span className="flex min-w-0 items-center gap-2">
-                    <EntryAvatar name={entry.participantName} />
-                    <LeaderboardEntryLink
-                      entryId={entry.id}
-                      participantName={entry.participantName}
-                    />
-                  </span>
+                  <LeaderboardEntryLink
+                    entryId={entry.id}
+                    participantName={entry.participantName}
+                  />
                 </td>
                 <td className="px-3 py-2 max-sm:col-start-2 max-sm:row-start-2 max-sm:p-0">
+                  <ScoreBreakdownBar
+                    className="max-w-40"
+                    correctHalf={entry.correctHalfCount}
+                    exact={entry.exactCount}
+                    withinThree={entry.withinThreeCount}
+                  />
+                  <span className="text-muted mt-1 block text-[0.68rem] font-semibold">
+                    {entry.exactCount} exact · {entry.withinThreeCount} within 3
+                    · {entry.correctHalfCount} half
+                  </span>
+                </td>
+                <td className="px-3 py-2 max-sm:col-start-3 max-sm:row-span-2 max-sm:row-start-1 max-sm:p-0">
                   <Champion champion={entry.champion} />
                 </td>
-                <td className="px-3 py-2 max-sm:sr-only">
-                  <span className="flex flex-wrap gap-1.5">
-                    <span className="bg-mint text-mint-ink rounded-full px-2 py-1 text-[0.68rem] font-black">
-                      {entry.exactCount} exact
-                    </span>
-                    <span className="bg-sky-soft text-brand-ink rounded-full px-2 py-1 text-[0.68rem] font-black">
-                      {entry.withinThreeCount} within 3
-                    </span>
-                    <span className="bg-rose-soft text-rose-ink rounded-full px-2 py-1 text-[0.68rem] font-black">
-                      {entry.correctHalfCount} half
-                    </span>
-                  </span>
-                  <span className="sr-only">
-                    {entry.exactCount} exact, {entry.withinThreeCount} within 3,
-                    {entry.correctHalfCount} in the correct half
-                  </span>
-                </td>
-                <td className="px-3 py-2 text-right max-sm:col-start-3 max-sm:row-span-2 max-sm:row-start-1 max-sm:p-0">
-                  <strong className="text-rose-score block text-xl font-black tabular-nums">
+                <td className="px-3 py-2 text-right max-sm:col-start-4 max-sm:row-span-2 max-sm:row-start-1 max-sm:p-0">
+                  <strong className="text-brand-ink-strong block text-xl font-black tabular-nums">
                     {entry.totalScore}
                   </strong>
-                  <span className="text-muted text-[0.62rem] font-bold uppercase">
-                    table points
-                  </span>
-                  <span
-                    aria-label={`${entry.totalScore} of 100 table points`}
-                    className="border-border bg-surface-subtle mt-1 ml-auto block h-2 w-24 overflow-hidden rounded-full border max-sm:w-16"
-                    role="progressbar"
-                    aria-valuemax={100}
-                    aria-valuemin={0}
-                    aria-valuenow={entry.totalScore}
-                  >
-                    <span
-                      className="from-accent-lilac to-accent-pink block h-full rounded-full bg-gradient-to-r"
-                      style={{
-                        width: `${Math.min(100, Math.max(0, entry.totalScore))}%`,
-                      }}
-                    />
-                  </span>
+                  <span className="sr-only">of 100 table points</span>
                 </td>
               </tr>
             ))}
@@ -224,42 +200,37 @@ export function LeaderboardRosterTable({
             {entries.map((entry) => (
               <tr
                 aria-label={`${entry.participantName} leaderboard entry`}
-                className="border-surface-lilac-border border-b last:border-b-0 max-sm:grid max-sm:min-h-20 max-sm:grid-cols-[2.5rem_minmax(0,1fr)_auto] max-sm:grid-rows-2 max-sm:items-center max-sm:gap-x-2 max-sm:px-3 max-sm:py-2"
+                className="border-surface-lilac-border border-b last:border-b-0 max-sm:grid max-sm:min-h-14 max-sm:grid-cols-[2.5rem_minmax(0,1fr)_2rem_3rem] max-sm:items-center max-sm:gap-x-2 max-sm:px-3 max-sm:py-2"
                 key={entry.publicKey}
               >
-                <td className="px-3 py-2 max-sm:col-start-1 max-sm:row-span-2 max-sm:p-0">
+                <td className="px-3 py-2 max-sm:p-0">
                   <span
                     aria-label="Rank pending"
-                    className="bg-brand grid size-9 place-items-center rounded-xl font-black text-white"
+                    className="bg-brand grid size-8 place-items-center rounded-lg font-black text-white sm:size-9 sm:rounded-xl"
                   >
                     —
                   </span>
                 </td>
-                <td className="min-w-0 px-3 py-2 max-sm:col-start-2 max-sm:row-start-1 max-sm:p-0">
-                  <span className="flex min-w-0 items-center gap-2">
-                    <EntryAvatar name={entry.participantName} />
-                    {predictionsRevealed && entry.id ? (
-                      <LeaderboardEntryLink
-                        entryId={entry.id}
-                        participantName={entry.participantName}
-                      />
-                    ) : (
-                      <span className="text-foreground font-black [overflow-wrap:anywhere]">
-                        {entry.participantName}
-                      </span>
-                    )}
-                  </span>
+                <td className="min-w-0 px-3 py-2 max-sm:p-0">
+                  {predictionsRevealed && entry.id ? (
+                    <LeaderboardEntryLink
+                      entryId={entry.id}
+                      participantName={entry.participantName}
+                    />
+                  ) : (
+                    <span className="text-foreground font-black break-words">
+                      {entry.participantName}
+                    </span>
+                  )}
                 </td>
-                <td className="px-3 py-2 max-sm:col-start-2 max-sm:row-start-2 max-sm:p-0">
+                <td className="px-3 py-2 max-sm:p-0">
                   <Champion champion={entry.champion} />
                 </td>
-                <td className="px-3 py-2 text-right max-sm:col-start-3 max-sm:row-span-2 max-sm:row-start-1 max-sm:p-0">
-                  <strong className="text-rose-score block text-xl font-black tabular-nums">
+                <td className="px-3 py-2 text-right max-sm:p-0">
+                  <strong className="text-brand-ink-strong block text-xl font-black tabular-nums">
                     {entry.totalScore}
                   </strong>
-                  <span className="text-muted text-[0.62rem] font-bold uppercase">
-                    table points
-                  </span>
+                  <span className="sr-only">of 100 table points</span>
                 </td>
               </tr>
             ))}

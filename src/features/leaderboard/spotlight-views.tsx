@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 import { PlayerMark } from "@/components/player-mark";
 import { TeamMark } from "@/components/team-mark";
 import { Badge } from "@/components/ui/badge";
@@ -12,6 +14,7 @@ import { LeaderboardEntryLink } from "./entry-link";
 import type {
   SpotlightCategoryBoard,
   SpotlightMatrixEntry,
+  SpotlightView,
 } from "./spotlight-board";
 import type { SpotlightPickDisplay } from "./spotlight-pick-grid";
 
@@ -76,7 +79,12 @@ function ResultChip({
             : "bg-surface-subtle text-muted"
       }`}
     >
-      Result rank {rank} · {accuracyPoints ?? 0} pts
+      <span aria-hidden="true">
+        #{rank} · {accuracyPoints ?? 0} pts
+      </span>
+      <span className="sr-only">
+        Result rank {rank}, {accuracyPoints ?? 0} accuracy points
+      </span>
     </span>
   );
 }
@@ -115,39 +123,26 @@ export function SpotlightCategoriesView({
                 {resultLive ? "Result live" : "Result pending"}
               </Badge>
             </div>
-            <div className="border-surface-lilac-border flex min-h-20 items-center gap-3 border-b border-dashed px-4 py-3">
+            <p
+              className="border-surface-lilac-border text-muted border-b border-dashed px-4 py-2 text-xs"
+              data-testid="category-leader"
+            >
+              <span className="text-[0.62rem] font-black tracking-wider uppercase">
+                Current leader
+              </span>{" "}
               {leader ? (
                 <>
-                  <SubjectMark
-                    assetPath={leader.assetPath}
-                    displayName={leader.displayName}
-                    shortName={leader.shortName}
-                    size="lg"
-                    subject={leader.subject}
-                  />
-                  <div className="min-w-0">
-                    <span className="text-muted block text-[0.62rem] font-black tracking-wider uppercase">
-                      Current leader
-                    </span>
-                    <strong className="text-brand-ink-strong mt-0.5 block text-sm font-black [overflow-wrap:anywhere]">
-                      {leader.displayName}
-                    </strong>
-                    <span className="text-muted mt-0.5 block text-xs font-semibold">
-                      {leader.metricLabel}
-                    </span>
-                  </div>
+                  <strong className="text-brand-ink-strong break-words">
+                    {leader.displayName}
+                  </strong>{" "}
+                  · {leader.metricLabel}
                 </>
               ) : (
-                <div>
-                  <span className="text-muted block text-[0.62rem] font-black tracking-wider uppercase">
-                    Current leader
-                  </span>
-                  <strong className="text-muted mt-1 block text-sm font-black">
-                    Awaiting results publication
-                  </strong>
-                </div>
+                <strong className="text-muted">
+                  Awaiting results publication
+                </strong>
               )}
-            </div>
+            </p>
             <div>
               {board.rows.map((row) => (
                 <details
@@ -162,7 +157,7 @@ export function SpotlightCategoriesView({
                       subject={row.subject}
                     />
                     <span className="min-w-0">
-                      <strong className="text-foreground flex items-center gap-1.5 text-xs font-black [overflow-wrap:anywhere]">
+                      <strong className="text-foreground flex items-center gap-1.5 text-xs font-black break-words">
                         <span>
                           {row.displayName}{" "}
                           {row.isOther ? (
@@ -202,7 +197,9 @@ export function SpotlightCategoriesView({
                           ) : null}
                         </span>
                         <span className="text-muted text-[0.68rem] font-bold">
-                          {row.count} of {entryCount} · Select to see names
+                          {row.count === 1
+                            ? row.pickers[0]?.participantName
+                            : `${row.count} of ${entryCount}`}
                         </span>
                       </span>
                     </span>
@@ -250,6 +247,27 @@ function matrixCellClass(pick: SpotlightPickDisplay): string {
   return "bg-surface-subtle text-muted";
 }
 
+const MATRIX_ABBREVIATIONS: Record<PredictionCategory, string> = {
+  most_clean_sheets: "CS",
+  overrated_player: "OP",
+  overrated_team: "OT",
+  top_assister: "TA",
+  top_scorer: "TS",
+  underdog_player: "UP",
+  underdog_team: "UT",
+};
+
+function compactMatrixResult(pick: SpotlightPickDisplay): string {
+  if (pick.resultStatus === "outside-range") return "Out";
+  if (pick.resultRank === undefined || pick.resultRank === null) {
+    return pick.category === "underdog_player" ||
+      pick.category === "overrated_player"
+      ? "N/A"
+      : "…";
+  }
+  return `#${pick.resultRank}`;
+}
+
 function matrixResult(pick: SpotlightPickDisplay): string {
   if (pick.resultStatus === "outside-range") return "Outside range";
   if (pick.resultRank === undefined || pick.resultRank === null) {
@@ -278,87 +296,214 @@ export function SpotlightMatrixView({
         <Badge>Lower rank / outside range</Badge>
         <Badge variant="warning">Result pending</Badge>
       </div>
-      <Card className="overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="min-w-[64rem] border-collapse text-xs">
-            <caption className="sr-only">
-              Every entry&apos;s seven spotlight picks and current accuracy.
-            </caption>
-            <thead>
-              <tr className="border-border text-muted border-b-2 text-[0.6rem] font-black tracking-wider uppercase">
-                <th
-                  className="bg-surface sticky left-0 z-20 px-3 py-3 text-left"
-                  scope="col"
-                >
-                  Entry
-                </th>
-                {PREDICTION_CATEGORY_DEFINITIONS.map((definition) => (
+      <div className="max-sm:hidden">
+        <Card className="overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="min-w-[64rem] border-collapse text-xs">
+              <caption className="sr-only">
+                Every entry&apos;s seven spotlight picks and current accuracy.
+              </caption>
+              <thead>
+                <tr className="border-border text-muted border-b-2 text-[0.6rem] font-black tracking-wider uppercase">
                   <th
-                    className="px-2 py-3 text-center"
-                    key={definition.category}
+                    className="bg-surface sticky left-0 z-20 px-3 py-3 text-left"
                     scope="col"
                   >
-                    {definition.label}
+                    Entry
                   </th>
-                ))}
-                <th className="px-3 py-3 text-center" scope="col">
-                  Accuracy
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {entries.map((entry) => (
-                <tr
-                  className="border-surface-lilac-border border-b last:border-b-0"
-                  key={entry.id}
-                >
-                  <th
-                    className="bg-surface sticky left-0 z-10 min-w-40 px-3 py-2 text-left"
-                    scope="row"
-                  >
-                    <LeaderboardEntryLink
-                      entryId={entry.id}
-                      participantName={entry.participantName}
-                    />
+                  {PREDICTION_CATEGORY_DEFINITIONS.map((definition) => (
+                    <th
+                      className="px-2 py-3 text-center"
+                      key={definition.category}
+                      scope="col"
+                    >
+                      {definition.label}
+                    </th>
+                  ))}
+                  <th className="px-3 py-3 text-center" scope="col">
+                    Accuracy
                   </th>
-                  {PREDICTION_CATEGORY_DEFINITIONS.map((definition) => {
-                    const pick = entry.picksByCategory.get(definition.category);
-                    return (
-                      <td
-                        className="px-2 py-2 text-center"
-                        key={definition.category}
-                      >
-                        {pick ? (
-                          <span
-                            className={`inline-flex min-h-12 min-w-24 flex-col items-center justify-center rounded-lg px-2 py-1 ${matrixCellClass(pick)}`}
-                          >
-                            <strong className="max-w-24 leading-4 [overflow-wrap:anywhere]">
-                              {shortPickName(pick)}
-                            </strong>
-                            <span className="mt-0.5 text-[0.6rem] font-bold">
-                              {matrixResult(pick)}
-                            </span>
-                          </span>
-                        ) : (
-                          <span className="text-muted">—</span>
-                        )}
-                      </td>
-                    );
-                  })}
-                  <td className="px-3 py-2 text-center">
-                    <strong className="text-rose-score block text-base font-black tabular-nums">
-                      {entry.accuracyScore}
-                    </strong>
-                    <span className="text-muted text-[0.62rem] font-bold">
-                      {entry.availableCategoryCount} of 7 available
-                    </span>
-                  </td>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </Card>
+              </thead>
+              <tbody>
+                {entries.map((entry) => (
+                  <tr
+                    className="border-surface-lilac-border border-b last:border-b-0"
+                    key={entry.id}
+                  >
+                    <th
+                      className="bg-surface sticky left-0 z-10 min-w-40 px-3 py-2 text-left"
+                      scope="row"
+                    >
+                      <LeaderboardEntryLink
+                        entryId={entry.id}
+                        participantName={entry.participantName}
+                      />
+                    </th>
+                    {PREDICTION_CATEGORY_DEFINITIONS.map((definition) => {
+                      const pick = entry.picksByCategory.get(
+                        definition.category,
+                      );
+                      return (
+                        <td
+                          className="px-2 py-2 text-center"
+                          key={definition.category}
+                        >
+                          {pick ? (
+                            <span
+                              className={`inline-flex min-h-12 min-w-24 flex-col items-center justify-center rounded-lg px-2 py-1 ${matrixCellClass(pick)}`}
+                            >
+                              <strong className="max-w-24 leading-4 break-words">
+                                {shortPickName(pick)}
+                              </strong>
+                              <span className="mt-0.5 text-[0.6rem] font-bold">
+                                {matrixResult(pick)}
+                              </span>
+                            </span>
+                          ) : (
+                            <span className="text-muted">—</span>
+                          )}
+                        </td>
+                      );
+                    })}
+                    <td className="px-3 py-2 text-center">
+                      <strong className="text-brand-ink-strong block text-base font-black tabular-nums">
+                        {entry.accuracyScore}
+                      </strong>
+                      <span className="text-muted text-[0.62rem] font-bold">
+                        {entry.availableCategoryCount} of 7 available
+                      </span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </Card>
+      </div>
+      <ul aria-label="Picks by entry" className="grid gap-2 sm:hidden">
+        {entries.map((entry) => (
+          <li
+            aria-label={`${entry.participantName} spotlight picks`}
+            className="border-border bg-surface rounded-xl border p-3"
+            key={entry.id}
+          >
+            <div className="flex items-center justify-between gap-2">
+              <LeaderboardEntryLink
+                entryId={entry.id}
+                participantName={entry.participantName}
+              />
+              <span className="text-muted shrink-0 text-xs font-semibold">
+                {entry.availableCategoryCount} of 7 live · {entry.accuracyScore}{" "}
+                pts
+              </span>
+            </div>
+            <ul
+              aria-label={`${entry.participantName} picks`}
+              className="mt-2 grid grid-cols-4 gap-1"
+            >
+              {PREDICTION_CATEGORY_DEFINITIONS.map((definition) => {
+                const pick = entry.picksByCategory.get(definition.category);
+                return (
+                  <li
+                    className={`flex min-h-9 items-center justify-center gap-1 rounded-lg px-1 text-[0.68rem] font-black ${pick ? matrixCellClass(pick) : "bg-surface-subtle text-muted"}`}
+                    key={definition.category}
+                  >
+                    <abbr
+                      aria-hidden="true"
+                      className="no-underline"
+                      title={definition.label}
+                    >
+                      {MATRIX_ABBREVIATIONS[definition.category]}
+                    </abbr>
+                    <span aria-hidden="true">
+                      {pick ? compactMatrixResult(pick) : "—"}
+                    </span>
+                    <span className="sr-only">
+                      {pick
+                        ? `${definition.label}: ${pick.displayName}, ${matrixResult(pick)}`
+                        : `${definition.label}: no pick`}
+                    </span>
+                  </li>
+                );
+              })}
+            </ul>
+          </li>
+        ))}
+      </ul>
     </section>
+  );
+}
+
+const activeChipClassName =
+  "border-brand bg-brand text-white dark:ring-1 dark:ring-accent-blue";
+const idleChipClassName =
+  "border-border bg-surface text-muted hover:bg-surface-subtle";
+
+export function SpotlightCategoryNav({
+  selected,
+}: {
+  selected: PredictionCategory;
+}) {
+  return (
+    <nav
+      aria-label="Choose a spotlight category"
+      className="-mx-1 overflow-x-auto px-1 pb-1"
+    >
+      <ul className="flex w-max gap-2">
+        {PREDICTION_CATEGORY_DEFINITIONS.map((definition) => {
+          const active = definition.category === selected;
+          return (
+            <li key={definition.category}>
+              <Link
+                aria-current={active ? "page" : undefined}
+                className={`focus-visible:ring-accent-blue inline-flex min-h-11 items-center rounded-full border px-3.5 text-xs font-black whitespace-nowrap outline-none focus-visible:ring-2 ${active ? activeChipClassName : idleChipClassName}`}
+                href={`/spotlight?category=${definition.category}`}
+                scroll={false}
+              >
+                {definition.label}
+              </Link>
+            </li>
+          );
+        })}
+      </ul>
+    </nav>
+  );
+}
+
+const viewOptions: readonly {
+  href: string;
+  label: string;
+  value: SpotlightView;
+}[] = [
+  { href: "/spotlight", label: "Categories", value: "categories" },
+  { href: "/spotlight?view=entries", label: "Entries", value: "entries" },
+  { href: "/spotlight?view=matrix", label: "Matrix", value: "matrix" },
+];
+
+export function SpotlightViewNav({ selected }: { selected: SpotlightView }) {
+  return (
+    <nav aria-label="Spotlight views">
+      <ul className="bg-surface-subtle grid grid-cols-3 gap-1 rounded-xl p-1">
+        {viewOptions.map((option) => {
+          const active = option.value === selected;
+          return (
+            <li key={option.value}>
+              <Link
+                aria-current={active ? "page" : undefined}
+                className={`focus-visible:ring-accent-blue inline-flex min-h-11 w-full items-center justify-center rounded-lg px-2 text-xs font-black outline-none focus-visible:ring-2 ${
+                  active
+                    ? "bg-brand dark:ring-accent-blue text-white dark:ring-1"
+                    : "text-muted hover:bg-surface"
+                }`}
+                href={option.href}
+              >
+                {option.label}
+              </Link>
+            </li>
+          );
+        })}
+      </ul>
+    </nav>
   );
 }

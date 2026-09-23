@@ -1,7 +1,13 @@
 "use client";
 
+import * as Dialog from "@radix-ui/react-dialog";
+
 import { move } from "@dnd-kit/helpers";
-import { Accessibility, PointerActivationConstraints } from "@dnd-kit/dom";
+import {
+  Accessibility,
+  Feedback,
+  PointerActivationConstraints,
+} from "@dnd-kit/dom";
 import {
   DragDropProvider,
   PointerSensor,
@@ -71,6 +77,7 @@ interface SortableTeamRowProps {
   count: number;
   disabled: boolean;
   positionKind: "predicted" | "actual";
+  onChoosePosition: (teamId: string) => void;
   onKeyboardMove: (
     teamId: string,
     destination: -5 | -1 | 1 | 5 | "start" | "end",
@@ -83,6 +90,7 @@ const SortableTeamRow = memo(function SortableTeamRow({
   count,
   disabled,
   positionKind,
+  onChoosePosition,
   onKeyboardMove,
 }: SortableTeamRowProps) {
   const position = index + 1;
@@ -94,6 +102,10 @@ const SortableTeamRow = memo(function SortableTeamRow({
       teamName: team.displayName,
       position,
     },
+    plugins: (defaults) => [
+      ...defaults,
+      Feedback.configure({ dropAnimation: null }),
+    ],
   });
 
   return (
@@ -115,17 +127,20 @@ const SortableTeamRow = memo(function SortableTeamRow({
         isDragging && "border-accent z-10 scale-[1.03] opacity-100 shadow-xl",
       )}
     >
-      <span
-        aria-label={`${positionKind === "predicted" ? "Predicted" : "Actual"} position ${position}`}
+      <button
+        aria-label={`Choose a new position for ${team.displayName}, currently ${position} of ${count}`}
         className={cn(
-          "grid size-8 shrink-0 place-items-center rounded-lg font-mono text-xs font-black tabular-nums",
+          "focus-visible:ring-accent-blue grid size-11 shrink-0 place-items-center rounded-lg font-mono text-xs font-black tabular-nums outline-none focus-visible:ring-2 disabled:cursor-not-allowed",
           position <= 10
             ? "bg-brand text-white"
             : "bg-brand-soft text-brand-ink",
         )}
+        disabled={disabled}
+        onClick={() => onChoosePosition(team.id)}
+        type="button"
       >
         {position}
-      </span>
+      </button>
 
       <TeamMark
         name={team.displayName}
@@ -191,6 +206,8 @@ export function PredictionSorter({
   className,
 }: PredictionSorterProps) {
   const headingId = useId();
+  const [moveTeamId, setMoveTeamId] = useState<string | null>(null);
+  const moveDescriptionId = useId();
   const positionKind = mode === "standings" ? "actual" : "predicted";
   const [announcement, setAnnouncement] = useState(
     mode === "standings"
@@ -206,17 +223,10 @@ export function PredictionSorter({
   );
   const isAlphabetical = ordersMatch(teams, alphabeticalTeams);
 
-  const handleKeyboardMove = useCallback(
-    (teamId: string, destination: -5 | -1 | 1 | 5 | "start" | "end") => {
+  const moveTeamToIndex = useCallback(
+    (teamId: string, requestedIndex: number) => {
       const currentIndex = teams.findIndex((team) => team.id === teamId);
       if (currentIndex < 0) return;
-
-      const requestedIndex =
-        destination === "start"
-          ? 0
-          : destination === "end"
-            ? teams.length - 1
-            : currentIndex + destination;
       const nextIndex = Math.min(teams.length - 1, Math.max(0, requestedIndex));
       const source = teams[currentIndex];
       if (!source) return;
@@ -239,6 +249,35 @@ export function PredictionSorter({
     },
     [onChange, teams],
   );
+
+  const handleKeyboardMove = useCallback(
+    (teamId: string, destination: -5 | -1 | 1 | 5 | "start" | "end") => {
+      const currentIndex = teams.findIndex((team) => team.id === teamId);
+      if (currentIndex < 0) return;
+      moveTeamToIndex(
+        teamId,
+        destination === "start"
+          ? 0
+          : destination === "end"
+            ? teams.length - 1
+            : currentIndex + destination,
+      );
+    },
+    [moveTeamToIndex, teams],
+  );
+
+  const moveTeam = moveTeamId
+    ? (teams.find((team) => team.id === moveTeamId) ?? null)
+    : null;
+  const moveTeamIndex = moveTeam
+    ? teams.findIndex((team) => team.id === moveTeam.id)
+    : -1;
+
+  function chooseIndex(index: number) {
+    if (!moveTeam) return;
+    moveTeamToIndex(moveTeam.id, index);
+    setMoveTeamId(null);
+  }
 
   function handleDragStart(event: DragStartEvent) {
     const source = teamForId(teams, event.operation.source?.id);
@@ -342,7 +381,8 @@ export function PredictionSorter({
               : "Your predicted table"}
           </h2>
           <p className="text-muted mt-1 text-sm leading-5">
-            Drag the handle, or use Arrow, Page Up, Page Down, Home, and End.
+            Drag the handle, tap a position number, or use Arrow, Page Up, Page
+            Down, Home, and End.
           </p>
         </div>
         <Button
@@ -387,11 +427,76 @@ export function PredictionSorter({
               count={teams.length}
               disabled={disabled}
               positionKind={positionKind}
+              onChoosePosition={setMoveTeamId}
               onKeyboardMove={handleKeyboardMove}
             />
           ))}
         </ol>
       </DragDropProvider>
+      <Dialog.Root
+        onOpenChange={(open) => {
+          if (!open) setMoveTeamId(null);
+        }}
+        open={moveTeam !== null}
+      >
+        <Dialog.Portal>
+          <Dialog.Overlay className="t-modal-overlay bg-brand-strong/60 fixed inset-0 z-50" />
+          <Dialog.Content
+            aria-describedby={moveDescriptionId}
+            className="border-border bg-surface text-foreground fixed inset-x-0 bottom-0 z-50 max-h-[85dvh] overflow-y-auto rounded-t-2xl border p-4 pb-[max(1rem,env(safe-area-inset-bottom))] shadow-2xl outline-none sm:inset-x-auto sm:top-1/2 sm:bottom-auto sm:left-1/2 sm:w-[min(26rem,calc(100vw-2rem))] sm:-translate-x-1/2 sm:-translate-y-1/2 sm:rounded-2xl"
+          >
+            {moveTeam ? (
+              <>
+                <Dialog.Title className="text-brand-ink-strong text-lg font-black">
+                  Move {moveTeam.displayName}
+                </Dialog.Title>
+                <Dialog.Description
+                  className="text-muted mt-1 text-sm"
+                  id={moveDescriptionId}
+                >
+                  Currently {positionKind} position {moveTeamIndex + 1} of{" "}
+                  {teams.length}.
+                </Dialog.Description>
+                <div className="mt-4 grid grid-cols-5 gap-2">
+                  {teams.map((team, index) => (
+                    <button
+                      aria-label={`Position ${index + 1}`}
+                      className="border-border bg-surface text-brand-ink-strong hover:border-accent-lilac disabled:bg-surface-subtle disabled:text-muted min-h-11 rounded-lg border text-sm font-black tabular-nums disabled:line-through"
+                      disabled={index === moveTeamIndex}
+                      key={team.id}
+                      onClick={() => chooseIndex(index)}
+                      type="button"
+                    >
+                      {index + 1}
+                    </button>
+                  ))}
+                </div>
+                <div className="mt-3 grid grid-cols-2 gap-2">
+                  <Button
+                    disabled={moveTeamIndex === 0}
+                    onClick={() => chooseIndex(0)}
+                    variant="secondary"
+                  >
+                    Move to top
+                  </Button>
+                  <Button
+                    disabled={moveTeamIndex === teams.length - 1}
+                    onClick={() => chooseIndex(teams.length - 1)}
+                    variant="secondary"
+                  >
+                    Move to bottom
+                  </Button>
+                </div>
+                <Dialog.Close asChild>
+                  <Button className="mt-2 w-full" variant="ghost">
+                    Cancel
+                  </Button>
+                </Dialog.Close>
+              </>
+            ) : null}
+          </Dialog.Content>
+        </Dialog.Portal>
+      </Dialog.Root>
     </section>
   );
 }

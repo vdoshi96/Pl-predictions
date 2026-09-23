@@ -282,10 +282,8 @@ export default async function AdminResultsPage() {
             Spotlight results
           </h1>
           <p className="text-muted mt-2 max-w-3xl text-sm leading-6">
-            Enter reviewed season outcomes row by row. Draft snapshots stay
-            private; publishing moves one exact immutable snapshot into public
-            scoring, and final status can only be undone against that same
-            active pointer.
+            Enter a result list, check it against everyone’s picks, then publish
+            it. Drafts stay private until you publish.
           </p>
         </div>
 

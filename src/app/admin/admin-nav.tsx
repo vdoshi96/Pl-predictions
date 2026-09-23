@@ -27,7 +27,7 @@ export function AdminNav({ current }: { current: AdminRoute }) {
               <li key={link.href}>
                 <Link
                   aria-current={active ? "page" : undefined}
-                  className={`focus-visible:ring-accent/30 focus-visible:ring-offset-background inline-flex min-h-11 w-full items-center justify-center rounded-xl px-3 text-sm font-bold outline-none focus-visible:ring-2 focus-visible:ring-offset-2 sm:w-auto ${active ? "bg-brand text-white" : "text-muted hover:bg-surface-subtle hover:text-foreground"}`}
+                  className={`focus-visible:ring-accent/30 focus-visible:ring-offset-background inline-flex min-h-11 w-full items-center justify-center rounded-xl px-3 text-sm font-bold outline-none focus-visible:ring-2 focus-visible:ring-offset-2 sm:w-auto ${active ? "bg-brand dark:ring-accent-blue text-white dark:ring-1" : "text-muted hover:bg-surface-subtle hover:text-foreground"}`}
                   href={link.href}
                 >
                   {link.label}

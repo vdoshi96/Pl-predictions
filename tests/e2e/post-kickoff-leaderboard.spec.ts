@@ -118,6 +118,33 @@ async function expectNoHorizontalOverflow(
   expect(widths.scroll).toBe(widths.client);
 }
 
+async function expectNoMidWordBreaks(
+  locator: import("@playwright/test").Locator,
+) {
+  const broken = await locator.evaluateAll((elements) => {
+    const failures: string[] = [];
+    for (const element of elements) {
+      for (const node of Array.from(element.childNodes)) {
+        if (node.nodeType !== Node.TEXT_NODE) continue;
+        const text = node.textContent ?? "";
+        for (const match of text.matchAll(/\S+/gu)) {
+          const range = document.createRange();
+          range.setStart(node, match.index ?? 0);
+          range.setEnd(node, (match.index ?? 0) + match[0].length);
+          const lineTops = new Set(
+            Array.from(range.getClientRects()).map((rect) =>
+              Math.round(rect.top),
+            ),
+          );
+          if (lineTops.size > 1) failures.push(match[0]);
+        }
+      }
+    }
+    return failures;
+  });
+  expect(broken, "Club names must wrap between words only.").toEqual([]);
+}
+
 test.afterEach(async () => {
   if (!qaFixture || !process.env.DATABASE_URL) return;
 
@@ -461,6 +488,7 @@ test("post-kickoff table and spotlight rankings stay split at desktop and mobile
     page.getByRole("table", { name: "Premier League season table" }),
   ).toBeVisible();
   await expectNoHorizontalOverflow(page);
+  await expectNoMidWordBreaks(page.locator("[data-club-name]"));
 
   await page.goto("/leaderboard", { waitUntil: "networkidle" });
   const scoredLeaderboard = page.getByLabel("Scored leaderboard");
@@ -514,19 +542,28 @@ test("post-kickoff table and spotlight rankings stay split at desktop and mobile
     1,
   );
   await page
-    .getByRole("combobox", { name: "Category", exact: true })
-    .selectOption("underdog_team");
-  await page.getByRole("button", { name: "Show category" }).click();
+    .getByRole("navigation", { name: "Choose a spotlight category" })
+    .getByRole("link", { name: "Underdog team", exact: true })
+    .click();
+  await page.waitForURL(/[?&]category=underdog_team(?:&|$)/u);
   await expect(page.getByText("Result live", { exact: true })).toHaveCount(1);
   await expectNoHorizontalOverflow(page);
 
   await page.goto("/spotlight?view=matrix", { waitUntil: "networkidle" });
   await expect(page.getByLabel("Spotlight matrix")).toBeVisible();
-  await expect(
-    page
-      .getByRole("table", { name: /seven spotlight picks/i })
-      .getByRole("row"),
-  ).toHaveCount(3);
+  if ((page.viewportSize()?.width ?? 1280) < 640) {
+    await expect(
+      page
+        .getByRole("list", { name: "Picks by entry" })
+        .getByRole("listitem", { name: /spotlight picks$/u }),
+    ).toHaveCount(2);
+  } else {
+    await expect(
+      page
+        .getByRole("table", { name: /seven spotlight picks/i })
+        .getByRole("row"),
+    ).toHaveCount(3);
+  }
   await expectNoHorizontalOverflow(page);
 
   await page.goto("/spotlight?view=entries&sort=overall", {
@@ -781,14 +818,13 @@ test("post-kickoff table and spotlight rankings stay split at desktop and mobile
   }
   await page.goto("/leaderboard");
   await page.getByLabel("Find a participant").fill(swappedName);
-  await page.getByRole("button", { name: "Find", exact: true }).click();
   await expect(
     page.getByLabel(`${swappedName} leaderboard entry`),
   ).toBeVisible();
   await expect(page.getByLabel(`${exactName} leaderboard entry`)).toHaveCount(
     0,
   );
-  await page.getByRole("link", { name: "Clear", exact: true }).click();
+  await page.getByRole("button", { name: "Clear", exact: true }).click();
   await expect(page.getByLabel(`${exactName} leaderboard entry`)).toBeVisible();
 
   // More joint leaders than a three-slot podium can hold. Cleanup owns every ID.

@@ -90,27 +90,28 @@ export function WinStreakLeaderboard({
           >
             {entries.map((entry, index) => (
               <li
+                className="border-border grid min-h-14 min-w-0 grid-cols-[2.25rem_minmax(0,1fr)_auto_auto] items-center gap-x-3 border-b px-3 py-2 last:border-b-0"
                 key={`${entry.displayName}-${index}`}
-                className="border-border grid min-w-0 grid-cols-[2.5rem_minmax(0,1fr)_auto_auto] items-center gap-x-2 gap-y-3 border-b p-3 last:border-b-0"
               >
-                <span className="bg-brand-soft text-brand-ink grid size-9 place-items-center rounded-xl font-mono text-sm font-black tabular-nums">
+                <span className="bg-brand-soft text-brand-ink grid size-8 place-items-center rounded-lg text-sm font-black tabular-nums">
                   {entry.rank}
                 </span>
-                <div className="min-w-0">
-                  <strong className="text-brand-ink-strong block leading-5 font-black [overflow-wrap:anywhere]">
+                <div className="grid min-w-0 gap-1">
+                  <strong className="text-brand-ink-strong block leading-5 font-black break-words">
                     {entry.displayName}
                   </strong>
                   {entry.isViewer ? (
-                    <Badge className="mt-1" variant="accent">
+                    <Badge className="justify-self-start" variant="accent">
                       You
                     </Badge>
                   ) : null}
+                  <PickSummary pick={entry.currentPick} />
                 </div>
                 <span className="text-center">
                   <span className="text-muted block text-[0.58rem] font-black tracking-wide uppercase">
                     Current
                   </span>
-                  <strong className="text-brand-ink-strong font-mono text-lg tabular-nums">
+                  <strong className="text-brand-ink-strong text-lg font-black tabular-nums">
                     {entry.currentStreak}
                   </strong>
                 </span>
@@ -118,13 +119,10 @@ export function WinStreakLeaderboard({
                   <span className="text-muted block text-[0.58rem] font-black tracking-wide uppercase">
                     Best
                   </span>
-                  <strong className="text-rose-score font-mono text-lg font-black tabular-nums">
+                  <strong className="text-brand-ink text-lg font-black tabular-nums">
                     {entry.bestStreak}
                   </strong>
                 </span>
-                <div className="border-border col-span-4 min-w-0 border-t pt-3">
-                  <PickSummary pick={entry.currentPick} />
-                </div>
               </li>
             ))}
           </ol>
@@ -155,12 +153,12 @@ export function WinStreakLeaderboard({
                     key={`${entry.displayName}-${index}`}
                     className="border-border border-t first:border-t-0"
                   >
-                    <td className="px-3 py-3 text-center font-mono font-black tabular-nums">
+                    <td className="px-3 py-3 text-center font-black tabular-nums">
                       {entry.rank}
                     </td>
                     <th
                       scope="row"
-                      className="text-brand-ink-strong px-3 py-3 leading-5 font-bold [overflow-wrap:anywhere]"
+                      className="text-brand-ink-strong px-3 py-3 leading-5 font-bold break-words"
                     >
                       <span>{entry.displayName}</span>
                       {entry.isViewer ? (
@@ -172,10 +170,10 @@ export function WinStreakLeaderboard({
                     <td className="px-3 py-3">
                       <PickSummary pick={entry.currentPick} />
                     </td>
-                    <td className="px-2 py-3 text-center font-mono tabular-nums">
+                    <td className="px-2 py-3 text-center tabular-nums">
                       {entry.currentStreak}
                     </td>
-                    <td className="text-rose-score px-2 py-3 text-center font-mono font-black tabular-nums">
+                    <td className="text-brand-ink px-2 py-3 text-center font-black tabular-nums">
                       {entry.bestStreak}
                     </td>
                   </tr>

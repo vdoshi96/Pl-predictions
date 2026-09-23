@@ -1,8 +1,8 @@
 export function SiteFooter() {
   return (
     <footer className="border-border bg-brand-soft text-muted mt-auto border-t">
-      <div className="mx-auto grid w-full max-w-6xl gap-2 px-4 pt-6 pb-[max(1.5rem,env(safe-area-inset-bottom))] text-xs leading-5 sm:px-6 lg:px-8">
-        <p className="text-brand-ink font-bold">
+      <div className="mx-auto grid w-full max-w-6xl gap-1 px-4 pt-4 pb-[max(1.25rem,env(safe-area-inset-bottom))] text-[0.7rem] leading-4 sm:px-6 lg:px-8">
+        <p className="text-brand-ink font-medium">
           Dranx Prediction League is an independent, private prediction
           competition. It is not affiliated with or endorsed by the Premier
           League or any club.

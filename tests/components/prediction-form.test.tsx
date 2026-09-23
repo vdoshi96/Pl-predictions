@@ -397,7 +397,16 @@ describe("PredictionForm", () => {
         name: /table starts a–z as a blank slate/i,
       }),
     ).toBeVisible();
-    expect(screen.getByText(/not last season’s table/i)).toBeVisible();
+    expect(screen.getByText("Why?").tagName).toBe("SUMMARY");
+    expect(screen.getByText(/not last season’s table/i)).toBeInTheDocument();
+    expect(
+      screen.getByRole("heading", { name: /who is making this prediction/i }),
+    ).toHaveClass("sr-only");
+    expect(
+      screen.getByRole("button", {
+        name: /^Choose a new position for Arsenal, currently 1 of 20$/u,
+      }),
+    ).toBeVisible();
     expect(
       screen.getByText(/progress will be saved in this browser/i),
     ).toBeVisible();

@@ -6,7 +6,6 @@ import {
   ArrowLeft,
   Check,
   LockKeyhole,
-  ShieldCheck,
 } from "lucide-react";
 import Link from "next/link";
 import {
@@ -960,21 +959,8 @@ export function PredictionForm({
               Step 1 of 3 · Your table
             </div>
             <Card className="overflow-visible" id="submit-prediction">
-              <CardContent className="grid gap-4">
-                <div className="flex items-start gap-3">
-                  <span className="bg-sky-soft text-brand-ink grid size-10 shrink-0 place-items-center rounded-xl">
-                    <ShieldCheck aria-hidden="true" className="size-5" />
-                  </span>
-                  <div className="min-w-0">
-                    <h2 className="text-brand-ink-strong text-lg font-black">
-                      Who is making this prediction?
-                    </h2>
-                    <p className="text-muted mt-1 text-sm leading-5">
-                      Add your display name, then continue to the seven
-                      spotlight picks before the final review.
-                    </p>
-                  </div>
-                </div>
+              <CardContent className="grid gap-3 p-3 sm:p-4">
+                <h2 className="sr-only">Who is making this prediction?</h2>
 
                 <div>
                   <label
@@ -1059,25 +1045,30 @@ export function PredictionForm({
             {isAlphabetical ? (
               <aside
                 aria-labelledby="alphabetical-blank-slate-heading"
-                className="border-warning/35 bg-warning-soft text-warning flex items-start gap-3 rounded-2xl border p-4"
+                className="border-warning/35 bg-warning-soft text-warning rounded-xl border px-3 py-2"
               >
-                <AlertTriangle
-                  aria-hidden="true"
-                  className="text-warning mt-0.5 size-5 shrink-0"
-                />
-                <div>
+                <div className="flex items-center gap-2">
+                  <AlertTriangle
+                    aria-hidden="true"
+                    className="size-4 shrink-0"
+                  />
                   <h2
+                    className="min-w-0 grow text-sm font-black"
                     id="alphabetical-blank-slate-heading"
-                    className="text-sm font-black"
                   >
                     The table starts A–Z as a blank slate
                   </h2>
-                  <p className="text-warning mt-1 text-sm leading-5">
+                </div>
+                <details className="text-sm leading-5">
+                  <summary className="inline-flex min-h-11 cursor-pointer items-center font-bold underline underline-offset-4">
+                    Why?
+                  </summary>
+                  <p className="pb-1">
                     This is not last season’s table or a suggested prediction.
                     Reorder the clubs, or confirm the A–Z order when you
                     continue if it is really your prediction.
                   </p>
-                </div>
+                </details>
               </aside>
             ) : null}
 
@@ -1155,7 +1146,9 @@ export function PredictionForm({
 
       <div
         className={`border-border/80 bg-surface z-20 -mx-2 border-t px-2 pt-2 pb-[max(0.75rem,env(safe-area-inset-bottom))] shadow-[0_-16px_30px_-26px_rgba(55,0,60,0.6)] sm:static sm:mx-0 sm:border-0 sm:bg-transparent sm:p-0 sm:shadow-none ${
-          disabled ? "static" : "sticky bottom-0"
+          disabled
+            ? "static"
+            : "sticky bottom-0 max-sm:bottom-[var(--mobile-tab-bar-height,0px)]"
         } ${stage === "spotlight" && expandedSelectorCategory ? "hidden" : ""}`}
       >
         <div

@@ -14,7 +14,7 @@ const walkthroughSteps = [
     callouts: [
       {
         label:
-          "Enter your display name first, then drag the handles or use Arrow, Page Up, Page Down, Home, and End.",
+          "Enter your display name first, then drag the handles, tap a position number, or use Arrow, Page Up, Page Down, Home, and End.",
         marker: "1",
         position: { left: "96%", top: "84%" },
       },
@@ -54,7 +54,7 @@ const walkthroughSteps = [
     title: "Make seven spotlight picks",
   },
   {
-    alt: "Mobile final-review page showing the participant name, Edit table action, and ordered clubs.",
+    alt: "Mobile final-review screen showing the participant name, Edit table action, and ordered clubs.",
     callouts: [
       {
         label:

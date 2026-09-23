@@ -64,7 +64,7 @@ export function Podium({
                       entryId={entry.id}
                       participantName={entry.participantName}
                     />
-                    <span className="text-muted block text-xs">
+                    <span className="podium-detail text-muted text-xs">
                       {entry.exactCount} exact · {entry.champion.displayName}
                     </span>
                   </div>

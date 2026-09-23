@@ -652,12 +652,20 @@ test("desktop public routes render the complete league without overflow", async 
   await expect(
     page.getByRole("img", { name: /Mobile .* screen/u }),
   ).toHaveCount(3);
+  await page.getByRole("tab", { name: "Spotlight" }).click();
+  await expect(page.getByRole("tab", { name: "Spotlight" })).toHaveAttribute(
+    "aria-selected",
+    "true",
+  );
   await expect(
-    page.getByRole("heading", { level: 3, name: "Top scorer" }),
+    page.getByRole("heading", { level: 3, name: "Top scorer", exact: true }),
   ).toBeVisible();
   await expect(
-    page.getByText(/occupied result rank earns max\(0, N \+ 1/u),
+    page.getByText(
+      "With 14 entries, 1st earns 14 points, 2nd earns 13, and so on down to 0.",
+    ),
   ).toBeVisible();
+  await expect(page.getByText(/max\(0, N \+ 1/u)).toHaveCount(0);
   await expect(page.getByText(/owner-run Codex automation/i)).toHaveCount(0);
   await expectNoHorizontalOverflow(page);
 });

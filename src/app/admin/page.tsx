@@ -1,4 +1,4 @@
-import { count, desc, eq } from "drizzle-orm";
+import { and, asc, count, desc, eq, isNull, max } from "drizzle-orm";
 import { Database, RefreshCcw, Settings2, Users } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
@@ -8,10 +8,16 @@ import { Card, CardContent } from "@/components/ui/card";
 import { getDb } from "@/db/client";
 import {
   predictions,
+  spotlightResultSnapshots,
+  spotlightResultStates,
+  winStreakFixtures,
+  winStreakRounds,
   standingsImportRuns,
   standingsSnapshots,
 } from "@/db/schema";
 import { getAdminSession } from "@/features/admin";
+import { AdminStatusBoard, buildAdminStatusRows, type AdminDatasetKey } from "@/features/admin/status-board";
+import { isSpotlightResultDataset } from "@/features/results";
 import { getActiveSeasonContext } from "@/features/seasons/queries";
 import { formatChicagoUtcDateTime } from "@/shared/format";
 import { getSeasonAccess } from "@/shared/policy";
@@ -26,7 +32,7 @@ export default async function AdminPage() {
 
   const { databaseNow, season } = await getActiveSeasonContext();
   const db = getDb();
-  const [[submissionCount], latestRuns, activeSnapshots] = await Promise.all([
+  const [[submissionCount], latestRuns, activeSnapshots, resultStates, nextRounds] = await Promise.all([
     db
       .select({ value: count() })
       .from(predictions)
@@ -50,10 +56,81 @@ export default async function AdminPage() {
           .where(eq(standingsSnapshots.id, season.activeSnapshotId))
           .limit(1)
       : Promise.resolve([]),
+    db
+      .select({
+        activeCapturedAt: spotlightResultSnapshots.capturedAt,
+        activeCoveredThroughRank: spotlightResultSnapshots.coveredThroughRank,
+        activeSnapshotId: spotlightResultStates.activeSnapshotId,
+        dataset: spotlightResultStates.dataset,
+        finalSnapshotId: spotlightResultStates.finalSnapshotId,
+        workingSnapshotId: spotlightResultStates.workingSnapshotId,
+      })
+      .from(spotlightResultStates)
+      .leftJoin(
+        spotlightResultSnapshots,
+        eq(spotlightResultSnapshots.id, spotlightResultStates.activeSnapshotId),
+      )
+      .where(eq(spotlightResultStates.seasonId, season.id)),
+    db
+      .select({
+        lastKickoffAt: max(winStreakFixtures.kickoffAt),
+        matchweek: winStreakRounds.matchweek,
+      })
+      .from(winStreakRounds)
+      .leftJoin(winStreakFixtures, eq(winStreakFixtures.roundId, winStreakRounds.id))
+      .where(
+        and(
+          eq(winStreakRounds.seasonId, season.id),
+          isNull(winStreakRounds.resolvedAt),
+        ),
+      )
+      .groupBy(winStreakRounds.id, winStreakRounds.matchweek)
+      .orderBy(asc(winStreakRounds.matchweek))
+      .limit(1),
   ]);
 
   const activeSnapshot = activeSnapshots[0];
   const latestRun = latestRuns[0];
+  const nextRound = nextRounds[0];
+  const statusRows = buildAdminStatusRows({
+    datasets: resultStates.flatMap((state) =>
+      isSpotlightResultDataset(state.dataset)
+        ? [
+            {
+              active:
+                state.activeSnapshotId && state.activeCapturedAt
+                  ? {
+                      capturedAt: state.activeCapturedAt,
+                      coveredThroughRank: state.activeCoveredThroughRank,
+                    }
+                  : null,
+              dataset: state.dataset as AdminDatasetKey,
+              hasUnpublishedDraft:
+                state.workingSnapshotId !== null &&
+                state.workingSnapshotId !== state.activeSnapshotId,
+              isFinal:
+                state.finalSnapshotId !== null &&
+                state.finalSnapshotId === state.activeSnapshotId,
+            },
+          ]
+        : [],
+    ),
+    standings: activeSnapshot
+      ? {
+          capturedAt:
+            season.standingsAcceptedThrough ?? activeSnapshot.capturedAt,
+          isFinal: activeSnapshot.isFinal,
+        }
+      : null,
+    winStreak: nextRound
+      ? {
+          matchweek: nextRound.matchweek,
+          readyToResolve:
+            nextRound.lastKickoffAt !== null &&
+            new Date(nextRound.lastKickoffAt).getTime() <= databaseNow.getTime(),
+        }
+      : null,
+  });
   const access = getSeasonAccess(
     {
       openingKickoff: season.openingKickoff,
@@ -135,6 +212,8 @@ export default async function AdminPage() {
             </Card>
           ))}
         </section>
+
+        <AdminStatusBoard rows={statusRows} />
 
         <section
           aria-labelledby="review-queue-heading"

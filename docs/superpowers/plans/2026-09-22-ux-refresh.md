@@ -509,8 +509,10 @@ export function SnapshotStatus({ isFinal }: { isFinal: boolean }) {
 
 - [ ] **Step 7: Run the tests**
 
-Run: `npx vitest run tests/unit/league-format.test.ts tests/components/site-shell.test.tsx -t "league-time formatting|site footer|page heading|league time|snapshot status"`
-Expected: PASS for those blocks. The `mobile tab bar` and `site header` blocks still fail; Task 3 fixes them.
+Run: `npx vitest run tests/unit/league-format.test.ts`
+Expected: PASS.
+
+`tests/components/site-shell.test.tsx` cannot load yet, because it imports `@/components/mobile-tab-bar`, which Task 3 creates. A `-t` filter does not skip import resolution. Its `site footer`, `page heading`, `league time`, and `snapshot status` blocks are verified in Task 3 Step 8. Do not stub or create `mobile-tab-bar.tsx` here.
 
 - [ ] **Step 8: Commit**
 
@@ -1361,6 +1363,8 @@ export function findAdjacentEntries(
 
 - [ ] **Step 3: Create `src/features/entries/entry-pager.tsx`**
 
+Implementation correction: put the space after each screen-reader label outside the span (`<span className="sr-only">Previous entry:</span>{" "}`, likewise Next). The accessibility-name library trims each child element; the original trailing space was lost. The owner supplied this correction, and all 11 entry-comparison tests passed.
+
 ```tsx
 import Link from "next/link";
 
@@ -1673,6 +1677,8 @@ export function EntryComparisonTable({
 - [ ] **Step 6: CSS.** In `src/app/globals.css`, delete the rules `.entry-comparison > li > div { … }` and `.entry-comparison > li > div > div { … }`. Keep `.entry-comparison` and `.entry-comparison > li + li`.
 
 - [ ] **Step 7: Rewrite the data flow in `src/app/entries/[id]/page.tsx`.**
+
+JSX correction: when embedding the replacement markup, omit the snippet’s semicolon after `null` inside `{…}` and the semicolon after `<EntryComparisonTable … />`. They are not part of the rendered JSX.
 
 1. Change the signature to `export default async function EntryPage({ params, searchParams }: PageProps<"/entries/[id]">)` and read both: `const [{ id }, query] = await Promise.all([params, searchParams]);` then `const entry = await getEntryComparison(id);`.
 2. After `if (!entry) notFound();` add:
@@ -2831,6 +2837,8 @@ export default function RulesPage() {
 }
 ```
 
+Implementation correction for the walkthrough: the existing browser contract counts three images named `Mobile … screen`. Change the review image alt text from `Mobile final-review page` to `Mobile final-review screen`; this keeps the description truthful and consistent.
+
 - [ ] **Step 4: Edit `src/components/how-to-play.tsx`.** In step 1, change the first callout label to exactly: `Enter your display name first, then drag the handles, tap a position number, or use Arrow, Page Up, Page Down, Home, and End.`
 
 - [ ] **Step 5: Run the tests**
@@ -2872,6 +2880,8 @@ Expected: all 4 sorter tests fail, the progress file fails to import, and the pr
 - add `export { spotlightIncompleteCategories, spotlightPicksAreComplete } from "./spotlight-completeness";`
 
 Every existing importer continues to work.
+
+Implementation correction: import only `normalizedCustomName` and `spotlightPicksAreComplete` into the form. The other two local imports are unused and fail the zero-warning lint gate; keep the specified exports and re-exports unchanged.
 
 - [ ] **Step 3: Create `src/features/predictions/spotlight-progress.tsx`**
 
@@ -2950,6 +2960,8 @@ export function SpotlightProgress({ picks }: { picks: SpotlightPicksDraft }) {
 ```
 
 - [ ] **Step 5: Tap-a-position sheet** in `prediction-sorter.tsx`.
+
+Implementation correction from the production-build browser run: import `Feedback` from `@dnd-kit/dom` and extend each sortable row’s default plugins with `Feedback.configure({ dropAnimation: null })`. The library’s default 250ms drop cleanup replaces the dragged DOM node after the test has focused its keyboard handle; the trace showed focus at 130ms and ArrowDown at 274ms after mouse-up, with no move received. Removing that delayed drop animation keeps the settled row available for immediate keyboard input. Keep all default sortable plugins.
 
 1. Add `import * as Dialog from "@radix-ui/react-dialog";`.
 2. Add the prop `onChoosePosition: (teamId: string) => void;` to `SortableTeamRowProps`, and destructure it.
@@ -3108,6 +3120,8 @@ function chooseIndex(index: number) {
 
 - [ ] **Step 6: Compact Stage 1** in `prediction-form.tsx`.
 
+JSX correction: omit the A–Z banner snippet’s semicolon after `null` inside the JSX expression.
+
 1. **Name card:** change `CardContent className="grid gap-4"` to `className="grid gap-3 p-3 sm:p-4"`. Delete the whole icon-and-description block (the `div.flex.items-start.gap-3` containing the `ShieldCheck` icon, the `h2`, and the description `p`), and put `<h2 className="sr-only">Who is making this prediction?</h2>` as the first child instead. Keep the label, input, help text, honeypot, disabled notice, and error exactly as they are. Remove the `ShieldCheck` import if it becomes unused.
 2. **A–Z banner:** replace the whole `isAlphabetical ? (<aside …>…</aside>) : null` with:
 
@@ -3172,6 +3186,8 @@ Run: `npx vitest run tests/components/admin-status-board.test.tsx`
 Expected: FAIL with `Failed to resolve import "@/features/admin/status-board"`.
 
 - [ ] **Step 2: Create `src/features/admin/status-board.tsx`**
+
+Implementation correction: add `relative` to the status-board scrolling wrapper. Temporary browser measurements found the absolutely positioned `sr-only` attention labels extending to 435.75px on a 390px page, outside the scroll container’s containing block. Positioning the wrapper contains those labels while keeping the table scrollable and accessible. A `min-w-0` attempt did not change the failure and was removed; the temporary measurements were also removed.
 
 ```tsx
 import Link from "next/link";
@@ -3627,6 +3643,12 @@ Expected: both exit 0. Integration needs `TEST_DATABASE_URL` or `TEST_DATABASE_N
 
 - [ ] **Step 8: Refresh the walkthrough images and run every browser journey**
 
+Implementation correction from exact-width browser verification: track and cancel the searchable selector’s delayed pointer-selection timer when a click completes, the picker opens or closes, or the component unmounts. The 320px journey selected Other player and immediately opened the next club picker, but the old 100ms callback then focused the Other-name field again and closed the club picker. Keep the immediate pointer-down selection and delayed fallback for browsers that cancel click. The tests stay unchanged.
+
+Verification sequencing: after the pre-kickoff phase failed, run the existing `npm run test:e2e:post-kickoff` script separately through the same isolated-database wrapper to complete its independent checks. No browser test is skipped or weakened.
+
+Contract conflict found during implementation: `tests/e2e/app-journey.spec.ts:655–660` expects Spotlight content visible in the default Table panel and the old `occupied result rank earns max(0, N + 1` formula. `tests/components/rules-page.test.tsx` requires the default Spotlight panel to be hidden and forbids `max(0` in the page text. The browser test is outside Task 12’s edit allowlist. `tests/e2e/mobile-reflow-privacy.spec.ts:475–479` also requires computed `overflowWrap: "anywhere"`, conflicting with this plan’s required word-safe `break-words` styling. Preserve the protected tests and record the observed failures; resolving these contradictory contracts needs owner authorization.
+
 ```bash
 QA_SCREENSHOT_DIR=output/qa/ux-refresh-2026-09 LOCAL_HTTP_E2E=1 npm run test:e2e
 ```
@@ -3634,7 +3656,9 @@ QA_SCREENSHOT_DIR=output/qa/ux-refresh-2026-09 LOCAL_HTTP_E2E=1 npm run test:e2e
 Expected: every project passes (existing intentional skips remain skipped). This rewrites `public/how-to-play/step-1-table-mobile.png`, `step-2-spotlight-mobile.png`, and `step-3-review-mobile.png` from the new UI. Open each image and confirm it shows the compact Stage 1 (name field, one-line A–Z banner, several clubs visible) and the Stage 2 progress dots. Record the cleanup evidence the suites print in `docs/QA.md`.
 
 - [ ] **Step 9: Run `npm run check`**
-      Expected: exit 0. This is the repository's complete Definition-of-Done gate from `AGENTS.md`.
+
+Invocation note: use `npm run check` without a global `LOCAL_HTTP_E2E=1` prefix. The npm script already scopes that flag to its browser phase. Applying it to the whole command changes the production-cookie/CSP unit-test environment and caused four unrelated security assertions to fail; do not change those tests or security code.
+Expected: exit 0. This is the repository's complete Definition-of-Done gate from `AGENTS.md`.
 
 - [ ] **Step 10: Commit**
 

@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="generated-by" content="scripts/generate-docs-html.mjs" />
     <meta name="canonical-source" content="QA.md" />
-    <meta name="canonical-source-sha256" content="86e4e452f0ea7d7d3075969222d2f78b8e9a00c188e4dd826486891bf44a999f" />
+    <meta name="canonical-source-sha256" content="d0494dcb2351f56ca4a40a4e7533fd9df95bfa0ba96be3bc13c6baf5f1dc819f" />
     <title>Quality assurance</title>
     <style>
       :root { color-scheme: light dark; font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
@@ -40,6 +40,59 @@
   <body>
     <main>
       <h1 id="quality-assurance">Quality assurance</h1>
+<h2 id="september-22-ux-refresh">September 22 UX refresh</h2>
+<p>The <a href="superpowers/specs/2026-09-22-ux-audit.html">approved UX audit</a> defines this refresh; the <a href="superpowers/plans/2026-09-22-ux-refresh.html">implementation plan</a> records the task sequence and corrections. Tasks 6–12 are committed through <code>4f3d7c9</code>, with scoped verification fixes in <code>deac2af</code> and <code>694e7fc</code>. The complete check on the source committed as <code>694e7fc</code> exited 1 at the browser gate. Release is blocked by protected browser assertions that conflict with the new Rules contract and word-safe wrapping.</p>
+<table>
+<thead>
+<tr>
+<th>Gate</th>
+<th>Evidence</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Red-green tests</td>
+<td>Task 6: 11 passed; Task 7: 9 passed; Task 8: 21 passed; Task 9: 11 passed; Task 10: 52 passed; Task 11: 6 passed. Each prescribed task command passed before its commit. Task 12’s existing post-kickoff script passed all 5 projects before commit <code>4f3d7c9</code>.</td>
+</tr>
+<tr>
+<td>Full unit and component suite</td>
+<td><code>npm run check</code> → <code>npm test</code>: 517 passed, 32 guarded integration skips, 0 failed (76 passed files, 5 skipped files). The plan’s 13-file finish-line command separately passed all 147 tests.</td>
+</tr>
+<tr>
+<td>Isolated integration</td>
+<td><code>npm run check</code> → <code>npm run test:integration</code>: 32 passed, 0 failed across 5 files, through the isolated-database safety wrapper.</td>
+</tr>
+<tr>
+<td>Static checks</td>
+<td><code>npm run check</code> verified documentation parity for 22 Markdown/HTML pairs and 580 players, 578 portraits, and 2 silhouette fallbacks. Formatting, zero-warning ESLint, and TypeScript all passed with 0 errors.</td>
+</tr>
+<tr>
+<td>Production build</td>
+<td><code>npm run check</code> → <code>npm run build:verify</code> exited 0 with Next.js 16.3.0 (Webpack): compilation, TypeScript, prerendering, and build traces passed.</td>
+</tr>
+<tr>
+<td>Browser journeys</td>
+<td><code>npm run check</code> scopes <code>LOCAL_HTTP_E2E=1</code> to <code>npm run test:e2e</code>. Its pre-kickoff phase finished with 21 passed, 3 failed, and 26 existing skips. The failures are the desktop Rules assertion and the 320px/430px wrapping assertion described below. Drag-to-keyboard and Other-player selector focus races are fixed; those interactions passed in this run. The independent command <code>QA_SCREENSHOT_DIR=output/qa/ux-refresh-2026-09 LOCAL_HTTP_E2E=1 npm run test:e2e:post-kickoff</code> passed 5/5 projects before Task 12’s commit and again on <code>694e7fc</code> (2.9 minutes, 0 failed or skipped).</td>
+</tr>
+<tr>
+<td>Walkthrough captures</td>
+<td>The capture-enabled browser suite refreshed all three <code>public/how-to-play/step-*-mobile.png</code> images. Each was opened for inspection: compact name/A–Z/table layout, seven Spotlight progress dots, and the review table are visible. Desktop and mobile post-kickoff captures are retained under <code>output/qa/ux-refresh-2026-09</code>.</td>
+</tr>
+<tr>
+<td>Accessibility</td>
+<td>Unit checks passed for Rules keyboard navigation, entry pager labels, sorter position controls, and Spotlight progress. All 5 post-kickoff projects passed reflow and word-boundary assertions. Desktop/mobile Season table, Leaderboard, and owner overview captures were inspected. Not run: optional axe audit because no <code>QA_AXE_SOURCE</code> was configured.</td>
+</tr>
+<tr>
+<td>Production release</td>
+<td>Not run: merge, production deployment, and read-only production smoke depend on the complete check passing. No production writes were performed.</td>
+</tr>
+</tbody></table>
+<p>The remaining browser failures are outside Task 12’s test-edit allowlist:</p>
+<ul>
+<li><code>tests/e2e/app-journey.spec.ts:657</code>, “desktop public routes render the complete league without overflow”: the <code>Top scorer</code> heading is not visible in the default Table tab. The following assertion expects <code>occupied result rank earns max(0, N + 1</code>. The new <code>rules-page.test.tsx</code> requires the Spotlight panel to start hidden and forbids <code>max(0</code> in the page text. Changing only the implementation cannot satisfy both contracts without defeating the approved behavior.</li>
+<li><code>tests/e2e/mobile-reflow-privacy.spec.ts:475</code>, “320–430px reflow keeps private identifiers out of HTML and RSC”: both exact-width projects expected <code>overflowWrap: &quot;anywhere&quot;</code> and received <code>&quot;break-word&quot;</code>; <code>textOverflow: &quot;clip&quot;</code> and <code>whiteSpace: &quot;normal&quot;</code> matched. The plan requires <code>break-words</code> and forbids the old anywhere styling. The later assertion at line 500 also pins the old wrapping value; it was not reached.</li>
+</ul>
+<p>The full complete-check output is retained locally at <code>output/qa/ux-refresh-2026-09/complete-check.log</code>; the final independent post-kickoff output is in the same directory as <code>post-kickoff.log</code>. The two protected test files remain unchanged; only the exact Task 12 post-kickoff edits were made. The unresolved action is to authorize updating these obsolete browser expectations to the approved tabs, participant-facing scoring explanation, and word-boundary behavior. Assertions after the failures were not reached and are not claimed as verified.</p>
+<p>Post-kickoff cleanup assertions passed on all five projects: zero remaining synthetic predictions, prediction items, category picks, snapshots, and standings items; exact original season restored, with one guarded restore when the QA snapshot was active. The suite prints pass/fail results rather than a separate cleanup inventory. An earlier desktop attempt had a transient Neon fetch failure during a cleanup count; its rerun passed. A successful WebKit run and the complete check logged a server-side “destination stream closed early” error; a clean server-error log is not claimed.</p>
 <h2 id="september-5-approved-redesign">September 5 approved redesign</h2>
 <p>The <a href="redesign-release.html">redesign release record</a> tracks the comparison-first interface, complete tied podium, isolated browser matrix, and production verification. Its release status supersedes interface descriptions in the dated records that follow.</p>
 <h2 id="september-1-win-streak-display-name-resumption">September 1 Win Streak display-name resumption</h2>
@@ -992,7 +1045,7 @@
 <li><input checked="" disabled="" type="checkbox"> Regenerate final HTML peers, publish this closeout through <code>main</code>, synchronize local and remote <code>main</code>, and remove completed branch state.</li>
 </ul>
 
-      <p class="source">Generated deterministically from <a href="QA.md">docs/QA.md</a>. Canonical SHA-256: <code>86e4e452f0ea7d7d3075969222d2f78b8e9a00c188e4dd826486891bf44a999f</code>.</p>
+      <p class="source">Generated deterministically from <a href="QA.md">docs/QA.md</a>. Canonical SHA-256: <code>d0494dcb2351f56ca4a40a4e7533fd9df95bfa0ba96be3bc13c6baf5f1dc819f</code>.</p>
     </main>
   </body>
 </html>

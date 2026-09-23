@@ -139,7 +139,7 @@ The palette pairs warm neutral surfaces with purple identity and a small set of 
 
 ### Semantic colors
 
-Mint, warning, and danger pairs communicate successful, cautionary, and failed states. Comparison-gap chips have a separate signed scale with near, slight, and far bands in each theme. Preserve their arrows and numerical differences; color is additional information.
+Mint, warning, and danger pairs communicate successful, cautionary, and failed states. Comparison gaps use a diverging scale: neutral under one place, then slight (1–3), clear (3–8), and far (8+), green above expectation and crimson below. Table points use one ordinal scale everywhere: Exact (strong green), Within 3 (mint), Correct half (lilac), No points (neutral). Danger red is reserved for errors and negative movement. The tokens are `--gap-*` and `--score-*` in `globals.css`. Preserve their arrows and numerical differences; color is additional information.
 
 **The semantic pair Rule.** Use each status foreground with its matching surface, and retain a text label or numerical cue.
 
@@ -159,9 +159,9 @@ Decorative uppercase eyebrows are not a heading pattern. Functional table column
 
 ## Layout
 
-The public page shell uses `min(100% - 2rem, 72rem)` and centers itself. Its minimum supported viewport is 320px. The header contains a compact brand row and a separate row of five navigation links.
+The public page shell uses `min(100% - 2rem, 72rem)` and centers itself. Its minimum supported viewport is 320px. From 640px the header contains a compact brand row and a row of five text links. Below 640px the header is one brand row and a fixed bottom tab bar (Table, Leaderboard, Spotlight, Streak, Rules; 56px targets; safe-area padded) replaces the text links. Sticky action bars offset themselves by `--mobile-tab-bar-height`.
 
-The season comparison uses a flexible table column beside a 19rem supporting column, with a 2rem gap. Below 900px, it becomes one column. At that breakpoint, podium columns become stacked rank groups. Each mobile group has a 4.5rem rank rail; every tied participant remains visible.
+The season comparison uses a flexible table column beside a 19rem supporting column, with a 2rem gap. Below 900px, it becomes one column. Podium rank groups remain side by side at every width, and every tied participant remains visible.
 
 Card padding increases from the 16px spacing step to the 24px step at 640px. Smaller gaps use the 8px and 12px steps. Under 480px, navigation spacing and podium decoration contract to preserve content width.
 
@@ -207,11 +207,13 @@ Cards are bordered surfaces without a default panel shadow. Headers, content, an
 
 ### Navigation
 
-Primary navigation names Season table, Leaderboard, Spotlight, Win Streak, and Rules. Active links use a lilac underline and purple ink, with `aria-current="page"`. Links retain a 48px minimum height. The skip link becomes visible on focus.
+Primary navigation names Season table, Leaderboard, Spotlight, Win Streak, and Rules. Active links use a lilac underline and purple ink, with `aria-current="page"`. Links retain a 48px minimum height. The skip link becomes visible on focus. Below 640px, a fixed bottom tab bar provides Table, Leaderboard, Spotlight, Streak, and Rules with 56px targets and safe-area padding. Owner pages replace public navigation with a single "View public site" link.
 
 The owner results desk uses selected workspace controls with `aria-pressed`. Inactive workspaces remain mounted and hidden so switching datasets preserves unsaved drafts. Publication remains a separate reviewed action with its existing validation and attestation gates.
 
 ### Podium
+
+The podium is a compact side-by-side strip on every width; the full ranked table below it remains the complete accessible list.
 
 Group entries by occupied competition ranks 1, 2, and 3, including every tied entry. Do not allocate only three participant slots. A rank group shares its treatment, and the first-place header carries the strongest brand fill.
 

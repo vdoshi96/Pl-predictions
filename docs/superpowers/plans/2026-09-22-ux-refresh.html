@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="generated-by" content="scripts/generate-docs-html.mjs" />
     <meta name="canonical-source" content="2026-09-22-ux-refresh.md" />
-    <meta name="canonical-source-sha256" content="57ad76910ce2c9b1ee622bdb3fdae99052e076a62321fd4019577d25e988b16a" />
+    <meta name="canonical-source-sha256" content="aba4d7ae6e5d9fb1146edf663ef11b3e21236b6ff5bdfe3e687128afc07baa1b" />
     <title>September 2026 UX Refresh Implementation Plan</title>
     <style>
       :root { color-scheme: light dark; font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
@@ -642,8 +642,9 @@ export function SnapshotStatus({ isFinal }: { isFinal: boolean }) {
 <li><p><input disabled="" type="checkbox"> <strong>Step 7: Run the tests</strong></p>
 </li>
 </ul>
-<p>Run: <code>npx vitest run tests/unit/league-format.test.ts tests/components/site-shell.test.tsx -t &quot;league-time formatting|site footer|page heading|league time|snapshot status&quot;</code>
-Expected: PASS for those blocks. The <code>mobile tab bar</code> and <code>site header</code> blocks still fail; Task 3 fixes them.</p>
+<p>Run: <code>npx vitest run tests/unit/league-format.test.ts</code>
+Expected: PASS.</p>
+<p><code>tests/components/site-shell.test.tsx</code> cannot load yet, because it imports <code>@/components/mobile-tab-bar</code>, which Task 3 creates. A <code>-t</code> filter does not skip import resolution. Its <code>site footer</code>, <code>page heading</code>, <code>league time</code>, and <code>snapshot status</code> blocks are verified in Task 3 Step 8. Do not stub or create <code>mobile-tab-bar.tsx</code> here.</p>
 <ul>
 <li><input disabled="" type="checkbox"> <strong>Step 8: Commit</strong></li>
 </ul>
@@ -1493,6 +1494,7 @@ export function findAdjacentEntries(
 <ul>
 <li><input disabled="" type="checkbox"> <strong>Step 3: Create <code>src/features/entries/entry-pager.tsx</code></strong></li>
 </ul>
+<p>Implementation correction: put the space after each screen-reader label outside the span (<code>&lt;span className=&quot;sr-only&quot;&gt;Previous entry:&lt;/span&gt;{&quot; &quot;}</code>, likewise Next). The accessibility-name library trims each child element; the original trailing space was lost. The owner supplied this correction, and all 11 entry-comparison tests passed.</p>
 <pre><code class="language-tsx">import Link from &quot;next/link&quot;;
 
 import type { AdjacentEntries } from &quot;./navigation&quot;;
@@ -1804,6 +1806,7 @@ export function EntryComparisonTable({
 <li><p><input disabled="" type="checkbox"> <strong>Step 7: Rewrite the data flow in <code>src/app/entries/[id]/page.tsx</code>.</strong></p>
 </li>
 </ul>
+<p>JSX correction: when embedding the replacement markup, omit the snippet’s semicolon after <code>null</code> inside <code>{…}</code> and the semicolon after <code>&lt;EntryComparisonTable … /&gt;</code>. They are not part of the rendered JSX.</p>
 <ol>
 <li>Change the signature to <code>export default async function EntryPage({ params, searchParams }: PageProps&lt;&quot;/entries/[id]&quot;&gt;)</code> and read both: <code>const [{ id }, query] = await Promise.all([params, searchParams]);</code> then <code>const entry = await getEntryComparison(id);</code>.</li>
 <li>After <code>if (!entry) notFound();</code> add:</li>
@@ -2946,6 +2949,7 @@ export default function RulesPage() {
   );
 }
 </code></pre>
+<p>Implementation correction for the walkthrough: the existing browser contract counts three images named <code>Mobile … screen</code>. Change the review image alt text from <code>Mobile final-review page</code> to <code>Mobile final-review screen</code>; this keeps the description truthful and consistent.</p>
 <ul>
 <li><p><input disabled="" type="checkbox"> <strong>Step 4: Edit <code>src/components/how-to-play.tsx</code>.</strong> In step 1, change the first callout label to exactly: <code>Enter your display name first, then drag the handles, tap a position number, or use Arrow, Page Up, Page Down, Home, and End.</code></p>
 </li>
@@ -2990,6 +2994,7 @@ Expected: all 4 sorter tests fail, the progress file fails to import, and the pr
 </li>
 </ul>
 <p>Every existing importer continues to work.</p>
+<p>Implementation correction: import only <code>normalizedCustomName</code> and <code>spotlightPicksAreComplete</code> into the form. The other two local imports are unused and fail the zero-warning lint gate; keep the specified exports and re-exports unchanged.</p>
 <ul>
 <li><input disabled="" type="checkbox"> <strong>Step 3: Create <code>src/features/predictions/spotlight-progress.tsx</code></strong></li>
 </ul>
@@ -3067,6 +3072,7 @@ export function SpotlightProgress({ picks }: { picks: SpotlightPicksDraft }) {
 <ul>
 <li><input disabled="" type="checkbox"> <strong>Step 5: Tap-a-position sheet</strong> in <code>prediction-sorter.tsx</code>.</li>
 </ul>
+<p>Implementation correction from the production-build browser run: import <code>Feedback</code> from <code>@dnd-kit/dom</code> and extend each sortable row’s default plugins with <code>Feedback.configure({ dropAnimation: null })</code>. The library’s default 250ms drop cleanup replaces the dragged DOM node after the test has focused its keyboard handle; the trace showed focus at 130ms and ArrowDown at 274ms after mouse-up, with no move received. Removing that delayed drop animation keeps the settled row available for immediate keyboard input. Keep all default sortable plugins.</p>
 <ol>
 <li>Add <code>import * as Dialog from &quot;@radix-ui/react-dialog&quot;;</code>.</li>
 <li>Add the prop <code>onChoosePosition: (teamId: string) =&gt; void;</code> to <code>SortableTeamRowProps</code>, and destructure it.</li>
@@ -3222,6 +3228,7 @@ function chooseIndex(index: number) {
 <ul>
 <li><input disabled="" type="checkbox"> <strong>Step 6: Compact Stage 1</strong> in <code>prediction-form.tsx</code>.</li>
 </ul>
+<p>JSX correction: omit the A–Z banner snippet’s semicolon after <code>null</code> inside the JSX expression.</p>
 <ol>
 <li><strong>Name card:</strong> change <code>CardContent className=&quot;grid gap-4&quot;</code> to <code>className=&quot;grid gap-3 p-3 sm:p-4&quot;</code>. Delete the whole icon-and-description block (the <code>div.flex.items-start.gap-3</code> containing the <code>ShieldCheck</code> icon, the <code>h2</code>, and the description <code>p</code>), and put <code>&lt;h2 className=&quot;sr-only&quot;&gt;Who is making this prediction?&lt;/h2&gt;</code> as the first child instead. Keep the label, input, help text, honeypot, disabled notice, and error exactly as they are. Remove the <code>ShieldCheck</code> import if it becomes unused.</li>
 <li><strong>A–Z banner:</strong> replace the whole <code>isAlphabetical ? (&lt;aside …&gt;…&lt;/aside&gt;) : null</code> with:</li>
@@ -3283,6 +3290,7 @@ Expected: FAIL with <code>Failed to resolve import &quot;@/features/admin/status
 <ul>
 <li><input disabled="" type="checkbox"> <strong>Step 2: Create <code>src/features/admin/status-board.tsx</code></strong></li>
 </ul>
+<p>Implementation correction: add <code>relative</code> to the status-board scrolling wrapper. Temporary browser measurements found the absolutely positioned <code>sr-only</code> attention labels extending to 435.75px on a 390px page, outside the scroll container’s containing block. Positioning the wrapper contains those labels while keeping the table scrollable and accessible. A <code>min-w-0</code> attempt did not change the failure and was removed; the temporary measurements were also removed.</p>
 <pre><code class="language-tsx">import Link from &quot;next/link&quot;;
 
 import { formatLeagueDateTime } from &quot;@/shared/format&quot;;
@@ -3710,16 +3718,19 @@ Expected: every listed file passes, with no failures.
 <ul>
 <li><input disabled="" type="checkbox"> <strong>Step 8: Refresh the walkthrough images and run every browser journey</strong></li>
 </ul>
+<p>Implementation correction from exact-width browser verification: track and cancel the searchable selector’s delayed pointer-selection timer when a click completes, the picker opens or closes, or the component unmounts. The 320px journey selected Other player and immediately opened the next club picker, but the old 100ms callback then focused the Other-name field again and closed the club picker. Keep the immediate pointer-down selection and delayed fallback for browsers that cancel click. The tests stay unchanged.</p>
+<p>Verification sequencing: after the pre-kickoff phase failed, run the existing <code>npm run test:e2e:post-kickoff</code> script separately through the same isolated-database wrapper to complete its independent checks. No browser test is skipped or weakened.</p>
+<p>Contract conflict found during implementation: <code>tests/e2e/app-journey.spec.ts:655–660</code> expects Spotlight content visible in the default Table panel and the old <code>occupied result rank earns max(0, N + 1</code> formula. <code>tests/components/rules-page.test.tsx</code> requires the default Spotlight panel to be hidden and forbids <code>max(0</code> in the page text. The browser test is outside Task 12’s edit allowlist. <code>tests/e2e/mobile-reflow-privacy.spec.ts:475–479</code> also requires computed <code>overflowWrap: &quot;anywhere&quot;</code>, conflicting with this plan’s required word-safe <code>break-words</code> styling. Preserve the protected tests and record the observed failures; resolving these contradictory contracts needs owner authorization.</p>
 <pre><code class="language-bash">QA_SCREENSHOT_DIR=output/qa/ux-refresh-2026-09 LOCAL_HTTP_E2E=1 npm run test:e2e
 </code></pre>
 <p>Expected: every project passes (existing intentional skips remain skipped). This rewrites <code>public/how-to-play/step-1-table-mobile.png</code>, <code>step-2-spotlight-mobile.png</code>, and <code>step-3-review-mobile.png</code> from the new UI. Open each image and confirm it shows the compact Stage 1 (name field, one-line A–Z banner, several clubs visible) and the Stage 2 progress dots. Record the cleanup evidence the suites print in <code>docs/QA.md</code>.</p>
 <ul>
-<li><p><input disabled="" type="checkbox"> <strong>Step 9: Run <code>npm run check</code></strong>
-Expected: exit 0. This is the repository&#39;s complete Definition-of-Done gate from <code>AGENTS.md</code>.
-</p>
-</li>
-<li><p><input disabled="" type="checkbox"> <strong>Step 10: Commit</strong></p>
-</li>
+<li><input disabled="" type="checkbox"> <strong>Step 9: Run <code>npm run check</code></strong></li>
+</ul>
+<p>Invocation note: use <code>npm run check</code> without a global <code>LOCAL_HTTP_E2E=1</code> prefix. The npm script already scopes that flag to its browser phase. Applying it to the whole command changes the production-cookie/CSP unit-test environment and caused four unrelated security assertions to fail; do not change those tests or security code.
+Expected: exit 0. This is the repository&#39;s complete Definition-of-Done gate from <code>AGENTS.md</code>.</p>
+<ul>
+<li><input disabled="" type="checkbox"> <strong>Step 10: Commit</strong></li>
 </ul>
 <pre><code class="language-bash">git add DESIGN.md DESIGN.html AGENTS.md AGENTS.html docs/QA.md docs/QA.html docs/superpowers public/how-to-play
 git commit -m &quot;Record September 22 UX refresh design, QA evidence, and walkthrough captures&quot;
@@ -3747,7 +3758,7 @@ git commit -m &quot;Record September 22 UX refresh design, QA evidence, and walk
 <li>New analytics, animations, themes, fonts, or icons beyond the lucide icons named here.</li>
 </ul>
 
-      <p class="source">Generated deterministically from <a href="2026-09-22-ux-refresh.md">docs/superpowers/plans/2026-09-22-ux-refresh.md</a>. Canonical SHA-256: <code>57ad76910ce2c9b1ee622bdb3fdae99052e076a62321fd4019577d25e988b16a</code>.</p>
+      <p class="source">Generated deterministically from <a href="2026-09-22-ux-refresh.md">docs/superpowers/plans/2026-09-22-ux-refresh.md</a>. Canonical SHA-256: <code>aba4d7ae6e5d9fb1146edf663ef11b3e21236b6ff5bdfe3e687128afc07baa1b</code>.</p>
     </main>
   </body>
 </html>

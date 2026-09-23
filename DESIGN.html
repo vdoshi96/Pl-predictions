@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="generated-by" content="scripts/generate-docs-html.mjs" />
     <meta name="canonical-source" content="DESIGN.md" />
-    <meta name="canonical-source-sha256" content="2589a9ac1ec79ebcaae28b09abf6098750db110d6bc90c9818f95c8399b89fd4" />
+    <meta name="canonical-source-sha256" content="cce91786b0733f564612472db95bf96aeec4b750bdb6ef75cb3c391b7e48051d" />
     <title>Design System: Dranx Prediction League</title>
     <style>
       :root { color-scheme: light dark; font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
@@ -166,7 +166,7 @@ padding: &quot;2px 10px&quot;
 <h3 id="neutral">Neutral</h3>
 <p><strong>Warm paper</strong> surrounds <strong>surface</strong> panels. <strong>Subtle surface</strong> and <strong>soft brand</strong> group supporting information. <strong>Foreground</strong>, <strong>muted</strong>, and <strong>border</strong> separate primary content, supporting copy, and row boundaries.</p>
 <h3 id="semantic-colors">Semantic colors</h3>
-<p>Mint, warning, and danger pairs communicate successful, cautionary, and failed states. Comparison-gap chips have a separate signed scale with near, slight, and far bands in each theme. Preserve their arrows and numerical differences; color is additional information.</p>
+<p>Mint, warning, and danger pairs communicate successful, cautionary, and failed states. Comparison gaps use a diverging scale: neutral under one place, then slight (1–3), clear (3–8), and far (8+), green above expectation and crimson below. Table points use one ordinal scale everywhere: Exact (strong green), Within 3 (mint), Correct half (lilac), No points (neutral). Danger red is reserved for errors and negative movement. The tokens are <code>--gap-*</code> and <code>--score-*</code> in <code>globals.css</code>. Preserve their arrows and numerical differences; color is additional information.</p>
 <p><strong>The semantic pair Rule.</strong> Use each status foreground with its matching surface, and retain a text label or numerical cue.</p>
 <p>The sidecar&#39;s synthesized tonal ramps support preview swatches; they are not additional application colors.</p>
 <p>The application follows the operating system&#39;s color preference. The light-preview scope is reserved for intentional light examples; it does not replace theme-aware application surfaces.</p>
@@ -176,8 +176,8 @@ padding: &quot;2px 10px&quot;
 <p><strong>The comparison hierarchy Rule.</strong> Keep club or participant names prominent, supporting facts quieter, and scores aligned. Let long names wrap instead of concealing them.</p>
 <p>Decorative uppercase eyebrows are not a heading pattern. Functional table column labels remain part of the comparison interface.</p>
 <h2 id="layout">Layout</h2>
-<p>The public page shell uses <code>min(100% - 2rem, 72rem)</code> and centers itself. Its minimum supported viewport is 320px. The header contains a compact brand row and a separate row of five navigation links.</p>
-<p>The season comparison uses a flexible table column beside a 19rem supporting column, with a 2rem gap. Below 900px, it becomes one column. At that breakpoint, podium columns become stacked rank groups. Each mobile group has a 4.5rem rank rail; every tied participant remains visible.</p>
+<p>The public page shell uses <code>min(100% - 2rem, 72rem)</code> and centers itself. Its minimum supported viewport is 320px. From 640px the header contains a compact brand row and a row of five text links. Below 640px the header is one brand row and a fixed bottom tab bar (Table, Leaderboard, Spotlight, Streak, Rules; 56px targets; safe-area padded) replaces the text links. Sticky action bars offset themselves by <code>--mobile-tab-bar-height</code>.</p>
+<p>The season comparison uses a flexible table column beside a 19rem supporting column, with a 2rem gap. Below 900px, it becomes one column. Podium rank groups remain side by side at every width, and every tied participant remains visible.</p>
 <p>Card padding increases from the 16px spacing step to the 24px step at 640px. Smaller gaps use the 8px and 12px steps. Under 480px, navigation spacing and podium decoration contract to preserve content width.</p>
 <p>Comparison tables retain row boundaries. On mobile, Group avg. appears as a labeled inline value beneath the club name. The entry comparison leads with per-club scoring. Stage 3 uses an ordinary full-page review with all 20 clubs and seven picks, separate edit actions, and one final submission action.</p>
 <p>Bottom actions and mobile selector sheets account for the device safe area. A selector becomes a fixed bottom sheet on narrow screens and an anchored dropdown from 640px. Constrain wide matrices within their own scroll region; preserve the page&#39;s reflow.</p>
@@ -200,9 +200,10 @@ padding: &quot;2px 10px&quot;
 <h3 id="cards-and-comparison-rows">Cards and comparison rows</h3>
 <p>Cards are bordered surfaces without a default panel shadow. Headers, content, and footers share responsive padding. Footers use a dividing line. Comparison lists join rows inside one rounded outline, preserving data density and column alignment.</p>
 <h3 id="navigation">Navigation</h3>
-<p>Primary navigation names Season table, Leaderboard, Spotlight, Win Streak, and Rules. Active links use a lilac underline and purple ink, with <code>aria-current=&quot;page&quot;</code>. Links retain a 48px minimum height. The skip link becomes visible on focus.</p>
+<p>Primary navigation names Season table, Leaderboard, Spotlight, Win Streak, and Rules. Active links use a lilac underline and purple ink, with <code>aria-current=&quot;page&quot;</code>. Links retain a 48px minimum height. The skip link becomes visible on focus. Below 640px, a fixed bottom tab bar provides Table, Leaderboard, Spotlight, Streak, and Rules with 56px targets and safe-area padding. Owner pages replace public navigation with a single &quot;View public site&quot; link.</p>
 <p>The owner results desk uses selected workspace controls with <code>aria-pressed</code>. Inactive workspaces remain mounted and hidden so switching datasets preserves unsaved drafts. Publication remains a separate reviewed action with its existing validation and attestation gates.</p>
 <h3 id="podium">Podium</h3>
+<p>The podium is a compact side-by-side strip on every width; the full ranked table below it remains the complete accessible list.</p>
 <p>Group entries by occupied competition ranks 1, 2, and 3, including every tied entry. Do not allocate only three participant slots. A rank group shares its treatment, and the first-place header carries the strongest brand fill.</p>
 <p>Animal icons derive deterministically from the public display name and are hidden from assistive technology. They require no profile setting or additional personal data. Visible names, rank labels, and scores carry meaning independently.</p>
 <p><strong>The equal place Rule.</strong> Give every participant at the same rank the same visual status, without truncating the group.</p>
@@ -229,7 +230,7 @@ padding: &quot;2px 10px&quot;
 </ul>
 <p>Not canonized: inherited system-font headings are recorded as implementation evidence, not a distinctive display-font rule. One-off decorative values and unused legacy styling do not establish patterns for additional screens.</p>
 
-      <p class="source">Generated deterministically from <a href="DESIGN.md">DESIGN.md</a>. Canonical SHA-256: <code>2589a9ac1ec79ebcaae28b09abf6098750db110d6bc90c9818f95c8399b89fd4</code>.</p>
+      <p class="source">Generated deterministically from <a href="DESIGN.md">DESIGN.md</a>. Canonical SHA-256: <code>cce91786b0733f564612472db95bf96aeec4b750bdb6ef75cb3c391b7e48051d</code>.</p>
     </main>
   </body>
 </html>

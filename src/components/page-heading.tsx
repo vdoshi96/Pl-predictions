@@ -12,7 +12,7 @@ export function PageHeading({
   children?: ReactNode;
 }) {
   return (
-    <header className="page-heading">
+    <header className="page-heading min-w-0">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div className="min-w-0">
           <h1 className="text-[1.75rem] leading-8 font-bold tracking-tight break-words sm:text-4xl sm:leading-10">

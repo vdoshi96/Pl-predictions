@@ -116,6 +116,8 @@ describe("page heading", () => {
     const heading = screen.getByRole("heading", { level: 1 });
     expect(heading).toHaveClass("break-words");
     expect(heading.className).not.toContain("overflow-wrap:anywhere");
+    // Grid parents must not size to the longest unbroken word.
+    expect(heading.closest("header")).toHaveClass("min-w-0");
   });
 });
 

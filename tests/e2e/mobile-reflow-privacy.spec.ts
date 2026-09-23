@@ -473,7 +473,7 @@ test("320–430px reflow keeps private identifiers out of HTML and RSC", async (
       whiteSpace: getComputedStyle(element).whiteSpace,
     })),
   ).toEqual({
-    overflowWrap: "anywhere",
+    overflowWrap: "break-word",
     textOverflow: "clip",
     whiteSpace: "normal",
   });
@@ -497,7 +497,7 @@ test("320–430px reflow keeps private identifiers out of HTML and RSC", async (
       whiteSpace: getComputedStyle(element).whiteSpace,
     })),
   ).toEqual({
-    overflowWrap: "anywhere",
+    overflowWrap: "break-word",
     textOverflow: "clip",
     whiteSpace: "normal",
   });

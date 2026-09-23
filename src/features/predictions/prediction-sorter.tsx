@@ -3,7 +3,11 @@
 import * as Dialog from "@radix-ui/react-dialog";
 
 import { move } from "@dnd-kit/helpers";
-import { Accessibility, PointerActivationConstraints } from "@dnd-kit/dom";
+import {
+  Accessibility,
+  Feedback,
+  PointerActivationConstraints,
+} from "@dnd-kit/dom";
 import {
   DragDropProvider,
   PointerSensor,
@@ -98,6 +102,10 @@ const SortableTeamRow = memo(function SortableTeamRow({
       teamName: team.displayName,
       position,
     },
+    plugins: (defaults) => [
+      ...defaults,
+      Feedback.configure({ dropAnimation: null }),
+    ],
   });
 
   return (

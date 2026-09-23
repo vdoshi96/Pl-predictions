@@ -83,6 +83,7 @@ export function SearchablePredictionSelect({
   const containerRef = useRef<HTMLDivElement>(null);
   const otherInputRef = useRef<HTMLInputElement>(null);
   const closeTimerRef = useRef<number | null>(null);
+  const pointerSelectionTimerRef = useRef<number | null>(null);
   const [uncontrolledExpanded, setUncontrolledExpanded] = useState(false);
   const [closing, setClosing] = useState(false);
   const [query, setQuery] = useState("");
@@ -151,8 +152,16 @@ export function SearchablePredictionSelect({
     });
   }
 
+  function cancelPointerSelection() {
+    if (pointerSelectionTimerRef.current !== null) {
+      window.clearTimeout(pointerSelectionTimerRef.current);
+      pointerSelectionTimerRef.current = null;
+    }
+  }
+
   function openPicker() {
     if (disabled) return;
+    cancelPointerSelection();
     if (closeTimerRef.current !== null) {
       window.clearTimeout(closeTimerRef.current);
       closeTimerRef.current = null;
@@ -165,6 +174,7 @@ export function SearchablePredictionSelect({
   }
 
   function closePicker() {
+    cancelPointerSelection();
     if (closeTimerRef.current !== null) {
       window.clearTimeout(closeTimerRef.current);
     }
@@ -188,6 +198,7 @@ export function SearchablePredictionSelect({
 
   useEffect(
     () => () => {
+      cancelPointerSelection();
       if (closeTimerRef.current !== null) {
         window.clearTimeout(closeTimerRef.current);
       }
@@ -204,8 +215,9 @@ export function SearchablePredictionSelect({
   }
 
   function selectValueFromPointer(nextValue: Exclude<SelectValue, null>) {
+    cancelPointerSelection();
     onChange(nextValue);
-    window.setTimeout(() => {
+    pointerSelectionTimerRef.current = window.setTimeout(() => {
       closePicker();
       if (nextValue === "other") otherInputRef.current?.focus();
     }, 100);

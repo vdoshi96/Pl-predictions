@@ -1,0 +1,3753 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="generated-by" content="scripts/generate-docs-html.mjs" />
+    <meta name="canonical-source" content="2026-09-22-ux-refresh.md" />
+    <meta name="canonical-source-sha256" content="57ad76910ce2c9b1ee622bdb3fdae99052e076a62321fd4019577d25e988b16a" />
+    <title>September 2026 UX Refresh Implementation Plan</title>
+    <style>
+      :root { color-scheme: light dark; font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+      body { margin: 0; background: #f5f5f0; color: #18201c; }
+      main { box-sizing: border-box; width: min(100% - 2rem, 880px); margin: 2rem auto; padding: clamp(1.25rem, 4vw, 3rem); background: #fff; border: 1px solid #d9ddd8; border-radius: 1rem; box-shadow: 0 18px 60px rgb(22 31 26 / 8%); }
+      h1, h2, h3 { line-height: 1.15; color: #102d22; }
+      h1 { font-size: clamp(2rem, 5vw, 3.25rem); letter-spacing: -.04em; }
+      h2 { margin-top: 2.5rem; padding-top: 1rem; border-top: 1px solid #e2e6e2; }
+      p, li { line-height: 1.7; }
+      a { color: #087854; text-underline-offset: .2em; }
+      code { padding: .12rem .35rem; border-radius: .3rem; background: #edf1ed; font-size: .92em; }
+      pre { overflow-x: auto; padding: 1rem; border-radius: .65rem; background: #111a16; color: #edf8f2; }
+      pre code { padding: 0; background: transparent; }
+      table { display: block; overflow-x: auto; width: 100%; border-collapse: collapse; }
+      th, td { padding: .65rem .8rem; border: 1px solid #d9ddd8; text-align: left; vertical-align: top; }
+      th { background: #edf4ef; }
+      img { max-width: 100%; height: auto; border-radius: .75rem; }
+      blockquote { margin-left: 0; padding-left: 1rem; border-left: .25rem solid #1b9a6c; color: #49564f; }
+      .source { margin-top: 3rem; padding-top: 1rem; border-top: 1px solid #d9ddd8; color: #627069; font-size: .85rem; }
+      @media (prefers-color-scheme: dark) {
+        body { background: #0e1512; color: #e5ebe7; }
+        main { background: #16201b; border-color: #34423a; }
+        h1, h2, h3 { color: #f2fff8; }
+        h2, .source { border-color: #34423a; }
+        a { color: #58ddb0; }
+        code, th { background: #24322b; }
+        th, td { border-color: #3b4b42; }
+        blockquote { color: #b5c2bb; }
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1 id="september-2026-ux-refresh-implementation-plan">September 2026 UX Refresh Implementation Plan</h1>
+<blockquote>
+<p><strong>For agentic workers:</strong> REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task by task. Steps use checkbox (<code>- [ ]</code>) syntax for tracking.</p>
+</blockquote>
+<p><strong>Goal:</strong> Implement all 17 findings from the owner-approved September 22 UI/UX audit. Show answers sooner on mobile, give scores and gaps colors that match their meaning, and replace two-step controls with one-tap ones. The competition rules, data, and privacy must not change.</p>
+<p><strong>Architecture:</strong> This is presentation work inside the existing Next.js 16 App Router application. New pure helpers and small client components carry the new behavior. The existing server queries, scoring, server actions, schema, and migrations remain unchanged, except for one additive read field (<code>secondsUntilDeadline</code>) and one read-only owner overview query. The tests already exist on this branch. Implementation is finished when they pass.</p>
+<p><strong>Tech Stack:</strong> Next.js 16.3 App Router, React 19, TypeScript, Tailwind CSS v4, Radix Dialog, lucide-react, Drizzle/Neon (read-only use here), Vitest + Testing Library (jsdom), and Playwright.</p>
+<p><strong>Spec:</strong> <code>docs/superpowers/specs/2026-09-22-ux-audit.html</code>. Open it in a browser. Each section shows a current capture beside the approved design. The plan has priority when it gives more precise instructions, such as exact copy, class names, and labels.</p>
+<hr>
+<h2 id="0-rules-of-engagement-read-twice">0. Rules of engagement (read twice)</h2>
+<p>These rules exist because this work is easy to overbuild. Follow them literally.</p>
+<ol>
+<li><strong>Use only the tests you were given.</strong> Every test this work needs is already committed on this branch. Do <strong>not</strong> create, delete, rename, skip (<code>.skip</code>, <code>.todo</code>, <code>test.fixme</code>), weaken, or loosen any test. Do not add snapshot tests, helper test files, or &quot;extra coverage.&quot;</li>
+<li><strong>Do not edit any file under <code>tests/</code>,</strong> except the four exact Playwright edits in Task 12. Those edits are written out in full; apply them character for character.</li>
+<li><strong>Report a test that looks wrong; do not change it.</strong> If a provided test fails after you have implemented the step exactly as written, stop and report the file, test name, full failure output, and what you implemented. Do not change the test, and do not try alternative implementations until one passes.</li>
+<li><strong>Do not do unrequested work.</strong> No refactors outside the listed files, new dependencies, schema or migration changes, server-action changes, or scoring changes. Do not add features that are not in this plan. When the plan gives code, use that code. When it gives a class list, use those classes.</li>
+<li><strong>Never touch</strong> <code>drizzle/</code>, <code>src/db/schema.ts</code>, <code>scripts/</code>, <code>.impeccable/</code>, <code>public/team-marks/</code>, <code>public/player-faces/</code>, <code>premier-league-players-*/</code>, <code>src/features/scoring/</code>, <code>src/features/results/</code> (except the read-only import in Task 11), or <code>src/app/actions/</code>.</li>
+<li><strong>Never run</strong> a production write, seed, migration, <code>LOCK</code>, <code>REVEAL</code>, fixture apply, or result publish. Browser tests only run through the repository&#39;s isolated-database wrapper, which the <code>npm run test:e2e*</code> scripts already use.</li>
+<li>Read <code>AGENTS.md</code> first. This Next.js version differs from your training data. If you touch routing or page props, read the relevant guide under <code>node_modules/next/dist/docs/</code> before writing code.</li>
+<li>Commit after every task with the message given. Do not squash. Work on branch <code>vishal/ux-refresh-2026-09</code> (already checked out).</li>
+</ol>
+<h3 id="contract-strings-do-not-change">Contract strings: do not change</h3>
+<p>Existing browser tests and the production smoke suite locate elements by these exact strings. Keep all of them visible and spelled exactly as they are now:</p>
+<ul>
+<li>Level-one headings: <code>The season, against our predictions.</code>, <code>The friends’ leaderboard.</code>, <code>Who called it?</code>, <code>One pick. Keep it going.</code>, <code>The rules, without the guesswork.</code>, <code>Season control room</code>, and <code>Admin sign in</code>.</li>
+<li><code>Submissions closed · predictions revealed</code> (season table meta), <code>Provisional</code> / <code>Final</code> badge text, <code>Matchweek N</code> meta text.</li>
+<li>Link <code>View separate spotlight accuracy</code>; link <code>Read the full scoring rules</code> → <code>/rules#spotlight-scoring</code>.</li>
+<li>Labels <code>Scored leaderboard</code>, <code>Leaderboard podium</code>, <code>${name} leaderboard entry</code> (row <code>aria-label</code>), <code>Rank N</code> (rank badge <code>aria-label</code>), <code>Predicted champion: ${club}</code> (with a visible crest image), <code>Spotlight categories</code>, <code>Spotlight matrix</code>, <code>Spotlight accuracy leaderboard</code>, <code>${name} spotlight accuracy entry</code>, <code>Premier League season table</code>, <code>${name}&#39;s predicted table</code>, <code>Premier League predicted positions</code>, and <code>${team}, predicted position N of 20</code> (sorter <code>li</code>).</li>
+<li>Win Streak: test id <code>win-streak-leaderboard</code>, heading <code>Win Streak leaderboard</code>, the sentence <code>Ranked by personal best. Tied bests share a rank; current picks are visible as soon as they are locked.</code>, region <code>Your Win Streak</code>, textbox <code>Display name</code>, buttons <code>Continue to profile</code>, <code>Review pick</code>, <code>Confirm ${club}</code>, dialog <code>Review your pick</code>, headings <code>${name}&#39;s streak</code> and <code>Pick locked: ${club}</code>, text <code>Matchweeks 2–38 · Public picks · No account or password</code>, and text <code>No pick yet</code>.</li>
+<li>Entry flow: textbox <code>Your display name</code>, button <code>Continue to spotlight picks</code>, heading <code>Make your spotlight picks</code>, text <code>Type at least 2 letters to search players.</code>, <code>Draft saved in this browser</code>, <code>Not scored</code>, <code>How you enter</code> (rules disclosure), and <code>How to play in three steps</code>.</li>
+</ul>
+<h2 id="global-constraints">Global constraints</h2>
+<ul>
+<li>Participant data stays exactly as it is: no new personal fields, no new cookies, and no widened cookie paths. The prediction receipt cookie stays scoped to <code>/entries</code>. The audit&#39;s &quot;You&quot; pin and &quot;Your prediction&quot; column are therefore <strong>out of scope</strong> and are not built.</li>
+<li>Never serialize unrevealed prediction IDs, positions 2–20, or spotlight picks into HTML or RSC. Any server-to-client prop added here must contain only data the page already rendered publicly.</li>
+<li>Keep the podium grouped by occupied competition ranks 1–3, with every tied participant styled identically.</li>
+<li>Table points (maximum 100) and Spotlight accuracy stay visually and semantically separate.</li>
+<li>Touch targets must be at least 44px (<code>min-h-11</code>), and the sorter drag handle stays at 56px (<code>size-14</code>).</li>
+<li>Names, ranks, and numbers must carry meaning without color. Color is never the only signal.</li>
+<li>Club and participant names wrap <strong>between words</strong>: use Tailwind <code>break-words</code>, and never <code>[overflow-wrap:anywhere]</code>.</li>
+<li>Global CSS in <code>src/app/globals.css</code> is unlayered, so it beats Tailwind utilities regardless of specificity. Never put a Tailwind <code>display</code> or <code>height</code> utility on an element whose own global class sets that property. Use a wrapper element or a data attribute instead.</li>
+<li>Short local times use Chicago time via <code>formatLeagueDateTime</code>. <strong>Deadlines</strong> (Win Streak &quot;Picks close&quot;, entry cutoff) keep the existing <code>formatChicagoUtcDateTime</code> dual-zone string, because people act on them.</li>
+<li>React 19 lint forbids synchronous <code>setState</code> in effects. Where this plan does it deliberately (URL hash), it gives the exact justified <code>eslint-disable-next-line</code> comment. Do not add others.</li>
+</ul>
+<h2 id="review-focus-failure-modes-that-are-easy-to-miss">Review Focus (failure modes that are easy to miss)</h2>
+<ol>
+<li><strong>A 320px club name breaks mid-word</strong>, for example &quot;Mancheste / r City&quot;. Club names must wrap only between words. This is pinned by the Task 12 Playwright helper <code>expectNoMidWordBreaks</code>, which runs on all five projects, including <code>reflow-320-chromium</code>.</li>
+<li><strong>The bottom tab bar covers a sticky action bar or selector sheet.</strong> The Stage 1 &quot;Continue&quot; bar, the Win Streak &quot;Review pick&quot; footer, and the player-search bottom sheet must sit above the tab bar. This is pinned by existing mobile journeys (<code>app-journey</code>, <code>mobile-reflow-privacy</code>, and <code>win-streak</code> specs), which click those controls at 320, 390, and 430px. Task 3 gives the offsets.</li>
+<li><strong>The leaderboard filter must work without JavaScript.</strong> The input keeps <code>name=&quot;q&quot;</code> inside a <code>GET /leaderboard</code> form, so pressing Enter still filters on the server. This is pinned by <code>leaderboard-board.test.tsx</code> → &quot;filters rows as the visitor types…&quot; (checks <code>name=&quot;q&quot;</code>) and &quot;starts from the server query…&quot;.</li>
+<li><strong>Old deep links still work.</strong> <code>/rules#spotlight-scoring</code> must open the Spotlight tab. <code>/spotlight?category=…</code> must keep working after the select is removed. These are pinned by <code>rules-page.test.tsx</code> → &quot;opens the Spotlight section from an existing #spotlight-scoring link&quot; and <code>spotlight-views.test.tsx</code> → &quot;switches category with one tap…&quot;.</li>
+<li><strong>A tie spanning the podium and the list.</strong> All entries stay in the accessible table. The podium only adds a compact visual summary. This is pinned by <code>leaderboard-board.test.tsx</code> → &quot;keeps every scored entry in the accessible table&quot; and the three podium tie tests.</li>
+</ol>
+<hr>
+<h2 id="file-map">File map</h2>
+<p>Create:</p>
+<table>
+<thead>
+<tr>
+<th>File</th>
+<th>Responsibility</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>src/components/score-pill.tsx</code></td>
+<td><code>ScorePill</code> + <code>SCORE_TIER_LABELS</code>: one table-points tier chip used everywhere</td>
+</tr>
+<tr>
+<td><code>src/components/score-breakdown-bar.tsx</code></td>
+<td><code>ScoreBreakdownBar</code>: proportional exact / within-3 / half bar</td>
+</tr>
+<tr>
+<td><code>src/components/league-time.tsx</code></td>
+<td><code>LeagueTime</code>: <code>&lt;time&gt;</code> with a short Chicago line and a UTC tooltip</td>
+</tr>
+<tr>
+<td><code>src/components/snapshot-status.tsx</code></td>
+<td><code>SnapshotStatus</code>: Provisional/Final badge plus a Provisional explainer</td>
+</tr>
+<tr>
+<td><code>src/components/mobile-tab-bar.tsx</code></td>
+<td><code>MobileTabBar</code>: fixed bottom navigation below 640px</td>
+</tr>
+<tr>
+<td><code>src/features/leaderboard/leaderboard-explorer.tsx</code></td>
+<td><code>LeaderboardExplorer</code>: instant client-side participant filter</td>
+</tr>
+<tr>
+<td><code>src/features/entries/navigation.ts</code></td>
+<td><code>findAdjacentEntries</code>: previous and next entries in leaderboard order</td>
+</tr>
+<tr>
+<td><code>src/features/entries/entry-pager.tsx</code></td>
+<td><code>EntryPager</code>: previous/next links</td>
+</tr>
+<tr>
+<td><code>src/features/entries/entry-compare-picker.tsx</code></td>
+<td><code>EntryComparePicker</code>: one-tap &quot;Compare with…&quot; links</td>
+</tr>
+<tr>
+<td><code>src/features/entries/entry-comparison-table.tsx</code></td>
+<td><code>EntryComparisonTable</code> + <code>summarizeEntryTiers</code></td>
+</tr>
+<tr>
+<td><code>src/features/win-streak/fixture-days.ts</code></td>
+<td><code>groupFixturesByLeagueDay</code></td>
+</tr>
+<tr>
+<td><code>src/features/win-streak/used-club-reason.ts</code></td>
+<td><code>usedClubReason</code></td>
+</tr>
+<tr>
+<td><code>src/features/win-streak/round-countdown.tsx</code></td>
+<td><code>RoundCountdown</code> + <code>formatRoundCountdownLabel</code></td>
+</tr>
+<tr>
+<td><code>src/features/win-streak/round-outcomes.tsx</code></td>
+<td><code>RoundOutcomeChips</code> (shared by Win Streak and Rules)</td>
+</tr>
+<tr>
+<td><code>src/features/win-streak/win-streak-layout.tsx</code></td>
+<td><code>WinStreakLayout</code>: puts the board or the panel first</td>
+</tr>
+<tr>
+<td><code>src/app/rules/rules-tabs.tsx</code></td>
+<td><code>RulesTabs</code>: accessible tabs with hash deep-linking</td>
+</tr>
+<tr>
+<td><code>src/features/predictions/spotlight-completeness.ts</code></td>
+<td>Moved completeness helpers (breaks an import cycle)</td>
+</tr>
+<tr>
+<td><code>src/features/predictions/spotlight-progress.tsx</code></td>
+<td><code>SpotlightProgress</code>: seven-dot Stage 2 progress</td>
+</tr>
+<tr>
+<td><code>src/features/admin/status-board.tsx</code></td>
+<td><code>buildAdminStatusRows</code> + <code>AdminStatusBoard</code></td>
+</tr>
+</tbody></table>
+<p>Modify: <code>src/app/globals.css</code>, <code>src/shared/format.ts</code>, <code>src/components/page-heading.tsx</code>, <code>src/components/site-footer.tsx</code>, <code>src/components/site-header.tsx</code>, <code>src/components/site-navigation.tsx</code>, <code>src/app/layout.tsx</code>, <code>src/features/standings/season-table-page.tsx</code>, <code>src/features/leaderboard/leaderboard-board.tsx</code>, <code>src/features/leaderboard/podium.tsx</code>, <code>src/app/leaderboard/page.tsx</code>, <code>src/app/entries/[id]/page.tsx</code>, <code>src/features/leaderboard/spotlight-views.tsx</code>, <code>src/app/spotlight/page.tsx</code>, <code>src/features/win-streak/view-model.ts</code>, <code>src/features/win-streak/queries.ts</code>, <code>src/features/win-streak/win-streak-entry-panel.tsx</code>, <code>src/features/win-streak/win-streak-leaderboard.tsx</code>, <code>src/app/win-streak/page.tsx</code>, <code>src/app/rules/page.tsx</code>, <code>src/components/how-to-play.tsx</code>, <code>src/features/predictions/prediction-sorter.tsx</code>, <code>src/features/predictions/prediction-form.tsx</code>, <code>src/features/predictions/spotlight-predictions-form.tsx</code>, <code>src/features/predictions/searchable-prediction-select.tsx</code>, <code>src/app/admin/page.tsx</code>, <code>src/app/admin/admin-nav.tsx</code>, <code>src/app/admin/results/page.tsx</code>, <code>tests/e2e/post-kickoff-leaderboard.spec.ts</code> (Task 12 only), <code>DESIGN.md</code>, <code>AGENTS.md</code>, <code>docs/QA.md</code>, and the generated HTML peers.</p>
+<h2 id="the-tests-already-committed-your-finish-line">The tests (already committed; your finish line)</h2>
+<table>
+<thead>
+<tr>
+<th>Test file</th>
+<th>Owning task</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>tests/unit/consensus-delta-palette.test.ts</code></td>
+<td>1</td>
+</tr>
+<tr>
+<td><code>tests/unit/league-format.test.ts</code></td>
+<td>2</td>
+</tr>
+<tr>
+<td><code>tests/components/site-shell.test.tsx</code></td>
+<td>2 (footer, heading, time, status) and 3 (tab bar, header)</td>
+</tr>
+<tr>
+<td><code>tests/components/season-table-page.test.tsx</code></td>
+<td>4</td>
+</tr>
+<tr>
+<td><code>tests/components/leaderboard-board.test.tsx</code></td>
+<td>5</td>
+</tr>
+<tr>
+<td><code>tests/components/entry-comparison.test.tsx</code></td>
+<td>6</td>
+</tr>
+<tr>
+<td><code>tests/components/spotlight-views.test.tsx</code></td>
+<td>7</td>
+</tr>
+<tr>
+<td><code>tests/unit/win-streak-production-ui.test.tsx</code></td>
+<td>8</td>
+</tr>
+<tr>
+<td><code>tests/components/rules-page.test.tsx</code></td>
+<td>9</td>
+</tr>
+<tr>
+<td><code>tests/components/prediction-sorter-move.test.tsx</code></td>
+<td>10</td>
+</tr>
+<tr>
+<td><code>tests/components/spotlight-progress.test.tsx</code></td>
+<td>10</td>
+</tr>
+<tr>
+<td><code>tests/components/prediction-form.test.tsx</code> (one test edited)</td>
+<td>10</td>
+</tr>
+<tr>
+<td><code>tests/components/admin-status-board.test.tsx</code></td>
+<td>11</td>
+</tr>
+</tbody></table>
+<p>The complete target command (Task 13) is:</p>
+<pre><code class="language-bash">npx vitest run tests/unit/consensus-delta-palette.test.ts tests/unit/league-format.test.ts tests/components/site-shell.test.tsx tests/components/season-table-page.test.tsx tests/components/leaderboard-board.test.tsx tests/components/entry-comparison.test.tsx tests/components/spotlight-views.test.tsx tests/unit/win-streak-production-ui.test.tsx tests/components/rules-page.test.tsx tests/components/prediction-sorter-move.test.tsx tests/components/spotlight-progress.test.tsx tests/components/prediction-form.test.tsx tests/components/admin-status-board.test.tsx
+</code></pre>
+<hr>
+<h3 id="task-1-score-and-gap-color-tokens-score-pill-breakdown-bar">Task 1: Score and gap color tokens, score pill, breakdown bar</h3>
+<p><strong>Files:</strong></p>
+<ul>
+<li>Modify: <code>src/app/globals.css</code></li>
+<li>Create: <code>src/components/score-pill.tsx</code>, <code>src/components/score-breakdown-bar.tsx</code></li>
+<li>Test: <code>tests/unit/consensus-delta-palette.test.ts</code></li>
+</ul>
+<p><strong>Interfaces produced:</strong></p>
+<ul>
+<li><p><code>ScorePill({ points: ScorePoints; tier: ScoreTier })</code> renders <code>&lt;span class=&quot;score-pill&quot; data-tier={tier}&gt;{points} · {label}&lt;/span&gt;</code>.</p>
+</li>
+<li><p><code>SCORE_TIER_LABELS: Record&lt;ScoreTier, string&gt;</code></p>
+</li>
+<li><p><code>ScoreBreakdownBar({ exact: number; withinThree: number; correctHalf: number; missed?: number; size?: &quot;sm&quot; | &quot;lg&quot;; className?: string })</code></p>
+</li>
+<li><p><input disabled="" type="checkbox"> <strong>Step 1: Run the failing test</strong></p>
+</li>
+</ul>
+<p>Run: <code>npx vitest run tests/unit/consensus-delta-palette.test.ts</code>
+Expected: FAIL with <code>Missing --gap-neutral-bg token.</code> and 14 other failures.</p>
+<ul>
+<li><input disabled="" type="checkbox"> <strong>Step 2: Add tokens to the light <code>:root</code> block</strong> in <code>src/app/globals.css</code>, directly after the line <code>--brand-hover: #4b0b50;</code>:</li>
+</ul>
+<pre><code class="language-css">--score-exact-bg: #0b6b47;
+--score-exact-ink: #ffffff;
+--score-within-bg: #c9f0dc;
+--score-within-ink: #0b4d34;
+--score-half-bg: #e6dcef;
+--score-half-ink: #4b2560;
+--score-miss-bg: #efebf0;
+--score-miss-ink: #6b6071;
+--score-within-bar: #3aa877;
+--score-half-bar: #a992bb;
+--gap-neutral-bg: #efebf0;
+--gap-neutral-ink: #6b6071;
+--gap-positive-slight-bg: #d3f3e2;
+--gap-positive-slight-ink: #0b4d34;
+--gap-positive-clear-bg: #1f7a54;
+--gap-positive-clear-ink: #ffffff;
+--gap-positive-far-bg: #0b5a3b;
+--gap-positive-far-ink: #ffffff;
+--gap-negative-slight-bg: #fbdde2;
+--gap-negative-slight-ink: #7a1c2c;
+--gap-negative-clear-bg: #b4344d;
+--gap-negative-clear-ink: #ffffff;
+--gap-negative-far-bg: #7e1830;
+--gap-negative-far-ink: #ffffff;
+</code></pre>
+<ul>
+<li><input disabled="" type="checkbox"> <strong>Step 3: Add dark overrides</strong> inside the existing <code>@media (prefers-color-scheme: dark) { :root { … } }</code> block, directly after <code>--accent-blue: #ce9cd6;</code>:</li>
+</ul>
+<pre><code class="language-css">--score-within-bg: #174c37;
+--score-within-ink: #b7ffdc;
+--score-half-bg: #3b2a45;
+--score-half-ink: #e7c7eb;
+--score-miss-bg: #342939;
+--score-miss-ink: #bcb0c2;
+--gap-neutral-bg: #342939;
+--gap-neutral-ink: #bcb0c2;
+--gap-positive-slight-bg: #163f2f;
+--gap-positive-slight-ink: #b7ffdc;
+--gap-negative-slight-bg: #43161f;
+--gap-negative-slight-ink: #ffc9d3;
+</code></pre>
+<ul>
+<li><input disabled="" type="checkbox"> <strong>Step 4: Replace every <code>.consensus-delta</code> rule.</strong> Delete all seven existing <code>.consensus-delta[...]</code> rules and the whole <code>@media (prefers-color-scheme: dark) { .consensus-delta… }</code> block that follows them. Put this in their place:</li>
+</ul>
+<pre><code class="language-css">.consensus-delta[data-band=&quot;neutral&quot;] {
+  background: var(--gap-neutral-bg);
+  color: var(--gap-neutral-ink);
+}
+
+.consensus-delta[data-direction=&quot;positive&quot;][data-band=&quot;slight&quot;] {
+  background: var(--gap-positive-slight-bg);
+  color: var(--gap-positive-slight-ink);
+}
+
+.consensus-delta[data-direction=&quot;positive&quot;][data-band=&quot;clear&quot;] {
+  background: var(--gap-positive-clear-bg);
+  color: var(--gap-positive-clear-ink);
+}
+
+.consensus-delta[data-direction=&quot;positive&quot;][data-band=&quot;far&quot;] {
+  background: var(--gap-positive-far-bg);
+  color: var(--gap-positive-far-ink);
+}
+
+.consensus-delta[data-direction=&quot;negative&quot;][data-band=&quot;slight&quot;] {
+  background: var(--gap-negative-slight-bg);
+  color: var(--gap-negative-slight-ink);
+}
+
+.consensus-delta[data-direction=&quot;negative&quot;][data-band=&quot;clear&quot;] {
+  background: var(--gap-negative-clear-bg);
+  color: var(--gap-negative-clear-ink);
+}
+
+.consensus-delta[data-direction=&quot;negative&quot;][data-band=&quot;far&quot;] {
+  background: var(--gap-negative-far-bg);
+  color: var(--gap-negative-far-ink);
+}
+
+.score-pill {
+  display: inline-flex;
+  min-height: 1.75rem;
+  align-items: center;
+  border-radius: 0.5rem;
+  padding-inline: 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 900;
+  white-space: nowrap;
+}
+
+.score-pill[data-tier=&quot;exact&quot;] {
+  background: var(--score-exact-bg);
+  color: var(--score-exact-ink);
+}
+
+.score-pill[data-tier=&quot;within-three&quot;] {
+  background: var(--score-within-bg);
+  color: var(--score-within-ink);
+}
+
+.score-pill[data-tier=&quot;correct-half&quot;] {
+  background: var(--score-half-bg);
+  color: var(--score-half-ink);
+}
+
+.score-pill[data-tier=&quot;miss&quot;] {
+  background: var(--score-miss-bg);
+  color: var(--score-miss-ink);
+}
+
+.score-bar {
+  display: flex;
+  width: 100%;
+  height: 0.375rem;
+  overflow: hidden;
+  border-radius: 9999px;
+  background: var(--surface-subtle);
+}
+
+.score-bar[data-size=&quot;lg&quot;] {
+  height: 0.625rem;
+}
+
+.score-bar &gt; [data-tier=&quot;exact&quot;] {
+  background: var(--score-exact-bg);
+}
+
+.score-bar &gt; [data-tier=&quot;within-three&quot;] {
+  background: var(--score-within-bar);
+}
+
+.score-bar &gt; [data-tier=&quot;correct-half&quot;] {
+  background: var(--score-half-bar);
+}
+</code></pre>
+<ul>
+<li><input disabled="" type="checkbox"> <strong>Step 5: Create <code>src/components/score-pill.tsx</code></strong></li>
+</ul>
+<pre><code class="language-tsx">import type { ScorePoints, ScoreTier } from &quot;@/features/scoring&quot;;
+
+export const SCORE_TIER_LABELS: Record&lt;ScoreTier, string&gt; = {
+  &quot;correct-half&quot;: &quot;Correct half&quot;,
+  exact: &quot;Exact&quot;,
+  miss: &quot;No points&quot;,
+  &quot;within-three&quot;: &quot;Within 3&quot;,
+};
+
+export function ScorePill({
+  points,
+  tier,
+}: {
+  points: ScorePoints;
+  tier: ScoreTier;
+}) {
+  return (
+    &lt;span className=&quot;score-pill&quot; data-tier={tier}&gt;
+      {points} · {SCORE_TIER_LABELS[tier]}
+    &lt;/span&gt;
+  );
+}
+</code></pre>
+<ul>
+<li><input disabled="" type="checkbox"> <strong>Step 6: Create <code>src/components/score-breakdown-bar.tsx</code></strong></li>
+</ul>
+<pre><code class="language-tsx">import { cn } from &quot;@/components/ui/cn&quot;;
+
+export function ScoreBreakdownBar({
+  className,
+  correctHalf,
+  exact,
+  missed,
+  size = &quot;sm&quot;,
+  withinThree,
+}: {
+  className?: string;
+  correctHalf: number;
+  exact: number;
+  missed?: number;
+  size?: &quot;sm&quot; | &quot;lg&quot;;
+  withinThree: number;
+}) {
+  const label = [
+    `${exact} exact`,
+    `${withinThree} within three places`,
+    `${correctHalf} in the correct half`,
+    ...(missed === undefined ? [] : [`${missed} missed`]),
+  ].join(&quot;, &quot;);
+
+  return (
+    &lt;span
+      aria-label={label}
+      className={cn(&quot;score-bar&quot;, className)}
+      data-size={size}
+      role=&quot;img&quot;
+    &gt;
+      &lt;span data-tier=&quot;exact&quot; style={{ width: `${exact * 5}%` }} /&gt;
+      &lt;span data-tier=&quot;within-three&quot; style={{ width: `${withinThree * 3}%` }} /&gt;
+      &lt;span data-tier=&quot;correct-half&quot; style={{ width: `${correctHalf}%` }} /&gt;
+    &lt;/span&gt;
+  );
+}
+</code></pre>
+<ul>
+<li><input disabled="" type="checkbox"> <strong>Step 7: Run the test</strong></li>
+</ul>
+<p>Run: <code>npx vitest run tests/unit/consensus-delta-palette.test.ts</code>
+Expected: PASS (15 tests).</p>
+<ul>
+<li><input disabled="" type="checkbox"> <strong>Step 8: Commit</strong></li>
+</ul>
+<pre><code class="language-bash">git add src/app/globals.css src/components/score-pill.tsx src/components/score-breakdown-bar.tsx
+git commit -m &quot;Add score and gap color scales with shared score pill and breakdown bar&quot;
+</code></pre>
+<hr>
+<h3 id="task-2-short-league-time-provisional-explainer-lighter-heading-and-footer">Task 2: Short league time, Provisional explainer, lighter heading and footer</h3>
+<p><strong>Files:</strong></p>
+<ul>
+<li>Modify: <code>src/shared/format.ts</code>, <code>src/components/page-heading.tsx</code>, <code>src/components/site-footer.tsx</code></li>
+<li>Create: <code>src/components/league-time.tsx</code>, <code>src/components/snapshot-status.tsx</code></li>
+<li>Test: <code>tests/unit/league-format.test.ts</code>; <code>tests/components/site-shell.test.tsx</code> (describe blocks <code>site footer</code>, <code>page heading</code>, <code>league time</code>, <code>snapshot status</code>)</li>
+</ul>
+<p><strong>Interfaces produced:</strong></p>
+<ul>
+<li><p><code>formatLeagueDateTime(value: Date | string): string</code> → <code>&quot;Sun 20 Sep, 1:13 pm CDT&quot;</code></p>
+</li>
+<li><p><code>formatLeagueDay(value: Date | string): string</code> → <code>&quot;Sat 10 Oct&quot;</code></p>
+</li>
+<li><p><code>formatLeagueTime(value: Date | string): string</code> → <code>&quot;6:30 am&quot;</code></p>
+</li>
+<li><p><code>formatUtcDateTime(value: Date | string): string</code> → <code>&quot;20 Sep 2026, 18:13 UTC&quot;</code></p>
+</li>
+<li><p><code>LeagueTime({ prefix?: string; value: Date | string })</code></p>
+</li>
+<li><p><code>SnapshotStatus({ isFinal: boolean })</code></p>
+</li>
+<li><p><code>PROVISIONAL_EXPLANATION: string</code></p>
+</li>
+<li><p><input disabled="" type="checkbox"> <strong>Step 1: Run the failing tests</strong></p>
+</li>
+</ul>
+<p>Run: <code>npx vitest run tests/unit/league-format.test.ts</code>
+Expected: FAIL because <code>formatLeagueDateTime</code> is not exported.</p>
+<ul>
+<li><input disabled="" type="checkbox"> <strong>Step 2: Append to <code>src/shared/format.ts</code></strong> (leave every existing export as it is):</li>
+</ul>
+<pre><code class="language-ts">const leagueFormatter = new Intl.DateTimeFormat(&quot;en-US&quot;, {
+  day: &quot;numeric&quot;,
+  hour: &quot;numeric&quot;,
+  hour12: true,
+  minute: &quot;2-digit&quot;,
+  month: &quot;short&quot;,
+  timeZone: &quot;America/Chicago&quot;,
+  timeZoneName: &quot;short&quot;,
+  weekday: &quot;short&quot;,
+});
+
+function leagueParts(value: Date | string) {
+  const date = typeof value === &quot;string&quot; ? new Date(value) : value;
+  const parts = new Map(
+    leagueFormatter
+      .formatToParts(date)
+      .filter((part) =&gt; part.type !== &quot;literal&quot;)
+      .map((part) =&gt; [part.type, part.value]),
+  );
+  return {
+    day: `${parts.get(&quot;weekday&quot;)} ${parts.get(&quot;day&quot;)} ${parts.get(&quot;month&quot;)}`,
+    time: `${parts.get(&quot;hour&quot;)}:${parts.get(&quot;minute&quot;)} ${parts.get(&quot;dayPeriod&quot;)?.toLowerCase()}`,
+    zone: parts.get(&quot;timeZoneName&quot;),
+  };
+}
+
+export function formatLeagueDateTime(value: Date | string) {
+  const parts = leagueParts(value);
+  return `${parts.day}, ${parts.time} ${parts.zone}`;
+}
+
+export function formatLeagueDay(value: Date | string) {
+  return leagueParts(value).day;
+}
+
+export function formatLeagueTime(value: Date | string) {
+  return leagueParts(value).time;
+}
+
+export function formatUtcDateTime(value: Date | string) {
+  const date = typeof value === &quot;string&quot; ? new Date(value) : value;
+  return formatDateTimePart(date, dateTimeFormatters.utc);
+}
+</code></pre>
+<ul>
+<li><input disabled="" type="checkbox"> <strong>Step 3: Create <code>src/components/league-time.tsx</code></strong></li>
+</ul>
+<pre><code class="language-tsx">import { formatLeagueDateTime, formatUtcDateTime } from &quot;@/shared/format&quot;;
+
+export function LeagueTime({
+  prefix,
+  value,
+}: {
+  prefix?: string;
+  value: Date | string;
+}) {
+  const date = typeof value === &quot;string&quot; ? new Date(value) : value;
+  return (
+    &lt;time dateTime={date.toISOString()} title={formatUtcDateTime(date)}&gt;
+      {prefix ? `${prefix} ` : &quot;&quot;}
+      {formatLeagueDateTime(date)}
+    &lt;/time&gt;
+  );
+}
+</code></pre>
+<ul>
+<li><input disabled="" type="checkbox"> <strong>Step 4: Create <code>src/components/snapshot-status.tsx</code></strong></li>
+</ul>
+<pre><code class="language-tsx">&quot;use client&quot;;
+
+import { Info } from &quot;lucide-react&quot;;
+import { useId, useState } from &quot;react&quot;;
+
+import { Badge } from &quot;@/components/ui/badge&quot;;
+
+export const PROVISIONAL_EXPLANATION =
+  &quot;Provisional tables change as matchweeks are played. The owner marks the table Final after the last matchweek.&quot;;
+
+export function SnapshotStatus({ isFinal }: { isFinal: boolean }) {
+  const [open, setOpen] = useState(false);
+  const panelId = useId();
+
+  if (isFinal) return &lt;Badge variant=&quot;success&quot;&gt;Final&lt;/Badge&gt;;
+
+  return (
+    &lt;span className=&quot;relative inline-flex items-center&quot;&gt;
+      &lt;Badge variant=&quot;warning&quot;&gt;Provisional&lt;/Badge&gt;
+      &lt;button
+        aria-controls={panelId}
+        aria-expanded={open}
+        aria-label=&quot;What does Provisional mean?&quot;
+        className=&quot;text-muted hover:text-brand-ink focus-visible:ring-accent-blue inline-grid size-11 place-items-center rounded-full outline-none focus-visible:ring-2&quot;
+        onClick={() =&gt; setOpen((current) =&gt; !current)}
+        type=&quot;button&quot;
+      &gt;
+        &lt;Info aria-hidden=&quot;true&quot; className=&quot;size-4&quot; /&gt;
+      &lt;/button&gt;
+      {open ? (
+        &lt;span
+          className=&quot;border-border bg-surface text-foreground absolute top-full right-0 z-30 mt-1 w-64 rounded-xl border p-3 text-xs leading-5 shadow-lg&quot;
+          id={panelId}
+          role=&quot;note&quot;
+        &gt;
+          {PROVISIONAL_EXPLANATION}
+        &lt;/span&gt;
+      ) : null}
+    &lt;/span&gt;
+  );
+}
+</code></pre>
+<ul>
+<li><p><input disabled="" type="checkbox"> <strong>Step 5: Rewrite <code>src/components/page-heading.tsx</code></strong>. Keep the same props and the same structure; only these class strings change.</p>
+</li>
+<li><p><code>h1</code> className: <code>text-[1.75rem] leading-8 font-bold tracking-tight break-words sm:text-4xl sm:leading-10</code></p>
+</li>
+<li><p>description <code>p</code> className: <code>text-muted mt-1.5 max-w-2xl text-sm leading-6 sm:mt-2</code></p>
+</li>
+<li><p>children wrapper className: <code>text-muted mt-3 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs leading-5</code></p>
+</li>
+<li><p><input disabled="" type="checkbox"> <strong>Step 6: Edit <code>src/components/site-footer.tsx</code></strong></p>
+</li>
+<li><p>Container <code>div</code> className: <code>mx-auto grid w-full max-w-6xl gap-1 px-4 pt-4 pb-[max(1.25rem,env(safe-area-inset-bottom))] text-[0.7rem] leading-4 sm:px-6 lg:px-8</code></p>
+</li>
+<li><p>First <code>p</code> className: <code>text-brand-ink font-medium</code> (it was <code>text-brand-ink font-bold</code>)</p>
+</li>
+<li><p>Keep both paragraphs&#39; text exactly as it is.</p>
+</li>
+<li><p><input disabled="" type="checkbox"> <strong>Step 7: Run the tests</strong></p>
+</li>
+</ul>
+<p>Run: <code>npx vitest run tests/unit/league-format.test.ts tests/components/site-shell.test.tsx -t &quot;league-time formatting|site footer|page heading|league time|snapshot status&quot;</code>
+Expected: PASS for those blocks. The <code>mobile tab bar</code> and <code>site header</code> blocks still fail; Task 3 fixes them.</p>
+<ul>
+<li><input disabled="" type="checkbox"> <strong>Step 8: Commit</strong></li>
+</ul>
+<pre><code class="language-bash">git add src/shared/format.ts src/components/league-time.tsx src/components/snapshot-status.tsx src/components/page-heading.tsx src/components/site-footer.tsx
+git commit -m &quot;Add short league time, Provisional explainer, and lighter headings and footer&quot;
+</code></pre>
+<hr>
+<h3 id="task-3-mobile-tab-bar-and-owner-aware-header">Task 3: Mobile tab bar and owner-aware header</h3>
+<p><strong>Files:</strong></p>
+<ul>
+<li>Create: <code>src/components/mobile-tab-bar.tsx</code></li>
+<li>Modify: <code>src/components/site-navigation.tsx</code>, <code>src/components/site-header.tsx</code>, <code>src/app/layout.tsx</code>, <code>src/app/globals.css</code>, <code>src/features/predictions/prediction-form.tsx</code> (one class), <code>src/features/predictions/searchable-prediction-select.tsx</code> (one class), and <code>src/features/win-streak/win-streak-entry-panel.tsx</code> (one class)</li>
+<li>Test: <code>tests/components/site-shell.test.tsx</code> (all); <code>tests/components/prediction-form.test.tsx</code> → &quot;shared site chrome&quot; and &quot;uses a safe-area-aware sticky action at mobile widths&quot;</li>
+</ul>
+<p><strong>Interfaces produced:</strong> <code>MobileTabBar()</code> (no props); CSS custom property <code>--mobile-tab-bar-height</code> on <code>body</code> below 640px, when the tab bar is present.</p>
+<ul>
+<li><input disabled="" type="checkbox"> <strong>Step 1: Run the failing test</strong></li>
+</ul>
+<p>Run: <code>npx vitest run tests/components/site-shell.test.tsx</code>
+Expected: FAIL with <code>Failed to resolve import &quot;@/components/mobile-tab-bar&quot;</code>.</p>
+<ul>
+<li><input disabled="" type="checkbox"> <strong>Step 2: Create <code>src/components/mobile-tab-bar.tsx</code></strong></li>
+</ul>
+<pre><code class="language-tsx">&quot;use client&quot;;
+
+import { BookOpen, Flame, ListOrdered, Sparkles, Trophy } from &quot;lucide-react&quot;;
+import Link from &quot;next/link&quot;;
+import { usePathname } from &quot;next/navigation&quot;;
+
+const tabs = [
+  { href: &quot;/&quot;, icon: ListOrdered, label: &quot;Table&quot; },
+  { href: &quot;/leaderboard&quot;, icon: Trophy, label: &quot;Leaderboard&quot; },
+  { href: &quot;/spotlight&quot;, icon: Sparkles, label: &quot;Spotlight&quot; },
+  { href: &quot;/win-streak&quot;, icon: Flame, label: &quot;Streak&quot; },
+  { href: &quot;/rules&quot;, icon: BookOpen, label: &quot;Rules&quot; },
+] as const;
+
+export function isCurrentSection(pathname: string, href: string) {
+  if (href === &quot;/leaderboard&quot;) {
+    return pathname === &quot;/leaderboard&quot; || pathname.startsWith(&quot;/entries/&quot;);
+  }
+  return pathname === href;
+}
+
+export function MobileTabBar() {
+  const pathname = usePathname() ?? &quot;/&quot;;
+  if (pathname.startsWith(&quot;/admin&quot;)) return null;
+
+  return (
+    &lt;nav aria-label=&quot;Primary navigation&quot; className=&quot;mobile-tab-bar&quot;&gt;
+      {tabs.map(({ href, icon: Icon, label }) =&gt; (
+        &lt;Link
+          aria-current={isCurrentSection(pathname, href) ? &quot;page&quot; : undefined}
+          href={href}
+          key={href}
+        &gt;
+          &lt;Icon aria-hidden=&quot;true&quot; className=&quot;size-5&quot; strokeWidth={1.9} /&gt;
+          &lt;span&gt;{label}&lt;/span&gt;
+        &lt;/Link&gt;
+      ))}
+    &lt;/nav&gt;
+  );
+}
+</code></pre>
+<ul>
+<li><input disabled="" type="checkbox"> <strong>Step 3: Replace <code>src/components/site-navigation.tsx</code></strong></li>
+</ul>
+<pre><code class="language-tsx">&quot;use client&quot;;
+
+import Link from &quot;next/link&quot;;
+import { usePathname } from &quot;next/navigation&quot;;
+
+import { isCurrentSection } from &quot;./mobile-tab-bar&quot;;
+
+const navigation = [
+  { href: &quot;/&quot;, label: &quot;Season table&quot; },
+  { href: &quot;/leaderboard&quot;, label: &quot;Leaderboard&quot; },
+  { href: &quot;/spotlight&quot;, label: &quot;Spotlight&quot; },
+  { href: &quot;/win-streak&quot;, label: &quot;Win Streak&quot; },
+  { href: &quot;/rules&quot;, label: &quot;Rules&quot; },
+] as const;
+
+export function SiteNavigation() {
+  const pathname = usePathname() ?? &quot;/&quot;;
+
+  if (pathname.startsWith(&quot;/admin&quot;)) {
+    return (
+      &lt;nav aria-label=&quot;Primary navigation&quot; className=&quot;site-nav&quot;&gt;
+        &lt;Link href=&quot;/&quot;&gt;View public site&lt;/Link&gt;
+      &lt;/nav&gt;
+    );
+  }
+
+  return (
+    &lt;div className=&quot;max-sm:hidden&quot;&gt;
+      &lt;nav aria-label=&quot;Primary navigation&quot; className=&quot;site-nav&quot;&gt;
+        {navigation.map(({ href, label }) =&gt; (
+          &lt;Link
+            aria-current={isCurrentSection(pathname, href) ? &quot;page&quot; : undefined}
+            href={href}
+            key={href}
+          &gt;
+            {label}
+          &lt;/Link&gt;
+        ))}
+      &lt;/nav&gt;
+    &lt;/div&gt;
+  );
+}
+</code></pre>
+<ul>
+<li><p><input disabled="" type="checkbox"> <strong>Step 4: Edit <code>src/components/site-header.tsx</code>.</strong> Change only the brand row wrapper&#39;s className from <code>flex min-h-18 items-center justify-between gap-3</code> to <code>flex min-h-14 items-center justify-between gap-3 sm:min-h-18</code>.</p>
+</li>
+<li><p><input disabled="" type="checkbox"> <strong>Step 5: Edit <code>src/app/layout.tsx</code>.</strong> Import <code>MobileTabBar</code> from <code>@/components/mobile-tab-bar</code> and render <code>&lt;MobileTabBar /&gt;</code> directly after <code>&lt;SiteFooter /&gt;</code>.</p>
+</li>
+<li><p><input disabled="" type="checkbox"> <strong>Step 6: CSS in <code>src/app/globals.css</code>.</strong> Delete these rules inside <code>@media (max-width: 479px)</code>: <code>.site-nav { … }</code> and <code>.site-nav a { … }</code> (the text nav is hidden below 640px now). Then append:</p>
+</li>
+</ul>
+<pre><code class="language-css">.mobile-tab-bar {
+  position: fixed;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 40;
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  border-top: 1px solid var(--border);
+  background: var(--surface);
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+.mobile-tab-bar a {
+  display: grid;
+  min-height: 56px;
+  place-items: center;
+  align-content: center;
+  gap: 2px;
+  color: var(--muted);
+  font-size: 0.66rem;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.mobile-tab-bar a[aria-current=&quot;page&quot;] {
+  color: var(--brand-ink);
+}
+
+.mobile-tab-bar a:focus-visible {
+  outline-offset: -3px;
+}
+
+@media (max-width: 639px) {
+  body:has(.mobile-tab-bar) {
+    --mobile-tab-bar-height: calc(56px + env(safe-area-inset-bottom));
+    padding-bottom: var(--mobile-tab-bar-height);
+  }
+}
+
+@media (min-width: 640px) {
+  .mobile-tab-bar {
+    display: none;
+  }
+}
+</code></pre>
+<ul>
+<li><input disabled="" type="checkbox"> <strong>Step 7: Keep the sticky bars above the tab bar.</strong> Add one class to each of these three elements and change nothing else:</li>
+</ul>
+<ol>
+<li><code>src/features/predictions/prediction-form.tsx</code>. In the sticky action wrapper&#39;s template string, change <code>&quot;sticky bottom-0&quot;</code> to <code>&quot;sticky bottom-0 max-sm:bottom-[var(--mobile-tab-bar-height,0px)]&quot;</code>. Keep <code>bottom-0</code>, because an existing test asserts it.</li>
+<li><code>src/features/predictions/searchable-prediction-select.tsx</code>. In the listbox className, change <code>z-40</code> to <code>z-50</code>. Leave <code>sm:z-30</code> as it is.</li>
+<li><code>src/features/win-streak/win-streak-entry-panel.tsx</code>. In the <code>CardFooter</code> className of the pick card (<code>bg-surface/95 sticky bottom-0 …</code>), add <code>max-sm:bottom-[var(--mobile-tab-bar-height,0px)]</code> after <code>bottom-0</code>.</li>
+</ol>
+<ul>
+<li><input disabled="" type="checkbox"> <strong>Step 8: Run the tests</strong></li>
+</ul>
+<p>Run: <code>npx vitest run tests/components/site-shell.test.tsx tests/components/prediction-form.test.tsx -t &quot;mobile tab bar|site header|site footer|page heading|league time|snapshot status|shared site chrome|safe-area-aware sticky action&quot;</code>
+Expected: PASS.</p>
+<ul>
+<li><input disabled="" type="checkbox"> <strong>Step 9: Commit</strong></li>
+</ul>
+<pre><code class="language-bash">git add src/components/mobile-tab-bar.tsx src/components/site-navigation.tsx src/components/site-header.tsx src/app/layout.tsx src/app/globals.css src/features/predictions/prediction-form.tsx src/features/predictions/searchable-prediction-select.tsx src/features/win-streak/win-streak-entry-panel.tsx
+git commit -m &quot;Add mobile bottom tab bar and owner-aware header navigation&quot;
+</code></pre>
+<hr>
+<h3 id="task-4-season-table-diverging-gaps-zone-legend-one-meta-line-word-safe-names">Task 4: Season table: diverging gaps, zone legend, one meta line, word-safe names</h3>
+<p><strong>Files:</strong></p>
+<ul>
+<li>Modify: <code>src/features/standings/season-table-page.tsx</code></li>
+<li>Test: <code>tests/components/season-table-page.test.tsx</code></li>
+</ul>
+<p><strong>Interfaces:</strong> Consumes <code>LeagueTime</code> and <code>SnapshotStatus</code> (Task 2) and the gap tokens (Task 1). Produces <code>SEASON_TABLE_ZONES</code> (exported constant).</p>
+<ul>
+<li><input disabled="" type="checkbox"> <strong>Step 1: Run the failing test</strong></li>
+</ul>
+<p>Run: <code>npx vitest run tests/components/season-table-page.test.tsx</code>
+Expected: 4 failures (&quot;shows one short meta line…&quot;, &quot;labels the zone rails…&quot;, &quot;bands gaps…&quot;, and &quot;never lets club names break…&quot;).</p>
+<ul>
+<li><input disabled="" type="checkbox"> <strong>Step 2: Add the zone legend constant</strong> below <code>zoneFor</code>:</li>
+</ul>
+<pre><code class="language-tsx">export const SEASON_TABLE_ZONES = [
+  { className: &quot;bg-accent&quot;, label: &quot;Champions League&quot; },
+  { className: &quot;bg-accent-blue&quot;, label: &quot;Europa League&quot; },
+  { className: &quot;bg-accent-pink&quot;, label: &quot;Relegation&quot; },
+] as const;
+</code></pre>
+<ul>
+<li><input disabled="" type="checkbox"> <strong>Step 3: Replace the band logic in <code>DeltaChip</code>.</strong> Replace everything from <code>const roundedDelta</code> through the <code>data-band={band}</code> attribute with this code (the <code>visible</code> and <code>description</code> strings stay the same):</li>
+</ul>
+<pre><code class="language-tsx">  const roundedDelta = Number(formatConsensusValue(delta));
+  const magnitude = Math.abs(roundedDelta);
+  const direction =
+    roundedDelta === 0 ? &quot;neutral&quot; : roundedDelta &gt; 0 ? &quot;positive&quot; : &quot;negative&quot;;
+  const band =
+    magnitude &lt; 1
+      ? &quot;neutral&quot;
+      : magnitude &lt; 3
+        ? &quot;slight&quot;
+        : magnitude &lt; 8
+          ? &quot;clear&quot;
+          : &quot;far&quot;;
+  const visible = `${direction === &quot;neutral&quot; ? &quot;‒&quot; : direction === &quot;positive&quot; ? &quot;▲&quot; : &quot;▼&quot;} ${formatConsensusValue(magnitude)}`;
+  const description =
+    direction === &quot;neutral&quot;
+      ? `${formatConsensusValue(magnitude)} places from the league&#39;s average prediction`
+      : `${direction === &quot;positive&quot; ? &quot;overachieving&quot; : &quot;underachieving&quot;} by ${formatConsensusValue(magnitude)} places vs the league&#39;s average prediction`;
+
+  return (
+    &lt;span
+      className=&quot;consensus-delta inline-flex min-h-7 items-center rounded-lg px-2 text-xs font-black whitespace-nowrap&quot;
+      data-band={band}
+      data-direction={direction}
+    &gt;
+</code></pre>
+<ul>
+<li><p><input disabled="" type="checkbox"> <strong>Step 4: Change the page heading.</strong></p>
+</li>
+<li><p><code>status</code>: <code>view.snapshot ? &lt;SnapshotStatus isFinal={view.snapshot.isFinal} /&gt; : undefined</code></p>
+</li>
+<li><p>children, in this order: <code>{view.snapshot ? &lt;LeagueTime prefix=&quot;Updated&quot; value={view.snapshot.capturedAt} /&gt; : null}</code>, then the existing <code>Matchweek N</code> span, then <code>&lt;span&gt;Submissions closed · predictions revealed&lt;/span&gt;</code></p>
+</li>
+<li><p>Delete the <code>&lt;span&gt;{view.seasonName}&lt;/span&gt;</code> child, and remove the now-unused <code>Badge</code> and <code>formatChicagoUtcDateTime</code> imports.</p>
+</li>
+<li><p><input disabled="" type="checkbox"> <strong>Step 5: Add the legend</strong> as the first child of the fragment that renders the table, before the consensus-waiting card, only when <code>view.snapshot</code> exists:</p>
+</li>
+</ul>
+<pre><code class="language-tsx">&lt;ul
+  aria-label=&quot;Table zones&quot;
+  className=&quot;text-muted flex flex-wrap gap-x-4 gap-y-1 px-1 text-xs font-semibold&quot;
+&gt;
+  {SEASON_TABLE_ZONES.map((zone) =&gt; (
+    &lt;li className=&quot;flex items-center gap-1.5&quot; key={zone.label}&gt;
+      &lt;span
+        aria-hidden=&quot;true&quot;
+        className={`block h-3 w-1 rounded-full ${zone.className}`}
+      /&gt;
+      {zone.label}
+    &lt;/li&gt;
+  ))}
+&lt;/ul&gt;
+</code></pre>
+<ul>
+<li><p><input disabled="" type="checkbox"> <strong>Step 6: Make the columns wide enough at 320px and wrap only between words.</strong></p>
+</li>
+<li><p><code>colgroup</code>: <code>&lt;col className=&quot;w-2&quot; /&gt;</code>, <code>&lt;col className=&quot;w-7 sm:w-9&quot; /&gt;</code>, <code>&lt;col /&gt;</code>, <code>&lt;col className=&quot;w-8 sm:w-11&quot; /&gt;</code>, the Group avg. col unchanged, and the Gap col <code>w-[4.25rem] sm:w-20</code>.</p>
+</li>
+<li><p>The club-name span: replace <code>[overflow-wrap:anywhere]</code> with <code>break-words</code> and add the attribute <code>data-club-name</code>. The final className is <code>min-w-0 text-xs leading-4 break-words sm:text-sm</code>.</p>
+</li>
+<li><p><code>Callout</code> <code>strong</code>: replace <code>[overflow-wrap:anywhere]</code> with <code>break-words</code>.</p>
+</li>
+<li><p>After this step, <code>grep -n &quot;overflow-wrap:anywhere&quot; src/features/standings/season-table-page.tsx</code> must print nothing.</p>
+</li>
+<li><p><input disabled="" type="checkbox"> <strong>Step 7: Run the test</strong></p>
+</li>
+</ul>
+<p>Run: <code>npx vitest run tests/components/season-table-page.test.tsx</code>
+Expected: PASS (9 tests).</p>
+<ul>
+<li><input disabled="" type="checkbox"> <strong>Step 8: Commit</strong></li>
+</ul>
+<pre><code class="language-bash">git add src/features/standings/season-table-page.tsx
+git commit -m &quot;Season table: diverging gap bands, zone legend, one meta line, word-safe names&quot;
+</code></pre>
+<hr>
+<h3 id="task-5-leaderboard-compact-podium-56px-rows-breakdown-bar-instant-filter">Task 5: Leaderboard: compact podium, 56px rows, breakdown bar, instant filter</h3>
+<p><strong>Files:</strong></p>
+<ul>
+<li>Modify: <code>src/features/leaderboard/leaderboard-board.tsx</code>, <code>src/features/leaderboard/podium.tsx</code>, <code>src/app/leaderboard/page.tsx</code>, <code>src/app/globals.css</code> (podium block)</li>
+<li>Create: <code>src/features/leaderboard/leaderboard-explorer.tsx</code></li>
+<li>Test: <code>tests/components/leaderboard-board.test.tsx</code></li>
+</ul>
+<p><strong>Interfaces:</strong></p>
+<ul>
+<li><p>Produces <code>matchesParticipantQuery(name: string, query: string): boolean</code> (exported from <code>leaderboard-board.tsx</code>).</p>
+</li>
+<li><p>Produces <code>LeaderboardExplorer({ initialQuery: string; predictionsRevealed: boolean; rosterEntries: readonly LeaderboardRosterEntry[]; scoredEntries: readonly ScoredLeaderboardEntry[] | null })</code>.</p>
+</li>
+<li><p><code>ScoredLeaderboardBoard({ entries, query? })</code> and <code>LeaderboardRosterTable({ entries, predictionsRevealed })</code> keep their signatures.</p>
+</li>
+<li><p><input disabled="" type="checkbox"> <strong>Step 1: Run the failing test</strong></p>
+</li>
+</ul>
+<p>Run: <code>npx vitest run tests/components/leaderboard-board.test.tsx</code>
+Expected: FAIL with <code>Failed to resolve import &quot;@/features/leaderboard/leaderboard-explorer&quot;</code>.</p>
+<ul>
+<li><input disabled="" type="checkbox"> <strong>Step 2: Rewrite <code>src/features/leaderboard/leaderboard-board.tsx</code></strong> as follows:</li>
+</ul>
+<pre><code class="language-tsx">import { ScoreBreakdownBar } from &quot;@/components/score-breakdown-bar&quot;;
+import { TeamMark } from &quot;@/components/team-mark&quot;;
+import { Card } from &quot;@/components/ui/card&quot;;
+
+import { LeaderboardEntryLink } from &quot;./entry-link&quot;;
+import { Podium } from &quot;./podium&quot;;
+import type { LeaderboardRosterEntry, ScoredLeaderboardEntry } from &quot;./queries&quot;;
+
+export function matchesParticipantQuery(name: string, query: string) {
+  return name
+    .toLocaleLowerCase(&quot;en-GB&quot;)
+    .includes(query.trim().toLocaleLowerCase(&quot;en-GB&quot;));
+}
+
+function Movement({ value }: { value: number | null }) {
+  const climbed = value !== null &amp;&amp; value &gt; 0;
+  const dropped = value !== null &amp;&amp; value &lt; 0;
+  const label =
+    value === null
+      ? &quot;no previous table&quot;
+      : climbed
+        ? `climbed ${value} ${value === 1 ? &quot;place&quot; : &quot;places&quot;}`
+        : dropped
+          ? `dropped ${Math.abs(value)} ${value === -1 ? &quot;place&quot; : &quot;places&quot;}`
+          : &quot;no rank change&quot;;
+  return (
+    &lt;span
+      className={`mt-0.5 block text-[0.68rem] font-black whitespace-nowrap ${
+        climbed ? &quot;text-mint-ink&quot; : dropped ? &quot;text-danger&quot; : &quot;text-muted&quot;
+      }`}
+    &gt;
+      &lt;span aria-hidden=&quot;true&quot;&gt;
+        {climbed ? `▲${value}` : dropped ? `▼${Math.abs(value!)}` : &quot;–&quot;}
+      &lt;/span&gt;
+      &lt;span className=&quot;sr-only&quot;&gt;{label}&lt;/span&gt;
+    &lt;/span&gt;
+  );
+}
+
+function Champion({
+  champion,
+}: {
+  champion: LeaderboardRosterEntry[&quot;champion&quot;];
+}) {
+  return (
+    &lt;span
+      aria-label={`Predicted champion: ${champion.displayName}`}
+      className=&quot;text-brand-ink inline-flex min-w-0 items-center gap-1.5 text-xs font-bold&quot;
+    &gt;
+      &lt;TeamMark
+        decorative
+        initials={champion.shortName}
+        name={champion.displayName}
+        size=&quot;sm&quot;
+        src={champion.assetPath}
+      /&gt;
+      &lt;span className=&quot;min-w-0 break-words max-sm:sr-only&quot;&gt;
+        {champion.displayName}
+      &lt;/span&gt;
+    &lt;/span&gt;
+  );
+}
+
+const rowClassName =
+  &quot;border-surface-lilac-border hover:bg-surface-subtle border-b align-middle last:border-b-0 max-sm:grid max-sm:min-h-14 max-sm:grid-cols-[2.5rem_minmax(0,1fr)_2rem_3rem] max-sm:grid-rows-[auto_auto] max-sm:items-center max-sm:gap-x-2 max-sm:px-3 max-sm:py-2&quot;;
+
+export function ScoredLeaderboardBoard({
+  entries,
+  query = &quot;&quot;,
+}: {
+  entries: readonly ScoredLeaderboardEntry[];
+  query?: string;
+}) {
+  const visibleEntries = entries.filter((entry) =&gt;
+    matchesParticipantQuery(entry.participantName, query),
+  );
+  const hasMovement = entries.some((entry) =&gt; entry.movement !== null);
+
+  return (
+    &lt;section aria-label=&quot;Scored leaderboard&quot; className=&quot;grid gap-4&quot;&gt;
+      &lt;Podium entries={entries} /&gt;
+      {hasMovement ? (
+        &lt;p className=&quot;text-muted px-1 text-xs&quot;&gt;
+          ▲▼ Movement since the previous published table.
+        &lt;/p&gt;
+      ) : null}
+      {visibleEntries.length === 0 ? (
+        &lt;p className=&quot;text-muted py-4 text-sm&quot; role=&quot;status&quot;&gt;
+          No matching participant. Try a different name.
+        &lt;/p&gt;
+      ) : null}
+      &lt;Card className=&quot;overflow-hidden&quot;&gt;
+        &lt;table className=&quot;w-full border-collapse text-sm max-sm:block&quot;&gt;
+          &lt;caption className=&quot;sr-only&quot;&gt;
+            Table leaderboard with shared ranks, movement, champion picks,
+            scoring breakdowns, and points out of 100.
+          &lt;/caption&gt;
+          &lt;thead className=&quot;max-sm:sr-only&quot;&gt;
+            &lt;tr className=&quot;border-border text-muted border-b-2 text-left text-[0.62rem] font-black tracking-wider uppercase&quot;&gt;
+              &lt;th className=&quot;w-20 px-3 py-3&quot; scope=&quot;col&quot;&gt;
+                Rank
+              &lt;/th&gt;
+              &lt;th className=&quot;px-3 py-3&quot; scope=&quot;col&quot;&gt;
+                Entry
+              &lt;/th&gt;
+              &lt;th className=&quot;px-3 py-3&quot; scope=&quot;col&quot;&gt;
+                Breakdown
+              &lt;/th&gt;
+              &lt;th className=&quot;px-3 py-3&quot; scope=&quot;col&quot;&gt;
+                Champion
+              &lt;/th&gt;
+              &lt;th className=&quot;w-28 px-3 py-3 text-right&quot; scope=&quot;col&quot;&gt;
+                Table points
+              &lt;/th&gt;
+            &lt;/tr&gt;
+          &lt;/thead&gt;
+          &lt;tbody className=&quot;max-sm:block&quot;&gt;
+            {visibleEntries.map((entry) =&gt; (
+              &lt;tr
+                aria-label={`${entry.participantName} leaderboard entry`}
+                className={rowClassName}
+                key={entry.id}
+              &gt;
+                &lt;td className=&quot;px-3 py-2 max-sm:col-start-1 max-sm:row-span-2 max-sm:row-start-1 max-sm:p-0 max-sm:text-center&quot;&gt;
+                  &lt;span
+                    aria-label={`Rank ${entry.rank}`}
+                    className=&quot;bg-brand mx-auto grid size-8 place-items-center rounded-lg text-sm font-black text-white tabular-nums sm:mx-0 sm:size-9 sm:rounded-xl&quot;
+                  &gt;
+                    {entry.rank}
+                  &lt;/span&gt;
+                  &lt;Movement value={entry.movement} /&gt;
+                &lt;/td&gt;
+                &lt;td className=&quot;min-w-0 px-3 py-2 max-sm:col-start-2 max-sm:row-start-1 max-sm:p-0&quot;&gt;
+                  &lt;LeaderboardEntryLink
+                    entryId={entry.id}
+                    participantName={entry.participantName}
+                  /&gt;
+                &lt;/td&gt;
+                &lt;td className=&quot;px-3 py-2 max-sm:col-start-2 max-sm:row-start-2 max-sm:p-0&quot;&gt;
+                  &lt;ScoreBreakdownBar
+                    className=&quot;max-w-40&quot;
+                    correctHalf={entry.correctHalfCount}
+                    exact={entry.exactCount}
+                    withinThree={entry.withinThreeCount}
+                  /&gt;
+                  &lt;span className=&quot;text-muted mt-1 block text-[0.68rem] font-semibold&quot;&gt;
+                    {entry.exactCount} exact · {entry.withinThreeCount} within 3
+                    · {entry.correctHalfCount} half
+                  &lt;/span&gt;
+                &lt;/td&gt;
+                &lt;td className=&quot;px-3 py-2 max-sm:col-start-3 max-sm:row-span-2 max-sm:row-start-1 max-sm:p-0&quot;&gt;
+                  &lt;Champion champion={entry.champion} /&gt;
+                &lt;/td&gt;
+                &lt;td className=&quot;px-3 py-2 text-right max-sm:col-start-4 max-sm:row-span-2 max-sm:row-start-1 max-sm:p-0&quot;&gt;
+                  &lt;strong className=&quot;text-brand-ink-strong block text-xl font-black tabular-nums&quot;&gt;
+                    {entry.totalScore}
+                  &lt;/strong&gt;
+                  &lt;span className=&quot;sr-only&quot;&gt;of 100 table points&lt;/span&gt;
+                &lt;/td&gt;
+              &lt;/tr&gt;
+            ))}
+          &lt;/tbody&gt;
+        &lt;/table&gt;
+      &lt;/Card&gt;
+    &lt;/section&gt;
+  );
+}
+
+export function LeaderboardRosterTable({
+  entries,
+  predictionsRevealed,
+}: {
+  entries: readonly LeaderboardRosterEntry[];
+  predictionsRevealed: boolean;
+}) {
+  return (
+    &lt;section aria-label=&quot;Submission roster&quot;&gt;
+      &lt;Card className=&quot;overflow-hidden&quot;&gt;
+        &lt;table className=&quot;w-full border-collapse text-sm max-sm:block&quot;&gt;
+          &lt;caption className=&quot;sr-only&quot;&gt;
+            Active prediction entries and their public champion picks.
+          &lt;/caption&gt;
+          &lt;thead className=&quot;max-sm:sr-only&quot;&gt;
+            &lt;tr className=&quot;border-border text-muted border-b-2 text-left text-[0.62rem] font-black tracking-wider uppercase&quot;&gt;
+              &lt;th className=&quot;w-16 px-3 py-3&quot; scope=&quot;col&quot;&gt;
+                Rank
+              &lt;/th&gt;
+              &lt;th className=&quot;px-3 py-3&quot; scope=&quot;col&quot;&gt;
+                Entry
+              &lt;/th&gt;
+              &lt;th className=&quot;px-3 py-3&quot; scope=&quot;col&quot;&gt;
+                Champion
+              &lt;/th&gt;
+              &lt;th className=&quot;w-28 px-3 py-3 text-right&quot; scope=&quot;col&quot;&gt;
+                Table points
+              &lt;/th&gt;
+            &lt;/tr&gt;
+          &lt;/thead&gt;
+          &lt;tbody className=&quot;max-sm:block&quot;&gt;
+            {entries.map((entry) =&gt; (
+              &lt;tr
+                aria-label={`${entry.participantName} leaderboard entry`}
+                className=&quot;border-surface-lilac-border border-b last:border-b-0 max-sm:grid max-sm:min-h-14 max-sm:grid-cols-[2.5rem_minmax(0,1fr)_2rem_3rem] max-sm:items-center max-sm:gap-x-2 max-sm:px-3 max-sm:py-2&quot;
+                key={entry.publicKey}
+              &gt;
+                &lt;td className=&quot;px-3 py-2 max-sm:p-0&quot;&gt;
+                  &lt;span
+                    aria-label=&quot;Rank pending&quot;
+                    className=&quot;bg-brand grid size-8 place-items-center rounded-lg font-black text-white sm:size-9 sm:rounded-xl&quot;
+                  &gt;
+                    —
+                  &lt;/span&gt;
+                &lt;/td&gt;
+                &lt;td className=&quot;min-w-0 px-3 py-2 max-sm:p-0&quot;&gt;
+                  {predictionsRevealed &amp;&amp; entry.id ? (
+                    &lt;LeaderboardEntryLink
+                      entryId={entry.id}
+                      participantName={entry.participantName}
+                    /&gt;
+                  ) : (
+                    &lt;span className=&quot;text-foreground font-black break-words&quot;&gt;
+                      {entry.participantName}
+                    &lt;/span&gt;
+                  )}
+                &lt;/td&gt;
+                &lt;td className=&quot;px-3 py-2 max-sm:p-0&quot;&gt;
+                  &lt;Champion champion={entry.champion} /&gt;
+                &lt;/td&gt;
+                &lt;td className=&quot;px-3 py-2 text-right max-sm:p-0&quot;&gt;
+                  &lt;strong className=&quot;text-brand-ink-strong block text-xl font-black tabular-nums&quot;&gt;
+                    {entry.totalScore}
+                  &lt;/strong&gt;
+                  &lt;span className=&quot;sr-only&quot;&gt;of 100 table points&lt;/span&gt;
+                &lt;/td&gt;
+              &lt;/tr&gt;
+            ))}
+          &lt;/tbody&gt;
+        &lt;/table&gt;
+      &lt;/Card&gt;
+    &lt;/section&gt;
+  );
+}
+</code></pre>
+<ul>
+<li><p><input disabled="" type="checkbox"> <strong>Step 3: Edit <code>src/features/leaderboard/podium.tsx</code>.</strong> Change only the detail span className from <code>text-muted block text-xs</code> to <code>podium-detail text-muted text-xs</code>.</p>
+</li>
+<li><p><input disabled="" type="checkbox"> <strong>Step 4: Replace the podium CSS.</strong> In <code>src/app/globals.css</code>, delete every rule whose selector starts with <code>.podium</code> (from <code>.podium {</code> through <code>.podium-score span { … }</code>). Also delete the <code>@media (min-width: 900px)</code> podium padding block and the podium rules inside the <code>@media (max-width: 899px)</code> and <code>@media (max-width: 479px)</code> blocks. Keep <code>.season-layout</code> inside the 899px block. Append:</p>
+</li>
+</ul>
+<pre><code class="language-css">.podium {
+  border-block: 1px solid var(--border);
+  padding-block: 0.75rem;
+}
+.podium-tiers {
+  display: grid;
+  grid-auto-columns: minmax(0, 1fr);
+  grid-auto-flow: column;
+  align-items: end;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+}
+.podium-tier {
+  min-width: 0;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px 12px 8px 8px;
+}
+.podium-tier[data-rank=&quot;1&quot;] {
+  border-color: var(--accent-lilac);
+}
+.podium-place {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 0.35rem;
+  padding: 0.4rem 0.5rem;
+  background: var(--brand-soft);
+  border-radius: 11px 11px 0 0;
+}
+.podium-place strong {
+  font-size: 0.95rem;
+  color: var(--brand-ink);
+}
+.podium-place span {
+  font-size: 0.65rem;
+  color: var(--muted);
+}
+.podium-tier[data-rank=&quot;1&quot;] .podium-place {
+  background: var(--brand);
+}
+.podium-tier[data-rank=&quot;1&quot;] .podium-place strong {
+  color: var(--accent);
+}
+.podium-tier[data-rank=&quot;1&quot;] .podium-place span {
+  color: #decae2;
+}
+.podium-people {
+  display: grid;
+}
+.podium-person {
+  display: grid;
+  min-width: 0;
+  justify-items: center;
+  gap: 0.15rem;
+  padding: 0.5rem 0.4rem;
+  text-align: center;
+}
+.podium-person + .podium-person {
+  border-top: 1px solid var(--border);
+}
+.podium-mascot {
+  display: grid;
+  width: 36px;
+  height: 36px;
+  place-items: center;
+  color: var(--brand-ink);
+  background: var(--brand-soft);
+  border-radius: 50% 50% 35% 35%;
+}
+.podium-mascot svg {
+  width: 22px;
+  height: 22px;
+}
+.podium-score {
+  color: var(--brand-ink);
+  font-size: 1.15rem;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.podium-score span {
+  color: var(--muted);
+  font-size: 0.65rem;
+  font-weight: 500;
+}
+.podium-detail {
+  display: none;
+}
+@media (min-width: 900px) {
+  .podium-person {
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    align-items: center;
+    justify-items: start;
+    gap: 0.65rem;
+    padding: 0.75rem;
+    text-align: left;
+  }
+  .podium-mascot {
+    width: 48px;
+    height: 48px;
+  }
+  .podium-mascot svg {
+    width: 32px;
+    height: 32px;
+  }
+  .podium-detail {
+    display: block;
+  }
+  .podium-tier[data-rank=&quot;1&quot;] {
+    padding-bottom: 1rem;
+  }
+  .podium-tier[data-rank=&quot;2&quot;] {
+    padding-bottom: 0.5rem;
+  }
+}
+</code></pre>
+<ul>
+<li><input disabled="" type="checkbox"> <strong>Step 5: Create <code>src/features/leaderboard/leaderboard-explorer.tsx</code></strong></li>
+</ul>
+<pre><code class="language-tsx">&quot;use client&quot;;
+
+import { useState } from &quot;react&quot;;
+
+import {
+  LeaderboardRosterTable,
+  matchesParticipantQuery,
+  ScoredLeaderboardBoard,
+} from &quot;./leaderboard-board&quot;;
+import type { LeaderboardRosterEntry, ScoredLeaderboardEntry } from &quot;./queries&quot;;
+
+export function LeaderboardExplorer({
+  initialQuery,
+  predictionsRevealed,
+  rosterEntries,
+  scoredEntries,
+}: {
+  initialQuery: string;
+  predictionsRevealed: boolean;
+  rosterEntries: readonly LeaderboardRosterEntry[];
+  scoredEntries: readonly ScoredLeaderboardEntry[] | null;
+}) {
+  const [query, setQuery] = useState(initialQuery);
+  const count = scoredEntries?.length ?? rosterEntries.length;
+
+  return (
+    &lt;div className=&quot;grid gap-4&quot;&gt;
+      &lt;form
+        action=&quot;/leaderboard&quot;
+        aria-label=&quot;Participant filter&quot;
+        className=&quot;flex items-center gap-2&quot;
+        onSubmit={(event) =&gt; event.preventDefault()}
+        role=&quot;search&quot;
+      &gt;
+        &lt;label className=&quot;sr-only&quot; htmlFor=&quot;leaderboard-filter&quot;&gt;
+          Find a participant
+        &lt;/label&gt;
+        &lt;input
+          autoComplete=&quot;off&quot;
+          className=&quot;border-border bg-surface min-h-11 w-full max-w-sm rounded-lg border px-3 text-base sm:text-sm&quot;
+          id=&quot;leaderboard-filter&quot;
+          maxLength={80}
+          name=&quot;q&quot;
+          onChange={(event) =&gt; setQuery(event.target.value)}
+          placeholder={`Filter ${count} ${count === 1 ? &quot;name&quot; : &quot;names&quot;}`}
+          type=&quot;search&quot;
+          value={query}
+        /&gt;
+        {query ? (
+          &lt;button
+            className=&quot;text-brand-ink inline-flex min-h-11 items-center rounded-lg px-3 text-sm font-semibold underline&quot;
+            onClick={() =&gt; setQuery(&quot;&quot;)}
+            type=&quot;button&quot;
+          &gt;
+            Clear
+          &lt;/button&gt;
+        ) : null}
+      &lt;/form&gt;
+      {scoredEntries ? (
+        &lt;ScoredLeaderboardBoard entries={scoredEntries} query={query} /&gt;
+      ) : (
+        &lt;LeaderboardRosterTable
+          entries={rosterEntries.filter((entry) =&gt;
+            matchesParticipantQuery(entry.participantName, query),
+          )}
+          predictionsRevealed={predictionsRevealed}
+        /&gt;
+      )}
+    &lt;/div&gt;
+  );
+}
+</code></pre>
+<ul>
+<li><p><input disabled="" type="checkbox"> <strong>Step 6: Edit <code>src/app/leaderboard/page.tsx</code>.</strong></p>
+</li>
+<li><p><code>status</code>: <code>view.snapshot ? &lt;SnapshotStatus isFinal={view.snapshot.isFinal} /&gt; : undefined</code></p>
+</li>
+<li><p>The &quot;Updated&quot; child becomes <code>&lt;LeagueTime prefix=&quot;Updated&quot; value={view.snapshot.capturedAt} /&gt;</code> (still conditional on <code>view.snapshot</code>). Keep the entries-count span, the Matchweek span, and the <code>View separate spotlight accuracy</code> link.</p>
+</li>
+<li><p>Delete the whole <code>&lt;form action=&quot;/leaderboard&quot; …&gt;…&lt;/form&gt;</code> block.</p>
+</li>
+<li><p>Replace the final ternary (<code>view.entries.length === 0 ? … : scoringStarted &amp;&amp; view.scoredEntries ? … : …</code>) with the following. Keep the existing empty-state <code>Card</code> exactly as it is.</p>
+</li>
+</ul>
+<pre><code class="language-tsx">{view.entries.length === 0 ? (
+  /* existing &quot;No entries yet&quot; Card, unchanged */
+) : (
+  &lt;LeaderboardExplorer
+    initialQuery={query}
+    predictionsRevealed={view.predictionsRevealed}
+    rosterEntries={view.entries.map((entry) =&gt; ({
+      ...entry,
+      spotlightPicks: null,
+    }))}
+    scoredEntries={
+      scoringStarted &amp;&amp; view.scoredEntries ? view.scoredEntries : null
+    }
+  /&gt;
+)}
+</code></pre>
+<p>The <code>spotlightPicks: null</code> mapping keeps pick data out of the client payload. Leave it in.</p>
+<ul>
+<li><p>Remove the now-unused imports: <code>Badge</code>, <code>formatChicagoUtcDateTime</code>, <code>LeaderboardRosterTable</code>, and <code>ScoredLeaderboardBoard</code>.</p>
+</li>
+<li><p><input disabled="" type="checkbox"> <strong>Step 7: Run the test</strong></p>
+</li>
+</ul>
+<p>Run: <code>npx vitest run tests/components/leaderboard-board.test.tsx</code>
+Expected: PASS (16 tests).</p>
+<ul>
+<li><input disabled="" type="checkbox"> <strong>Step 8: Commit</strong></li>
+</ul>
+<pre><code class="language-bash">git add src/features/leaderboard/leaderboard-board.tsx src/features/leaderboard/podium.tsx src/features/leaderboard/leaderboard-explorer.tsx src/app/leaderboard/page.tsx src/app/globals.css
+git commit -m &quot;Leaderboard: compact podium, 56px rows with breakdown bar, instant filter&quot;
+</code></pre>
+<hr>
+<h3 id="task-6-entry-detail-score-summary-filters-compare-previousnext">Task 6: Entry detail: score summary, filters, compare, previous/next</h3>
+<p><strong>Files:</strong></p>
+<ul>
+<li>Create: <code>src/features/entries/navigation.ts</code>, <code>src/features/entries/entry-pager.tsx</code>, <code>src/features/entries/entry-compare-picker.tsx</code>, <code>src/features/entries/entry-comparison-table.tsx</code></li>
+<li>Modify: <code>src/app/entries/[id]/page.tsx</code>, <code>src/app/globals.css</code> (two rules)</li>
+<li>Test: <code>tests/components/entry-comparison.test.tsx</code></li>
+</ul>
+<p><strong>Interfaces produced:</strong></p>
+<ul>
+<li><p><code>type EntryReference = { id: string; participantName: string }</code></p>
+</li>
+<li><p><code>type AdjacentEntries = { next: EntryReference | null; position: number; previous: EntryReference | null; total: number }</code></p>
+</li>
+<li><p><code>findAdjacentEntries(ordered: readonly EntryReference[], currentId: string): AdjacentEntries | null</code></p>
+</li>
+<li><p><code>EntryPager({ navigation: AdjacentEntries })</code></p>
+</li>
+<li><p><code>EntryComparePicker({ activeCompareId: string | null; entryId: string; others: readonly EntryReference[] })</code></p>
+</li>
+<li><p><code>type EntryCompare = { participantName: string; positions: Readonly&lt;Record&lt;string, number&gt;&gt; }</code></p>
+</li>
+<li><p><code>summarizeEntryTiers(items)</code> returns <code>{ correctHalf, exact, miss, scored, withinThree }</code></p>
+</li>
+<li><p><code>EntryComparisonTable({ compare: EntryCompare | null; items: readonly EntryComparisonItem[]; participantName: string; totalScore: number | null })</code></p>
+</li>
+<li><p><input disabled="" type="checkbox"> <strong>Step 1: Run the failing test</strong></p>
+</li>
+</ul>
+<p>Run: <code>npx vitest run tests/components/entry-comparison.test.tsx</code>
+Expected: FAIL with <code>Failed to resolve import &quot;@/features/entries/entry-compare-picker&quot;</code>.</p>
+<ul>
+<li><input disabled="" type="checkbox"> <strong>Step 2: Create <code>src/features/entries/navigation.ts</code></strong></li>
+</ul>
+<pre><code class="language-ts">export type EntryReference = Readonly&lt;{ id: string; participantName: string }&gt;;
+
+export type AdjacentEntries = Readonly&lt;{
+  next: EntryReference | null;
+  position: number;
+  previous: EntryReference | null;
+  total: number;
+}&gt;;
+
+export function findAdjacentEntries(
+  ordered: readonly EntryReference[],
+  currentId: string,
+): AdjacentEntries | null {
+  const index = ordered.findIndex((entry) =&gt; entry.id === currentId);
+  if (index &lt; 0) return null;
+  return {
+    next: ordered[index + 1] ?? null,
+    position: index + 1,
+    previous: ordered[index - 1] ?? null,
+    total: ordered.length,
+  };
+}
+</code></pre>
+<ul>
+<li><input disabled="" type="checkbox"> <strong>Step 3: Create <code>src/features/entries/entry-pager.tsx</code></strong></li>
+</ul>
+<pre><code class="language-tsx">import Link from &quot;next/link&quot;;
+
+import type { AdjacentEntries } from &quot;./navigation&quot;;
+
+const linkClassName =
+  &quot;text-brand-ink inline-flex min-h-11 min-w-0 items-center gap-1 font-semibold underline underline-offset-4&quot;;
+
+export function EntryPager({ navigation }: { navigation: AdjacentEntries }) {
+  return (
+    &lt;nav
+      aria-label=&quot;Entry navigation&quot;
+      className=&quot;flex items-center justify-between gap-3 text-sm&quot;
+    &gt;
+      {navigation.previous ? (
+        &lt;Link
+          className={linkClassName}
+          href={`/entries/${navigation.previous.id}`}
+        &gt;
+          &lt;span aria-hidden=&quot;true&quot;&gt;‹&lt;/span&gt;
+          &lt;span className=&quot;sr-only&quot;&gt;Previous entry: &lt;/span&gt;
+          &lt;span className=&quot;min-w-0 break-words&quot;&gt;
+            {navigation.previous.participantName}
+          &lt;/span&gt;
+        &lt;/Link&gt;
+      ) : (
+        &lt;span /&gt;
+      )}
+      &lt;span className=&quot;text-muted shrink-0 text-xs&quot;&gt;
+        {navigation.position} of {navigation.total}
+      &lt;/span&gt;
+      {navigation.next ? (
+        &lt;Link
+          className={`${linkClassName} justify-end text-right`}
+          href={`/entries/${navigation.next.id}`}
+        &gt;
+          &lt;span className=&quot;sr-only&quot;&gt;Next entry: &lt;/span&gt;
+          &lt;span className=&quot;min-w-0 break-words&quot;&gt;
+            {navigation.next.participantName}
+          &lt;/span&gt;
+          &lt;span aria-hidden=&quot;true&quot;&gt;›&lt;/span&gt;
+        &lt;/Link&gt;
+      ) : (
+        &lt;span /&gt;
+      )}
+    &lt;/nav&gt;
+  );
+}
+</code></pre>
+<ul>
+<li><input disabled="" type="checkbox"> <strong>Step 4: Create <code>src/features/entries/entry-compare-picker.tsx</code></strong></li>
+</ul>
+<pre><code class="language-tsx">import Link from &quot;next/link&quot;;
+
+import type { EntryReference } from &quot;./navigation&quot;;
+
+export function EntryComparePicker({
+  activeCompareId,
+  entryId,
+  others,
+}: {
+  activeCompareId: string | null;
+  entryId: string;
+  others: readonly EntryReference[];
+}) {
+  return (
+    &lt;details
+      className=&quot;border-border bg-surface rounded-xl border&quot;
+      open={activeCompareId !== null}
+    &gt;
+      &lt;summary className=&quot;text-brand-ink flex min-h-11 cursor-pointer items-center px-3 text-sm font-black&quot;&gt;
+        Compare with…
+      &lt;/summary&gt;
+      &lt;ul className=&quot;border-border grid gap-1 border-t p-2 sm:grid-cols-3&quot;&gt;
+        {others.map((other) =&gt; (
+          &lt;li key={other.id}&gt;
+            &lt;Link
+              aria-current={other.id === activeCompareId ? &quot;true&quot; : undefined}
+              className=&quot;hover:bg-surface-subtle aria-[current=true]:bg-brand-soft aria-[current=true]:text-brand-ink flex min-h-11 items-center rounded-lg px-2 text-sm font-semibold break-words&quot;
+              href={`/entries/${entryId}?compare=${other.id}`}
+            &gt;
+              {other.participantName}
+            &lt;/Link&gt;
+          &lt;/li&gt;
+        ))}
+      &lt;/ul&gt;
+      {activeCompareId ? (
+        &lt;Link
+          className=&quot;text-brand-ink border-border flex min-h-11 items-center border-t px-3 text-sm font-semibold underline&quot;
+          href={`/entries/${entryId}`}
+        &gt;
+          Stop comparing
+        &lt;/Link&gt;
+      ) : null}
+    &lt;/details&gt;
+  );
+}
+</code></pre>
+<ul>
+<li><input disabled="" type="checkbox"> <strong>Step 5: Create <code>src/features/entries/entry-comparison-table.tsx</code></strong></li>
+</ul>
+<pre><code class="language-tsx">&quot;use client&quot;;
+
+import { useState } from &quot;react&quot;;
+
+import { ScoreBreakdownBar } from &quot;@/components/score-breakdown-bar&quot;;
+import { ScorePill } from &quot;@/components/score-pill&quot;;
+import { TeamMark } from &quot;@/components/team-mark&quot;;
+import type { ScoreTier } from &quot;@/features/scoring&quot;;
+import { ordinal } from &quot;@/shared/format&quot;;
+
+import type { EntryComparisonItem } from &quot;./queries&quot;;
+
+export type EntryCompare = Readonly&lt;{
+  participantName: string;
+  positions: Readonly&lt;Record&lt;string, number&gt;&gt;;
+}&gt;;
+
+type Filter = &quot;all&quot; | ScoreTier;
+
+export function summarizeEntryTiers(
+  items: readonly Pick&lt;EntryComparisonItem, &quot;tier&quot;&gt;[],
+) {
+  const summary = {
+    correctHalf: 0,
+    exact: 0,
+    miss: 0,
+    scored: false,
+    withinThree: 0,
+  };
+  for (const item of items) {
+    if (item.tier === null) continue;
+    summary.scored = true;
+    if (item.tier === &quot;exact&quot;) summary.exact += 1;
+    else if (item.tier === &quot;within-three&quot;) summary.withinThree += 1;
+    else if (item.tier === &quot;correct-half&quot;) summary.correctHalf += 1;
+    else summary.miss += 1;
+  }
+  return summary;
+}
+
+const rowColumns =
+  &quot;grid grid-cols-[2rem_minmax(0,1fr)_auto] items-center gap-x-2 gap-y-0.5 px-3 py-2 sm:grid-cols-[2.25rem_minmax(0,1fr)_3rem_3rem_5.5rem]&quot;;
+const rowColumnsWithCompare =
+  &quot;grid grid-cols-[2rem_minmax(0,1fr)_auto] items-center gap-x-2 gap-y-0.5 px-3 py-2 sm:grid-cols-[2.25rem_minmax(0,1fr)_3rem_3rem_3rem_5.5rem]&quot;;
+
+export function EntryComparisonTable({
+  compare,
+  items,
+  participantName,
+  totalScore,
+}: {
+  compare: EntryCompare | null;
+  items: readonly EntryComparisonItem[];
+  participantName: string;
+  totalScore: number | null;
+}) {
+  const [filter, setFilter] = useState&lt;Filter&gt;(&quot;all&quot;);
+  const summary = summarizeEntryTiers(items);
+  const showSummary = totalScore !== null &amp;&amp; summary.scored;
+  const columns = compare ? rowColumnsWithCompare : rowColumns;
+  const filters: readonly { label: string; value: Filter }[] = [
+    { label: `All ${items.length}`, value: &quot;all&quot; },
+    { label: `Exact · ${summary.exact}`, value: &quot;exact&quot; },
+    { label: `Within 3 · ${summary.withinThree}`, value: &quot;within-three&quot; },
+    { label: `Half · ${summary.correctHalf}`, value: &quot;correct-half&quot; },
+    { label: `Missed · ${summary.miss}`, value: &quot;miss&quot; },
+  ];
+  const visible =
+    filter === &quot;all&quot; ? items : items.filter((item) =&gt; item.tier === filter);
+
+  return (
+    &lt;div className=&quot;grid gap-4&quot;&gt;
+      {showSummary ? (
+        &lt;section aria-label=&quot;Score summary&quot; className=&quot;grid gap-3&quot;&gt;
+          &lt;p className=&quot;flex items-end gap-2&quot;&gt;
+            &lt;strong className=&quot;text-brand-ink-strong text-4xl leading-none font-black tabular-nums&quot;&gt;
+              {totalScore}
+            &lt;/strong&gt;
+            &lt;span className=&quot;text-muted pb-1 text-sm font-semibold&quot;&gt;
+              / 100 table points
+            &lt;/span&gt;
+          &lt;/p&gt;
+          &lt;ScoreBreakdownBar
+            correctHalf={summary.correctHalf}
+            exact={summary.exact}
+            missed={summary.miss}
+            size=&quot;lg&quot;
+            withinThree={summary.withinThree}
+          /&gt;
+          &lt;div
+            aria-label=&quot;Filter clubs&quot;
+            className=&quot;-mx-1 flex gap-2 overflow-x-auto px-1 pb-1&quot;
+            role=&quot;group&quot;
+          &gt;
+            {filters.map((option) =&gt; {
+              const active = filter === option.value;
+              return (
+                &lt;button
+                  aria-pressed={active}
+                  className={`inline-flex min-h-11 shrink-0 items-center rounded-full border px-3.5 text-xs font-black whitespace-nowrap ${
+                    active
+                      ? &quot;border-brand bg-brand dark:ring-accent-blue text-white dark:ring-1&quot;
+                      : &quot;border-border bg-surface text-muted hover:bg-surface-subtle&quot;
+                  }`}
+                  key={option.value}
+                  onClick={() =&gt; setFilter(option.value)}
+                  type=&quot;button&quot;
+                &gt;
+                  {option.label}
+                &lt;/button&gt;
+              );
+            })}
+          &lt;/div&gt;
+        &lt;/section&gt;
+      ) : null}
+
+      &lt;div
+        aria-hidden=&quot;true&quot;
+        className={`text-muted hidden text-[0.62rem] font-black tracking-wide uppercase sm:grid ${columns}`}
+      &gt;
+        &lt;span&gt;Pred&lt;/span&gt;
+        &lt;span&gt;Club&lt;/span&gt;
+        &lt;span className=&quot;text-center&quot;&gt;Actual&lt;/span&gt;
+        &lt;span className=&quot;text-center&quot;&gt;Off&lt;/span&gt;
+        {compare ? (
+          &lt;span className=&quot;truncate text-center&quot;&gt;
+            {compare.participantName}
+          &lt;/span&gt;
+        ) : null}
+        &lt;span className=&quot;text-right&quot;&gt;Pts&lt;/span&gt;
+      &lt;/div&gt;
+
+      &lt;ol
+        aria-label={`${participantName}&#39;s predicted table`}
+        className=&quot;entry-comparison&quot;
+      &gt;
+        {visible.map((item) =&gt; (
+          &lt;li
+            className={columns}
+            data-tier={item.tier ?? &quot;unscored&quot;}
+            key={item.teamId}
+          &gt;
+            &lt;span
+              aria-label={`Predicted ${ordinal(item.predictedPosition)}`}
+              className=&quot;bg-brand row-span-2 grid size-8 place-items-center rounded-lg text-xs font-black text-white tabular-nums sm:row-span-1&quot;
+            &gt;
+              {item.predictedPosition}
+            &lt;/span&gt;
+            &lt;span className=&quot;col-start-2 row-start-1 flex min-w-0 items-center gap-2 sm:col-start-auto sm:row-start-auto&quot;&gt;
+              &lt;TeamMark
+                initials={item.shortName}
+                name={item.displayName}
+                size=&quot;sm&quot;
+                src={item.assetPath}
+              /&gt;
+              &lt;span className=&quot;text-foreground min-w-0 text-sm font-black break-words&quot;&gt;
+                {item.displayName}
+              &lt;/span&gt;
+            &lt;/span&gt;
+            &lt;span className=&quot;text-muted col-start-2 row-start-2 flex flex-wrap gap-x-3 text-xs font-bold tabular-nums sm:contents&quot;&gt;
+              &lt;span className=&quot;sm:text-foreground sm:text-center sm:text-sm&quot;&gt;
+                &lt;span aria-hidden=&quot;true&quot; className=&quot;sm:hidden&quot;&gt;
+                  Act{&quot; &quot;}
+                &lt;/span&gt;
+                &lt;span className=&quot;sr-only&quot;&gt;Actual position &lt;/span&gt;
+                {item.actualPosition ?? &quot;—&quot;}
+              &lt;/span&gt;
+              &lt;span className=&quot;sm:text-center&quot;&gt;
+                &lt;span aria-hidden=&quot;true&quot; className=&quot;sm:hidden&quot;&gt;
+                  Off{&quot; &quot;}
+                &lt;/span&gt;
+                &lt;span className=&quot;sr-only&quot;&gt;Places off &lt;/span&gt;
+                {item.difference ?? &quot;—&quot;}
+              &lt;/span&gt;
+              {compare ? (
+                &lt;span className=&quot;sm:text-foreground sm:text-center sm:text-sm&quot;&gt;
+                  &lt;span aria-hidden=&quot;true&quot; className=&quot;sm:hidden&quot;&gt;
+                    {compare.participantName}{&quot; &quot;}
+                  &lt;/span&gt;
+                  &lt;span className=&quot;sr-only&quot;&gt;
+                    {compare.participantName} predicted{&quot; &quot;}
+                  &lt;/span&gt;
+                  {compare.positions[item.teamId] ?? &quot;—&quot;}
+                &lt;/span&gt;
+              ) : null}
+            &lt;/span&gt;
+            &lt;span className=&quot;col-start-3 row-span-2 row-start-1 text-right sm:col-start-auto sm:row-span-1 sm:row-start-auto&quot;&gt;
+              {item.tier &amp;&amp; item.points !== null ? (
+                &lt;ScorePill points={item.points} tier={item.tier} /&gt;
+              ) : (
+                &lt;span className=&quot;text-muted text-xs font-bold&quot;&gt;Not scored&lt;/span&gt;
+              )}
+            &lt;/span&gt;
+          &lt;/li&gt;
+        ))}
+      &lt;/ol&gt;
+      {visible.length === 0 ? (
+        &lt;p className=&quot;text-muted text-sm&quot; role=&quot;status&quot;&gt;
+          No clubs in this group.
+        &lt;/p&gt;
+      ) : null}
+    &lt;/div&gt;
+  );
+}
+</code></pre>
+<ul>
+<li><p><input disabled="" type="checkbox"> <strong>Step 6: CSS.</strong> In <code>src/app/globals.css</code>, delete the rules <code>.entry-comparison &gt; li &gt; div { … }</code> and <code>.entry-comparison &gt; li &gt; div &gt; div { … }</code>. Keep <code>.entry-comparison</code> and <code>.entry-comparison &gt; li + li</code>.</p>
+</li>
+<li><p><input disabled="" type="checkbox"> <strong>Step 7: Rewrite the data flow in <code>src/app/entries/[id]/page.tsx</code>.</strong></p>
+</li>
+</ul>
+<ol>
+<li>Change the signature to <code>export default async function EntryPage({ params, searchParams }: PageProps&lt;&quot;/entries/[id]&quot;&gt;)</code> and read both: <code>const [{ id }, query] = await Promise.all([params, searchParams]);</code> then <code>const entry = await getEntryComparison(id);</code>.</li>
+<li>After <code>if (!entry) notFound();</code> add:</li>
+</ol>
+<pre><code class="language-tsx">const board = entry.predictionsRevealed ? await getLeaderboardView() : null;
+const boardEntries: readonly { id: string | null; participantName: string }[] =
+  board ? (board.scoredEntries ?? board.entries) : [];
+const ordered = boardEntries.flatMap((candidate) =&gt;
+  candidate.id
+    ? [{ id: candidate.id, participantName: candidate.participantName }]
+    : [],
+);
+const navigation = findAdjacentEntries(ordered, entry.id);
+const compareId = typeof query.compare === &quot;string&quot; ? query.compare : null;
+const compareEntry =
+  entry.predictionsRevealed &amp;&amp; compareId &amp;&amp; compareId !== entry.id
+    ? await getEntryComparison(compareId)
+    : null;
+const compare = compareEntry?.predictionsRevealed
+  ? {
+      participantName: compareEntry.participantName,
+      positions: Object.fromEntries(
+        compareEntry.comparisonItems.map((item) =&gt; [
+          item.teamId,
+          item.predictedPosition,
+        ]),
+      ),
+    }
+  : null;
+</code></pre>
+<ol start="3">
+<li>PageHeading children become: <code>&lt;LeagueTime prefix=&quot;Submitted&quot; value={entry.createdAt} /&gt;</code> and <code>{entry.snapshot ? &lt;SnapshotStatus isFinal={entry.snapshot.isFinal} /&gt; : null}</code>. Delete the <code>totalScore</code> strong from the heading; the score now lives in the summary.</li>
+<li>Directly after <code>PageHeading</code>, add <code>{navigation ? &lt;EntryPager navigation={navigation} /&gt; : null}</code>.</li>
+<li>In the snapshot line, replace <code>Standings snapshot {formatChicagoUtcDateTime(...)}</code> with <code>&lt;LeagueTime prefix=&quot;Standings from&quot; value={entry.snapshot.capturedAt} /&gt;</code>, keeping the <code>· Matchweek N</code> suffix.</li>
+<li>Replace the entire <code>&lt;ol className=&quot;entry-comparison&quot; …&gt;…&lt;/ol&gt;</code> block with:</li>
+</ol>
+<pre><code class="language-tsx">{
+  entry.predictionsRevealed &amp;&amp; ordered.length &gt; 1 ? (
+    &lt;EntryComparePicker
+      activeCompareId={compare ? compareId : null}
+      entryId={entry.id}
+      others={ordered.filter((other) =&gt; other.id !== entry.id)}
+    /&gt;
+  ) : null;
+}
+&lt;EntryComparisonTable
+  compare={compare}
+  items={entry.comparisonItems}
+  participantName={entry.participantName}
+  totalScore={entry.totalScore}
+/&gt;;
+</code></pre>
+<ol start="7">
+<li>Delete the <code>tierPresentation</code> constant and the imports it alone used (<code>TeamMark</code>, <code>ordinal</code>, and <code>formatChicagoUtcDateTime</code> if unused). Add the imports <code>getLeaderboardView</code> (from <code>@/features/leaderboard/queries</code>), <code>findAdjacentEntries</code>, <code>EntryPager</code>, <code>EntryComparePicker</code>, <code>EntryComparisonTable</code>, <code>LeagueTime</code>, and <code>SnapshotStatus</code>. Keep the Spotlight picks card unchanged.</li>
+</ol>
+<ul>
+<li><input disabled="" type="checkbox"> <strong>Step 8: Run the test</strong></li>
+</ul>
+<p>Run: <code>npx vitest run tests/components/entry-comparison.test.tsx</code>
+Expected: PASS (11 tests).</p>
+<ul>
+<li><input disabled="" type="checkbox"> <strong>Step 9: Commit</strong></li>
+</ul>
+<pre><code class="language-bash">git add src/features/entries src/app/entries src/app/globals.css
+git commit -m &quot;Entry detail: score summary with filters, compare column, previous and next&quot;
+</code></pre>
+<hr>
+<h3 id="task-7-spotlight-one-tap-categories-leader-line-lone-picker-names-mobile-matrix-cards">Task 7: Spotlight: one-tap categories, leader line, lone-picker names, mobile matrix cards</h3>
+<p><strong>Files:</strong></p>
+<ul>
+<li>Modify: <code>src/features/leaderboard/spotlight-views.tsx</code>, <code>src/app/spotlight/page.tsx</code></li>
+<li>Test: <code>tests/components/spotlight-views.test.tsx</code></li>
+</ul>
+<p><strong>Interfaces produced:</strong> <code>SpotlightCategoryNav({ selected: PredictionCategory })</code> and <code>SpotlightViewNav({ selected: SpotlightView })</code>, both exported from <code>spotlight-views.tsx</code>.</p>
+<ul>
+<li><input disabled="" type="checkbox"> <strong>Step 1: Run the failing test</strong></li>
+</ul>
+<p>Run: <code>npx vitest run tests/components/spotlight-views.test.tsx</code>
+Expected: 8 failures.</p>
+<ul>
+<li><input disabled="" type="checkbox"> <strong>Step 2: Edit <code>ResultChip</code>.</strong> Replace only the ranked return value (the last <code>return</code> in <code>ResultChip</code>) with:</li>
+</ul>
+<pre><code class="language-tsx">return (
+  &lt;span
+    className={`rounded-lg px-2 py-1 text-[0.68rem] font-black whitespace-nowrap ${
+      rank === 1
+        ? &quot;bg-mint text-mint-ink&quot;
+        : rank &lt;= 5
+          ? &quot;bg-sky-soft text-brand-ink&quot;
+          : &quot;bg-surface-subtle text-muted&quot;
+    }`}
+  &gt;
+    &lt;span aria-hidden=&quot;true&quot;&gt;
+      #{rank} · {accuracyPoints ?? 0} pts
+    &lt;/span&gt;
+    &lt;span className=&quot;sr-only&quot;&gt;
+      Result rank {rank}, {accuracyPoints ?? 0} accuracy points
+    &lt;/span&gt;
+  &lt;/span&gt;
+);
+</code></pre>
+<ul>
+<li><input disabled="" type="checkbox"> <strong>Step 3: Replace the leader block.</strong> In <code>SpotlightCategoriesView</code>, replace the whole <code>&lt;div className=&quot;border-surface-lilac-border flex min-h-20 …&quot;&gt;…&lt;/div&gt;</code> (both the leader and no-leader branches) with:</li>
+</ul>
+<pre><code class="language-tsx">&lt;p
+  className=&quot;border-surface-lilac-border text-muted border-b border-dashed px-4 py-2 text-xs&quot;
+  data-testid=&quot;category-leader&quot;
+&gt;
+  &lt;span className=&quot;text-[0.62rem] font-black tracking-wider uppercase&quot;&gt;
+    Current leader
+  &lt;/span&gt;{&quot; &quot;}
+  {leader ? (
+    &lt;&gt;
+      &lt;strong className=&quot;text-brand-ink-strong break-words&quot;&gt;
+        {leader.displayName}
+      &lt;/strong&gt;{&quot; &quot;}
+      · {leader.metricLabel}
+    &lt;/&gt;
+  ) : (
+    &lt;strong className=&quot;text-muted&quot;&gt;Awaiting results publication&lt;/strong&gt;
+  )}
+&lt;/p&gt;
+</code></pre>
+<p>The <code>SubjectMark</code> import stays in use because the rows still use it.</p>
+<ul>
+<li><p><input disabled="" type="checkbox"> <strong>Step 4: Update the row summary text.</strong></p>
+</li>
+<li><p>In the row <code>strong</code>, replace <code>[overflow-wrap:anywhere]</code> with <code>break-words</code>.</p>
+</li>
+<li><p>Replace <code>{row.count} of {entryCount} · Select to see names</code> with <code>{row.count === 1 ? row.pickers[0]?.participantName : </code>${row.count} of ${entryCount}<code>}</code> (use a JSX expression, not a nested template string).</p>
+</li>
+<li><p><input disabled="" type="checkbox"> <strong>Step 5: Add the two navigation components</strong> to <code>spotlight-views.tsx</code>. Add <code>import Link from &quot;next/link&quot;;</code> and <code>import type { SpotlightView } from &quot;./spotlight-board&quot;;</code>.</p>
+</li>
+</ul>
+<pre><code class="language-tsx">const activeChipClassName =
+  &quot;border-brand bg-brand text-white dark:ring-1 dark:ring-accent-blue&quot;;
+const idleChipClassName =
+  &quot;border-border bg-surface text-muted hover:bg-surface-subtle&quot;;
+
+export function SpotlightCategoryNav({
+  selected,
+}: {
+  selected: PredictionCategory;
+}) {
+  return (
+    &lt;nav
+      aria-label=&quot;Choose a spotlight category&quot;
+      className=&quot;-mx-1 overflow-x-auto px-1 pb-1&quot;
+    &gt;
+      &lt;ul className=&quot;flex w-max gap-2&quot;&gt;
+        {PREDICTION_CATEGORY_DEFINITIONS.map((definition) =&gt; {
+          const active = definition.category === selected;
+          return (
+            &lt;li key={definition.category}&gt;
+              &lt;Link
+                aria-current={active ? &quot;page&quot; : undefined}
+                className={`focus-visible:ring-accent-blue inline-flex min-h-11 items-center rounded-full border px-3.5 text-xs font-black whitespace-nowrap outline-none focus-visible:ring-2 ${active ? activeChipClassName : idleChipClassName}`}
+                href={`/spotlight?category=${definition.category}`}
+                scroll={false}
+              &gt;
+                {definition.label}
+              &lt;/Link&gt;
+            &lt;/li&gt;
+          );
+        })}
+      &lt;/ul&gt;
+    &lt;/nav&gt;
+  );
+}
+
+const viewOptions: readonly {
+  href: string;
+  label: string;
+  value: SpotlightView;
+}[] = [
+  { href: &quot;/spotlight&quot;, label: &quot;Categories&quot;, value: &quot;categories&quot; },
+  { href: &quot;/spotlight?view=entries&quot;, label: &quot;Entries&quot;, value: &quot;entries&quot; },
+  { href: &quot;/spotlight?view=matrix&quot;, label: &quot;Matrix&quot;, value: &quot;matrix&quot; },
+];
+
+export function SpotlightViewNav({ selected }: { selected: SpotlightView }) {
+  return (
+    &lt;nav aria-label=&quot;Spotlight views&quot;&gt;
+      &lt;ul className=&quot;bg-surface-subtle grid grid-cols-3 gap-1 rounded-xl p-1&quot;&gt;
+        {viewOptions.map((option) =&gt; {
+          const active = option.value === selected;
+          return (
+            &lt;li key={option.value}&gt;
+              &lt;Link
+                aria-current={active ? &quot;page&quot; : undefined}
+                className={`focus-visible:ring-accent-blue inline-flex min-h-11 w-full items-center justify-center rounded-lg px-2 text-xs font-black outline-none focus-visible:ring-2 ${
+                  active
+                    ? &quot;bg-brand dark:ring-accent-blue text-white dark:ring-1&quot;
+                    : &quot;text-muted hover:bg-surface&quot;
+                }`}
+                href={option.href}
+              &gt;
+                {option.label}
+              &lt;/Link&gt;
+            &lt;/li&gt;
+          );
+        })}
+      &lt;/ul&gt;
+    &lt;/nav&gt;
+  );
+}
+</code></pre>
+<ul>
+<li><input disabled="" type="checkbox"> <strong>Step 6: Add mobile matrix cards to <code>SpotlightMatrixView</code>.</strong></li>
+</ul>
+<ol>
+<li>Add this near <code>matrixResult</code>:</li>
+</ol>
+<pre><code class="language-tsx">const MATRIX_ABBREVIATIONS: Record&lt;PredictionCategory, string&gt; = {
+  most_clean_sheets: &quot;CS&quot;,
+  overrated_player: &quot;OP&quot;,
+  overrated_team: &quot;OT&quot;,
+  top_assister: &quot;TA&quot;,
+  top_scorer: &quot;TS&quot;,
+  underdog_player: &quot;UP&quot;,
+  underdog_team: &quot;UT&quot;,
+};
+
+function compactMatrixResult(pick: SpotlightPickDisplay): string {
+  if (pick.resultStatus === &quot;outside-range&quot;) return &quot;Out&quot;;
+  if (pick.resultRank === undefined || pick.resultRank === null) {
+    return pick.category === &quot;underdog_player&quot; ||
+      pick.category === &quot;overrated_player&quot;
+      ? &quot;N/A&quot;
+      : &quot;…&quot;;
+  }
+  return `#${pick.resultRank}`;
+}
+</code></pre>
+<ol start="2">
+<li>Wrap the existing <code>&lt;Card className=&quot;overflow-hidden&quot;&gt;…&lt;/Card&gt;</code> (the table) in <code>&lt;div className=&quot;max-sm:hidden&quot;&gt;…&lt;/div&gt;</code>.</li>
+<li>After that wrapper, still inside the section, add:</li>
+</ol>
+<pre><code class="language-tsx">&lt;ul aria-label=&quot;Picks by entry&quot; className=&quot;grid gap-2 sm:hidden&quot;&gt;
+  {entries.map((entry) =&gt; (
+    &lt;li
+      aria-label={`${entry.participantName} spotlight picks`}
+      className=&quot;border-border bg-surface rounded-xl border p-3&quot;
+      key={entry.id}
+    &gt;
+      &lt;div className=&quot;flex items-center justify-between gap-2&quot;&gt;
+        &lt;LeaderboardEntryLink
+          entryId={entry.id}
+          participantName={entry.participantName}
+        /&gt;
+        &lt;span className=&quot;text-muted shrink-0 text-xs font-semibold&quot;&gt;
+          {entry.availableCategoryCount} of 7 live · {entry.accuracyScore} pts
+        &lt;/span&gt;
+      &lt;/div&gt;
+      &lt;ul
+        aria-label={`${entry.participantName} picks`}
+        className=&quot;mt-2 grid grid-cols-4 gap-1&quot;
+      &gt;
+        {PREDICTION_CATEGORY_DEFINITIONS.map((definition) =&gt; {
+          const pick = entry.picksByCategory.get(definition.category);
+          return (
+            &lt;li
+              className={`flex min-h-9 items-center justify-center gap-1 rounded-lg px-1 text-[0.68rem] font-black ${pick ? matrixCellClass(pick) : &quot;bg-surface-subtle text-muted&quot;}`}
+              key={definition.category}
+            &gt;
+              &lt;abbr
+                aria-hidden=&quot;true&quot;
+                className=&quot;no-underline&quot;
+                title={definition.label}
+              &gt;
+                {MATRIX_ABBREVIATIONS[definition.category]}
+              &lt;/abbr&gt;
+              &lt;span aria-hidden=&quot;true&quot;&gt;
+                {pick ? compactMatrixResult(pick) : &quot;—&quot;}
+              &lt;/span&gt;
+              &lt;span className=&quot;sr-only&quot;&gt;
+                {pick
+                  ? `${definition.label}: ${pick.displayName}, ${matrixResult(pick)}`
+                  : `${definition.label}: no pick`}
+              &lt;/span&gt;
+            &lt;/li&gt;
+          );
+        })}
+      &lt;/ul&gt;
+    &lt;/li&gt;
+  ))}
+&lt;/ul&gt;
+</code></pre>
+<ol start="4">
+<li>In the table&#39;s Accuracy cell, change <code>text-rose-score</code> to <code>text-brand-ink-strong</code>. Replace the table&#39;s <code>[overflow-wrap:anywhere]</code> with <code>break-words</code>.</li>
+</ol>
+<ul>
+<li><p><input disabled="" type="checkbox"> <strong>Step 7: Edit <code>src/app/spotlight/page.tsx</code>.</strong></p>
+</li>
+<li><p>Remove the <code>view.seasonName</code> meta span.</p>
+</li>
+<li><p>Replace the whole <code>&lt;nav aria-label=&quot;Spotlight views&quot;&gt;…&lt;/nav&gt;</code> block with <code>&lt;SpotlightViewNav selected={selectedView} /&gt;</code>, and delete the page&#39;s <code>viewOptions</code> constant.</p>
+</li>
+<li><p>Replace the whole <code>&lt;form action=&quot;/spotlight&quot; …&gt;…&lt;/form&gt;</code> with <code>&lt;SpotlightCategoryNav selected={selectedCategory} /&gt;</code>.</p>
+</li>
+<li><p>In the aside, delete the sentence <code>Select a player or club to see everyone who backed them. Spotlight accuracy stays separate from table points.</code> and replace it with <code>Spotlight accuracy stays separate from table points.</code></p>
+</li>
+<li><p>In the Entries view sort nav, add <code>dark:ring-1 dark:ring-accent-blue</code> to the active class string (<code>border-brand bg-brand text-white</code>).</p>
+</li>
+<li><p>In the Entries view score <code>strong</code>, change <code>text-rose-score</code> to <code>text-brand-ink-strong</code>.</p>
+</li>
+<li><p>Import <code>SpotlightCategoryNav</code> and <code>SpotlightViewNav</code>.</p>
+</li>
+<li><p><input disabled="" type="checkbox"> <strong>Step 8: Run the test</strong></p>
+</li>
+</ul>
+<p>Run: <code>npx vitest run tests/components/spotlight-views.test.tsx</code>
+Expected: PASS (9 tests).</p>
+<ul>
+<li><input disabled="" type="checkbox"> <strong>Step 9: Commit</strong></li>
+</ul>
+<pre><code class="language-bash">git add src/features/leaderboard/spotlight-views.tsx src/app/spotlight/page.tsx
+git commit -m &quot;Spotlight: one-tap category chips, leader line, and mobile matrix cards&quot;
+</code></pre>
+<hr>
+<h3 id="task-8-win-streak-countdown-day-grouped-fixtures-used-club-reasons-inline-board-picks">Task 8: Win Streak: countdown, day-grouped fixtures, used-club reasons, inline board picks</h3>
+<p><strong>Files:</strong></p>
+<ul>
+<li>Create: <code>src/features/win-streak/fixture-days.ts</code>, <code>used-club-reason.ts</code>, <code>round-countdown.tsx</code>, <code>round-outcomes.tsx</code>, <code>win-streak-layout.tsx</code></li>
+<li>Modify: <code>src/features/win-streak/view-model.ts</code>, <code>queries.ts</code>, <code>win-streak-entry-panel.tsx</code>, <code>win-streak-leaderboard.tsx</code>, and <code>src/app/win-streak/page.tsx</code></li>
+<li>Test: <code>tests/unit/win-streak-production-ui.test.tsx</code></li>
+</ul>
+<p><strong>Interfaces produced:</strong></p>
+<ul>
+<li><p><code>WinStreakActiveRoundView</code> gains <code>secondsUntilDeadline: number</code>.</p>
+</li>
+<li><p><code>groupFixturesByLeagueDay&lt;T extends { kickoffAt: string }&gt;(fixtures: readonly T[]): { dayLabel: string; fixtures: (T &amp; { timeLabel: string })[] }[]</code></p>
+</li>
+<li><p><code>usedClubReason(history: readonly WinStreakHistoryView[], teamSlug: WinStreakTeamSlug): string</code></p>
+</li>
+<li><p><code>formatRoundCountdownLabel(totalSeconds: number, matchweek: number): string</code></p>
+</li>
+<li><p><code>RoundCountdown({ deadlineIso: string; initialRemainingSeconds: number; matchweek: number })</code></p>
+</li>
+<li><p><code>WIN_STREAK_ROUND_OUTCOMES</code> and <code>RoundOutcomeChips()</code></p>
+</li>
+<li><p><code>WinStreakLayout({ leaderboard: ReactNode; panel: ReactNode; viewerPresent: boolean })</code></p>
+</li>
+<li><p><input disabled="" type="checkbox"> <strong>Step 1: Run the failing test</strong></p>
+</li>
+</ul>
+<p>Run: <code>npx vitest run tests/unit/win-streak-production-ui.test.tsx</code>
+Expected: FAIL with <code>Failed to resolve import &quot;@/features/win-streak/fixture-days&quot;</code>.</p>
+<ul>
+<li><input disabled="" type="checkbox"> <strong>Step 2: View model and query.</strong> In <code>view-model.ts</code>, add <code>secondsUntilDeadline: number;</code> to <code>WinStreakActiveRoundView</code>. In <code>queries.ts</code> <code>activeRoundView</code>, add this to the returned object:</li>
+</ul>
+<pre><code class="language-ts">    secondsUntilDeadline: Math.max(
+      0,
+      Math.floor((deadline.getTime() - databaseNow.getTime()) / 1_000),
+    ),
+</code></pre>
+<ul>
+<li><input disabled="" type="checkbox"> <strong>Step 3: Create <code>src/features/win-streak/fixture-days.ts</code></strong></li>
+</ul>
+<pre><code class="language-ts">import { formatLeagueDay, formatLeagueTime } from &quot;@/shared/format&quot;;
+
+export type FixtureDayGroup&lt;T extends { kickoffAt: string }&gt; = {
+  dayLabel: string;
+  fixtures: (T &amp; { timeLabel: string })[];
+};
+
+export function groupFixturesByLeagueDay&lt;T extends { kickoffAt: string }&gt;(
+  fixtures: readonly T[],
+): FixtureDayGroup&lt;T&gt;[] {
+  const groups: FixtureDayGroup&lt;T&gt;[] = [];
+  const sorted = [...fixtures].sort(
+    (left, right) =&gt; Date.parse(left.kickoffAt) - Date.parse(right.kickoffAt),
+  );
+  for (const fixture of sorted) {
+    const dayLabel = formatLeagueDay(fixture.kickoffAt);
+    const withTime = {
+      ...fixture,
+      timeLabel: formatLeagueTime(fixture.kickoffAt),
+    };
+    const current = groups.at(-1);
+    if (current?.dayLabel === dayLabel) current.fixtures.push(withTime);
+    else groups.push({ dayLabel, fixtures: [withTime] });
+  }
+  return groups;
+}
+</code></pre>
+<ul>
+<li><input disabled="" type="checkbox"> <strong>Step 4: Create <code>src/features/win-streak/used-club-reason.ts</code></strong></li>
+</ul>
+<pre><code class="language-ts">import type { WinStreakTeamSlug } from &quot;./fixtures&quot;;
+import type { WinStreakHistoryView } from &quot;./view-model&quot;;
+
+export function usedClubReason(
+  history: readonly WinStreakHistoryView[],
+  teamSlug: WinStreakTeamSlug,
+): string {
+  const latestWin = history
+    .filter((entry) =&gt; entry.outcome === &quot;win&quot; &amp;&amp; entry.teamSlug === teamSlug)
+    .sort((left, right) =&gt; right.matchweek - left.matchweek)[0];
+  return latestWin
+    ? `Won in MW${latestWin.matchweek} · unlocks when your streak resets`
+    : &quot;Used in this streak&quot;;
+}
+</code></pre>
+<ul>
+<li><input disabled="" type="checkbox"> <strong>Step 5: Create <code>src/features/win-streak/round-outcomes.tsx</code></strong></li>
+</ul>
+<pre><code class="language-tsx">export const WIN_STREAK_ROUND_OUTCOMES = [
+  &quot;Win → +1, club used&quot;,
+  &quot;Draw or loss → reset&quot;,
+  &quot;Missed → held&quot;,
+] as const;
+
+export function RoundOutcomeChips() {
+  return (
+    &lt;ul aria-label=&quot;How a round scores&quot; className=&quot;flex flex-wrap gap-1.5&quot;&gt;
+      {WIN_STREAK_ROUND_OUTCOMES.map((outcome, index) =&gt; (
+        &lt;li
+          className={`rounded-full px-2.5 py-1 text-[0.7rem] font-bold ${index === 0 ? &quot;bg-mint text-mint-ink&quot; : &quot;bg-brand-soft text-brand-ink&quot;}`}
+          key={outcome}
+        &gt;
+          {outcome}
+        &lt;/li&gt;
+      ))}
+    &lt;/ul&gt;
+  );
+}
+</code></pre>
+<ul>
+<li><input disabled="" type="checkbox"> <strong>Step 6: Create <code>src/features/win-streak/round-countdown.tsx</code>.</strong> The timing logic is copied from <code>SubmissionCountdown</code> on purpose; that pattern already passes lint.</li>
+</ul>
+<pre><code class="language-tsx">&quot;use client&quot;;
+
+import { useRouter } from &quot;next/navigation&quot;;
+import { useEffect, useMemo, useRef, useState } from &quot;react&quot;;
+
+import {
+  normalizeRemainingSeconds,
+  splitCountdown,
+} from &quot;@/components/submission-countdown&quot;;
+
+function unit(value: number, singular: string) {
+  return `${value} ${singular}${value === 1 ? &quot;&quot; : &quot;s&quot;}`;
+}
+
+export function formatRoundCountdownLabel(
+  totalSeconds: number,
+  matchweek: number,
+) {
+  const parts = splitCountdown(totalSeconds);
+  return `${unit(parts.days, &quot;day&quot;)}, ${unit(parts.hours, &quot;hour&quot;)}, ${unit(parts.minutes, &quot;minute&quot;)} until Matchweek ${matchweek} picks lock`;
+}
+
+const units = [
+  { key: &quot;days&quot;, label: &quot;days&quot; },
+  { key: &quot;hours&quot;, label: &quot;hrs&quot; },
+  { key: &quot;minutes&quot;, label: &quot;min&quot; },
+] as const;
+
+export function RoundCountdown({
+  deadlineIso,
+  initialRemainingSeconds,
+  matchweek,
+}: {
+  deadlineIso: string;
+  initialRemainingSeconds: number;
+  matchweek: number;
+}) {
+  const router = useRouter();
+  const initialRemaining = normalizeRemainingSeconds(initialRemainingSeconds);
+  const [remainingSeconds, setRemainingSeconds] = useState(initialRemaining);
+  const refreshedAtZero = useRef(false);
+
+  useEffect(() =&gt; {
+    const startedAt = performance.now();
+
+    function updateCountdown() {
+      const elapsedSeconds = Math.floor(
+        Math.max(0, performance.now() - startedAt) / 1_000,
+      );
+      setRemainingSeconds(Math.max(0, initialRemaining - elapsedSeconds));
+    }
+
+    updateCountdown();
+    const boundaryDelay = 1_000 - (performance.now() % 1_000);
+    let intervalId: number | undefined;
+    const timeoutId = window.setTimeout(() =&gt; {
+      updateCountdown();
+      intervalId = window.setInterval(updateCountdown, 1_000);
+    }, boundaryDelay);
+    return () =&gt; {
+      window.clearTimeout(timeoutId);
+      if (intervalId !== undefined) window.clearInterval(intervalId);
+    };
+  }, [initialRemaining]);
+
+  useEffect(() =&gt; {
+    if (
+      initialRemaining &gt; 0 &amp;&amp;
+      remainingSeconds === 0 &amp;&amp;
+      !refreshedAtZero.current
+    ) {
+      refreshedAtZero.current = true;
+      router.refresh();
+    }
+  }, [initialRemaining, remainingSeconds, router]);
+
+  const parts = useMemo(
+    () =&gt; splitCountdown(remainingSeconds),
+    [remainingSeconds],
+  );
+
+  return (
+    &lt;time
+      aria-label={formatRoundCountdownLabel(remainingSeconds, matchweek)}
+      aria-live=&quot;off&quot;
+      className=&quot;flex gap-1.5&quot;
+      dateTime={deadlineIso}
+      role=&quot;timer&quot;
+    &gt;
+      {units.map((part) =&gt; (
+        &lt;span
+          className=&quot;bg-brand grid min-w-11 rounded-lg px-1.5 py-1 text-center text-white&quot;
+          key={part.key}
+        &gt;
+          &lt;strong className=&quot;text-base leading-5 font-black tabular-nums&quot;&gt;
+            {String(parts[part.key]).padStart(2, &quot;0&quot;)}
+          &lt;/strong&gt;
+          &lt;span className=&quot;text-[0.55rem] leading-3 font-bold text-white/70 uppercase&quot;&gt;
+            {part.label}
+          &lt;/span&gt;
+        &lt;/span&gt;
+      ))}
+    &lt;/time&gt;
+  );
+}
+</code></pre>
+<ul>
+<li><input disabled="" type="checkbox"> <strong>Step 7: Create <code>src/features/win-streak/win-streak-layout.tsx</code></strong></li>
+</ul>
+<pre><code class="language-tsx">import type { ReactNode } from &quot;react&quot;;
+
+export function WinStreakLayout({
+  leaderboard,
+  panel,
+  viewerPresent,
+}: {
+  leaderboard: ReactNode;
+  panel: ReactNode;
+  viewerPresent: boolean;
+}) {
+  const panelSlot = (
+    &lt;div
+      className=&quot;min-w-0 lg:sticky lg:top-5 lg:col-start-1 lg:row-start-1&quot;
+      data-testid=&quot;win-streak-panel-slot&quot;
+    &gt;
+      {panel}
+    &lt;/div&gt;
+  );
+  const leaderboardSlot = (
+    &lt;div
+      className=&quot;min-w-0 lg:col-start-2 lg:row-start-1&quot;
+      data-testid=&quot;win-streak-leaderboard-slot&quot;
+    &gt;
+      {leaderboard}
+    &lt;/div&gt;
+  );
+
+  return (
+    &lt;div className=&quot;grid min-w-0 gap-5 lg:grid-cols-[minmax(20rem,0.82fr)_minmax(0,1.18fr)] lg:items-start lg:gap-7&quot;&gt;
+      {viewerPresent ? (
+        &lt;&gt;
+          {panelSlot}
+          {leaderboardSlot}
+        &lt;/&gt;
+      ) : (
+        &lt;&gt;
+          {leaderboardSlot}
+          {panelSlot}
+        &lt;/&gt;
+      )}
+    &lt;/div&gt;
+  );
+}
+</code></pre>
+<ul>
+<li><input disabled="" type="checkbox"> <strong>Step 8: Edit <code>win-streak-entry-panel.tsx</code>.</strong></li>
+</ul>
+<ol>
+<li><strong><code>TeamChoice</code>:</strong> add the prop <code>unavailableReason: string</code>. Replace the hard-coded <code>Used in this streak</code> text in the reason span with <code>{unavailableReason}</code>. Change the reason span color from <code>text-danger</code> to <code>text-muted</code>.</li>
+<li><strong>Streak summary card (<code>ProfilePanel</code>):</strong> directly after the paragraph that says <code>All clubs are available.</code> / <code>N winning clubs are unavailable…</code>, add <code>&lt;div className=&quot;mt-3&quot;&gt;&lt;RoundOutcomeChips /&gt;&lt;/div&gt;</code>.</li>
+<li><strong>Pick card header:</strong> replace <code>&lt;p className=&quot;text-muted mt-1 text-sm leading-5&quot;&gt;Locks {formatChicagoUtcDateTime(activeRound.deadlineAt)}&lt;/p&gt;</code> with:</li>
+</ol>
+<pre><code class="language-tsx">                &lt;p className=&quot;text-muted mt-1 text-sm leading-5&quot;&gt;
+                  Locks {formatChicagoUtcDateTime(activeRound.deadlineAt)}
+                &lt;/p&gt;
+                &lt;div className=&quot;mt-2&quot;&gt;
+                  &lt;RoundCountdown
+                    deadlineIso={activeRound.deadlineAt}
+                    initialRemainingSeconds={activeRound.secondsUntilDeadline}
+                    matchweek={activeRound.matchweek}
+                  /&gt;
+                &lt;/div&gt;
+</code></pre>
+<ol start="4">
+<li><strong>Fixture grid:</strong> replace the <code>&lt;div className=&quot;grid gap-2&quot;&gt;{activeRound.fixtures.map(…)}&lt;/div&gt;</code> inside the fieldset with:</li>
+</ol>
+<pre><code class="language-tsx">&lt;div className=&quot;grid gap-4&quot;&gt;
+  {groupFixturesByLeagueDay(activeRound.fixtures).map((group) =&gt; (
+    &lt;div className=&quot;grid gap-2&quot; key={group.dayLabel}&gt;
+      &lt;h4 className=&quot;text-muted px-1 text-[0.68rem] font-black tracking-wider uppercase&quot;&gt;
+        {group.dayLabel}
+      &lt;/h4&gt;
+      {group.fixtures.map((fixture) =&gt; (
+        &lt;div
+          className=&quot;border-border bg-surface-lilac grid min-w-0 grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-1.5 rounded-2xl border p-1.5 sm:gap-3 sm:p-2&quot;
+          key={`${fixture.homeTeamSlug}:${fixture.awayTeamSlug}`}
+        &gt;
+          &lt;TeamChoice
+            available={!used.has(fixture.homeTeamSlug)}
+            checked={selectedTeamSlug === fixture.homeTeamSlug}
+            side=&quot;Home&quot;
+            teamSlug={fixture.homeTeamSlug}
+            unavailableReason={usedClubReason(
+              viewer.history,
+              fixture.homeTeamSlug,
+            )}
+            onSelect={(teamSlug) =&gt; {
+              setSelectedTeamSlug(teamSlug);
+              setMessage(null);
+            }}
+          /&gt;
+          &lt;span className=&quot;text-muted px-0.5 text-center text-[0.68rem] leading-4 font-black whitespace-nowrap&quot;&gt;
+            {fixture.timeLabel}
+          &lt;/span&gt;
+          &lt;TeamChoice
+            available={!used.has(fixture.awayTeamSlug)}
+            checked={selectedTeamSlug === fixture.awayTeamSlug}
+            side=&quot;Away&quot;
+            teamSlug={fixture.awayTeamSlug}
+            unavailableReason={usedClubReason(
+              viewer.history,
+              fixture.awayTeamSlug,
+            )}
+            onSelect={(teamSlug) =&gt; {
+              setSelectedTeamSlug(teamSlug);
+              setMessage(null);
+            }}
+          /&gt;
+        &lt;/div&gt;
+      ))}
+    &lt;/div&gt;
+  ))}
+&lt;/div&gt;
+</code></pre>
+<ol start="5">
+<li><strong><code>PickReviewDialog</code>:</strong> add the prop <code>currentStreak: number</code>, and pass <code>currentStreak={viewer.currentStreak}</code> where it is rendered. After the team card (<code>&lt;div className=&quot;border-border bg-surface-lilac mt-5 …&quot;&gt;…&lt;/div&gt;</code>), add:</li>
+</ol>
+<pre><code class="language-tsx">&lt;ul
+  aria-label=&quot;What happens next&quot;
+  className=&quot;text-foreground mt-4 grid gap-1.5 text-sm leading-5&quot;
+&gt;
+  &lt;li&gt;
+    {`If ${team.displayName} win: streak ${currentStreak} → ${currentStreak + 1}. ${team.displayName} is then unavailable until your streak resets.`}
+  &lt;/li&gt;
+  &lt;li&gt;Draw or loss: streak resets to 0 and every club unlocks.&lt;/li&gt;
+&lt;/ul&gt;
+</code></pre>
+<ol start="6">
+<li><strong>Dialog content becomes a mobile bottom sheet.</strong> In the <code>Dialog.Content</code> className, replace <code>fixed inset-x-2 top-[max(0.5rem,env(safe-area-inset-top))] bottom-[max(0.5rem,env(safe-area-inset-bottom))]</code> with <code>fixed inset-x-0 bottom-0 max-h-[85dvh] rounded-t-2xl pb-[max(1rem,env(safe-area-inset-bottom))]</code>. Add <code>sm:inset-x-auto sm:rounded-2xl</code>, and keep the existing <code>sm:top-1/2 sm:bottom-auto sm:left-1/2 …</code> classes. Keep the title, description, buttons, and the <code>t-modal t-modal-centered-responsive</code> classes.</li>
+<li>Add the imports: <code>groupFixturesByLeagueDay</code>, <code>usedClubReason</code>, <code>RoundCountdown</code>, and <code>RoundOutcomeChips</code>.</li>
+</ol>
+<ul>
+<li><input disabled="" type="checkbox"> <strong>Step 9: Edit <code>win-streak-leaderboard.tsx</code> (mobile list and table).</strong></li>
+</ul>
+<p>Replace each mobile <code>&lt;li&gt;</code> with:</p>
+<pre><code class="language-tsx">&lt;li
+  className=&quot;border-border grid min-h-14 min-w-0 grid-cols-[2.25rem_minmax(0,1fr)_auto_auto] items-center gap-x-3 border-b px-3 py-2 last:border-b-0&quot;
+  key={`${entry.displayName}-${index}`}
+&gt;
+  &lt;span className=&quot;bg-brand-soft text-brand-ink grid size-8 place-items-center rounded-lg text-sm font-black tabular-nums&quot;&gt;
+    {entry.rank}
+  &lt;/span&gt;
+  &lt;div className=&quot;grid min-w-0 gap-1&quot;&gt;
+    &lt;strong className=&quot;text-brand-ink-strong block leading-5 font-black break-words&quot;&gt;
+      {entry.displayName}
+    &lt;/strong&gt;
+    {entry.isViewer ? (
+      &lt;Badge className=&quot;justify-self-start&quot; variant=&quot;accent&quot;&gt;
+        You
+      &lt;/Badge&gt;
+    ) : null}
+    &lt;PickSummary pick={entry.currentPick} /&gt;
+  &lt;/div&gt;
+  &lt;span className=&quot;text-center&quot;&gt;
+    &lt;span className=&quot;text-muted block text-[0.58rem] font-black tracking-wide uppercase&quot;&gt;
+      Current
+    &lt;/span&gt;
+    &lt;strong className=&quot;text-brand-ink-strong text-lg font-black tabular-nums&quot;&gt;
+      {entry.currentStreak}
+    &lt;/strong&gt;
+  &lt;/span&gt;
+  &lt;span className=&quot;text-center&quot;&gt;
+    &lt;span className=&quot;text-muted block text-[0.58rem] font-black tracking-wide uppercase&quot;&gt;
+      Best
+    &lt;/span&gt;
+    &lt;strong className=&quot;text-brand-ink text-lg font-black tabular-nums&quot;&gt;
+      {entry.bestStreak}
+    &lt;/strong&gt;
+  &lt;/span&gt;
+&lt;/li&gt;
+</code></pre>
+<p>In the desktop table:</p>
+<ul>
+<li>Remove <code>font-mono</code> from the rank <code>td</code> and the current <code>td</code>.</li>
+<li>Change the best <code>td</code> from <code>text-rose-score … font-mono font-black</code> to <code>text-brand-ink … font-black</code>.</li>
+<li>In the row <code>th</code>, replace <code>[overflow-wrap:anywhere]</code> with <code>break-words</code>.</li>
+</ul>
+<p>After this step, <code>grep -nE &quot;font-mono|rose-score|overflow-wrap:anywhere&quot; src/features/win-streak/win-streak-leaderboard.tsx</code> must print nothing.</p>
+<ul>
+<li><input disabled="" type="checkbox"> <strong>Step 10: Edit <code>src/app/win-streak/page.tsx</code>.</strong> Replace the two-column <code>div</code> (the one containing the panel and the leaderboard) with:</li>
+</ul>
+<pre><code class="language-tsx">&lt;WinStreakLayout
+  leaderboard={&lt;WinStreakLeaderboard entries={view.leaderboard} /&gt;}
+  panel={
+    &lt;WinStreakEntryPanel
+      activeRound={view.activeRound}
+      createProfileAction={createWinStreakProfileAction}
+      submitPickAction={submitWinStreakPickAction}
+      viewer={view.viewer}
+    /&gt;
+  }
+  viewerPresent={view.viewer !== null}
+/&gt;
+</code></pre>
+<p>Keep the Hero (including <code>Picks close …</code> with <code>formatChicagoUtcDateTime</code> and the <code>Matchweeks 2–38 · Public picks · No account or password</code> text) and <code>SourceNote</code> unchanged.</p>
+<ul>
+<li><input disabled="" type="checkbox"> <strong>Step 11: Run the test</strong></li>
+</ul>
+<p>Run: <code>npx vitest run tests/unit/win-streak-production-ui.test.tsx</code>
+Expected: PASS (21 tests).</p>
+<ul>
+<li><input disabled="" type="checkbox"> <strong>Step 12: Commit</strong></li>
+</ul>
+<pre><code class="language-bash">git add src/features/win-streak src/app/win-streak/page.tsx
+git commit -m &quot;Win Streak: round countdown, day-grouped kickoffs, used-club reasons, inline board picks&quot;
+</code></pre>
+<hr>
+<h3 id="task-9-rules-three-tabs-participant-language-deep-links">Task 9: Rules: three tabs, participant language, deep links</h3>
+<p><strong>Files:</strong></p>
+<ul>
+<li>Create: <code>src/app/rules/rules-tabs.tsx</code></li>
+<li>Modify: <code>src/app/rules/page.tsx</code> (full rewrite below), <code>src/components/how-to-play.tsx</code> (one string)</li>
+<li>Test: <code>tests/components/rules-page.test.tsx</code>; must still pass: <code>tests/components/how-to-play.test.tsx</code>, <code>tests/components/scoring-example.test.tsx</code>, <code>tests/unit/public-copy.test.ts</code></li>
+</ul>
+<p><strong>Interfaces produced:</strong> <code>type RulesTab = { content: ReactNode; label: string; panelId: string; value: string }</code> and <code>RulesTabs({ tabs: readonly RulesTab[] })</code>.</p>
+<ul>
+<li><input disabled="" type="checkbox"> <strong>Step 1: Run the failing test</strong></li>
+</ul>
+<p>Run: <code>npx vitest run tests/components/rules-page.test.tsx</code>
+Expected: 6 failures (<code>Unable to find … role &quot;tablist&quot;</code> plus the forbidden-language test).</p>
+<ul>
+<li><input disabled="" type="checkbox"> <strong>Step 2: Create <code>src/app/rules/rules-tabs.tsx</code></strong></li>
+</ul>
+<pre><code class="language-tsx">&quot;use client&quot;;
+
+import {
+  useEffect,
+  useId,
+  useRef,
+  useState,
+  type KeyboardEvent,
+  type ReactNode,
+} from &quot;react&quot;;
+
+export type RulesTab = Readonly&lt;{
+  content: ReactNode;
+  label: string;
+  panelId: string;
+  value: string;
+}&gt;;
+
+export function RulesTabs({ tabs }: { tabs: readonly RulesTab[] }) {
+  const [selected, setSelected] = useState(tabs[0]!.value);
+  const tabRefs = useRef&lt;(HTMLButtonElement | null)[]&gt;([]);
+  const baseId = useId();
+
+  useEffect(() =&gt; {
+    const match = tabs.find(
+      (tab) =&gt; tab.panelId === window.location.hash.slice(1),
+    );
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- the URL hash is browser-only state that is read after hydration.
+    if (match) setSelected(match.value);
+  }, [tabs]);
+
+  function focusTab(index: number) {
+    const wrapped = (index + tabs.length) % tabs.length;
+    setSelected(tabs[wrapped]!.value);
+    tabRefs.current[wrapped]?.focus();
+  }
+
+  function handleKeyDown(
+    event: KeyboardEvent&lt;HTMLButtonElement&gt;,
+    index: number,
+  ) {
+    const next =
+      event.key === &quot;ArrowRight&quot;
+        ? index + 1
+        : event.key === &quot;ArrowLeft&quot;
+          ? index - 1
+          : event.key === &quot;Home&quot;
+            ? 0
+            : event.key === &quot;End&quot;
+              ? tabs.length - 1
+              : null;
+    if (next === null) return;
+    event.preventDefault();
+    focusTab(next);
+  }
+
+  return (
+    &lt;div className=&quot;grid gap-5&quot;&gt;
+      &lt;div
+        aria-label=&quot;Rules sections&quot;
+        className=&quot;bg-surface-subtle grid grid-cols-3 gap-1 rounded-xl p-1&quot;
+        role=&quot;tablist&quot;
+      &gt;
+        {tabs.map((tab, index) =&gt; {
+          const active = tab.value === selected;
+          return (
+            &lt;button
+              aria-controls={tab.panelId}
+              aria-selected={active}
+              className={`focus-visible:ring-accent-blue min-h-11 rounded-lg px-2 text-sm font-black outline-none focus-visible:ring-2 ${
+                active
+                  ? &quot;bg-surface text-brand-ink dark:ring-accent-blue shadow-sm dark:ring-1&quot;
+                  : &quot;text-muted&quot;
+              }`}
+              id={`${baseId}-${tab.value}-tab`}
+              key={tab.value}
+              onClick={() =&gt; setSelected(tab.value)}
+              onKeyDown={(event) =&gt; handleKeyDown(event, index)}
+              ref={(node) =&gt; {
+                tabRefs.current[index] = node;
+              }}
+              role=&quot;tab&quot;
+              tabIndex={active ? 0 : -1}
+              type=&quot;button&quot;
+            &gt;
+              {tab.label}
+            &lt;/button&gt;
+          );
+        })}
+      &lt;/div&gt;
+      {tabs.map((tab) =&gt; (
+        &lt;section
+          aria-labelledby={`${baseId}-${tab.value}-tab`}
+          className=&quot;grid gap-5&quot;
+          hidden={tab.value !== selected}
+          id={tab.panelId}
+          key={tab.value}
+          role=&quot;tabpanel&quot;
+          tabIndex={0}
+        &gt;
+          {tab.content}
+        &lt;/section&gt;
+      ))}
+    &lt;/div&gt;
+  );
+}
+</code></pre>
+<ul>
+<li><input disabled="" type="checkbox"> <strong>Step 3: Replace <code>src/app/rules/page.tsx</code> completely</strong></li>
+</ul>
+<pre><code class="language-tsx">import { EyeOff, Search, Sparkles, Trophy } from &quot;lucide-react&quot;;
+import type { Metadata } from &quot;next&quot;;
+import Link from &quot;next/link&quot;;
+
+import { HowToPlay } from &quot;@/components/how-to-play&quot;;
+import { PageHeading } from &quot;@/components/page-heading&quot;;
+import { ScoringExample } from &quot;@/components/scoring-example&quot;;
+import { Card, CardContent } from &quot;@/components/ui/card&quot;;
+import { RULES_PENDING_RESULTS_MESSAGE } from &quot;@/content/public-copy&quot;;
+import { RoundOutcomeChips } from &quot;@/features/win-streak/round-outcomes&quot;;
+
+import { RulesTabs } from &quot;./rules-tabs&quot;;
+
+export const metadata: Metadata = { title: &quot;How to play &amp; scoring&quot; };
+
+const tableRules = [
+  { label: &quot;Exact finishing position&quot;, points: 5 },
+  { label: &quot;Within three places&quot;, points: 3 },
+  { label: &quot;Correct top or bottom half&quot;, points: 1 },
+  { label: &quot;Everything else&quot;, points: 0 },
+] as const;
+
+const spotlightCategories = [
+  [&quot;Top scorer&quot;, &quot;The player who finishes highest in the league goals list.&quot;],
+  [
+    &quot;Top assister&quot;,
+    &quot;The player who finishes highest in the league assists list.&quot;,
+  ],
+  [&quot;Most clean sheets&quot;, &quot;The club that keeps the most clean sheets.&quot;],
+  [
+    &quot;Underdog team&quot;,
+    &quot;The club that beats the group’s average prediction by the most. Only clubs picked for this category are ranked.&quot;,
+  ],
+  [
+    &quot;Overrated team&quot;,
+    &quot;The club that falls furthest below the group’s average prediction. Only clubs picked for this category are ranked.&quot;,
+  ],
+  [
+    &quot;Underdog player&quot;,
+    &quot;Picked players ranked by reviewed average season rating, highest first. A player without a rating shows N/A and scores nothing.&quot;,
+  ],
+  [
+    &quot;Overrated player&quot;,
+    &quot;Picked players ranked by reviewed average season rating, lowest first. A player without a rating shows N/A and scores nothing.&quot;,
+  ],
+] as const;
+
+function TableRules() {
+  return (
+    &lt;&gt;
+      &lt;Card&gt;
+        &lt;CardContent&gt;
+          &lt;div className=&quot;flex items-start gap-3&quot;&gt;
+            &lt;span className=&quot;bg-brand-soft text-brand-ink grid size-11 shrink-0 place-items-center rounded-xl&quot;&gt;
+              &lt;Trophy aria-hidden=&quot;true&quot; className=&quot;size-5&quot; /&gt;
+            &lt;/span&gt;
+            &lt;div&gt;
+              &lt;h2 className=&quot;text-brand-ink-strong text-xl font-black&quot;&gt;
+                League-table points
+              &lt;/h2&gt;
+              &lt;p className=&quot;text-muted mt-1 text-sm leading-6&quot;&gt;
+                Each club earns only its highest matching tier. Your champion is
+                the club placed first in your table; it uses the same scoring,
+                with no separate bonus. The most anyone can score is 100.
+              &lt;/p&gt;
+            &lt;/div&gt;
+          &lt;/div&gt;
+          &lt;dl className=&quot;mt-4 grid grid-cols-2 gap-2 sm:grid-cols-4&quot;&gt;
+            {tableRules.map((rule) =&gt; (
+              &lt;div
+                className=&quot;bg-brand-soft ring-border rounded-xl p-3 text-center ring-1&quot;
+                key={rule.label}
+              &gt;
+                &lt;dt className=&quot;text-muted text-xs leading-4 font-semibold&quot;&gt;
+                  {rule.label}
+                &lt;/dt&gt;
+                &lt;dd className=&quot;text-brand-ink mt-1 text-2xl font-black&quot;&gt;
+                  {rule.points}
+                &lt;/dd&gt;
+              &lt;/div&gt;
+            ))}
+          &lt;/dl&gt;
+        &lt;/CardContent&gt;
+      &lt;/Card&gt;
+      &lt;ScoringExample /&gt;
+      &lt;details className=&quot;border-border border-y py-4&quot;&gt;
+        &lt;summary className=&quot;min-h-11 cursor-pointer font-bold&quot;&gt;
+          How you enter
+        &lt;/summary&gt;
+        &lt;div className=&quot;mt-4&quot;&gt;
+          &lt;HowToPlay /&gt;
+        &lt;/div&gt;
+      &lt;/details&gt;
+      &lt;Card&gt;
+        &lt;CardContent className=&quot;flex items-start gap-3&quot;&gt;
+          &lt;EyeOff
+            aria-hidden=&quot;true&quot;
+            className=&quot;text-brand-ink size-6 shrink-0&quot;
+          /&gt;
+          &lt;div&gt;
+            &lt;h2 className=&quot;text-brand-ink-strong text-lg font-black&quot;&gt;
+              Privacy and reveal
+            &lt;/h2&gt;
+            &lt;p className=&quot;text-muted mt-1 text-sm leading-6&quot;&gt;
+              Before the reveal, everyone sees only each entry’s name, 0 points,
+              and champion. The other 19 positions and all seven spotlight picks
+              stay private until the season opens.
+            &lt;/p&gt;
+          &lt;/div&gt;
+        &lt;/CardContent&gt;
+      &lt;/Card&gt;
+    &lt;/&gt;
+  );
+}
+
+function SpotlightRules() {
+  return (
+    &lt;&gt;
+      &lt;div className=&quot;flex items-start gap-3&quot;&gt;
+        &lt;span className=&quot;bg-rose-soft text-rose-ink grid size-11 shrink-0 place-items-center rounded-xl&quot;&gt;
+          &lt;Sparkles aria-hidden=&quot;true&quot; className=&quot;size-5&quot; /&gt;
+        &lt;/span&gt;
+        &lt;div&gt;
+          &lt;h2 className=&quot;text-brand-ink-strong text-xl font-black&quot;&gt;
+            Pick seven outcomes. Closer calls score more.
+          &lt;/h2&gt;
+          &lt;p className=&quot;text-muted mt-1 text-sm leading-6&quot;&gt;
+            Each category is ranked once its result list is published. The
+            best-placed pick earns one point per entry, the next earns one
+            fewer, and so on. With 14 entries, 1st earns 14 points, 2nd earns
+            13, and so on down to 0. Ties share the higher place. Spotlight
+            points never change your 100-point table score.
+          &lt;/p&gt;
+        &lt;/div&gt;
+      &lt;/div&gt;
+      &lt;Card&gt;
+        &lt;CardContent&gt;
+          &lt;h3 className=&quot;text-brand-ink-strong text-sm font-black&quot;&gt;
+            Worked example · Top scorer
+          &lt;/h3&gt;
+          &lt;ul className=&quot;mt-2 grid gap-1.5 text-sm&quot;&gt;
+            &lt;li className=&quot;flex items-center justify-between gap-3&quot;&gt;
+              &lt;span&gt;Your pick finished 1st&lt;/span&gt;
+              &lt;span className=&quot;score-pill&quot; data-tier=&quot;exact&quot;&gt;
+                +14
+              &lt;/span&gt;
+            &lt;/li&gt;
+            &lt;li className=&quot;flex items-center justify-between gap-3&quot;&gt;
+              &lt;span&gt;Your pick finished 13th&lt;/span&gt;
+              &lt;span className=&quot;score-pill&quot; data-tier=&quot;miss&quot;&gt;
+                +2
+              &lt;/span&gt;
+            &lt;/li&gt;
+          &lt;/ul&gt;
+        &lt;/CardContent&gt;
+      &lt;/Card&gt;
+      &lt;div className=&quot;grid gap-2 sm:grid-cols-2&quot;&gt;
+        {spotlightCategories.map(([label, description]) =&gt; (
+          &lt;div
+            className=&quot;border-border bg-surface-lilac rounded-xl border p-3&quot;
+            key={label}
+          &gt;
+            &lt;h3 className=&quot;text-brand-ink-strong text-sm font-black&quot;&gt;
+              {label}
+            &lt;/h3&gt;
+            &lt;p className=&quot;text-muted mt-1 text-xs leading-5&quot;&gt;{description}&lt;/p&gt;
+          &lt;/div&gt;
+        ))}
+      &lt;/div&gt;
+      &lt;p className=&quot;text-muted text-sm leading-6&quot;&gt;
+        Example: if the group expected Manchester United to finish 2.4th on
+        average and they finish 10th, they are 7.6 places below expectations.
+        That is a strong overrated pick and a poor underdog pick.
+      &lt;/p&gt;
+      &lt;p className=&quot;text-muted text-sm leading-6&quot;&gt;
+        {RULES_PENDING_RESULTS_MESSAGE}
+      &lt;/p&gt;
+      &lt;Card&gt;
+        &lt;CardContent className=&quot;flex items-start gap-3&quot;&gt;
+          &lt;Search
+            aria-hidden=&quot;true&quot;
+            className=&quot;text-brand-ink size-6 shrink-0&quot;
+          /&gt;
+          &lt;div&gt;
+            &lt;h3 className=&quot;text-brand-ink-strong text-lg font-black&quot;&gt;
+              Can’t find a player?
+            &lt;/h3&gt;
+            &lt;p className=&quot;text-muted mt-1 text-sm leading-6&quot;&gt;
+              Search by first or last name. If someone is missing, choose Other
+              player and type their name. The owner matches it to the right
+              player before results count.
+            &lt;/p&gt;
+          &lt;/div&gt;
+        &lt;/CardContent&gt;
+      &lt;/Card&gt;
+      &lt;Link
+        className=&quot;bg-brand text-accent focus-visible:ring-accent-blue hover:bg-brand-hover inline-flex min-h-11 items-center justify-self-start rounded-xl px-4 text-sm font-black outline-none focus-visible:ring-2&quot;
+        href=&quot;/spotlight&quot;
+      &gt;
+        Open spotlight accuracy
+      &lt;/Link&gt;
+    &lt;/&gt;
+  );
+}
+
+function WinStreakRules() {
+  return (
+    &lt;&gt;
+      &lt;div&gt;
+        &lt;h2 className=&quot;text-brand-ink-strong text-xl font-black&quot;&gt;
+          One club per matchweek. Keep winning.
+        &lt;/h2&gt;
+        &lt;p className=&quot;text-muted mt-1 text-sm leading-6&quot;&gt;
+          Matchweeks 2–38. Pick one club to win before the round’s first
+          kickoff. Picks are final and everyone can see them.
+        &lt;/p&gt;
+      &lt;/div&gt;
+      &lt;RoundOutcomeChips /&gt;
+      &lt;p className=&quot;text-muted text-sm leading-6&quot;&gt;
+        A club that wins for you can’t be picked again until your streak resets.
+        Your best streak decides your rank, and equal bests share a place. Lost
+        your cookie? Enter the same display name to pick up where you left off.
+      &lt;/p&gt;
+      &lt;Link
+        className=&quot;text-brand-ink inline-flex min-h-11 items-center justify-self-start text-sm font-semibold underline&quot;
+        href=&quot;/win-streak&quot;
+      &gt;
+        Play Win Streak
+      &lt;/Link&gt;
+    &lt;/&gt;
+  );
+}
+
+export default function RulesPage() {
+  return (
+    &lt;main id=&quot;main-content&quot; className=&quot;page-shell w-full flex-1 py-6 sm:py-10&quot;&gt;
+      &lt;div className=&quot;mx-auto grid max-w-4xl gap-5 sm:gap-7&quot;&gt;
+        &lt;PageHeading
+          title=&quot;The rules, without the guesswork.&quot;
+          description=&quot;The season game and Win Streak run independently.&quot;
+        /&gt;
+        &lt;RulesTabs
+          tabs={[
+            {
+              content: &lt;TableRules /&gt;,
+              label: &quot;Table&quot;,
+              panelId: &quot;table-rules&quot;,
+              value: &quot;table&quot;,
+            },
+            {
+              content: &lt;SpotlightRules /&gt;,
+              label: &quot;Spotlight&quot;,
+              panelId: &quot;spotlight-scoring&quot;,
+              value: &quot;spotlight&quot;,
+            },
+            {
+              content: &lt;WinStreakRules /&gt;,
+              label: &quot;Win Streak&quot;,
+              panelId: &quot;win-streak-rules&quot;,
+              value: &quot;win-streak&quot;,
+            },
+          ]}
+        /&gt;
+      &lt;/div&gt;
+    &lt;/main&gt;
+  );
+}
+</code></pre>
+<ul>
+<li><p><input disabled="" type="checkbox"> <strong>Step 4: Edit <code>src/components/how-to-play.tsx</code>.</strong> In step 1, change the first callout label to exactly: <code>Enter your display name first, then drag the handles, tap a position number, or use Arrow, Page Up, Page Down, Home, and End.</code></p>
+</li>
+<li><p><input disabled="" type="checkbox"> <strong>Step 5: Run the tests</strong></p>
+</li>
+</ul>
+<p>Run: <code>npx vitest run tests/components/rules-page.test.tsx tests/components/how-to-play.test.tsx tests/components/scoring-example.test.tsx tests/unit/public-copy.test.ts</code>
+Expected: PASS.</p>
+<ul>
+<li><input disabled="" type="checkbox"> <strong>Step 6: Commit</strong></li>
+</ul>
+<pre><code class="language-bash">git add src/app/rules src/components/how-to-play.tsx
+git commit -m &quot;Rules: Table, Spotlight, and Win Streak tabs in participant language&quot;
+</code></pre>
+<hr>
+<h3 id="task-10-next-season-entry-flow-tap-a-position-sheet-compact-stage-1-stage-2-progress">Task 10: Next-season entry flow: tap-a-position sheet, compact Stage 1, Stage 2 progress</h3>
+<p><strong>Files:</strong></p>
+<ul>
+<li>Create: <code>src/features/predictions/spotlight-completeness.ts</code>, <code>src/features/predictions/spotlight-progress.tsx</code></li>
+<li>Modify: <code>src/features/predictions/prediction-sorter.tsx</code>, <code>src/features/predictions/prediction-form.tsx</code>, <code>src/features/predictions/spotlight-predictions-form.tsx</code></li>
+<li>Test: <code>tests/components/prediction-sorter-move.test.tsx</code>, <code>tests/components/spotlight-progress.test.tsx</code>, <code>tests/components/prediction-form.test.tsx</code> (whole file must pass)</li>
+</ul>
+<p><strong>Interfaces produced:</strong></p>
+<ul>
+<li><p><code>SpotlightProgress({ picks: SpotlightPicksDraft })</code></p>
+</li>
+<li><p><code>spotlightIncompleteCategories</code> and <code>spotlightPicksAreComplete</code> move to <code>spotlight-completeness.ts</code>, and <code>spotlight-predictions-form.tsx</code> re-exports them under the same names.</p>
+</li>
+<li><p><input disabled="" type="checkbox"> <strong>Step 1: Run the failing tests</strong></p>
+</li>
+</ul>
+<p>Run: <code>npx vitest run tests/components/prediction-sorter-move.test.tsx tests/components/spotlight-progress.test.tsx tests/components/prediction-form.test.tsx</code>
+Expected: all 4 sorter tests fail, the progress file fails to import, and the prediction-form test &quot;asks for the display name before the A–Z blank-slate table&quot; fails on <code>Why?</code>.</p>
+<ul>
+<li><p><input disabled="" type="checkbox"> <strong>Step 2: Move the completeness helpers.</strong> Create <code>src/features/predictions/spotlight-completeness.ts</code>. Move <code>normalizedCustomName</code>, <code>normalizedCustomNameKey</code>, <code>spotlightPicksAreComplete</code>, and <code>spotlightIncompleteCategories</code> into it verbatim, importing <code>PREDICTION_CATEGORY_DEFINITIONS</code> and <code>PredictionCategory</code> from <code>./categories</code> and <code>import type { SpotlightPicksDraft } from &quot;./spotlight-predictions-form&quot;;</code>. Export all four. In <code>spotlight-predictions-form.tsx</code>:</p>
+</li>
+<li><p>delete those four definitions;</p>
+</li>
+<li><p>add <code>import { normalizedCustomName, normalizedCustomNameKey, spotlightIncompleteCategories, spotlightPicksAreComplete } from &quot;./spotlight-completeness&quot;;</code></p>
+</li>
+<li><p>add <code>export { spotlightIncompleteCategories, spotlightPicksAreComplete } from &quot;./spotlight-completeness&quot;;</code></p>
+</li>
+</ul>
+<p>Every existing importer continues to work.</p>
+<ul>
+<li><input disabled="" type="checkbox"> <strong>Step 3: Create <code>src/features/predictions/spotlight-progress.tsx</code></strong></li>
+</ul>
+<pre><code class="language-tsx">import { cn } from &quot;@/components/ui/cn&quot;;
+
+import { PREDICTION_CATEGORY_DEFINITIONS } from &quot;./categories&quot;;
+import { spotlightIncompleteCategories } from &quot;./spotlight-completeness&quot;;
+import type { SpotlightPicksDraft } from &quot;./spotlight-predictions-form&quot;;
+
+export function SpotlightProgress({ picks }: { picks: SpotlightPicksDraft }) {
+  const incomplete = new Set(spotlightIncompleteCategories(picks));
+  const done = PREDICTION_CATEGORY_DEFINITIONS.length - incomplete.size;
+  const next =
+    PREDICTION_CATEGORY_DEFINITIONS.find((definition) =&gt;
+      incomplete.has(definition.category),
+    )?.category ?? null;
+
+  return (
+    &lt;div
+      aria-label=&quot;Spotlight progress&quot;
+      className=&quot;flex items-center gap-1.5&quot;
+      role=&quot;group&quot;
+    &gt;
+      {PREDICTION_CATEGORY_DEFINITIONS.map((definition) =&gt; {
+        const state = !incomplete.has(definition.category)
+          ? &quot;done&quot;
+          : definition.category === next
+            ? &quot;next&quot;
+            : &quot;todo&quot;;
+        return (
+          &lt;span
+            aria-hidden=&quot;true&quot;
+            className={cn(
+              &quot;h-2.5 rounded-full&quot;,
+              state === &quot;done&quot;
+                ? &quot;bg-mint-ink w-2.5&quot;
+                : state === &quot;next&quot;
+                  ? &quot;bg-brand w-6&quot;
+                  : &quot;bg-border w-2.5&quot;,
+            )}
+            data-state={state}
+            key={definition.category}
+          /&gt;
+        );
+      })}
+      &lt;span className=&quot;text-muted ml-1.5 text-xs font-bold&quot;&gt;
+        {done} of 7 picked
+      &lt;/span&gt;
+    &lt;/div&gt;
+  );
+}
+</code></pre>
+<ul>
+<li><input disabled="" type="checkbox"> <strong>Step 4: Stage 2 header</strong> in <code>spotlight-predictions-form.tsx</code>. Replace the intro <code>Card</code> (the one with the <code>Sparkles</code> icon) with the markup below. Remove the <code>Sparkles</code> import if it becomes unused.</li>
+</ul>
+<pre><code class="language-tsx">&lt;div className=&quot;grid gap-2&quot;&gt;
+  &lt;p className=&quot;text-rose-ink text-xs font-black tracking-[0.12em] uppercase&quot;&gt;
+    Step 2 of 3
+  &lt;/p&gt;
+  &lt;h2
+    className=&quot;text-brand-ink-strong text-2xl font-black tracking-tight outline-none&quot;
+    id=&quot;spotlight-picks-heading&quot;
+    tabIndex={-1}
+  &gt;
+    Make your spotlight picks
+  &lt;/h2&gt;
+  &lt;SpotlightProgress picks={picks} /&gt;
+  &lt;p className=&quot;text-muted text-sm leading-6&quot;&gt;
+    {players.length &gt; 0
+      ? `Search ${players.length.toLocaleString(&quot;en-GB&quot;)} ${players.length === 1 ? &quot;player&quot; : &quot;players&quot;} by name (2+ letters). Other player is always available.`
+      : &quot;No player catalogue is loaded yet. Other player remains available in every player category.&quot;}
+  &lt;/p&gt;
+&lt;/div&gt;
+</code></pre>
+<ul>
+<li><input disabled="" type="checkbox"> <strong>Step 5: Tap-a-position sheet</strong> in <code>prediction-sorter.tsx</code>.</li>
+</ul>
+<ol>
+<li>Add <code>import * as Dialog from &quot;@radix-ui/react-dialog&quot;;</code>.</li>
+<li>Add the prop <code>onChoosePosition: (teamId: string) =&gt; void;</code> to <code>SortableTeamRowProps</code>, and destructure it.</li>
+<li>Replace the position <code>&lt;span aria-label={</code>${positionKind === &quot;predicted&quot; ? …} position ${position}<code>} …&gt;{position}&lt;/span&gt;</code> with:</li>
+</ol>
+<pre><code class="language-tsx">&lt;button
+  aria-label={`Choose a new position for ${team.displayName}, currently ${position} of ${count}`}
+  className={cn(
+    &quot;focus-visible:ring-accent-blue grid size-11 shrink-0 place-items-center rounded-lg font-mono text-xs font-black tabular-nums outline-none focus-visible:ring-2 disabled:cursor-not-allowed&quot;,
+    position &lt;= 10 ? &quot;bg-brand text-white&quot; : &quot;bg-brand-soft text-brand-ink&quot;,
+  )}
+  disabled={disabled}
+  onClick={() =&gt; onChoosePosition(team.id)}
+  type=&quot;button&quot;
+&gt;
+  {position}
+&lt;/button&gt;
+</code></pre>
+<ol start="4">
+<li>In <code>PredictionSorter</code>, refactor the index math into an absolute mover, and derive the keyboard mover from it. Replace <code>handleKeyboardMove</code> with:</li>
+</ol>
+<pre><code class="language-tsx">const moveTeamToIndex = useCallback(
+  (teamId: string, requestedIndex: number) =&gt; {
+    const currentIndex = teams.findIndex((team) =&gt; team.id === teamId);
+    if (currentIndex &lt; 0) return;
+    const nextIndex = Math.min(teams.length - 1, Math.max(0, requestedIndex));
+    const source = teams[currentIndex];
+    if (!source) return;
+
+    if (nextIndex === currentIndex) {
+      setAnnouncement(
+        `${source.displayName} is already at position ${currentIndex + 1} of ${teams.length}.`,
+      );
+      return;
+    }
+
+    const nextTeams = [...teams];
+    nextTeams.splice(currentIndex, 1);
+    nextTeams.splice(nextIndex, 0, source);
+    onChange(nextTeams);
+    navigator.vibrate?.(8);
+    setAnnouncement(
+      `${source.displayName} moved to position ${nextIndex + 1} of ${teams.length}.`,
+    );
+  },
+  [onChange, teams],
+);
+
+const handleKeyboardMove = useCallback(
+  (teamId: string, destination: -5 | -1 | 1 | 5 | &quot;start&quot; | &quot;end&quot;) =&gt; {
+    const currentIndex = teams.findIndex((team) =&gt; team.id === teamId);
+    if (currentIndex &lt; 0) return;
+    moveTeamToIndex(
+      teamId,
+      destination === &quot;start&quot;
+        ? 0
+        : destination === &quot;end&quot;
+          ? teams.length - 1
+          : currentIndex + destination,
+    );
+  },
+  [moveTeamToIndex, teams],
+);
+</code></pre>
+<ol start="5">
+<li>Add this state near the other state: <code>const [moveTeamId, setMoveTeamId] = useState&lt;string | null&gt;(null);</code> and <code>const moveDescriptionId = useId();</code>. Then derive:</li>
+</ol>
+<pre><code class="language-tsx">const moveTeam = moveTeamId
+  ? (teams.find((team) =&gt; team.id === moveTeamId) ?? null)
+  : null;
+const moveTeamIndex = moveTeam
+  ? teams.findIndex((team) =&gt; team.id === moveTeam.id)
+  : -1;
+
+function chooseIndex(index: number) {
+  if (!moveTeam) return;
+  moveTeamToIndex(moveTeam.id, index);
+  setMoveTeamId(null);
+}
+</code></pre>
+<ol start="6">
+<li>Pass <code>onChoosePosition={setMoveTeamId}</code> to every <code>SortableTeamRow</code>.</li>
+<li>Render the sheet as the last child of the <code>&lt;section&gt;</code>:</li>
+</ol>
+<pre><code class="language-tsx">&lt;Dialog.Root
+  onOpenChange={(open) =&gt; {
+    if (!open) setMoveTeamId(null);
+  }}
+  open={moveTeam !== null}
+&gt;
+  &lt;Dialog.Portal&gt;
+    &lt;Dialog.Overlay className=&quot;t-modal-overlay bg-brand-strong/60 fixed inset-0 z-50&quot; /&gt;
+    &lt;Dialog.Content
+      aria-describedby={moveDescriptionId}
+      className=&quot;border-border bg-surface text-foreground fixed inset-x-0 bottom-0 z-50 max-h-[85dvh] overflow-y-auto rounded-t-2xl border p-4 pb-[max(1rem,env(safe-area-inset-bottom))] shadow-2xl outline-none sm:inset-x-auto sm:top-1/2 sm:bottom-auto sm:left-1/2 sm:w-[min(26rem,calc(100vw-2rem))] sm:-translate-x-1/2 sm:-translate-y-1/2 sm:rounded-2xl&quot;
+    &gt;
+      {moveTeam ? (
+        &lt;&gt;
+          &lt;Dialog.Title className=&quot;text-brand-ink-strong text-lg font-black&quot;&gt;
+            Move {moveTeam.displayName}
+          &lt;/Dialog.Title&gt;
+          &lt;Dialog.Description
+            className=&quot;text-muted mt-1 text-sm&quot;
+            id={moveDescriptionId}
+          &gt;
+            Currently {positionKind} position {moveTeamIndex + 1} of{&quot; &quot;}
+            {teams.length}.
+          &lt;/Dialog.Description&gt;
+          &lt;div className=&quot;mt-4 grid grid-cols-5 gap-2&quot;&gt;
+            {teams.map((team, index) =&gt; (
+              &lt;button
+                aria-label={`Position ${index + 1}`}
+                className=&quot;border-border bg-surface text-brand-ink-strong hover:border-accent-lilac disabled:bg-surface-subtle disabled:text-muted min-h-11 rounded-lg border text-sm font-black tabular-nums disabled:line-through&quot;
+                disabled={index === moveTeamIndex}
+                key={team.id}
+                onClick={() =&gt; chooseIndex(index)}
+                type=&quot;button&quot;
+              &gt;
+                {index + 1}
+              &lt;/button&gt;
+            ))}
+          &lt;/div&gt;
+          &lt;div className=&quot;mt-3 grid grid-cols-2 gap-2&quot;&gt;
+            &lt;Button
+              disabled={moveTeamIndex === 0}
+              onClick={() =&gt; chooseIndex(0)}
+              variant=&quot;secondary&quot;
+            &gt;
+              Move to top
+            &lt;/Button&gt;
+            &lt;Button
+              disabled={moveTeamIndex === teams.length - 1}
+              onClick={() =&gt; chooseIndex(teams.length - 1)}
+              variant=&quot;secondary&quot;
+            &gt;
+              Move to bottom
+            &lt;/Button&gt;
+          &lt;/div&gt;
+          &lt;Dialog.Close asChild&gt;
+            &lt;Button className=&quot;mt-2 w-full&quot; variant=&quot;ghost&quot;&gt;
+              Cancel
+            &lt;/Button&gt;
+          &lt;/Dialog.Close&gt;
+        &lt;/&gt;
+      ) : null}
+    &lt;/Dialog.Content&gt;
+  &lt;/Dialog.Portal&gt;
+&lt;/Dialog.Root&gt;
+</code></pre>
+<ol start="8">
+<li>Change the helper paragraph under the sorter heading to: <code>Drag the handle, tap a position number, or use Arrow, Page Up, Page Down, Home, and End.</code></li>
+</ol>
+<ul>
+<li><input disabled="" type="checkbox"> <strong>Step 6: Compact Stage 1</strong> in <code>prediction-form.tsx</code>.</li>
+</ul>
+<ol>
+<li><strong>Name card:</strong> change <code>CardContent className=&quot;grid gap-4&quot;</code> to <code>className=&quot;grid gap-3 p-3 sm:p-4&quot;</code>. Delete the whole icon-and-description block (the <code>div.flex.items-start.gap-3</code> containing the <code>ShieldCheck</code> icon, the <code>h2</code>, and the description <code>p</code>), and put <code>&lt;h2 className=&quot;sr-only&quot;&gt;Who is making this prediction?&lt;/h2&gt;</code> as the first child instead. Keep the label, input, help text, honeypot, disabled notice, and error exactly as they are. Remove the <code>ShieldCheck</code> import if it becomes unused.</li>
+<li><strong>A–Z banner:</strong> replace the whole <code>isAlphabetical ? (&lt;aside …&gt;…&lt;/aside&gt;) : null</code> with:</li>
+</ol>
+<pre><code class="language-tsx">{
+  isAlphabetical ? (
+    &lt;aside
+      aria-labelledby=&quot;alphabetical-blank-slate-heading&quot;
+      className=&quot;border-warning/35 bg-warning-soft text-warning rounded-xl border px-3 py-2&quot;
+    &gt;
+      &lt;div className=&quot;flex items-center gap-2&quot;&gt;
+        &lt;AlertTriangle aria-hidden=&quot;true&quot; className=&quot;size-4 shrink-0&quot; /&gt;
+        &lt;h2
+          className=&quot;min-w-0 grow text-sm font-black&quot;
+          id=&quot;alphabetical-blank-slate-heading&quot;
+        &gt;
+          The table starts A–Z as a blank slate
+        &lt;/h2&gt;
+      &lt;/div&gt;
+      &lt;details className=&quot;text-sm leading-5&quot;&gt;
+        &lt;summary className=&quot;inline-flex min-h-11 cursor-pointer items-center font-bold underline underline-offset-4&quot;&gt;
+          Why?
+        &lt;/summary&gt;
+        &lt;p className=&quot;pb-1&quot;&gt;
+          This is not last season’s table or a suggested prediction. Reorder the
+          clubs, or confirm the A–Z order when you continue if it is really your
+          prediction.
+        &lt;/p&gt;
+      &lt;/details&gt;
+    &lt;/aside&gt;
+  ) : null;
+}
+</code></pre>
+<ul>
+<li><input disabled="" type="checkbox"> <strong>Step 7: Run the tests</strong></li>
+</ul>
+<p>Run: <code>npx vitest run tests/components/prediction-sorter-move.test.tsx tests/components/spotlight-progress.test.tsx tests/components/prediction-form.test.tsx tests/components/searchable-prediction-select.test.tsx tests/components/standings-paste-panel.test.tsx tests/components/manual-standings-form.test.tsx</code>
+Expected: PASS. The last three confirm that the admin standings sorter and the selector are unaffected.</p>
+<ul>
+<li><input disabled="" type="checkbox"> <strong>Step 8: Commit</strong></li>
+</ul>
+<pre><code class="language-bash">git add src/features/predictions
+git commit -m &quot;Entry flow: tap-a-position sheet, compact Stage 1, Stage 2 progress&quot;
+</code></pre>
+<hr>
+<h3 id="task-11-owner-desk-dataset-status-board-plain-intro-admin-header">Task 11: Owner desk: dataset status board, plain intro, admin header</h3>
+<p><strong>Files:</strong></p>
+<ul>
+<li>Create: <code>src/features/admin/status-board.tsx</code></li>
+<li>Modify: <code>src/app/admin/page.tsx</code>, <code>src/app/admin/results/page.tsx</code> (intro copy only), <code>src/app/admin/admin-nav.tsx</code> (one class)</li>
+<li>Test: <code>tests/components/admin-status-board.test.tsx</code>; must still pass: <code>tests/unit/admin-controls.test.tsx</code>, <code>tests/unit/admin-win-streak-route.test.ts</code></li>
+</ul>
+<p><strong>Interfaces produced:</strong> <code>AdminStatusInput</code>, <code>AdminStatusRow</code>, <code>AdminDatasetKey</code>, <code>buildAdminStatusRows(input: AdminStatusInput): AdminStatusRow[]</code>, and <code>AdminStatusBoard({ rows: readonly AdminStatusRow[] })</code>.</p>
+<ul>
+<li><input disabled="" type="checkbox"> <strong>Step 1: Run the failing test</strong></li>
+</ul>
+<p>Run: <code>npx vitest run tests/components/admin-status-board.test.tsx</code>
+Expected: FAIL with <code>Failed to resolve import &quot;@/features/admin/status-board&quot;</code>.</p>
+<ul>
+<li><input disabled="" type="checkbox"> <strong>Step 2: Create <code>src/features/admin/status-board.tsx</code></strong></li>
+</ul>
+<pre><code class="language-tsx">import Link from &quot;next/link&quot;;
+
+import { formatLeagueDateTime } from &quot;@/shared/format&quot;;
+
+export type AdminDatasetKey =
+  &quot;goals&quot; | &quot;assists&quot; | &quot;clean_sheets&quot; | &quot;player_ratings&quot;;
+
+export type AdminStatusInput = Readonly&lt;{
+  datasets: readonly Readonly&lt;{
+    active: Readonly&lt;{
+      capturedAt: Date;
+      coveredThroughRank: number | null;
+    }&gt; | null;
+    dataset: AdminDatasetKey;
+    hasUnpublishedDraft: boolean;
+    isFinal: boolean;
+  }&gt;[];
+  standings: Readonly&lt;{ capturedAt: Date; isFinal: boolean }&gt; | null;
+  winStreak: Readonly&lt;{ matchweek: number; readyToResolve: boolean }&gt; | null;
+}&gt;;
+
+export type AdminStatusRow = Readonly&lt;{
+  actionLabel: string;
+  attention: boolean;
+  draft: string;
+  href: string;
+  key: string;
+  label: string;
+  publicVersion: string;
+}&gt;;
+
+const DATASET_LABELS: Record&lt;AdminDatasetKey, string&gt; = {
+  assists: &quot;Assists&quot;,
+  clean_sheets: &quot;Clean sheets&quot;,
+  goals: &quot;Goals&quot;,
+  player_ratings: &quot;Player ratings&quot;,
+};
+
+const DATASET_ORDER: readonly AdminDatasetKey[] = [
+  &quot;goals&quot;,
+  &quot;assists&quot;,
+  &quot;clean_sheets&quot;,
+  &quot;player_ratings&quot;,
+];
+
+export function buildAdminStatusRows(
+  input: AdminStatusInput,
+): AdminStatusRow[] {
+  const rows: AdminStatusRow[] = [
+    {
+      actionLabel: &quot;Import standings&quot;,
+      attention: input.standings === null,
+      draft: &quot;—&quot;,
+      href: &quot;/admin/standings&quot;,
+      key: &quot;standings&quot;,
+      label: &quot;Standings&quot;,
+      publicVersion: input.standings
+        ? `${formatLeagueDateTime(input.standings.capturedAt)}${input.standings.isFinal ? &quot; · Final&quot; : &quot;&quot;}`
+        : &quot;None&quot;,
+    },
+  ];
+
+  for (const key of DATASET_ORDER) {
+    const dataset = input.datasets.find(
+      (candidate) =&gt; candidate.dataset === key,
+    );
+    const active = dataset?.active ?? null;
+    const hasDraft = dataset?.hasUnpublishedDraft ?? false;
+    rows.push({
+      actionLabel: hasDraft
+        ? &quot;Review &amp; publish&quot;
+        : active
+          ? &quot;Update&quot;
+          : &quot;Enter results&quot;,
+      attention: hasDraft || active === null,
+      draft: hasDraft ? &quot;Saved draft not published&quot; : &quot;—&quot;,
+      href: &quot;/admin/results&quot;,
+      key,
+      label: DATASET_LABELS[key],
+      publicVersion: active
+        ? [
+            formatLeagueDateTime(active.capturedAt),
+            active.coveredThroughRank
+              ? `to rank ${active.coveredThroughRank}`
+              : null,
+            dataset?.isFinal ? &quot;Final&quot; : null,
+          ]
+            .filter(Boolean)
+            .join(&quot; · &quot;)
+        : &quot;Not published&quot;,
+    });
+  }
+
+  rows.push(
+    input.winStreak
+      ? {
+          actionLabel: input.winStreak.readyToResolve
+            ? &quot;Resolve round&quot;
+            : &quot;Waiting for kickoffs&quot;,
+          attention: input.winStreak.readyToResolve,
+          draft: &quot;—&quot;,
+          href: &quot;/admin/win-streak&quot;,
+          key: &quot;win-streak&quot;,
+          label: `Win Streak MW${input.winStreak.matchweek}`,
+          publicVersion: &quot;Unresolved&quot;,
+        }
+      : {
+          actionLabel: &quot;Open&quot;,
+          attention: false,
+          draft: &quot;—&quot;,
+          href: &quot;/admin/win-streak&quot;,
+          key: &quot;win-streak&quot;,
+          label: &quot;Win Streak&quot;,
+          publicVersion: &quot;All rounds resolved&quot;,
+        },
+  );
+
+  return rows;
+}
+
+export function AdminStatusBoard({
+  rows,
+}: {
+  rows: readonly AdminStatusRow[];
+}) {
+  return (
+    &lt;section aria-labelledby=&quot;dataset-status-heading&quot; className=&quot;grid gap-3&quot;&gt;
+      &lt;h2 className=&quot;text-xl font-bold&quot; id=&quot;dataset-status-heading&quot;&gt;
+        Dataset status
+      &lt;/h2&gt;
+      &lt;div className=&quot;border-border bg-surface overflow-x-auto rounded-xl border&quot;&gt;
+        &lt;table
+          aria-label=&quot;Dataset status&quot;
+          className=&quot;w-full min-w-[34rem] text-left text-sm&quot;
+        &gt;
+          &lt;thead className=&quot;text-muted text-[0.65rem] font-black tracking-wide uppercase&quot;&gt;
+            &lt;tr&gt;
+              &lt;th className=&quot;px-3 py-2&quot; scope=&quot;col&quot;&gt;
+                Dataset
+              &lt;/th&gt;
+              &lt;th className=&quot;px-3 py-2&quot; scope=&quot;col&quot;&gt;
+                Public version
+              &lt;/th&gt;
+              &lt;th className=&quot;px-3 py-2&quot; scope=&quot;col&quot;&gt;
+                Draft
+              &lt;/th&gt;
+              &lt;th className=&quot;px-3 py-2&quot; scope=&quot;col&quot;&gt;
+                Action
+              &lt;/th&gt;
+            &lt;/tr&gt;
+          &lt;/thead&gt;
+          &lt;tbody&gt;
+            {rows.map((row) =&gt; (
+              &lt;tr className=&quot;border-border border-t&quot; key={row.key}&gt;
+                &lt;th className=&quot;px-3 py-2.5 font-bold&quot; scope=&quot;row&quot;&gt;
+                  {row.label}
+                &lt;/th&gt;
+                &lt;td className=&quot;text-muted px-3 py-2.5&quot;&gt;{row.publicVersion}&lt;/td&gt;
+                &lt;td className=&quot;text-muted px-3 py-2.5&quot;&gt;{row.draft}&lt;/td&gt;
+                &lt;td className=&quot;px-3 py-2.5&quot;&gt;
+                  {row.attention ? (
+                    &lt;&gt;
+                      &lt;span
+                        aria-hidden=&quot;true&quot;
+                        className=&quot;bg-warning mr-2 inline-block size-2 rounded-full&quot;
+                      /&gt;
+                      &lt;span className=&quot;sr-only&quot;&gt;Needs attention&lt;/span&gt;
+                    &lt;/&gt;
+                  ) : null}
+                  &lt;Link
+                    className=&quot;text-brand-ink inline-flex min-h-11 items-center font-semibold underline&quot;
+                    href={row.href}
+                  &gt;
+                    {row.actionLabel}
+                  &lt;/Link&gt;
+                &lt;/td&gt;
+              &lt;/tr&gt;
+            ))}
+          &lt;/tbody&gt;
+        &lt;/table&gt;
+      &lt;/div&gt;
+    &lt;/section&gt;
+  );
+}
+</code></pre>
+<ul>
+<li><input disabled="" type="checkbox"> <strong>Step 3: Query and render on <code>src/app/admin/page.tsx</code></strong> (read-only).</li>
+</ul>
+<ol>
+<li>Add these imports: <code>and, asc, isNull, max</code> from <code>drizzle-orm</code>; <code>spotlightResultSnapshots, spotlightResultStates, winStreakFixtures, winStreakRounds</code> from <code>@/db/schema</code>; <code>isSpotlightResultDataset</code> from <code>@/features/results</code>; <code>AdminStatusBoard, buildAdminStatusRows, type AdminDatasetKey</code> from <code>@/features/admin/status-board</code>.</li>
+<li>Extend the existing <code>Promise.all</code> with two more reads:</li>
+</ol>
+<pre><code class="language-ts">    db
+      .select({
+        activeCapturedAt: spotlightResultSnapshots.capturedAt,
+        activeCoveredThroughRank: spotlightResultSnapshots.coveredThroughRank,
+        activeSnapshotId: spotlightResultStates.activeSnapshotId,
+        dataset: spotlightResultStates.dataset,
+        finalSnapshotId: spotlightResultStates.finalSnapshotId,
+        workingSnapshotId: spotlightResultStates.workingSnapshotId,
+      })
+      .from(spotlightResultStates)
+      .leftJoin(
+        spotlightResultSnapshots,
+        eq(spotlightResultSnapshots.id, spotlightResultStates.activeSnapshotId),
+      )
+      .where(eq(spotlightResultStates.seasonId, season.id)),
+    db
+      .select({
+        lastKickoffAt: max(winStreakFixtures.kickoffAt),
+        matchweek: winStreakRounds.matchweek,
+      })
+      .from(winStreakRounds)
+      .leftJoin(winStreakFixtures, eq(winStreakFixtures.roundId, winStreakRounds.id))
+      .where(
+        and(
+          eq(winStreakRounds.seasonId, season.id),
+          isNull(winStreakRounds.resolvedAt),
+        ),
+      )
+      .groupBy(winStreakRounds.id, winStreakRounds.matchweek)
+      .orderBy(asc(winStreakRounds.matchweek))
+      .limit(1),
+</code></pre>
+<p>Destructure them as <code>resultStates</code> and <code>nextRounds</code>.</p>
+<ol start="3">
+<li>After <code>const latestRun = …</code>, build the rows:</li>
+</ol>
+<pre><code class="language-ts">const nextRound = nextRounds[0];
+const statusRows = buildAdminStatusRows({
+  datasets: resultStates.flatMap((state) =&gt;
+    isSpotlightResultDataset(state.dataset)
+      ? [
+          {
+            active:
+              state.activeSnapshotId &amp;&amp; state.activeCapturedAt
+                ? {
+                    capturedAt: state.activeCapturedAt,
+                    coveredThroughRank: state.activeCoveredThroughRank,
+                  }
+                : null,
+            dataset: state.dataset as AdminDatasetKey,
+            hasUnpublishedDraft:
+              state.workingSnapshotId !== null &amp;&amp;
+              state.workingSnapshotId !== state.activeSnapshotId,
+            isFinal:
+              state.finalSnapshotId !== null &amp;&amp;
+              state.finalSnapshotId === state.activeSnapshotId,
+          },
+        ]
+      : [],
+  ),
+  standings: activeSnapshot
+    ? {
+        capturedAt:
+          season.standingsAcceptedThrough ?? activeSnapshot.capturedAt,
+        isFinal: activeSnapshot.isFinal,
+      }
+    : null,
+  winStreak: nextRound
+    ? {
+        matchweek: nextRound.matchweek,
+        readyToResolve:
+          nextRound.lastKickoffAt !== null &amp;&amp;
+          new Date(nextRound.lastKickoffAt).getTime() &lt;= databaseNow.getTime(),
+      }
+    : null,
+});
+</code></pre>
+<ol start="4">
+<li>Render <code>&lt;AdminStatusBoard rows={statusRows} /&gt;</code> directly after the <code>Season status</code> section.</li>
+</ol>
+<ul>
+<li><p><input disabled="" type="checkbox"> <strong>Step 4: Plain intro on <code>src/app/admin/results/page.tsx</code>.</strong> Replace the paragraph text <code>Enter reviewed season outcomes row by row. Draft snapshots stay private; publishing moves one exact immutable snapshot into public scoring, and final status can only be undone against that same active pointer.</code> with <code>Enter a result list, check it against everyone’s picks, then publish it. Drafts stay private until you publish.</code> Change nothing else in that file.</p>
+</li>
+<li><p><input disabled="" type="checkbox"> <strong>Step 5: <code>src/app/admin/admin-nav.tsx</code>.</strong> In the active link class <code>bg-brand text-white</code>, append <code>dark:ring-1 dark:ring-accent-blue</code>. Change nothing else.</p>
+</li>
+<li><p><input disabled="" type="checkbox"> <strong>Step 6: Run the tests</strong></p>
+</li>
+</ul>
+<p>Run: <code>npx vitest run tests/components/admin-status-board.test.tsx tests/unit/admin-controls.test.tsx tests/unit/admin-win-streak-route.test.ts</code>
+Expected: PASS.</p>
+<ul>
+<li><input disabled="" type="checkbox"> <strong>Step 7: Commit</strong></li>
+</ul>
+<pre><code class="language-bash">git add src/features/admin/status-board.tsx src/app/admin/page.tsx src/app/admin/results/page.tsx src/app/admin/admin-nav.tsx
+git commit -m &quot;Owner desk: dataset status board and plain-language results intro&quot;
+</code></pre>
+<hr>
+<h3 id="task-12-browser-test-contract-updates-the-only-permitted-test-edits">Task 12: Browser-test contract updates (the only permitted test edits)</h3>
+<p><strong>Files:</strong> Modify <code>tests/e2e/post-kickoff-leaderboard.spec.ts</code> only.</p>
+<ul>
+<li><input disabled="" type="checkbox"> <strong>Step 1: Add a helper</strong> directly after the existing <code>expectNoHorizontalOverflow</code> function (around line 119):</li>
+</ul>
+<pre><code class="language-ts">async function expectNoMidWordBreaks(
+  locator: import(&quot;@playwright/test&quot;).Locator,
+) {
+  const broken = await locator.evaluateAll((elements) =&gt; {
+    const failures: string[] = [];
+    for (const element of elements) {
+      for (const node of Array.from(element.childNodes)) {
+        if (node.nodeType !== Node.TEXT_NODE) continue;
+        const text = node.textContent ?? &quot;&quot;;
+        for (const match of text.matchAll(/\S+/gu)) {
+          const range = document.createRange();
+          range.setStart(node, match.index ?? 0);
+          range.setEnd(node, (match.index ?? 0) + match[0].length);
+          const lineTops = new Set(
+            Array.from(range.getClientRects()).map((rect) =&gt;
+              Math.round(rect.top),
+            ),
+          );
+          if (lineTops.size &gt; 1) failures.push(match[0]);
+        }
+      }
+    }
+    return failures;
+  });
+  expect(broken, &quot;Club names must wrap between words only.&quot;).toEqual([]);
+}
+</code></pre>
+<ul>
+<li><input disabled="" type="checkbox"> <strong>Step 2: Use the helper on the season table.</strong> Directly after the <code>expectNoHorizontalOverflow(page);</code> that follows <code>page.getByRole(&quot;table&quot;, { name: &quot;Premier League season table&quot; })</code> (around line 462), add:</li>
+</ul>
+<pre><code class="language-ts">await expectNoMidWordBreaks(page.locator(&quot;[data-club-name]&quot;));
+</code></pre>
+<ul>
+<li><input disabled="" type="checkbox"> <strong>Step 3: Replace the category switch.</strong> Replace these four lines:</li>
+</ul>
+<pre><code class="language-ts">await page
+  .getByRole(&quot;combobox&quot;, { name: &quot;Category&quot;, exact: true })
+  .selectOption(&quot;underdog_team&quot;);
+await page.getByRole(&quot;button&quot;, { name: &quot;Show category&quot; }).click();
+</code></pre>
+<p>with:</p>
+<pre><code class="language-ts">await page
+  .getByRole(&quot;navigation&quot;, { name: &quot;Choose a spotlight category&quot; })
+  .getByRole(&quot;link&quot;, { name: &quot;Underdog team&quot;, exact: true })
+  .click();
+await page.waitForURL(/[?&amp;]category=underdog_team(?:&amp;|$)/u);
+</code></pre>
+<ul>
+<li><input disabled="" type="checkbox"> <strong>Step 4: Replace the matrix row count.</strong> Replace:</li>
+</ul>
+<pre><code class="language-ts">await expect(
+  page.getByRole(&quot;table&quot;, { name: /seven spotlight picks/i }).getByRole(&quot;row&quot;),
+).toHaveCount(3);
+</code></pre>
+<p>with:</p>
+<pre><code class="language-ts">if ((page.viewportSize()?.width ?? 1280) &lt; 640) {
+  await expect(
+    page
+      .getByRole(&quot;list&quot;, { name: &quot;Picks by entry&quot; })
+      .getByRole(&quot;listitem&quot;, { name: /spotlight picks$/u }),
+  ).toHaveCount(2);
+} else {
+  await expect(
+    page
+      .getByRole(&quot;table&quot;, { name: /seven spotlight picks/i })
+      .getByRole(&quot;row&quot;),
+  ).toHaveCount(3);
+}
+</code></pre>
+<ul>
+<li><input disabled="" type="checkbox"> <strong>Step 5: Replace the leaderboard search.</strong> Replace:</li>
+</ul>
+<pre><code class="language-ts">await page.getByLabel(&quot;Find a participant&quot;).fill(swappedName);
+await page.getByRole(&quot;button&quot;, { name: &quot;Find&quot;, exact: true }).click();
+</code></pre>
+<p>with:</p>
+<pre><code class="language-ts">await page.getByLabel(&quot;Find a participant&quot;).fill(swappedName);
+</code></pre>
+<p>Then, a few lines below, replace:</p>
+<pre><code class="language-ts">await page.getByRole(&quot;link&quot;, { name: &quot;Clear&quot;, exact: true }).click();
+</code></pre>
+<p>with:</p>
+<pre><code class="language-ts">await page.getByRole(&quot;button&quot;, { name: &quot;Clear&quot;, exact: true }).click();
+</code></pre>
+<ul>
+<li><input disabled="" type="checkbox"> <strong>Step 6: Commit</strong></li>
+</ul>
+<pre><code class="language-bash">git add tests/e2e/post-kickoff-leaderboard.spec.ts
+git commit -m &quot;Update post-kickoff browser contract for one-tap filters and mobile matrix&quot;
+</code></pre>
+<hr>
+<h3 id="task-13-documentation-walkthrough-captures-full-verification-release">Task 13: Documentation, walkthrough captures, full verification, release</h3>
+<p><strong>Files:</strong> <code>DESIGN.md</code>, <code>AGENTS.md</code>, <code>docs/QA.md</code>, the generated <code>*.html</code> peers, <code>public/how-to-play/step-1-table-mobile.png</code>, and <code>public/how-to-play/step-2-spotlight-mobile.png</code>.</p>
+<ul>
+<li><p><input disabled="" type="checkbox"> <strong>Step 1: Update <code>DESIGN.md</code>.</strong> Edit these sections in place and do not add others.</p>
+</li>
+<li><p><strong>Layout.</strong> Replace the sentence &quot;The header contains a compact brand row and a separate row of five navigation links.&quot; with: &quot;From 640px the header contains a compact brand row and a row of five text links. Below 640px the header is one brand row and a fixed bottom tab bar (Table, Leaderboard, Spotlight, Streak, Rules; 56px targets; safe-area padded) replaces the text links. Sticky action bars offset themselves by <code>--mobile-tab-bar-height</code>.&quot;</p>
+</li>
+<li><p><strong>Semantic colors.</strong> Replace the comparison-gap sentence with: &quot;Comparison gaps use a diverging scale: neutral under one place, then slight (1–3), clear (3–8), and far (8+), green above expectation and crimson below. Table points use one ordinal scale everywhere: Exact (strong green), Within 3 (mint), Correct half (lilac), No points (neutral). Danger red is reserved for errors and negative movement. The tokens are <code>--gap-*</code> and <code>--score-*</code> in <code>globals.css</code>.&quot;</p>
+</li>
+<li><p><strong>Podium.</strong> Add: &quot;The podium is a compact side-by-side strip on every width; the full ranked table below it remains the complete accessible list.&quot;</p>
+</li>
+<li><p><strong>Components → Navigation.</strong> Add the bottom tab bar, and note that the owner pages show only a &quot;View public site&quot; link.</p>
+</li>
+<li><p><input disabled="" type="checkbox"> <strong>Step 2: Update <code>AGENTS.md</code> → &quot;Interface direction&quot;.</strong> Append one sentence: &quot;The September 22 UX refresh adds a mobile bottom tab bar, one-tap Spotlight category chips, an instant leaderboard filter, a scored entry summary with compare and previous/next, tabbed Rules, and a Win Streak countdown with day-grouped kickoffs; <code>docs/superpowers/specs/2026-09-22-ux-audit.html</code> records the approved direction.&quot; Change nothing else.</p>
+</li>
+<li><p><input disabled="" type="checkbox"> <strong>Step 3: Add a section at the top of <code>docs/QA.md</code></strong> titled <code>## September 22 UX refresh</code>. Include one paragraph linking the spec, and a table with exactly these gates: Red-green tests, Full unit and component suite, Isolated integration, Static checks, Production build, Browser journeys, Walkthrough captures, Accessibility, and Production release. <strong>Fill each cell with the real command output from Steps 5–9 below (counts, pass or fail, commit and deployment IDs). Do not write a result you did not observe.</strong> Leave a gate&#39;s cell as <code>Not run: &lt;reason&gt;</code> if you could not run it.</p>
+</li>
+<li><p><input disabled="" type="checkbox"> <strong>Step 4: Regenerate documentation peers</strong></p>
+</li>
+</ul>
+<p>Run: <code>npm run docs:generate &amp;&amp; npm run docs:check</code>
+Expected: <code>docs:check</code> exits 0.</p>
+<ul>
+<li><p><input disabled="" type="checkbox"> <strong>Step 5: Run the finish-line test command</strong> (from &quot;The tests&quot; above).
+Expected: every listed file passes, with no failures.
+</p>
+</li>
+<li><p><input disabled="" type="checkbox"> <strong>Step 6: Run the static gates and the full unit suite</strong></p>
+</li>
+</ul>
+<pre><code class="language-bash">npm run format:check &amp;&amp; npm run lint &amp;&amp; npm run typecheck &amp;&amp; npm test
+</code></pre>
+<p>Expected: all exit 0. If <code>format:check</code> fails, run <code>npx prettier --write</code> on <strong>only the files you changed</strong>, then re-run. Do not reformat unrelated files.</p>
+<ul>
+<li><input disabled="" type="checkbox"> <strong>Step 7: Run the isolated integration suite and the production build</strong></li>
+</ul>
+<pre><code class="language-bash">npm run test:integration &amp;&amp; npm run build:verify
+</code></pre>
+<p>Expected: both exit 0. Integration needs <code>TEST_DATABASE_URL</code> or <code>TEST_DATABASE_NAME</code> in <code>.env.local</code>. If neither is configured, stop and ask the owner; do not point it at production.</p>
+<ul>
+<li><input disabled="" type="checkbox"> <strong>Step 8: Refresh the walkthrough images and run every browser journey</strong></li>
+</ul>
+<pre><code class="language-bash">QA_SCREENSHOT_DIR=output/qa/ux-refresh-2026-09 LOCAL_HTTP_E2E=1 npm run test:e2e
+</code></pre>
+<p>Expected: every project passes (existing intentional skips remain skipped). This rewrites <code>public/how-to-play/step-1-table-mobile.png</code>, <code>step-2-spotlight-mobile.png</code>, and <code>step-3-review-mobile.png</code> from the new UI. Open each image and confirm it shows the compact Stage 1 (name field, one-line A–Z banner, several clubs visible) and the Stage 2 progress dots. Record the cleanup evidence the suites print in <code>docs/QA.md</code>.</p>
+<ul>
+<li><p><input disabled="" type="checkbox"> <strong>Step 9: Run <code>npm run check</code></strong>
+Expected: exit 0. This is the repository&#39;s complete Definition-of-Done gate from <code>AGENTS.md</code>.
+</p>
+</li>
+<li><p><input disabled="" type="checkbox"> <strong>Step 10: Commit</strong></p>
+</li>
+</ul>
+<pre><code class="language-bash">git add DESIGN.md DESIGN.html AGENTS.md AGENTS.html docs/QA.md docs/QA.html docs/superpowers public/how-to-play
+git commit -m &quot;Record September 22 UX refresh design, QA evidence, and walkthrough captures&quot;
+</code></pre>
+<ul>
+<li><input disabled="" type="checkbox"> <strong>Step 11: Release, following <code>AGENTS.md</code>.</strong> Push <code>vishal/ux-refresh-2026-09</code>, open a PR to <code>main</code> titled <code>September 22 UX refresh</code>, and wait for the Vercel checks to pass. Merge, then wait for the production deployment to be Ready on <code>pl-predictions-2026.vercel.app</code>. Run the read-only production smoke:</li>
+</ul>
+<pre><code class="language-bash">npm run test:production-smoke
+</code></pre>
+<p>Expected: all five projects pass. Then run <code>git checkout main &amp;&amp; git pull --ff-only</code>, confirm local <code>main</code> equals the merge commit, and fill the &quot;Production release&quot; row in <code>docs/QA.md</code> in a follow-up commit on a new branch using the same PR flow. Never run <code>test:production-write-smoke</code>.</p>
+<hr>
+<h2 id="win-conditions-all-must-be-true">Win conditions (all must be true)</h2>
+<ol>
+<li>Every test file in &quot;The tests&quot; passes, and no test file anywhere was added, removed, renamed, skipped, or edited, apart from the Task 12 edits.</li>
+<li><code>npm run check</code> exits 0 on the final branch head.</li>
+<li><code>grep -rn &quot;overflow-wrap:anywhere&quot; src/features/standings/season-table-page.tsx src/features/leaderboard src/app/entries src/features/win-streak/win-streak-leaderboard.tsx src/components/page-heading.tsx</code> prints nothing.</li>
+<li><code>grep -rn &quot;Show category\|Select to see names\|Current data status\|max(0, N&quot; src</code> prints nothing.</li>
+<li><code>git diff main --stat -- drizzle src/db scripts src/features/scoring src/features/results src/app/actions</code> prints nothing.</li>
+<li>The production smoke passes against the merged deployment, and <code>docs/QA.md</code> records the real results.</li>
+</ol>
+<h2 id="out-of-scope-do-not-build">Out of scope (do not build)</h2>
+<ul>
+<li>A &quot;You&quot; pin on the leaderboard and a &quot;Your prediction&quot; season-table column. These need the <code>/entries</code>-scoped receipt cookie widened, which is a privacy decision for the owner.</li>
+<li>Any change to scoring, ranking, tie rules, deadlines, the Win Streak rules, or data publication.</li>
+<li>New analytics, animations, themes, fonts, or icons beyond the lucide icons named here.</li>
+</ul>
+
+      <p class="source">Generated deterministically from <a href="2026-09-22-ux-refresh.md">docs/superpowers/plans/2026-09-22-ux-refresh.md</a>. Canonical SHA-256: <code>57ad76910ce2c9b1ee622bdb3fdae99052e076a62321fd4019577d25e988b16a</code>.</p>
+    </main>
+  </body>
+</html>

@@ -99,6 +99,7 @@ const TEAM_SLUG_BY_OFFICIAL_NAME = new Map<string, TeamSlug>(
 // (first Newcastle, then the October/Christmas selections update). Normalize
 // every published alias before validating the complete season schedule.
 const OFFICIAL_PUBLISHED_ALIASES = [
+  ["Bournemouth", "afc-bournemouth"],
   ["Brighton", "brighton-and-hove-albion"],
   ["Coventry", "coventry-city"],
   ["Hull", "hull-city"],

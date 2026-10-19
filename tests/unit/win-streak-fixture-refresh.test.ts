@@ -206,6 +206,34 @@ describe("official Win Streak fixture refresh", () => {
     );
   });
 
+  it("normalizes the published Bournemouth alias to AFC Bournemouth", () => {
+    const html = `
+      <article>
+        <p><strong>Saturday 28 November 2026</strong><br />
+          Bournemouth v Brighton<br />
+          20:15 Arsenal v Bournemouth (Sky Sports)
+        </p>
+      </article>
+    `;
+
+    expect(parseOfficialFixtureArticle(html)).toEqual([
+      expect.objectContaining({
+        awayTeamSlug: "brighton-and-hove-albion",
+        explicitTime: false,
+        homeTeamSlug: "afc-bournemouth",
+        localDate: "2026-11-28",
+        localTime: "15:00",
+      }),
+      expect.objectContaining({
+        awayTeamSlug: "afc-bournemouth",
+        explicitTime: true,
+        homeTeamSlug: "arsenal",
+        localDate: "2026-11-28",
+        localTime: "20:15",
+      }),
+    ]);
+  });
+
   it("converts Europe/London local kickoffs across GMT and BST", () => {
     expect(localLondonKickoffToUtc("2026-08-29", "15:00")).toBe(
       "2026-08-29T14:00:00.000Z",
@@ -226,7 +254,7 @@ describe("official Win Streak fixture refresh", () => {
     expect(canonicalFixtureSnapshot.source.fixtureListUrl).toBe(
       OFFICIAL_FIXTURE_LIST_URL,
     );
-    expect(canonicalFixtureSnapshot.source.checkedAt).toBe("2026-10-10");
+    expect(canonicalFixtureSnapshot.source.checkedAt).toBe("2026-10-19");
     expect(canonicalFixtureSnapshot.rounds).toHaveLength(37);
     expect(canonicalFixtures()).toHaveLength(370);
     expect(

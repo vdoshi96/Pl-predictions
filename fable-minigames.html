@@ -1,0 +1,500 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Dranx Prediction League — Mid-Season Mini-Game Concepts</title>
+<style>
+  :root {
+    color-scheme: light dark;
+    --background: #f8f4fa;
+    --surface: #ffffff;
+    --surface-subtle: #f2eaf4;
+    --foreground: #2a0730;
+    --muted: #6f5f73;
+    --border: #dfd2e3;
+    --brand: #37003c;
+    --brand-strong: #26002d;
+    --brand-soft: #f1e5f3;
+    --accent: #00ff87;
+    --accent-blue: #05f0ff;
+    --accent-pink: #ff2882;
+    --accent-lilac: #953bff;
+    --accent-yellow: #ebff00;
+    --accent-ink: #26002d;
+    --mint: #ddffef;
+    --mint-ink: #075d42;
+    --warning-soft: #fff2cc;
+    --warning: #8a5a00;
+    --shadow: 0 22px 70px rgb(55 0 60 / 12%);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --background: #17041a;
+      --surface: #23102a;
+      --surface-subtle: #2c1533;
+      --foreground: #f3e9f5;
+      --muted: #b8a5bd;
+      --border: #5a3d61;
+      --brand-soft: #33143a;
+      --mint: #12382d;
+      --mint-ink: #8fffc9;
+      --warning-soft: #3a2c05;
+      --warning: #ffd60a;
+      --shadow: 0 22px 70px rgb(0 0 0 / 32%);
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    min-width: 320px;
+    background:
+      radial-gradient(circle at 8% 0%, rgb(149 59 255 / 8%), transparent 28rem),
+      radial-gradient(circle at 96% 18%, rgb(5 240 255 / 7%), transparent 24rem),
+      var(--background);
+    color: var(--foreground);
+    font-family: "Avenir Next", "Segoe UI", Helvetica, Arial, sans-serif;
+    line-height: 1.55;
+  }
+  .shell { width: min(100% - 2rem, 64rem); margin-inline: auto; padding-block: 2rem 4rem; }
+  header.hero {
+    position: relative;
+    overflow: hidden;
+    border-radius: 1.5rem;
+    padding: 2.25rem 1.75rem;
+    color: #fff;
+    background:
+      radial-gradient(circle at 92% 10%, rgb(5 240 255 / 25%), transparent 32%),
+      radial-gradient(circle at 72% 110%, rgb(255 40 130 / 26%), transparent 38%),
+      linear-gradient(135deg, #37003c 0%, #4d0055 54%, #26002d 100%);
+    box-shadow: 0 26px 70px -42px rgb(55 0 60 / 90%);
+  }
+  header.hero::after {
+    content: "";
+    position: absolute;
+    right: -4rem; bottom: -7rem;
+    width: 16rem; height: 16rem;
+    border: 2rem solid rgb(255 255 255 / 6%);
+    border-radius: 999px;
+    transform: rotate(-18deg);
+  }
+  header.hero h1 { margin: 0 0 0.5rem; font-size: clamp(1.6rem, 4.5vw, 2.4rem); line-height: 1.15; }
+  header.hero p { margin: 0; max-width: 44rem; color: rgb(255 255 255 / 82%); }
+  .hero-kicker {
+    display: inline-block;
+    margin-bottom: 0.9rem;
+    padding: 0.3rem 0.8rem;
+    border-radius: 999px;
+    background: var(--accent);
+    color: var(--accent-ink);
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  section.intro, article.game, section.matrix, section.guardrails {
+    margin-top: 1.5rem;
+    border: 1px solid var(--border);
+    border-radius: 1.25rem;
+    background: var(--surface);
+    box-shadow: var(--shadow);
+    padding: 1.5rem 1.5rem 1.75rem;
+  }
+  h2 { margin: 0 0 0.35rem; font-size: 1.35rem; line-height: 1.25; }
+  h3 { margin: 1.4rem 0 0.5rem; font-size: 1rem; letter-spacing: 0.04em; text-transform: uppercase; color: var(--muted); }
+  .tagline { margin: 0; color: var(--muted); font-style: italic; }
+  .badges { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-top: 0.9rem; }
+  .badge {
+    padding: 0.22rem 0.7rem;
+    border-radius: 999px;
+    font-size: 0.74rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+  .badge.cadence { background: var(--brand-soft); color: inherit; border: 1px solid var(--border); }
+  .badge.effort-low { background: var(--mint); color: var(--mint-ink); }
+  .badge.effort-medium { background: var(--warning-soft); color: var(--warning); }
+  .badge.data { background: rgb(5 240 255 / 14%); border: 1px solid rgb(5 240 255 / 35%); }
+  .game-number {
+    display: inline-grid;
+    place-items: center;
+    width: 2.2rem; height: 2.2rem;
+    margin-right: 0.6rem;
+    border-radius: 0.7rem;
+    background: linear-gradient(135deg, var(--accent-lilac), var(--accent-pink));
+    color: #fff;
+    font-weight: 800;
+    font-size: 1.05rem;
+    vertical-align: -0.55rem;
+  }
+  ul, ol { margin: 0.4rem 0 0; padding-left: 1.3rem; }
+  li { margin-bottom: 0.45rem; }
+  li:last-child { margin-bottom: 0; }
+  .flow { list-style: none; padding: 0; counter-reset: step; }
+  .flow li {
+    counter-increment: step;
+    position: relative;
+    padding-left: 2.4rem;
+    margin-bottom: 0.65rem;
+  }
+  .flow li::before {
+    content: counter(step);
+    position: absolute;
+    left: 0; top: 0.05rem;
+    width: 1.6rem; height: 1.6rem;
+    display: grid; place-items: center;
+    border-radius: 999px;
+    background: var(--accent);
+    color: var(--accent-ink);
+    font-weight: 800;
+    font-size: 0.85rem;
+  }
+  .scorebox {
+    margin-top: 0.6rem;
+    border-left: 4px solid var(--accent);
+    background: var(--surface-subtle);
+    border-radius: 0 0.75rem 0.75rem 0;
+    padding: 0.85rem 1rem;
+  }
+  .scorebox code { font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace; font-size: 0.88em; }
+  .why {
+    margin-top: 1.2rem;
+    border: 1px dashed var(--border);
+    border-radius: 0.85rem;
+    padding: 0.8rem 1rem;
+    color: var(--muted);
+    font-size: 0.92rem;
+  }
+  .why strong { color: var(--foreground); }
+  table { width: 100%; border-collapse: collapse; margin-top: 1rem; font-size: 0.92rem; }
+  th, td { text-align: left; padding: 0.6rem 0.7rem; border-bottom: 1px solid var(--border); vertical-align: top; }
+  th { font-size: 0.78rem; letter-spacing: 0.05em; text-transform: uppercase; color: var(--muted); }
+  .table-wrap { overflow-x: auto; }
+  footer { margin-top: 2.5rem; color: var(--muted); font-size: 0.85rem; text-align: center; }
+  @media (max-width: 480px) {
+    .shell { padding-block: 1rem 3rem; }
+    header.hero { padding: 1.6rem 1.25rem; }
+    section.intro, article.game, section.matrix, section.guardrails { padding: 1.15rem 1.1rem 1.3rem; }
+  }
+</style>
+</head>
+<body>
+<div class="shell">
+
+<header class="hero">
+  <span class="hero-kicker">Concept deck · 2026/27 season</span>
+  <h1>Mid-Season Mini-Games for the Dranx Prediction League</h1>
+  <p>Eight side competitions to keep the group opening the app between the pre-season submission and the final-day settle-up. Every concept runs on data the owner already enters (standings imports and the manual results desk), never touches the 100-point table leaderboard, and works one-thumb on a 320px screen.</p>
+</header>
+
+<section class="intro">
+  <h2>How these concepts were chosen</h2>
+  <p>The core game has a long quiet middle: entries are immutable, the reveal happens at opening kickoff, and after that participants mostly watch two leaderboards drift. These mini-games are designed to create <strong>new reasons to return</strong> — weekly, monthly, and at landmark moments (Christmas, halfway, run-in) — without compromising the product's constraints:</p>
+  <ul>
+    <li><strong>No new data pipelines.</strong> Each game resolves from imported standings snapshots or a small manual entry at the admin desk. No runtime football API, scraper, or cron.</li>
+    <li><strong>Main leaderboard is sacred.</strong> Mini-game points live on their own boards, like spotlight accuracy already does. Table points stay capped at 100 and derived-only.</li>
+    <li><strong>No fairness leaks.</strong> Games that use pre-season predictions only open after the reveal. Games with hidden picks keep them out of public HTML and RSC until their own lock moment, mirroring the existing serialization rules.</li>
+    <li><strong>Low ceremony.</strong> A pick should take under a minute on a phone. Display-name identity and the existing receipt cookie are enough; no accounts.</li>
+  </ul>
+</section>
+
+<!-- ─────────────────────────── 1 ─────────────────────────── -->
+<article class="game">
+  <h2><span class="game-number">1</span>Second Guess — the halfway crystal ball</h2>
+  <p class="tagline">"Knowing what you know now… would you still have picked that?"</p>
+  <div class="badges">
+    <span class="badge cadence">One-shot · Matchweek 19</span>
+    <span class="badge effort-low">Admin effort: low</span>
+    <span class="badge data">Data: standings imports only</span>
+  </div>
+
+  <h3>How it behaves</h3>
+  <ol class="flow">
+    <li>A banner appears when the imported standings first show every club on 17 played matches: <em>"The Second Guess window is open — 7 days to re-read the season."</em></li>
+    <li>Each participant submits a fresh mini-table: just the <strong>top 4, in order</strong>, and the <strong>bottom 3, in any order</strong>. Seven taps total, prefilled from their pre-season entry so laziness is one confirm away.</li>
+    <li>The window closes when the admin imports the first Matchweek 20 table. Picks are hidden until then, then revealed side by side with everyone's original pre-season answer for the same slots.</li>
+    <li>Scored automatically against the final imported table at season end, on its own leaderboard column.</li>
+  </ol>
+
+  <h3>Rules</h3>
+  <ul>
+    <li>One entry per revealed prediction; immutable once submitted, like the parent entry.</li>
+    <li>Miss the window and you're scored on your pre-season top 4 / bottom 3 instead — nobody is excluded, but fresh thinking can beat autopilot.</li>
+    <li>Picks stay unserialized in public payloads until the window closes.</li>
+  </ul>
+
+  <div class="scorebox">
+    <strong>Scoring.</strong> Top 4: <code>3 points</code> per club in the exact slot, <code>1 point</code> for the right club in the wrong top-4 slot. Bottom 3: <code>2 points</code> per correctly relegated club. Max 15. Tie-break: fewer changes from the pre-season entry wins (rewarding conviction).
+  </div>
+
+  <div class="why"><strong>Why it works:</strong> the single biggest mid-season conversation in any prediction group is "my August self was an idiot." This bottles that moment, produces a screenshot-friendly then-vs-now comparison, and needs nothing but the standings imports the owner already does.</div>
+</article>
+
+<!-- ─────────────────────────── 2 ─────────────────────────── -->
+<article class="game">
+  <h2><span class="game-number">2</span>Unbeaten — last club standing</h2>
+  <p class="tagline">Pick one club a week to avoid defeat. Lose once and you're out. Never pick the same club twice.</p>
+  <div class="badges">
+    <span class="badge cadence">Weekly · rolling rounds</span>
+    <span class="badge effort-low">Admin effort: low</span>
+    <span class="badge data">Data: points deltas between imports</span>
+  </div>
+
+  <h3>How it behaves</h3>
+  <ol class="flow">
+    <li>Each round corresponds to one matchweek. Before the round's first kickoff (a manually entered lock time per round), every surviving player picks one club they think will <strong>win or draw</strong>.</li>
+    <li>Clubs are single-use for the whole run: the picker's used clubs grey out in the selector, so the pool shrinks every week and easy picks run dry by November.</li>
+    <li>Resolution is automatic from standings: when the next import shows every club having played the round, a club's result is derived from its <strong>points delta</strong> — +3 win, +1 draw, +0 defeat. No per-match data entry needed.</li>
+    <li>Survivors advance; eliminated players see their tombstone on the "Wall of the Fallen" with the club that betrayed them. When one player remains (or all are out), the run ends and a new run starts the following matchweek.</li>
+  </ol>
+
+  <h3>Rules</h3>
+  <ul>
+    <li>Miss a lock and the game auto-assigns your <strong>highest pre-season-ranked unused club</strong> — a fair default that uses your own stated beliefs.</li>
+    <li>Picks are hidden until the round locks, then everyone's pick is public — half the fun is seeing who wasted Arsenal in week 2.</li>
+    <li>If a postponement means a club's delta can't be derived for a round, the round is void for that picker and their club is refunded. The admin can void a round entirely from the desk.</li>
+    <li>Multiple runs per season; each run's winner gets one star on the season honours board.</li>
+  </ul>
+
+  <div class="scorebox">
+    <strong>Scoring.</strong> Binary survival — no points to tune. Season honours: most stars, tie-broken by longest single streak.
+  </div>
+
+  <div class="why"><strong>Why it works:</strong> survivor pools are the most proven engagement loop in football groups, and the points-delta trick means it costs the owner nothing beyond the standings imports they already make each matchweek. The shrinking club pool keeps it strategic instead of "pick the leader every week."</div>
+</article>
+
+<!-- ─────────────────────────── 3 ─────────────────────────── -->
+<article class="game">
+  <h2><span class="game-number">3</span>Risers &amp; Sliders — the monthly swing-o-meter</h2>
+  <p class="tagline">Call the club that climbs furthest — and the one that falls hardest — this month.</p>
+  <div class="badges">
+    <span class="badge cadence">Monthly · Sep–Apr</span>
+    <span class="badge effort-low">Admin effort: low</span>
+    <span class="badge data">Data: two standings snapshots</span>
+  </div>
+
+  <h3>How it behaves</h3>
+  <ol class="flow">
+    <li>On the 1st of each month the game snapshots the current active standings as the <strong>baseline table</strong>.</li>
+    <li>Players pick one <strong>Riser</strong> (biggest position gain by month end) and one <strong>Slider</strong> (biggest drop). Two taps on the club grid, done.</li>
+    <li>At month end the latest imported table is compared to the baseline. Position change per club is computed, the swing podiums are published, and picks resolve.</li>
+    <li>A cumulative "Swing Season" leaderboard runs Sep–Apr; monthly winners get a flair chip next to their display name for that month.</li>
+  </ol>
+
+  <h3>Rules</h3>
+  <ul>
+    <li>Riser and Slider must be different clubs. Picks lock 48 hours into the month and stay hidden until lock.</li>
+    <li>Position change is measured in table places, full precision on ties broken by points change, then goal difference change as entered in the standings rows.</li>
+    <li>No entry that month = no points that month; the season board sums your best 6 of 8 months so holidays don't kill anyone's season.</li>
+  </ul>
+
+  <div class="scorebox">
+    <strong>Scoring.</strong> Exact biggest swing: <code>5 points</code>. Your club lands on the swing podium (top 3 movers in the right direction): <code>2 points</code>. Right direction at all (moved ≥2 places the way you said): <code>1 point</code>. Max 10/month.
+  </div>
+
+  <div class="why"><strong>Why it works:</strong> it converts every standings import into content. Mid-table clubs — invisible in the main game — suddenly matter, and the "best 6 of 8" rule keeps late joiners and busy months from feeling hopeless.</div>
+</article>
+
+<!-- ─────────────────────────── 4 ─────────────────────────── -->
+<article class="game">
+  <h2><span class="game-number">4</span>Boxing Day Bingo</h2>
+  <p class="tagline">A festive card of season storylines. First to a line wins the holidays.</p>
+  <div class="badges">
+    <span class="badge cadence">One card · resolves Dec–May</span>
+    <span class="badge effort-medium">Admin effort: medium</span>
+    <span class="badge data">Data: owner-attested events + standings</span>
+  </div>
+
+  <h3>How it behaves</h3>
+  <ol class="flow">
+    <li>In early December each player builds a <strong>3×3 card</strong> by choosing 9 squares from a curated pool of ~20 season-storyline propositions, e.g. <em>"A promoted club is in the top half on Boxing Day"</em>, <em>"The August leader is out of the top 4 by April"</em>, <em>"Any club goes 5 imports without moving position"</em>, <em>"A club hits 50 points before February"</em>.</li>
+    <li>Cards lock on Boxing Day kickoff. Squares light up as propositions become true.</li>
+    <li>Standings-derived squares resolve automatically on every import. Judgement squares (e.g. managerial change) resolve only when the owner attests them at the results desk — same attestation pattern the manual results flow already uses.</li>
+    <li>First completed row/column/diagonal wins Line honours; most lit squares at season end wins Full House honours.</li>
+  </ol>
+
+  <h3>Rules</h3>
+  <ul>
+    <li>The proposition pool is fixed and published before anyone picks, with each square's resolution source labelled <em>auto (standings)</em> or <em>owner-attested</em> — no ambiguity later.</li>
+    <li>A proposition, once true, stays lit (events aren't un-attested). The owner attestation is auditable, like other results-desk writes.</li>
+    <li>Ties on the same import/attestation batch share the honours — competition ranking, as elsewhere on the site.</li>
+  </ul>
+
+  <div class="scorebox">
+    <strong>Scoring.</strong> Honours-only (no points): 🏆 First Line and 🏆 Full House chips on the profile row. Keeping bingo points-free avoids any temptation to balance a 20-proposition pool numerically.
+  </div>
+
+  <div class="why"><strong>Why it works:</strong> it front-loads a fun December ritual (building the card is the game), then pays out drip-feed dopamine all spring as squares light up. Card construction is a natural group-chat argument generator.</div>
+</article>
+
+<!-- ─────────────────────────── 5 ─────────────────────────── -->
+<article class="game">
+  <h2><span class="game-number">5</span>The Number Is — closest without going over</h2>
+  <p class="tagline">Price-is-right guessing on one juicy season number per month.</p>
+  <div class="badges">
+    <span class="badge cadence">Monthly · one question</span>
+    <span class="badge effort-low">Admin effort: low</span>
+    <span class="badge data">Data: standings fields already imported</span>
+  </div>
+
+  <h3>How it behaves</h3>
+  <ol class="flow">
+    <li>Each month the game poses <strong>one number question</strong> resolvable from a future standings import, drawn from a pre-written season script: <em>"Leader's points total after Matchweek 19?"</em>, <em>"Gap between 4th and 5th on March 1st?"</em>, <em>"Goals scored by the top scorer of the table's bottom club by MW30?"</em> (that last one only in months where the results desk will have goals data anyway).</li>
+    <li>Players enter a single integer. Entries hide until lock (7 days), then show as a dot plot — everyone sees the group's collective read.</li>
+    <li>On the resolving import, closest-without-going-over wins the month. If everyone overshoots, closest overall wins.</li>
+  </ol>
+
+  <h3>Rules</h3>
+  <ul>
+    <li>One guess, integers only, no edits after submit. Duplicate guesses allowed (both can win, shared rank).</li>
+    <li>The question script is written before the season resumes and each question names its exact resolving field and import, so resolution is mechanical.</li>
+    <li>If the named import never happens (e.g. fixture chaos), the question voids — truthfully, with no winner recorded.</li>
+  </ul>
+
+  <div class="scorebox">
+    <strong>Scoring.</strong> Month winner: <code>3 points</code>. Within ±2 of the answer: <code>1 point</code>. Season "Numbers" board sums all months; ties share rank.
+  </div>
+
+  <div class="why"><strong>Why it works:</strong> lowest possible friction — one number, once a month — and the dot-plot reveal makes even losing entertaining. Perfect for the least engaged members of the group, which is exactly who retention features are for.</div>
+</article>
+
+<!-- ─────────────────────────── 6 ─────────────────────────── -->
+<article class="game">
+  <h2><span class="game-number">6</span>Bragging Rights Bracket</h2>
+  <p class="tagline">A March knockout where your weapon is the prediction you already made.</p>
+  <div class="badges">
+    <span class="badge cadence">Knockout · March–May</span>
+    <span class="badge effort-low">Admin effort: near zero</span>
+    <span class="badge data">Data: existing entries + standings</span>
+  </div>
+
+  <h3>How it behaves</h3>
+  <ol class="flow">
+    <li>In March, all active brackets are seeded into a knockout draw. Seeding: current spotlight-accuracy rank; byes fill uneven fields.</li>
+    <li>Each knockout round is pinned to one future standings import. A tie is decided by <strong>whose pre-season table better matches that import</strong>, measured by the same per-club closeness the main game already understands — but only over that round's <strong>featured slice</strong> (Round 1: positions 15–20; Quarters: 7–14; Semis: 1–6; Final: the full 20).</li>
+    <li>No picks required — players just watch their August self do battle. Each round page shows the head-to-head slice comparison club by club.</li>
+    <li>Ties within a round: closest on the slice's most extreme position wins; still tied, higher seed advances (stated up front).</li>
+  </ol>
+
+  <h3>Rules</h3>
+  <ul>
+    <li>Runs only after reveal (predictions are public by then, so no leak) and only over nondeleted brackets.</li>
+    <li>Bracket schedule (which import resolves which round) is published when the draw is made.</li>
+    <li>Champion gets the season's loudest cosmetic: a crown on the main leaderboard row. Cosmetic only — table points untouched.</li>
+  </ol>
+
+  <div class="scorebox">
+    <strong>Scoring.</strong> None to compute beyond match resolution — the bracket <em>is</em> the prize. This is deliberately a zero-input game: engagement with no ask.
+  </div>
+
+  <div class="why"><strong>Why it works:</strong> spring is when eliminated-feeling players drift away. A knockout gives everyone a fresh, forgiving format (one good slice can beat a better overall table), creates appointment viewing on specific imports, and requires literally no new user input or admin data.</div>
+</article>
+
+<!-- ─────────────────────────── 7 ─────────────────────────── -->
+<article class="game">
+  <h2><span class="game-number">7</span>Whose Table Is It Anyway?</h2>
+  <p class="tagline">One friend's revealed prediction, names off. Guess whose it is.</p>
+  <div class="badges">
+    <span class="badge cadence">Weekly quiz · post-reveal</span>
+    <span class="badge effort-low">Admin effort: none</span>
+    <span class="badge data">Data: revealed predictions only</span>
+  </div>
+
+  <h3>How it behaves</h3>
+  <ol class="flow">
+    <li>Each week the game deterministically selects one revealed entry (seeded rotation so everyone features once before repeats) and shows its <strong>full 20-club table and 7 spotlight picks with the display name redacted</strong>.</li>
+    <li>Every other player gets one guess from a dropdown of participant names. Guesses hide until the week flips.</li>
+    <li>At the flip, the author is unmasked with a flourish, correct guessers are celebrated, and the next mystery table goes up.</li>
+    <li>A season-long "Detective" board tracks correct unmaskings; the featured player sits that week out of guessing.</li>
+  </ol>
+
+  <h3>Rules</h3>
+  <ul>
+    <li>Strictly post-reveal — it only ever shows data that is already public, so no serialization rule is touched.</li>
+    <li>One guess, no edits, self-guessing impossible (you're excluded from your own week).</li>
+    <li>Groups smaller than 5 revealed entries skip this game (too guessable).</li>
+  </ul>
+
+  <div class="scorebox">
+    <strong>Scoring.</strong> Correct unmask: <code>2 points</code>. Being so predictable that <em>everyone</em> guesses you correctly: your entry earns the "Open Book" chip, which is its own kind of prize.
+  </div>
+
+  <div class="why"><strong>Why it works:</strong> it's the only concept here that's about the <em>friends</em> rather than the football — pure social-graph fun with zero data requirements. It also resurfaces everyone's spotlight picks mid-season, which are otherwise forgotten until results land.</div>
+</article>
+
+<!-- ─────────────────────────── 8 ─────────────────────────── -->
+<article class="game">
+  <h2><span class="game-number">8</span>The Mulligan — one redemption pick</h2>
+  <p class="tagline">Everyone gets to fix exactly one club. Choose the moment wisely.</p>
+  <div class="badges">
+    <span class="badge cadence">One-shot · any time MW10–MW30</span>
+    <span class="badge effort-low">Admin effort: low</span>
+    <span class="badge data">Data: final standings import</span>
+  </div>
+
+  <h3>How it behaves</h3>
+  <ol class="flow">
+    <li>From Matchweek 10, a quiet "Mulligan available" pill sits on each participant's revealed entry page.</li>
+    <li>Playing it means choosing <strong>one club</strong> from your pre-season table and writing a <strong>new final position</strong> for it. One club, one number, once per season, irreversible — the same immutability culture as the parent entry.</li>
+    <li>The mulligan is public the moment it's played (everyone's entry is already revealed), timestamped, and displayed as a strike-through on the old position: <em>"Everton 14th → 8th, played MW13"</em>.</li>
+    <li>At season end it scores on its own board: how much closer (or further!) your corrected position was versus your original, with a timing multiplier.</li>
+  </ol>
+
+  <h3>Rules</h3>
+  <ul>
+    <li>The window closes at Matchweek 30 — no run-in freerolls.</li>
+    <li>Original entry is never modified; the mulligan is a separate overlay record, so the sacred pre-season table stays intact everywhere else.</li>
+    <li>Unused mulligans score zero — but the board shows "held their nerve" as its own flavour text.</li>
+  </ul>
+
+  <div class="scorebox">
+    <strong>Scoring.</strong> <code>improvement = |original − actual| − |mulligan − actual|</code> (can be negative — a bad mulligan costs you). Timing multiplier: played MW10–14 ×3, MW15–22 ×2, MW23–30 ×1. Earlier conviction is worth more.
+  </div>
+
+  <div class="why"><strong>Why it works:</strong> it creates a genuine strategic dilemma that simmers for twenty matchweeks — play it early for the multiplier or wait for certainty — and the public, timestamped play is a group-chat event every single time someone commits. The negative-score risk keeps it from being a free hedge.</div>
+</article>
+
+<!-- ─────────────────────────── comparison ─────────────────────────── -->
+<section class="matrix">
+  <h2>Season rhythm at a glance</h2>
+  <p class="tagline">How the eight games stack across the year and what each one costs to run.</p>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th>Game</th><th>Cadence</th><th>User ask</th><th>Admin ask</th><th>Data source</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>1 · Second Guess</td><td>Once, MW19</td><td>7 taps</td><td>None extra</td><td>Standings imports</td></tr>
+        <tr><td>2 · Unbeaten</td><td>Weekly</td><td>1 tap/week</td><td>Set round locks; occasional void</td><td>Points deltas between imports</td></tr>
+        <tr><td>3 · Risers &amp; Sliders</td><td>Monthly</td><td>2 taps/month</td><td>None extra</td><td>Two standings snapshots</td></tr>
+        <tr><td>4 · Boxing Day Bingo</td><td>Once + drip</td><td>9 choices in Dec</td><td>Attest judgement squares</td><td>Standings + owner attestation</td></tr>
+        <tr><td>5 · The Number Is</td><td>Monthly</td><td>1 integer/month</td><td>Pre-write question script</td><td>Standings fields</td></tr>
+        <tr><td>6 · Bragging Rights Bracket</td><td>Knockout, spring</td><td>Zero</td><td>Publish draw + schedule</td><td>Existing entries + standings</td></tr>
+        <tr><td>7 · Whose Table Is It?</td><td>Weekly, post-reveal</td><td>1 guess/week</td><td>None</td><td>Revealed predictions</td></tr>
+        <tr><td>8 · The Mulligan</td><td>Once, MW10–30</td><td>1 club + 1 number</td><td>None extra</td><td>Final standings</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p><strong>A sensible rollout:</strong> start with <em>Unbeaten</em> (2) and <em>Risers &amp; Sliders</em> (3) — they establish the weekly/monthly habit for near-zero admin cost. Add <em>Second Guess</em> (1) and <em>Boxing Day Bingo</em> (4) as December landmarks, then let <em>Bragging Rights Bracket</em> (6) carry the spring. <em>The Number Is</em> (5), <em>Whose Table</em> (7), and <em>The Mulligan</em> (8) are seasoning — add whichever fits the group's personality.</p>
+</section>
+
+<!-- ─────────────────────────── guardrails ─────────────────────────── -->
+<section class="guardrails">
+  <h2>Non-negotiable guardrails (all games)</h2>
+  <ul>
+    <li><strong>Separate boards, always.</strong> Mini-game points never feed the 100-point table leaderboard or spotlight accuracy — same separation the spotlight page already models.</li>
+    <li><strong>No hidden-data leaks.</strong> Any unlocked mini-game pick stays out of public HTML, RSC, and route-handler payloads until its lock moment, exactly like unrevealed predictions today.</li>
+    <li><strong>Manual-first data.</strong> Every resolution derives from imported standings snapshots or owner-attested facts at the results desk. No runtime football APIs, scrapers, hotlinks, or crons.</li>
+    <li><strong>Truthful no-ops.</strong> Voided rounds, missed windows, and unplayed mulligans resolve honestly with no fabricated outcomes and no phantom audit records.</li>
+    <li><strong>Atomic writes.</strong> A mini-game entry persists completely or not at all, matching the all-or-nothing prediction write.</li>
+    <li><strong>Mobile-first.</strong> Every interaction is designed as taps on the existing club grid or a single field — 56px touch targets, no reflow breakage at 320px, no horizontal overflow.</li>
+    <li><strong>Cascade on delete.</strong> If a participant's prediction is deleted, their mini-game entries cascade too, and the deletion audit notes it.</li>
+  </ul>
+</section>
+
+<footer>Dranx Prediction League · mid-season mini-game concept deck · drafted August 2026</footer>
+
+</div>
+</body>
+</html>

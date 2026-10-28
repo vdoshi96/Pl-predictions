@@ -79,5 +79,10 @@
     "tsx": "4.23.11",
     "typescript": "^5",
     "vitest": "4.1.12"
+  },
+  "overrides": {
+    "@esbuild-kit/core-utils": {
+      "esbuild": "0.25.12"
+    }
   }
 }

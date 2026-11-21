@@ -254,7 +254,7 @@ describe("official Win Streak fixture refresh", () => {
     expect(canonicalFixtureSnapshot.source.fixtureListUrl).toBe(
       OFFICIAL_FIXTURE_LIST_URL,
     );
-    expect(canonicalFixtureSnapshot.source.checkedAt).toBe("2026-10-19");
+    expect(canonicalFixtureSnapshot.source.checkedAt).toBe("2026-11-21");
     expect(canonicalFixtureSnapshot.rounds).toHaveLength(37);
     expect(canonicalFixtures()).toHaveLength(370);
     expect(
